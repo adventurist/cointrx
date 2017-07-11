@@ -1,2 +1,6 @@
 coinenv
 coinenv/*
+.git
+.idea
+__pycache__
+Coin\ X.iml
