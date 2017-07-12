@@ -1,9 +1,11 @@
 from tornado.ioloop import IOLoop
 from tornado.web import Application, RequestHandler
+from tornado import escape
 from tornado.httputil import HTTPHeaders
 from tornado.options import define, options, parse_command_line
 
 import db
+import json
 
 define("port", default=96969, help="Default port for the WebServer")
 
@@ -29,9 +31,18 @@ class LoginHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def get(self):
+    def post(self) -> object:
         if self.request.headers.get("Content-Type") == 'application/json':
-            self.write("Attempting login")
+            request_data = {k: ''.join(v) for k, v in escape.json_decode(self.request.body).items()}
+            email = request_data.get('email')
+            password = request_data.get('password')
+            name = request_data.get('name')
+
+            if email is None or password is None or name is None:
+                self.write("You must supply more arguments")
+                self.write_error(401)
+            else:
+                self.write(db.check_authentication())
 
 
 if __name__ == "__main__":
@@ -41,6 +52,7 @@ if __name__ == "__main__":
     application = Application([
         (r"/", MainHandler),
         (r"/jigga", WunderHandler),
+        (r"/login", LoginHandler)
     ])
     application.listen(8888)
     IOLoop.instance().start()

@@ -40,3 +40,12 @@ def db_connect():
 
 def create_all():
     Base.metadata.create_all(db_connect())
+
+
+def create_user():
+    print("Stuff here")
+
+
+def check_authentication():
+    print("Authenticate this")
+    return "Yoyoma"
