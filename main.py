@@ -42,7 +42,9 @@ class LoginHandler(RequestHandler):
                 self.write("You must supply more arguments")
                 self.write_error(401)
             else:
-                self.write(db.check_authentication())
+                hashed_pw = db.User.generate_hash(password)
+                new_user = db.check_authentication(name, hashed_pw)
+                print(str(new_user))
 
 
 if __name__ == "__main__":
@@ -54,5 +56,5 @@ if __name__ == "__main__":
         (r"/jigga", WunderHandler),
         (r"/login", LoginHandler)
     ])
-    application.listen(8888)
+    application.listen(6969)
     IOLoop.instance().start()
