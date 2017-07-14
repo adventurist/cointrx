@@ -43,7 +43,7 @@ class LoginHandler(RequestHandler):
                 self.write_error(401)
             else:
                 hashed_pw = db.User.generate_hash(password)
-                new_user = db.check_authentication(name, hashed_pw)
+                new_user = db.check_authentication(name, hashed_pw, email)
                 print(str(new_user))
 
 
@@ -57,4 +57,6 @@ if __name__ == "__main__":
         (r"/login", LoginHandler)
     ])
     application.listen(6969)
+    db.Base.metadata.create_all(bind=db.engine)
+
     IOLoop.instance().start()
