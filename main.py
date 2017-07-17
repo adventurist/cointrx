@@ -8,7 +8,7 @@ from tornado.options import define, options, parse_command_line
 import db
 from utils.mail_helper import Sender as mail_sender
 
-define("port", default=96969, help="Default port for the WebServer")
+define("port", default=6969, help="Default port for the WebServer")
 
 
 class MainHandler(RequestHandler):
