@@ -27,7 +27,7 @@ class Sender:
 
     @staticmethod
     def create_message():
-        return """
+        return """chllow
         <html>
             <head></head>
             <body>
@@ -40,7 +40,7 @@ class Sender:
         """
 
     def send_message(self, to, fro, subject, text, files=[]):
-        self.s.connect(m_cfg.mailhost_url, 1025)
+        self.s.connect(m_cfg.mailhost_url, m_cfg.mailhost_port)
         # assert type(to) == list
         # assert type(files) == list
         msg = MIMEMultipart()
