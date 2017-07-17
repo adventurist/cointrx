@@ -8,10 +8,12 @@ from email import encoders as Encoders
 
 from types import SimpleNamespace
 
-mailconfig = SimpleNamespace()
-mailconfig.mailhost_url = "mail.cointrx.com"
-mailconfig.cointrx_admin = "Eman <adventurist@gmail.com>"
-mailconfig.welcome_subject = "Welcome to CoinTRX"
+m_cfg = SimpleNamespace()
+# m_cfg.mailhost_url = "mail.cointrx.com"
+m_cfg.mailhost_url = "127.0.0.1"
+m_cfg.mailhost_port = 25
+m_cfg.cointrx_admin = "Eman <adventurist@gmail.com>"
+m_cfg.welcome_subject = "Welcome to CoinTRX"
 
 
 class Sender:
@@ -20,8 +22,8 @@ class Sender:
     def __init__(self):
         self.s = SMTPAsync()
 
-    def connect(self, user, password):
-        yield self.s.connect(mailconfig.mailhost_url, 25)
+    def connect(self):
+        yield self.s.connect(m_cfg.mailhost_url, m_cfg.mailhost_port)
 
     @staticmethod
     def create_message():
@@ -37,17 +39,18 @@ class Sender:
         </html>
         """
 
-    def send_message(self, to, fro, subject, text, files=[], server="localhost"):
-        self.s.connect()
-        assert type(to) == list
-        assert type(files) == list
+    def send_message(self, to, fro, subject, text, files=[]):
+        self.s.connect(m_cfg.mailhost_url, 1025)
+        # assert type(to) == list
+        # assert type(files) == list
         msg = MIMEMultipart()
         msg['From'] = fro
         msg['To'] = COMMASPACE.join(to)
+        # msg['To'] = to
         msg['Date'] = formatdate(localtime=True)
         msg['Subject'] = subject
         msg.attach(MIMEText(text))
-        self.connect()
+        # self.connect()
         self.s.sendmail(fro, to, msg.as_string())
 
         # try:
@@ -67,5 +70,5 @@ class Sender:
     # Example:
 
     def send_mail(self, recipient):
-        self.send_message([recipient], mailconfig.cointrx_admin, mailconfig.welcome_subject,
-                            [Sender.create_message()], [])
+        self.send_message(recipient, m_cfg.cointrx_admin, m_cfg.welcome_subject,
+                            Sender.create_message(), [])
