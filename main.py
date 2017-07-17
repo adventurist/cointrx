@@ -1,11 +1,12 @@
 from tornado.ioloop import IOLoop
 from tornado.web import Application, RequestHandler
 from tornado import escape
+from tornado import iostream
 from tornado.httputil import HTTPHeaders
 from tornado.options import define, options, parse_command_line
 
 import db
-import json
+from utils.mail_helper import Sender as mail_sender
 
 define("port", default=96969, help="Default port for the WebServer")
 
@@ -42,9 +43,19 @@ class LoginHandler(RequestHandler):
                 self.write("You must supply more arguments")
                 self.write_error(401)
             else:
-                hashed_pw = db.User.generate_hash(password)
-                new_user = db.check_authentication(name, hashed_pw, email)
+                # hashed_pw = db.User.generate_hash(password)
+                new_user = db.check_authentication(name, password, email)
                 print(str(new_user))
+
+
+class SendMailHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def post(self):
+        sender = mail_sender()
+        if self.request.headers.get("Content-Type") == 'application/json':
+            sender.send_mail("Eman <adventurist@gmail.com")
 
 
 if __name__ == "__main__":
@@ -54,7 +65,8 @@ if __name__ == "__main__":
     application = Application([
         (r"/", MainHandler),
         (r"/jigga", WunderHandler),
-        (r"/login", LoginHandler)
+        (r"/login", LoginHandler),
+        (r"/sendmail", SendMailHandler),
     ])
     application.listen(6969)
     db.Base.metadata.create_all(bind=db.engine)
