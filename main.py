@@ -88,7 +88,7 @@ if __name__ == "__main__":
         (r"/login", LoginHandler),
         (r"/sendmail", SendMailHandler),
         (r"/fakenews", FakeNewsHandler),
-        (r"updateprices", UpdatePriceHandler)
+        (r"/updateprices", UpdatePriceHandler)
     ])
     application.listen(6969)
     db.Base.metadata.create_all(bind=db.engine)
