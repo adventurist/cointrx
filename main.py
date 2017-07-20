@@ -63,7 +63,7 @@ class FakeNewsHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def post(self):
+    def get(self):
         response = {'News': 'VERY fake news'}
         self.write(response)
 
