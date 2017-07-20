@@ -58,6 +58,15 @@ class SendMailHandler(RequestHandler):
             sender.send_mail("Eman <adventurist@gmail.com")
 
 
+class FakeNewsHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def post(self):
+        response = {'News': 'VERY fake news'}
+        self.write(response)
+
+
 if __name__ == "__main__":
     muhConnection = db.db_connect()
     print(muhConnection)
@@ -67,6 +76,7 @@ if __name__ == "__main__":
         (r"/jigga", WunderHandler),
         (r"/login", LoginHandler),
         (r"/sendmail", SendMailHandler),
+        (r"/fakenews", FakeNewsHandler)
     ])
     application.listen(6969)
     db.Base.metadata.create_all(bind=db.engine)
