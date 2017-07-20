@@ -10,7 +10,7 @@ http_client = AsyncHTTPClient()
 
 
 class Client:
-    def handle_response(response):
+    def handle_response(self, response):
         if response.error:
             print("Error: %s" % response.error)
         else:
