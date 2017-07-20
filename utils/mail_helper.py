@@ -27,7 +27,7 @@ class Sender:
 
     @staticmethod
     def create_message():
-        return """chllow
+        return """
         <html>
             <head></head>
             <body>
@@ -49,7 +49,7 @@ class Sender:
         # msg['To'] = to
         msg['Date'] = formatdate(localtime=True)
         msg['Subject'] = subject
-        msg.attach(MIMEText(text))
+        msg.attach(MIMEText(text, "html"))
         # self.connect()
         self.s.sendmail(fro, to, msg.as_string())
 

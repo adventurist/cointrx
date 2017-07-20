@@ -7,6 +7,7 @@ from tornado.options import define, options, parse_command_line
 
 import db
 from utils.mail_helper import Sender as mail_sender
+from utils.cointrx_client import Client as http_client
 
 define("port", default=6969, help="Default port for the WebServer")
 
@@ -55,7 +56,7 @@ class SendMailHandler(RequestHandler):
     def post(self):
         sender = mail_sender()
         if self.request.headers.get("Content-Type") == 'application/json':
-            sender.send_mail("Eman <adventurist@gmail.com")
+            sender.send_mail("adventurist@gmail.com")
 
 
 class FakeNewsHandler(RequestHandler):
@@ -64,6 +65,16 @@ class FakeNewsHandler(RequestHandler):
 
     def post(self):
         response = {'News': 'VERY fake news'}
+        self.write(response)
+
+
+class UpdatePriceHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self):
+        client = http_client()
+        response = client.get_prices()
         self.write(response)
 
 
@@ -76,7 +87,8 @@ if __name__ == "__main__":
         (r"/jigga", WunderHandler),
         (r"/login", LoginHandler),
         (r"/sendmail", SendMailHandler),
-        (r"/fakenews", FakeNewsHandler)
+        (r"/fakenews", FakeNewsHandler),
+        (r"updateprices", UpdatePriceHandler)
     ])
     application.listen(6969)
     db.Base.metadata.create_all(bind=db.engine)
