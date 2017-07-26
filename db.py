@@ -1,17 +1,29 @@
+import join as join
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from passlib.apps import custom_app_context as pwd_context
-from sqlalchemy import create_engine, Column, Integer, String, exc
+from sqlalchemy import ForeignKey
+from sqlalchemy import create_engine
+from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, Boolean, exc, event, Table, MetaData, DDL, join, select
+from sqlalchemy import desc
+from sqlalchemy import func
 from sqlalchemy.engine.url import URL
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.ext.declarative import declarative_base
 
+import asyncio
+
+from aiopg.sa import create_engine as async_engine
+
+import json
 import time
 import datetime
 import db_config
+import random
 
 from types import SimpleNamespace
 
 Base = declarative_base()
+metadata = MetaData()
 engine = create_engine(URL(**db_config.DATABASE))
 Session = sessionmaker(bind=engine)
 
@@ -19,6 +31,35 @@ session = Session()
 
 trxapp = SimpleNamespace()
 trxapp.config = {'SECRET_KEY': "jigga does as jigga does"}
+
+# async def count(conn):
+#     c1 = (await conn.scalar(jiggas.count()))
+#     c2 = (await conn.scalar(emails.count()))
+#     print("Population consists of", c1, "people with",
+#           c2, "emails in total")
+#     add_join = join(emails, jiggas, jiggas.c.id == emails.c.user_id)
+#     query = (select([jiggas.c.name])
+#              .select_from(add_join)
+#              .where(emails.c.private == False)  # noqa
+#              .group_by(jiggas.c.name)
+#              .having(func.count(emails.c.private) > 0))
+#
+#     print("Users with public emails:")
+#     async for row in conn.execute(query):
+#         print(row.name)
+#
+#     print()
+
+
+# async def show_julia(conn):
+#     print("Lookup for Julia:")
+#     add_join = join(emails, jiggas, jiggas.c.id == emails.c.user_id)
+#     query = (select([jiggas, emails], use_labels=True)
+#              .select_from(add_join).where(jiggas.c.name == 'Julia'))
+#     async for row in conn.execute(query):
+#         print(row.jiggas_name, row.jiggas_birthday,
+#               row.emails_email, row.emails_private)
+#     print()
 
 
 class User(Base):
@@ -32,7 +73,6 @@ class User(Base):
 
     def hash_password(self, password):
         self.hash = pwd_context.encrypt(password)
-
 
     @staticmethod
     def see_hash(password):
@@ -92,8 +132,122 @@ class User(Base):
         return user
 
 
+class CXPrice(Base):
+    __tablename__ = 'cx_price'
+    id = Column(Integer, primary_key=True)
+    currency = Column(String(4))
+    last = Column(DECIMAL(12, 2))
+    buy = Column(DECIMAL(12, 2))
+    sell = Column(DECIMAL(12, 2))
+    modified = Column(Integer)
+    revisions = relationship("CXPriceRevision", back_populates="cx_price", lazy="select")
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'currency': self.currency,
+            'last': self.last,
+            'buy': self.buy,
+            'sell': self.sell,
+            'modified': self.modified
+        }
+
+
+class CXPriceRevision(Base):
+    __tablename__ = 'cx_price_revision'
+    id = Column(Integer, primary_key=True)
+    rid = Column(Integer)
+    currency = Column(String(4))
+    last = Column(DECIMAL(12, 2))
+    buy = Column(DECIMAL(12, 2))
+    sell = Column(DECIMAL(12, 2))
+    modified = Column(Integer)
+    currency_id = Column(Integer, ForeignKey('cx_price.id'))
+    cx_price = relationship("CXPrice", back_populates="revisions")
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'rid': self.rid,
+            'currency': self.currency,
+            'last': self.last,
+            'buy': self.buy,
+            'sell': self.sell,
+            'modified': self.modified,
+            'currency_id': self.currency_id
+        }
+
+
+class CADCur(Base):
+    __tablename__ = 'cad_cur'
+    id = Column(Integer, primary_key=True)
+    currency = Column(String(4))
+    last = Column(DECIMAL(12, 3))
+    buy = Column(DECIMAL(12, 3))
+    sell = Column(DECIMAL(12, 3))
+    volume = Column(DECIMAL(12, 3))
+    modified = Column(Integer)
+
+
+class CADCurRevision(Base):
+    __tablename__ = 'cad_cur_revision'
+    id = Column(Integer, primary_key=True)
+    rid = Column(Integer)
+    currency = Column(String(4))
+    last = Column(DECIMAL(12, 3))
+    buy = Column(DECIMAL(12, 3))
+    sell = Column(DECIMAL(12, 3))
+    volume = Column(DECIMAL(12, 3))
+    modified = Column(Integer)
+
+
+async def test_db():
+    engine = await trx_db_engine()
+    async with engine:
+        async with engine.acquire() as conn:
+            query = select([CXPrice])
+            async for row in conn.execute(query):
+                print(row)
+
+
+    # engine = await async_engine(user='coinxadmin',
+    #                             database='coinxdb',
+    #                             host='127.0.0.1',
+    #                             password='coinxadmin')
+    # Session = sessionmaker(bind=engine)
+    # session = Session()
+    # prices = await session.query(CXPrice).all()
+    # async for price in prices:
+    #     print(price)
+
+
+# @asyncio.coroutine
+# def test_db():
+#     engine_instance = yield from trx_db_engine()
+#     with engine_instance.acquire() as conn:
+#         yield from conn.execute(tbl.insert().values(val='abc'))
+#
+#         for row in conn.execute(tbl.select().where(tbl.c.val=='abc')):
+#             print(row.id, row.val)
+    # async_e = yield from trx_db_engine()
+    # with (yield from async_e) as conn:
+    #     res = yield from conn.execute("SELECT * from cx_price_revision")
+    #     handle_db_data(res)
+    #
+    #     with engine.async_e() as conn:
+    #
+    #         yield from conn.execute(tbl.insert().values(val='abc'))
+    #
+    #         for row in conn.execute(tbl.select().where(tbl.c.val=='abc'))
+    #             print(row.id, row.val)
+
+
 def db_connect():
     return create_engine(URL(**db_config.DATABASE))
+
+
+async def trx_db_engine():
+    return async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'], host=db_config.DATABASE['host'], password=db_config.DATABASE['password'])
 
 
 def create_all():
@@ -104,11 +258,81 @@ def create_user():
     print("Stuff here")
 
 
+def handle_db_data(response):
+    for row in response:
+        if isinstance(row, CXPriceRevision):
+            print(row.serialize())
+
+
+def update_prices(data):
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(parse_price_data(data))
+
+
+async def parse_price_data(data):
+
+    for k, v in data.items():
+        print('My thing is')
+        print(k)
+        print('My value is')
+        print(json.dumps(v))
+
+    engine = await trx_db_engine()
+    async with engine:
+        async with engine.acquire() as conn:
+            query = select([CXPrice])
+            async for row in conn.execute(query):
+                print(row)
+    #     query_price = session.query(CXPrice).filter(CXPrice.currency == k).first()
+    #     # TODO move revision insert to trigger
+    #     if query_price is None:
+    #         new_currency = CXPrice(currency=k, last=v['last'], buy=v['buy'], sell=v['sell'], modified=time.time())
+    #         # last = session.query(CXPriceRevision).filter(CXPriceRevision.currency == v.currency).group_by(CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid))).one_or_none()
+    #         new_rev = CXPriceRevision(rid=1, currency=k, last=v['last'], buy=v['buy'], sell=v['sell'], modified=new_currency.modified)
+    #
+    #         try:
+    #             session.add(new_currency)
+    #             session.commit()
+    #             new_rev.currency_id = new_currency.id
+    #             session.add(new_rev)
+    #             session.commit()
+    #         except exc.SQLAlchemyError as error:
+    #             session.rollback()
+    #             print(error)
+    #     else:
+    #         print(query_price.serialize())
+    #
+    #         query_price.last = v['last']
+    #         query_price.buy = v['buy']
+    #         query_price.sell = v['sell']
+    #         query_price.modified = time.time()
+    #         revisions = query_price.revisions
+    #         # last = None
+    #         # last = session.query(CXPriceRevision).filter(CXPriceRevision.id == query_price.id).group_by(CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid))).one_or_none()
+    #         rid = 1 if revisions is None else revisions[0] + 1
+    #         new_rev = CXPriceRevision(rid=rid, currency=k, last=v['last'], buy=v['buy'], sell=v['sell'], modified=query_price.modified)
+    #
+    #         try:
+    #             session.add(query_price)
+    #             session.add(new_rev)
+    #             session.commit()
+    #         except exc.SQLAlchemyError as error:
+    #             session.rollback()
+    #             print(error)
+    #
+    #         # query_price(currency=k, last=v['last'], buy=v['buy'], sell=v['sell'])
+    #
+    #         try:
+    #             session.commit()
+    #         except exc.SQLAlchemyError as error:
+    #             session.rollback()
+    #             print(error)
+
+
 def check_authentication(user, password, email):
     query_user = session.query(User).filter(User.name == user).first()
     if query_user is not None:
-        verify = User.verify_password(email, password)
-        print("119 " + str(verify))
         if not User.verify_password(email, password):
             return "Login is no good"
 
@@ -122,8 +346,37 @@ def check_authentication(user, password, email):
 
             session.add(new_user)
             session.commit()
-            return new_user.serialize \
-                ()
+            return new_user.serialize()
 
         except exc.SQLAlchemyError as error:
             return error
+
+
+@event.listens_for(CXPrice, 'before_insert')
+def cx_insert_listener(*args):
+    for key in args:
+        print(key)
+
+
+@event.listens_for(CXPrice, 'after_update')
+def cx_update_listener(*args):
+
+    @event.listens_for(Session, "after_flush")
+    def cx_after_flush(prev_session, context):
+        for v in prev_session.dirty:
+            if isinstance(v, CXPrice):
+                last = session.query(CXPriceRevision).filter(CXPriceRevision.currency == v.currency).group_by(CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid))).one_or_none()
+                rid = 1 if last is None else last.rid + 1
+                new_rev = CXPriceRevision(rid=rid, currency=v.currency, last=v.last, buy=v.buy, sell=v.sell, modified=v.modified)
+                try:
+                    session.add(new_rev)
+                    session.commit()
+
+                except exc.SQLAlchemyError as error:
+                    session.rollback()
+
+
+
+
+                    # for v in context.mappers.Mapper:
+                    #

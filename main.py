@@ -1,13 +1,42 @@
+import asyncio
+import argparse
+import sys
+import logging
+import warnings
+
+from iox.loop_handler import IOHandler
+
+from tornado import escape
+from tornado import gen
+
 from tornado.ioloop import IOLoop
 from tornado.web import Application, RequestHandler
-from tornado import escape
-from tornado import iostream
-from tornado.httputil import HTTPHeaders
 from tornado.options import define, options, parse_command_line
 
-import db
 from utils.mail_helper import Sender as mail_sender
-from utils.cointrx_client import Client as http_client
+from utils.cointrx_client import Client
+
+import db
+
+parser = argparse.ArgumentParser('debugging asyncio')
+parser.add_argument(
+    '-v',
+    dest='verbose',
+    default=False,
+    action='store_true',
+)
+args = parser.parse_args()
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(levelname)7s: %(message)s',
+    stream=sys.stderr,
+)
+
+LOG = logging.getLogger('')
+
+io_handler = IOHandler()
+http_client = Client()
 
 define("port", default=6969, help="Default port for the WebServer")
 
@@ -72,15 +101,20 @@ class UpdatePriceHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
+    @gen.coroutine
     def get(self):
-        client = http_client()
-        response = client.get_prices()
-        self.write(response)
+        http_client.get_prices()
+
+        self.write('Sent request')
 
 
 if __name__ == "__main__":
-    muhConnection = db.db_connect()
-    print(muhConnection)
+    logging.basicConfig(level=logging.DEBUG)
+    looper = asyncio.get_event_loop()
+    looper.set_debug(True)
+    looper.slow_callback_duration = 0.001
+
+    warnings.simplefilter('always')
 
     application = Application([
         (r"/", MainHandler),
