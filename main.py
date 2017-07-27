@@ -1,8 +1,11 @@
 import asyncio
 import argparse
+import decimal
 import sys
 import logging
 import warnings
+
+import datetime
 
 from iox.loop_handler import IOHandler
 
@@ -17,6 +20,8 @@ from utils.mail_helper import Sender as mail_sender
 from utils.cointrx_client import Client
 
 import db
+
+import simplejson as json
 
 parser = argparse.ArgumentParser('debugging asyncio')
 parser.add_argument(
@@ -39,6 +44,18 @@ io_handler = IOHandler()
 http_client = Client()
 
 define("port", default=6969, help="Default port for the WebServer")
+
+
+# class MJSONEncoder(json.JSONEncoder):
+#     def default(self, obj):
+#         if isinstance(obj, decimal.Decimal):
+#             return str(obj)
+#         return super(MJSONEncoder, self).default(obj)
+#
+#     def datetime(self, obj):
+#         if isinstance(obj, datetime.datetime):
+#             return str(obj)
+#         return super(MJSONEncoder, self).default(obj)
 
 
 class MainHandler(RequestHandler):
@@ -108,6 +125,22 @@ class UpdatePriceHandler(RequestHandler):
         self.write('Sent request')
 
 
+class LatestPriceHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self):
+        result = (db.latest_prices())
+        data = {}
+        i = 0
+        for r in result:
+            if isinstance(r, db.CXPrice):
+                data[r.currency] = r.serialize()
+                i += 1
+        self.write(escape.json_encode(data))
+
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     looper = asyncio.get_event_loop()
@@ -122,7 +155,8 @@ if __name__ == "__main__":
         (r"/login", LoginHandler),
         (r"/sendmail", SendMailHandler),
         (r"/fakenews", FakeNewsHandler),
-        (r"/updateprices", UpdatePriceHandler)
+        (r"/updateprices", UpdatePriceHandler),
+        (r"/prices/latest", LatestPriceHandler)
     ])
     application.listen(6969)
     db.Base.metadata.create_all(bind=db.engine)
