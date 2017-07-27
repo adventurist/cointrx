@@ -1,4 +1,3 @@
-
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from passlib.apps import custom_app_context as pwd_context
 from sqlalchemy import ForeignKey
@@ -284,7 +283,6 @@ def latest_prices():
     return result
 
 
-
 async def parse_price_data(data):
     for k, v in data.items():
         # print('My thing is')
@@ -298,12 +296,26 @@ async def parse_price_data(data):
         async with engine:
             async with engine.acquire() as conn:
                 try:
-                    async with conn.begin():
-                        await conn.execute(
-                            CXPrice.__table__.update().where(CXPrice.currency == k).values(sell=v['sell'],
-                                                                                           last=v['last'],
-                                                                                           buy=v['buy'],
-                                                                                           modified=time.time()))
+                    query = select([CXPrice]).where(CXPrice.currency == k)
+                    # async for row in conn.execute(query):
+                    #     print(row)
+                    #     if row is None:
+                    #         print('jigga')
+                    result = await conn.execute(query)
+                    if result.rowcount < 1:
+                        async with conn.begin():
+                            await conn.execute(
+                                CXPrice.__table__.insert().values(currency=k, sell=v['sell'],
+                                                                  last=v['last'],
+                                                                  buy=v['buy'],
+                                                                  modified=time.time()))
+                    else:
+                        async with conn.begin():
+                            await conn.execute(
+                                CXPrice.__table__.update().where(CXPrice.currency == k).values(sell=v['sell'],
+                                                                                               last=v['last'],
+                                                                                               buy=v['buy'],
+                                                                                               modified=time.time()))
                 except exc.SQLAlchemyError as error:
                     print(error)
 

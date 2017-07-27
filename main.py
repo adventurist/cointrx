@@ -21,7 +21,6 @@ from utils.cointrx_client import Client
 
 import db
 
-
 parser = argparse.ArgumentParser('debugging asyncio')
 parser.add_argument(
     '-v',
@@ -137,7 +136,6 @@ class LatestPriceHandler(RequestHandler):
                 data[r.currency] = r.serialize()
                 i += 1
         self.write(escape.json_encode(data))
-
 
 
 if __name__ == "__main__":
