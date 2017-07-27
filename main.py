@@ -21,7 +21,6 @@ from utils.cointrx_client import Client
 
 import db
 
-import simplejson as json
 
 parser = argparse.ArgumentParser('debugging asyncio')
 parser.add_argument(
