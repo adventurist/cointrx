@@ -283,6 +283,31 @@ def latest_prices():
     return result
 
 
+# async def get_users():
+#     engine = await async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'],
+#                                 host=db_config.DATABASE['host'], password=db_config.DATABASE['password'])
+#
+#     async with engine:
+#         async with engine.acquire() as conn:
+#             try:
+#                 query = select([User])
+#                 result = await conn.execute(query)
+#                 result = await [r for r, in result]
+#                 return result
+#             except exc.SQLAlchemyError as error:
+#                 print(error)
+#
+
+def get_users():
+    result = session.query(User).all()
+    data = {}
+    for r in result:
+        if isinstance(r, User):
+            data.update(r.serialize())
+    print(data)
+    return result
+
+
 async def parse_price_data(data):
     for k, v in data.items():
         # print('My thing is')
@@ -299,7 +324,6 @@ async def parse_price_data(data):
                     query = select([CXPrice]).where(CXPrice.currency == k)
 
                     cur_time = time.time()
-                    rid = 1
                     # async for row in conn.execute(query):
                     #     print(row)
                     #     if row is None:

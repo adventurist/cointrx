@@ -133,9 +133,23 @@ class LatestPriceHandler(RequestHandler):
         i = 0
         for r in result:
             if isinstance(r, db.CXPrice):
-                data[r.currency] = r.serialize()
+                data[r.id] = r.serialize()
                 i += 1
-        self.write(escape.json_encode(data))
+        self.write(escape.json_encode({'TRX': [data]}))
+
+
+class UserListHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self):
+        result = (db.get_users())
+        data = {}
+        for r in result:
+            if isinstance(r, db.User):
+                data[r.id] = r.serialize()
+        self.write(escape.json_encode({'USERS': [data]}))
+
 
 
 if __name__ == "__main__":
@@ -153,7 +167,8 @@ if __name__ == "__main__":
         (r"/sendmail", SendMailHandler),
         (r"/fakenews", FakeNewsHandler),
         (r"/updateprices", UpdatePriceHandler),
-        (r"/prices/latest", LatestPriceHandler)
+        (r"/prices/latest", LatestPriceHandler),
+        (r"/users/all", UserListHandler)
     ])
     application.listen(6969)
     db.Base.metadata.create_all(bind=db.engine)
