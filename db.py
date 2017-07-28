@@ -297,25 +297,48 @@ async def parse_price_data(data):
             async with engine.acquire() as conn:
                 try:
                     query = select([CXPrice]).where(CXPrice.currency == k)
+
+                    cur_time = time.time()
+                    rid = 1
                     # async for row in conn.execute(query):
                     #     print(row)
                     #     if row is None:
                     #         print('jigga')
                     result = await conn.execute(query)
+
                     if result.rowcount < 1:
                         async with conn.begin():
                             await conn.execute(
                                 CXPrice.__table__.insert().values(currency=k, sell=v['sell'],
                                                                   last=v['last'],
                                                                   buy=v['buy'],
-                                                                  modified=time.time()))
+                                                                  modified=cur_time))
+
                     else:
                         async with conn.begin():
                             await conn.execute(
                                 CXPrice.__table__.update().where(CXPrice.currency == k).values(sell=v['sell'],
                                                                                                last=v['last'],
                                                                                                buy=v['buy'],
-                                                                                               modified=time.time()))
+                                                                                               modified=cur_time))
+                            # rev_query = await select([CXPriceRevision])
+                            # .where(CXPriceRevision.currency == k).group_by(CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid)))
+                            # async for row in conn.execute(rev_query):
+
+                    # rid = rid if row is None else row.rid + 1
+                    query2 = select([CXPriceRevision]).where(CXPriceRevision.currency == k).group_by(
+                        CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid)))
+                    result2 = await conn.execute(query2)
+                    rid = find_rid(result2)
+                    rid = rid + 1 if rid is not None else 1
+
+                    await conn.execute(
+                        CXPriceRevision.__table__.insert().values(rid=rid, currency=k, sell=v['sell'],
+                                                                  last=v['last'],
+                                                                  buy=v['buy'],
+                                                                  modified=cur_time))
+
+
                 except exc.SQLAlchemyError as error:
                     print(error)
 
@@ -387,6 +410,14 @@ async def fill_data(conn):
                 #         except exc.SQLAlchemyError as error:
                 #             session.rollback()
                 #             print(error)
+
+
+def find_rid(data):
+    for d in data:
+        if d is not None and d.rid is not None:
+            return d.rid
+        else:
+            return None
 
 
 def check_authentication(user, password, email):
