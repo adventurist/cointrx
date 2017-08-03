@@ -1,6 +1,7 @@
 import asyncio
 import argparse
 import decimal
+import random
 import os
 import sys
 import logging
@@ -118,8 +119,8 @@ class LoginHandler(RequestHandler):
             print('text/html, yo')
             print(name)
 
-        items = ["Jigga 1", "Jigga2", "Jigga 3"]
-        self.render("templates/template.html", title="Jiggas Login Handler", items=items)
+        message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut", "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time", "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife", "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
+        self.render("templates/template.html", title="Jiggas Login Handler", message=message)
 
 
 class SendMailHandler(RequestHandler):

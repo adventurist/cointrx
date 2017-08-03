@@ -3,6 +3,9 @@
 ** LOGIN FORM **
  *****************/
 
+#trx-login-nav {
+    -webkit-padding-start: 16px;
+}
 
 .login-welcome h3 {
   font-family: 'Lato', sans-serif;
@@ -13,9 +16,7 @@
 
 #trx-login-nav h2 {
   text-align: justify;
-  letter-spacing: 0.6px;
   line-height: 2;
-  font-weight: 300;
   text-indent: 50px;
   font-family: 'Lato', sans-serif;
   color: #177357;
@@ -23,7 +24,6 @@
   font-weight: bold;
   letter-spacing: 8px;
   position: relative;
-  padding: 0 0 2rem;
 }
 
 .login-end h2 {
@@ -33,6 +33,10 @@
   font-weight: 300;
   text-indent: 50px;
   font-family: 'Lato', sans-serif;
+}
+
+.tabs.primary {
+    -webkit-padding-start: 0;
 }
 
 li.tab {
@@ -47,5 +51,59 @@ li.tab a {
   border: 2px solid rgba(0, 218, 79, 0.35);
   color: #3d3d3d;
   text-transform: uppercase;
-  font-size: 0.8em
+  font-size: 0.8em;
+  transition: background-color 1000ms linear;
+}
+
+li.tab a:hover {
+    background: rgba(0, 218, 79, 0.35);
+    font-weight: 700;
+    color: #FFFFFF;
+}
+
+.user-login-form {
+    padding: 10px;
+}
+
+
+#login-name, #login-pass {
+    border: 1px solid #CDCDCD;
+    max-width: 100%;
+    padding: .5em;
+}
+
+.login-name-label,
+.login-pass-label {
+    -webkit-box-direction: normal;
+    font-family: 'Lato', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    cursor: default;
+    display: block;
+    font-size: .8rem;
+    margin-right: 1em;
+    text-transform: uppercase;
+}
+
+#login-name-description,
+#login-pass-description {
+    display: block;
+    -webkit-box-direction: normal;
+    font-family: 'Lato', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 0.85em;
+}
+
+#login-submit {
+    padding: 12px 30px;
+    text-transform: uppercase;
+    font-weight: lighter;
+    font-size: 0.9rem;
+    color: #666666;
+    border: 3px solid #177357;
+    background-color: white;
+    margin: 0;
+}
+
+#login-submit:hover {
+    background-color: #EEEEEE;
 }
