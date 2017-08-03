@@ -1,9 +1,12 @@
 import asyncio
 import argparse
 import decimal
+import os
 import sys
 import logging
 import warnings
+import base64
+import uuid
 
 import datetime
 
@@ -13,7 +16,7 @@ from tornado import escape
 from tornado import gen
 
 from tornado.ioloop import IOLoop
-from tornado.web import Application, RequestHandler
+from tornado.web import Application, RequestHandler, StaticFileHandler
 from tornado.options import define, options, parse_command_line
 
 from utils.mail_helper import Sender as mail_sender
@@ -40,6 +43,8 @@ LOG = logging.getLogger('')
 
 io_handler = IOHandler()
 http_client = Client()
+
+static_path = os.path.join(os.path.dirname(__file__), "static")
 
 define("port", default=6969, help="Default port for the WebServer")
 
@@ -78,6 +83,8 @@ class LoginHandler(RequestHandler):
         pass
 
     def post(self) -> object:
+        current_header = self.request.headers.get("Content-Type")
+        print(current_header)
         if self.request.headers.get("Content-Type") == 'application/json':
             request_data = {k: ''.join(v) for k, v in escape.json_decode(self.request.body).items()}
             email = request_data.get('email')
@@ -91,6 +98,28 @@ class LoginHandler(RequestHandler):
                 # hashed_pw = db.User.generate_hash(password)
                 new_user = db.check_authentication(name, password, email)
                 print(str(new_user))
+        elif self.request.headers.get("Content-Type") == 'text/html':
+            name = self.get_argument('name')
+            print(name)
+
+    def get(self, *args, **kwargs):
+        print('get getting get')
+        cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
+        current_header = self.request.headers.get("Content-Type")
+        print(cookie_secret)
+        print(self._headers)
+        print(self.get_status())
+        # name = self.get_argument('name')
+        # print(name)
+        print(current_header)
+
+        if self.request.headers.get("Content-Type") == 'text/html':
+            name = self.get_argument('name')
+            print('text/html, yo')
+            print(name)
+
+        items = ["Jigga 1", "Jigga2", "Jigga 3"]
+        self.render("templates/template.html", title="Jiggas Login Handler", items=items)
 
 
 class SendMailHandler(RequestHandler):
@@ -151,6 +180,44 @@ class UserListHandler(RequestHandler):
         self.write(escape.json_encode({'USERS': [data]}))
 
 
+class CurrencyHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self):
+        # for k,v in arguments.items():
+        if 'currency' in self.request.arguments:
+            currency = self.get_argument('currency')
+            print(currency)
+            price = db.latest_price(currency)
+            print(price)
+
+        else:
+            print('Whatchoo think this is, jigga!?')
+
+
+class TRXApplication(Application):
+    def __init__(self):
+        handlers = [
+            (r"/", MainHandler),
+            (r"/jigga", WunderHandler),
+            (r"/login", LoginHandler),
+            (r"/sendmail", SendMailHandler),
+            (r"/fakenews", FakeNewsHandler),
+            (r"/updateprices", UpdatePriceHandler),
+            (r"/prices/latest", LatestPriceHandler),
+            (r"/prices/currency", CurrencyHandler),
+            (r"/users/all", UserListHandler),
+            (r"/static/(.*)", StaticFileHandler, {
+                "path": "/static"})
+        ]
+        settings = {
+            "debug": True,
+            "static_path": os.path.join(os.path.dirname(__file__), "static"),
+            "template_path": os.path.join(os.path.dirname(__file__)),
+        }
+        Application.__init__(self, handlers, **settings)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
@@ -159,17 +226,7 @@ if __name__ == "__main__":
     looper.slow_callback_duration = 0.001
 
     warnings.simplefilter('always')
-
-    application = Application([
-        (r"/", MainHandler),
-        (r"/jigga", WunderHandler),
-        (r"/login", LoginHandler),
-        (r"/sendmail", SendMailHandler),
-        (r"/fakenews", FakeNewsHandler),
-        (r"/updateprices", UpdatePriceHandler),
-        (r"/prices/latest", LatestPriceHandler),
-        (r"/users/all", UserListHandler)
-    ])
+    application = TRXApplication()
     application.listen(6969)
     db.Base.metadata.create_all(bind=db.engine)
 

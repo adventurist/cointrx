@@ -283,6 +283,13 @@ def latest_prices():
     return result
 
 
+def latest_price(currency):
+    result = session.query(CXPrice).filter(CXPrice.currency == currency).one_or_none()
+    if result is not None:
+        print(result.serialize())
+        return 'jigga'
+
+
 # async def get_users():
 #     engine = await async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'],
 #                                 host=db_config.DATABASE['host'], password=db_config.DATABASE['password'])
