@@ -120,7 +120,7 @@ class LoginHandler(RequestHandler):
             print(name)
 
         message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut", "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time", "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife", "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
-        self.render("templates/template.html", title="Jiggas Login Handler", message=message)
+        self.render("templates/login.html", title="Jiggas Login Handler", message=message)
 
 
 class SendMailHandler(RequestHandler):
@@ -197,12 +197,32 @@ class CurrencyHandler(RequestHandler):
             print('Whatchoo think this is, jigga!?')
 
 
+class RegisterHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self):
+        message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut", "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time", "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife", "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
+        self.render("templates/register.html", title="Jiggas Register Handler", message=message)
+
+
+class PasswordHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self):
+        message = random.choice(["We gonna DOX you, slut", "A hackathon on yo ass, bitch", "You never gonna be able to log into SHIT", "Now we have all your informations", "We sell your passwords to Nigeria"])
+        self.render("templates/password.html", title="Jiggas Password Handler", message=message)
+
+
 class TRXApplication(Application):
     def __init__(self):
         handlers = [
             (r"/", MainHandler),
             (r"/jigga", WunderHandler),
             (r"/login", LoginHandler),
+            (r"/register", RegisterHandler),
+            (r"/password", PasswordHandler),
             (r"/sendmail", SendMailHandler),
             (r"/fakenews", FakeNewsHandler),
             (r"/updateprices", UpdatePriceHandler),

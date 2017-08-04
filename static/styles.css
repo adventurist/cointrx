@@ -107,3 +107,98 @@ li.tab a:hover {
 #login-submit:hover {
     background-color: #EEEEEE;
 }
+
+
+/******************
+** REGISTRATION FORM **
+ *****************/
+
+#trx-register-nav {
+    -webkit-padding-start: 16px;
+}
+
+.register-welcome h3 {
+    font-family: 'Lato', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    -webkit-box-direction: normal;
+}
+
+#trx-register-nav h2 {
+    text-align: justify;
+    line-height: 2;
+    text-indent: 50px;
+    font-family: 'Lato', sans-serif;
+    color: #73410a;
+    font-size: 3em;
+    font-weight: bold;
+    letter-spacing: 8px;
+    position: relative;
+}
+
+.register-end h2 {
+    text-align: justify;
+    letter-spacing: 0.6px;
+    line-height: 2;
+    font-weight: 300;
+    text-indent: 50px;
+    font-family: 'Lato', sans-serif;
+}
+
+.tabs.primary {
+    -webkit-padding-start: 0;
+}
+
+li.tab {
+    display: inline-block;
+}
+
+
+.user-register-form {
+    padding: 10px;
+}
+
+
+#register-name, #register-pass, #register-email {
+    border: 1px solid #CDCDCD;
+    max-width: 100%;
+    padding: .5em;
+}
+
+.register-name-label,
+.register-pass-label,
+.register-email-label {
+    -webkit-box-direction: normal;
+    font-family: 'Lato', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    cursor: default;
+    display: block;
+    font-size: .8rem;
+    margin-right: 1em;
+    text-transform: uppercase;
+}
+
+#register-name-description,
+#register-pass-description,
+#register-email-description {
+    display: block;
+    -webkit-box-direction: normal;
+    font-family: 'Lato', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 0.85em;
+}
+
+#register-submit {
+    padding: 12px 30px;
+    text-transform: uppercase;
+    font-weight: lighter;
+    font-size: 0.9rem;
+    color: #666666;
+    border: 3px solid #177357;
+    background-color: white;
+    margin: 0;
+}
+
+#register-submit:hover {
+    background-color: #EEEEEE;
+}
