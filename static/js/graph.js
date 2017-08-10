@@ -132,6 +132,14 @@ function createGraph(data) {
     x.domain(data.map(function(d) { return d.currency; }));
     y.domain([0, d3.max(data, function(d) { return d.last; })]);
 
+    const tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .offset([-10, 0])
+        .html(function(d) {
+            console.dir(d);
+            return "<strong>" + d.currency + " @</strong> <span style='color:red'>" + d.last + " EUR</span>";
+        });
+
     // append the rectangles for the bar chart
     svg.selectAll(".bar")
         .data(data)
@@ -140,7 +148,11 @@ function createGraph(data) {
         .attr("x", function(d) { return x(d.currency); })
         .attr("width", x.bandwidth())
         .attr("y", function(d) { return y(d.last); })
-        .attr("height", function(d) { return height - y(d.last); });
+        .attr("height", function(d) { return height - y(d.last) * 1.1; })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
+
+
 
     // add the x Axis
     svg.append("g")
@@ -150,4 +162,11 @@ function createGraph(data) {
     // add the y Axis
     svg.append("g")
         .call(d3.axisLeft(y));
+
+    svg.call(tip);
+
+    d3.selectAll('rec.bar').each(function() {
+        this.setAttribute('tabindex', 0);
+    })
+
 }
