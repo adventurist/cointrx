@@ -149,8 +149,8 @@ function createGraph(data) {
         .attr("y", function(d) { return y(d.last); })
         .attr("height", function(d) { return height - y(d.last) * 1.1; })
         .attr('tabindex', 1)
-        .on('mouseover, focus', tip.show)
-        .on('mouseout, blur', tip.hide);
+        .on('mouseover focus', tip.show)
+        .on('mouseout blur', tip.hide);
 
 
 
