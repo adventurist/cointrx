@@ -1,6 +1,7 @@
 import asyncio
 import argparse
 import decimal
+import json
 import random
 import os
 import sys
@@ -215,6 +216,24 @@ class PasswordHandler(RequestHandler):
         self.render("templates/password.html", title="Jiggas Password Handler", message=message)
 
 
+class GraphHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self):
+
+        result = (db.latest_prices())
+        data = []
+
+        for r in result:
+            if isinstance(r, db.CXPrice):
+                data.append(r.serialize())
+
+        print(data)
+        self.render("templates/graph.html", title="Price Trends", data=data)
+        # self.render("templates/graph.html", title="Price Trends", data=alter_data)
+
+
 class TRXApplication(Application):
     def __init__(self):
         handlers = [
@@ -228,6 +247,7 @@ class TRXApplication(Application):
             (r"/updateprices", UpdatePriceHandler),
             (r"/prices/latest", LatestPriceHandler),
             (r"/prices/currency", CurrencyHandler),
+            (r"/prices/graph", GraphHandler),
             (r"/users/all", UserListHandler),
             (r"/static/(.*)", StaticFileHandler, {
                 "path": "/static"})

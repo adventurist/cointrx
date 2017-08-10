@@ -202,3 +202,11 @@ li.tab {
 #register-submit:hover {
     background-color: #EEEEEE;
 }
+
+rect.bar:hover {
+    fill: black;
+}
+
+rect.bar {
+    fill: blueviolet;
+}
