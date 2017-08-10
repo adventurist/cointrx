@@ -130,14 +130,13 @@ function createGraph(data) {
 
     // Scale the range of the data in the domains
     x.domain(data.map(function(d) { return d.currency; }));
-    y.domain([0, d3.max(data, function(d) { return d.last; })]);
+    y.domain([d3.max(data, function(d) { return d.last; }) * 0.75, d3.max(data, function(d) { return d.last; })]);
 
     const tip = d3.tip()
         .attr('class', 'd3-tip')
         .offset([-10, 0])
         .html(function(d) {
-            console.dir(d);
-            return "<strong>" + d.currency + " @</strong> <span style='color:red'>" + d.last + " EUR</span>";
+            return "<strong>" + d.currency + " @</strong>$<span style='color:red'>" + d.last + " EUR</span>";
         });
 
     // append the rectangles for the bar chart
