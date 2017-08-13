@@ -108,7 +108,7 @@ function convertToEu(data) {
 
 function createGraph(data) {
     let margin = {top: 20, right: 20, bottom: 30, left: 40},
-        width = 960 - margin.left - margin.right,
+        width = 600 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
 // set the ranges
@@ -130,7 +130,7 @@ function createGraph(data) {
 
     // Scale the range of the data in the domains
     x.domain(data.map(function(d) { return d.currency; }));
-    y.domain([d3.max(data, function(d) { return d.last; }) * 0.75, d3.max(data, function(d) { return d.last; })]);
+    y.domain([1200, d3.max(data, function(d) { return d.last; })]);
 
     const tip = d3.tip()
         .attr('class', 'd3-tip')

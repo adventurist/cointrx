@@ -15,6 +15,55 @@
         <div id="trx-graph">
         </div>
 
+        <form class="graph-ui-form" data-drupal-selector="graph-ui-form" action="/graph" method="post" id="graph-iu" accept-charset="UTF-8" style="display: inline-block;">
+
+            <div class="form-item" tabindex="0">
+
+                <input class="graph-search" type="text" id="edit-search" name="Search" value="" size="60" maxlength="128" placeholder="Search" autocomplete="off">
+
+            </div>
+
+            <input type="submit" id="edit-graphsubmit" name="op" value="Submit" class="form-submit">
+
+            <details id="edit-stores" class="form-wrapper">
+
+            <summary role="button"><a class="details-title" href="#edit-graph"/></summary>
+
+            <details id="edit-fashion" class="form-wrapper">
+                <summary role="button"><a class="details-title" href="#edit-fashion"><span class="details-summary-prefix">Show</span>TRX</a><span class="summary"></span></summary>
+
+                <details id="edit-accessories-jewellery" class="form-wrapper">
+                    <summary role="button"><a class="details-title" href="#edit-accessories-jewellery"><span class="details-summary-prefix visually-hidden">Show</span>Currencies</a><span class="summary"></span></summary>
+
+
+                    <div id="edit-cad" class="graph-item" tabindex="0">
+                        CAD
+                    </div>
+
+                    <div id="edit-usd" class="graph-item" tabindex="0">
+                        USD
+                    </div>
+
+                    <div id="edit-eur" class="graph-item" tabindex="0">
+                        EUR
+                    </div>
+
+                    <div id="edit-gbp" class="graph-item" tabindex="0">
+                        GBP
+                    </div>
+
+                    <div id="edit-inr" class="graph-item" tabindex="0">
+                        INR
+                    </div>
+
+                </details>
+            </details>
+            </details>
+
+            <input data-drupal-selector="edit-graph-ui-form" type="hidden" name="form_id" value="graph_ui_form">
+
+        </form>
+
     </body>
     <script>
         TRXDATA.data = "{% raw data %}";
