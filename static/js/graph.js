@@ -221,7 +221,7 @@ function currencyFilterListen() {
 
 function currencyFilter(lang) {
     clearSvg();
-    getHistoryData('http://127.0.0.1:6969/prices/graph/currency?currency=' + lang);
+    getHistoryData('http://cointrx.com:6969/prices/graph/currency?currency=' + lang);
 }
 
 function clearSvg() {
