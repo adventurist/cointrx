@@ -172,9 +172,9 @@ class CXPriceRevision(Base):
             'id': self.id,
             'rid': self.rid,
             'currency': self.currency,
-            'last': self.last,
-            'buy': self.buy,
-            'sell': self.sell,
+            'last': re.sub("[^0-9^.]", "", str(self.last)),
+            'buy': re.sub("[^0-9^.]", "", str(self.buy)),
+            'sell': re.sub("[^0-9^.]", "", str(self.sell)),
             'modified': self.modified,
             'currency_id': self.currency_id
         }
@@ -289,6 +289,13 @@ def latest_price(currency):
         print(result.serialize())
         return 'jigga'
 
+
+def latest_price_history(currency):
+    result = session.query(CXPriceRevision).filter(CXPriceRevision.currency == currency).order_by(CXPriceRevision.rid.desc()).limit(15).all()
+    if result is not None:
+        for r in result:
+            print(r.serialize())
+    return result
 
 # async def get_users():
 #     engine = await async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'],

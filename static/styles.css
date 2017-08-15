@@ -250,18 +250,11 @@ li.tab {
     left: 0;
 }
 
-#trx-graph {
-    float: left;
-}
 
 /*******************
 ** GRAPH FORM *****
  *****************/
 
-#graph-iu {
-    float: right;
-    padding-top: 20px;
-}
 
 input#edit-search {
     padding-left: 0;
@@ -296,4 +289,26 @@ a.details-title {
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 85%;
+}
+
+details, summary {
+    padding: 4px;
+    cursor: pointer;
+}
+
+@media (min-width: 960px) {
+
+    #trx-graph {
+        display: inline-block;
+        width: 69.5%;
+    }
+
+    #graph-iu {
+        display: inline-block;
+        padding-top: 20px;
+        vertical-align: top;
+        width: 29.5%;
+    }
+
+
 }

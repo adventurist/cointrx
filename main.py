@@ -198,6 +198,25 @@ class CurrencyHandler(RequestHandler):
             print('Whatchoo think this is, jigga!?')
 
 
+class CurrencyRevisionHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self):
+        # for k,v in arguments.items():
+        if 'currency' in self.request.arguments:
+            currencies = []
+            currency = self.get_argument('currency')
+            print(currency)
+            prices = db.latest_price_history(currency)
+            for c in prices:
+                if isinstance(c, db.CXPriceRevision):
+                    currencies.append(c.serialize())
+            return self.write({currency: currencies})
+
+        else:
+            print('Whatchoo think this is, jigga!?')
+
 class RegisterHandler(RequestHandler):
     def data_received(self, chunk):
         pass
@@ -234,6 +253,11 @@ class GraphHandler(RequestHandler):
         # self.render("templates/graph.html", title="Price Trends", data=alter_data)
 
 
+class GraphFilterHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+
 class TRXApplication(Application):
     def __init__(self):
         handlers = [
@@ -248,6 +272,7 @@ class TRXApplication(Application):
             (r"/prices/latest", LatestPriceHandler),
             (r"/prices/currency", CurrencyHandler),
             (r"/prices/graph", GraphHandler),
+            (r"/prices/graph/currency", CurrencyRevisionHandler),
             (r"/users/all", UserListHandler),
             (r"/static/(.*)", StaticFileHandler, {
                 "path": "/static"})
