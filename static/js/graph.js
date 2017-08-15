@@ -221,7 +221,7 @@ function currencyFilterListen() {
 
 function currencyFilter(lang) {
     clearSvg();
-    getHistoryData('http://cointrx.com:6969/prices/graph/currency?currency=' + lang);
+    getHistoryData('http://127.0.0.1:6969/prices/graph/currency?currency=' + lang);
 }
 
 function clearSvg() {
@@ -238,7 +238,7 @@ function getHistoryData(url, data) {
 
         if (responseData != null) {
             console.dir(responseData);
-            currencyGraphHistory(responseData);
+            exchangeOneCurrency(settings.exchangeUrl, responseData);
         } else {
             return null;
         }
@@ -259,11 +259,12 @@ function currencyGraphHistory(initData) {
     data = [];
     console.dir(initData);
 
-    initData[Object.keys(initData)[0]].forEach(function(d) {
+    initData.forEach(function(d) {
         data.push({
             'last': Math.round(d.last * 100) / 100,
             'currency' : d.currency,
-            'rid': d.rid
+            'rid': d.rid,
+            'timestamp': d.modified,
         });
     });
 
@@ -289,8 +290,12 @@ function currencyGraphHistory(initData) {
             "translate(" + margin.left + "," + margin.top + ")");
     console.dir(data);
     // Scale the range of the data in the domains
-    x.domain(data.map(function(d) { return d.currency; }));
-    y.domain([0, d3.max(data, function(d) { return d.rid })]);
+    // y.domain(data.map(function(d) { return d.last; }));
+    // // x.domain([d3.max(data, function(d) { return d.timestamp/1500000000 }), d3.max(data, function(d) { return d.timestamp/1500000000 * 2})]);
+    // x.domain(data.map(function(d) { return d.rid;}));
+
+    x.domain(data.map(function(d) { return d.timestamp; }));
+    y.domain([1200, d3.max(data, function(d) { return d.last; })]);
 
     const tip = d3.tip()
         .attr('class', 'd3-tip')
@@ -307,7 +312,7 @@ function currencyGraphHistory(initData) {
         .append("g")
         .append("rect")
         .attr("class", "bar")
-        .attr("x", function(d) { return x(d.currency); })
+        .attr("x", function(d) { return x(d.timestamp); })
         .attr("width", x.bandwidth())
         .attr("y", function(d) { return y(d.last); })
         .attr("height", function(d) { return height - y(d.last) * 1.1; })
@@ -330,10 +335,10 @@ function currencyGraphHistory(initData) {
 
     text
         .attr("text-anchor", "center")
-        .attr("x", function(d) { return x(d.currency); })
+        .attr("x", function(d) { return x(d.timestamp); })
         .attr("y", function(d) { return y(d.last / 1.2);})
         .attr("font-family", "sans-serif")
-        .attr("font-size", "12px")
+        .attr("font-size", "20px")
         .attr("stroke-width", "1.5px")
         .attr("stroke", "#c6bcd0")
         .attr("fill", "#c6bcd0")
@@ -357,4 +362,45 @@ function currencyGraphHistory(initData) {
         this.setAttribute('tabindex', 0);
     })
 
+}
+
+function exchangeOneCurrency(url, data) {
+    let request = new httpRequest();
+    request.method = "GET";
+    request.url = url;
+
+    let convertedData = [];
+
+    request.success = function (response) {
+        let responseData = JSON.parse(response);
+
+        if (responseData.rates) {
+            if (Object.keys(data) != 'EUR') {
+                for (let c in responseData.rates) {
+                    data[Object.keys(data)[0]].forEach(function (d) {
+                        if (c == d.currency) {
+                            convertedData.push({
+                                rid: d.rid,
+                                currency: d.currency,
+                                modified: d.modified,
+                                last: Math.round(d.last / responseData.rates[c] * 100) / 100
+                            });
+                        }
+                    })
+                }
+            } else {
+                convertedData = data[Object.keys(data)[0]];
+            }
+            currencyGraphHistory(convertedData);
+        }
+        return responseData;
+    };
+
+    request.fail = function(error) {
+        let err = new Error();
+        console.log(err.stack);
+        console.error(error);
+    };
+
+    request.send();
 }
