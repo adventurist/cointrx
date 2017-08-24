@@ -132,8 +132,9 @@ function createGraph(data) {
             "translate(" + margin.left + "," + margin.top + ")");
     console.dir(data);
     // Scale the range of the data in the domains
+    let lastMax = d3.max(data, d => d.last);
     x.domain(data.map(function(d) { return d.currency; }));
-    y.domain([1200, d3.max(data, function(d) { return d.last; })]);
+    y.domain([lastMax * 0.78, lastMax]);
 
     const tip = d3.tip()
         .attr('class', 'd3-tip')
@@ -256,6 +257,8 @@ function getHistoryData(url, data) {
 
 function currencyGraphHistory(initData) {
 
+    var timeFormat = d3.timeFormat("%I:%M %p %a %Y");
+
     data = [];
     console.dir(initData);
 
@@ -294,8 +297,9 @@ function currencyGraphHistory(initData) {
     // // x.domain([d3.max(data, function(d) { return d.timestamp/1500000000 }), d3.max(data, function(d) { return d.timestamp/1500000000 * 2})]);
     // x.domain(data.map(function(d) { return d.rid;}));
 
-    x.domain(data.map(function(d) { return d.timestamp; }));
-    y.domain([1200, d3.max(data, function(d) { return d.last; })]);
+    let lastMax = d3.max(data, d => d.last);
+    x.domain(data.map(d => d.timestamp));
+    y.domain([lastMax * 0.78, lastMax]);
 
     const tip = d3.tip()
         .attr('class', 'd3-tip')
@@ -358,9 +362,16 @@ function currencyGraphHistory(initData) {
 
     svg.call(tip);
 
-    d3.selectAll('rec.bar').each(function() {
+    d3.selectAll('rect.bar').each(function() {
         this.setAttribute('tabindex', 0);
     })
+
+    // let xRange = d3.scaleTime().range([0, width]);
+    //
+    // let xAxis = d3.axisBottom(xRange)
+    //     .tickFormat(d3.timeFormat("%Y-%m-%d"));
+
+    console.dir(xAxis)
 
 }
 
