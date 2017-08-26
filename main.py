@@ -267,7 +267,7 @@ class GraphJsonHandler(RequestHandler):
                 data.append(r.serialize())
 
         print(data)
-        self.write(data)
+        self.write(escape.json_encode(data))
 
 
 class GraphFilterHandler(RequestHandler):
