@@ -97,7 +97,6 @@ class LoginHandler(RequestHandler):
                 self.write("You must supply more arguments")
                 self.write_error(401)
             else:
-                # hashed_pw = db.User.generate_hash(password)
                 new_user = db.check_authentication(name, password, email)
                 print(str(new_user))
         elif self.request.headers.get("Content-Type") == 'text/html':
@@ -250,7 +249,25 @@ class GraphHandler(RequestHandler):
 
         print(data)
         self.render("templates/graph.html", title="Price Trends", data=data)
+
         # self.render("templates/graph.html", title="Price Trends", data=alter_data)
+
+
+class GraphJsonHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self):
+
+        result = (db.latest_prices())
+        data = []
+
+        for r in result:
+            if isinstance(r, db.CXPrice):
+                data.append(r.serialize())
+
+        print(data)
+        self.write(data)
 
 
 class GraphFilterHandler(RequestHandler):
@@ -272,6 +289,7 @@ class TRXApplication(Application):
             (r"/prices/latest", LatestPriceHandler),
             (r"/prices/currency", CurrencyHandler),
             (r"/prices/graph", GraphHandler),
+            (r"/prices/graph/json", GraphJsonHandler),
             (r"/prices/graph/currency", CurrencyRevisionHandler),
             (r"/users/all", UserListHandler),
             (r"/static/(.*)", StaticFileHandler, {
