@@ -8,7 +8,9 @@ const TRXDATA = function() {
 };
 
 const settings = {
-    exchangeUrl: 'http://api.fixer.io/latest?symbols=USD,GBP,JPY,THB,ISK,CAD,DKK,EUR,RUB,CNY,INR,AUD,HKD,CHF,BRL,SGD,CLP,TWD,KRW,PLN,NZD,SEK'
+    exchangeUrl: 'http://api.fixer.io/latest?symbols=USD,GBP,JPY,THB,ISK,CAD,DKK,EUR,RUB,CNY,INR,AUD,HKD,CHF,BRL,SGD,CLP,TWD,KRW,PLN,NZD,SEK',
+    localUrl: 'http://127.0.0.1:6969',
+    liveUrl: 'http://cointrx.com:6969'
 };
 
 window.onload = function() {
@@ -72,7 +74,7 @@ function httpRequest() {
     };
 }
 
-function exchangeService(url, data) {
+function requestGraph(url, data, massageFn, graphFn) {
     let request = new httpRequest();
     request.method = "GET";
     request.url = url;
@@ -82,31 +84,22 @@ function exchangeService(url, data) {
     request.success = function(response) {
         let responseData = JSON.parse(response);
 
-        if (responseData.rates) {
+        convertedData = massageFn(responseData, convertedData, data);
 
-            for (let c in responseData.rates) {
-                data.forEach(function(d) {
-                    if (c == d.currency) {
-                        convertedData.push({currency: d.currency, last: Math.round(d.last / responseData.rates[c] * 100) / 100});
-                    }
-                })
-            }
-            createGraph(convertedData);
-        }
+        graphFn(convertedData);
+
         return responseData;
     };
-
 
     request.fail = function(error) {
         let err = new Error();
         console.log(err.stack);
         console.error(error);
     };
-
     request.send();
 }
 function convertToEu(data) {
-    exchangeService(settings.exchangeUrl, data);
+    requestGraph(settings.exchangeUrl, data, convertAllCurrenciesEur, createGraph);
 }
 
 function createGraph(data) {
@@ -114,24 +107,19 @@ function createGraph(data) {
         width = 800 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
-// set the ranges
     let x = d3.scaleBand()
         .range([0, width])
         .padding(0.1);
     let y = d3.scaleLinear()
         .range([height, 0]);
 
-// append the svg object to the body of the page
-// append a 'group' element to 'svg'
-// moves the 'group' element to the top left margin
     let svg = d3.select("#trx-graph").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
-    console.dir(data);
-    // Scale the range of the data in the domains
+
     let lastMax = d3.max(data, d => d.last);
     x.domain(data.map(function(d) { return d.currency; }));
     y.domain([lastMax * 0.78, lastMax]);
@@ -143,9 +131,8 @@ function createGraph(data) {
             return "<strong>" + d.currency + " @</strong>$<span style='color:red'>" + d.last + " EUR</span>";
         });
 
-    // append the rectangles for the bar chart
     let bar = svg.selectAll(".bar");
-    console.dir(data);
+
     bar.data(data)
         .enter()
         .append("g")
@@ -157,14 +144,7 @@ function createGraph(data) {
         .attr("height", function(d) { return height - y(d.last) * 1.1; })
         .attr('tabindex', 1)
         .on('mouseover focus', tip.show)
-        .on('mouseout blur', tip.hide)
-
-        // .append("text")
-        // .text(function(d) {
-        //     return d.last;
-        // })
-        ;
-    // bar.exit().remove();
+        .on('mouseout blur', tip.hide);
 
 
     let text = svg.selectAll("text")
@@ -186,12 +166,11 @@ function createGraph(data) {
         });
 
     text.exit().remove();
-    // add the x Axis
+
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(x));
 
-    // add the y Axis
     svg.append("g")
         .call(d3.axisLeft(y));
 
@@ -200,7 +179,6 @@ function createGraph(data) {
     d3.selectAll('rec.bar').each(function() {
         this.setAttribute('tabindex', 0);
     })
-
 }
 
 function currencyFilterListen() {
@@ -213,16 +191,13 @@ function currencyFilterListen() {
             if (choice != null) {
                 currencyFilter(choice);
             }
-
-
         })
     }
-
 }
 
 function currencyFilter(lang) {
     clearSvg();
-    getHistoryData('http://cointrx.com:6969/prices/graph/currency?currency=' + lang);
+    requestGraph(settings.localUrl + '/prices/graph/currency?currency=' + lang, null, convertCurrencyToEur, currencyGraphHistory);
 }
 
 function clearSvg() {
@@ -385,25 +360,23 @@ function exchangeOneCurrency(url, data) {
     request.success = function (response) {
         let responseData = JSON.parse(response);
 
-        if (responseData.rates) {
-            if (Object.keys(data) != 'EUR') {
-                for (let c in responseData.rates) {
-                    data[Object.keys(data)[0]].forEach(function (d) {
-                        if (c == d.currency) {
-                            convertedData.push({
-                                rid: d.rid,
-                                currency: d.currency,
-                                modified: d.modified,
-                                last: Math.round(d.last / responseData.rates[c] * 100) / 100
-                            });
-                        }
-                    })
-                }
-            } else {
-                convertedData = data[Object.keys(data)[0]];
+        if (Object.keys(data) != 'EUR') {
+            for (let c in responseData.rates) {
+                data[Object.keys(data)[0]].forEach(function (d) {
+                    if (c == d.currency) {
+                        convertedData.push({
+                            rid: d.rid,
+                            currency: d.currency,
+                            modified: d.modified,
+                            last: Math.round(d.last / responseData.rates[c] * 100) / 100
+                        });
+                    }
+                })
             }
-            currencyGraphHistory(convertedData);
+        } else {
+            convertedData = data[Object.keys(data)[0]];
         }
+        currencyGraphHistory(convertedData);
         return responseData;
     };
 
@@ -414,4 +387,35 @@ function exchangeOneCurrency(url, data) {
     };
 
     request.send();
+}
+
+function convertCurrencyToEur (responseData, convertedData, data) {
+    if (Object.keys(data) != 'EUR') {
+        for (let c in responseData.rates) {
+            data[Object.keys(data)[0]].forEach(function (d) {
+                if (c == d.currency) {
+                    convertedData.push({
+                        rid: d.rid,
+                        currency: d.currency,
+                        modified: d.modified,
+                        last: Math.round(d.last / responseData.rates[c] * 100) / 100
+                    });
+                }
+            })
+        }
+    } else {
+        convertedData = data[Object.keys(data)[0]];
+    }
+    return convertedData;
+}
+
+function convertAllCurrenciesEur(responseData, convertedData, data) {
+    for (let c in responseData.rates) {
+        data.forEach(function(d) {
+            if (c == d.currency) {
+                convertedData.push({currency: d.currency, last: Math.round(d.last / responseData.rates[c] * 100) / 100});
+            }
+        })
+    }
+    return convertedData;
 }

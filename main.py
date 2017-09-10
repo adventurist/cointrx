@@ -216,6 +216,7 @@ class CurrencyRevisionHandler(RequestHandler):
         else:
             print('Whatchoo think this is, jigga!?')
 
+
 class RegisterHandler(RequestHandler):
     def data_received(self, chunk):
         pass
