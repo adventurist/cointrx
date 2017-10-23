@@ -274,13 +274,17 @@ def update_prices(data):
 
 
 def latest_prices():
-    result = session.query(CXPrice).all()
-    data = {}
-    for r in result:
-        if isinstance(r, CXPrice):
-            data.update(r.serialize())
-    print(data)
-    return result
+    try:
+        result = session.query(CXPrice).all()
+        data = {}
+        for r in result:
+            if isinstance(r, CXPrice):
+                data.update(r.serialize())
+        print(data)
+        return result
+    except exc.SQLAlchemyError as err:
+        print(err.args)
+        session.rollback()
 
 
 def latest_price(currency):
