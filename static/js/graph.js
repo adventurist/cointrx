@@ -213,7 +213,7 @@ function currencyFilterListen() {
 function currencyFilter(lang) {
     if (TRXDATA.data !== null) {
         clearSvg();
-        requestGraph(settings.liveUrl + '/prices/graph/currency?currency=' + lang, TRXDATA.data, convertCurrencyToEur, currencyGraphHistory);
+        requestGraph(settings.localUrl + '/prices/graph/currency?currency=' + lang, TRXDATA.data, convertCurrencyToEur, currencyGraphHistory);
     }
 }
 
@@ -364,6 +364,11 @@ function currencyGraphHistory(initData) {
     //     .tickFormat(d3.timeFormat("%Y-%m-%d"));
 
     //console.dir(xAxis)
+    let ticks = d3.selectAll('.tick text');
+
+    ticks.attr('class', function(d, i) {
+        return d > 10000 ? 'timestamp' : 'price';
+    });
     formatDates()
 }
 
@@ -449,7 +454,7 @@ function dateListeners() {
 }
 
 function formatDates() {
-    let ticks = Array.from(document.querySelectorAll('#trx-graph g.tick text'));
+    let ticks = Array.from(document.querySelectorAll('#trx-graph text.timestamp'));
 
     ticks.forEach(function (t) {
         let replacement = new Date(t.innerHTML * 1000);
