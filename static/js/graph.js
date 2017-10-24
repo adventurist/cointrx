@@ -10,7 +10,7 @@ const TRXDATA = function() {
 const settings = {
     exchangeUrl: 'http://api.fixer.io/latest?symbols=USD,GBP,JPY,THB,ISK,CAD,DKK,EUR,RUB,CNY,INR,AUD,HKD,CHF,BRL,SGD,CLP,TWD,KRW,PLN,NZD,SEK',
     localUrl: 'http://127.0.0.1:6969',
-    liveUrl: 'http://cointrx.com:6969'
+    liveUrl: 'http://app.cointrx.com'
 };
 
 window.onload = function() {
