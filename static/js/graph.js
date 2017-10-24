@@ -1,3 +1,9 @@
+Date.prototype.getShort = function(){
+    return (this.getMonth() + 1) +
+        "/" +  this.getDate() +
+        " " +  this.getHours() + ":" + this.getMinutes();
+};
+
 const TRXDATA = function() {
     let data, rates;
 
@@ -32,7 +38,7 @@ window.onload = function() {
     convertToEu(data);
 
     currencyFilterListen();
-    dateListeners();
+    // dateListeners();
 };
 
 function httpRequest() {
@@ -46,7 +52,7 @@ function httpRequest() {
     this.data = null;
 
     this.send = function() {
-        ajax.open(this.method, this.url, this.asnyc);
+        ajax.open(this.method, this.url, this.async);
         ajax.send(this.data);
     };
 
@@ -358,7 +364,7 @@ function currencyGraphHistory(initData) {
     //     .tickFormat(d3.timeFormat("%Y-%m-%d"));
 
     //console.dir(xAxis)
-
+    formatDates()
 }
 
 function exchangeOneCurrency(url, data) {
@@ -446,6 +452,8 @@ function formatDates() {
     let ticks = Array.from(document.querySelectorAll('#trx-graph g.tick text'));
 
     ticks.forEach(function (t) {
-        t.innerHTML = new Date(t.innerHTML * 1000);
+        let replacement = new Date(t.innerHTML * 1000);
+
+        t.innerHTML = replacement.getShort();
     });
 }
