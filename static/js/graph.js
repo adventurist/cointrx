@@ -1,5 +1,5 @@
 const TRXDATA = function() {
-    let data;
+    let data, rates;
 
     const init = function (Args) {
         data = Args;
@@ -17,17 +17,22 @@ window.onload = function() {
 
 
     let initData = JSON.parse(TRXDATA.data.replace(/'/g, '"'));
+    TRXDATA.rates = {};
     let data = [];
 
     initData.forEach(function(d) {
+        let rate = Math.round(d.last * 100) / 100;
         data.push({
                 'last': Math.round(d.last * 100) / 100,
                 'currency' : d.currency
             });
+        TRXDATA.rates[d.currency] = rate;
     });
+    TRXDATA.data = data;
     convertToEu(data);
 
     currencyFilterListen();
+    dateListeners();
 };
 
 function httpRequest() {
@@ -83,6 +88,10 @@ function requestGraph(url, data, massageFn, graphFn) {
 
     request.success = function(response) {
         let responseData = JSON.parse(response);
+
+        if (responseData.base !== undefined && responseData.rates !== undefined) {
+            TRXDATA.rates = responseData.rates;
+        }
 
         convertedData = massageFn(responseData, convertedData, data);
 
@@ -196,43 +205,45 @@ function currencyFilterListen() {
 }
 
 function currencyFilter(lang) {
-    clearSvg();
-    requestGraph(settings.localUrl + '/prices/graph/currency?currency=' + lang, null, convertCurrencyToEur, currencyGraphHistory);
+    if (TRXDATA.data !== null) {
+        clearSvg();
+        requestGraph(settings.localUrl + '/prices/graph/currency?currency=' + lang, TRXDATA.data, convertCurrencyToEur, currencyGraphHistory);
+    }
 }
 
 function clearSvg() {
     d3.selectAll('svg').remove();
 }
 
-function getHistoryData(url, data) {
-    let request = new httpRequest();
-    request.method = "GET";
-    request.url = url;
-
-    request.success = function(response) {
-        let responseData = JSON.parse(response);
-
-        if (responseData != null) {
-            console.dir(responseData);
-            exchangeOneCurrency(settings.exchangeUrl, responseData);
-        } else {
-            return null;
-        }
-    };
-
-
-    request.fail = function(error) {
-        let err = new Error();
-        console.log(err.stack);
-        console.error(error);
-    };
-
-    request.send();
-}
+// function getHistoryData(url, data) {
+//     let request = new httpRequest();
+//     request.method = "GET";
+//     request.url = url;
+//
+//     request.success = function(response) {
+//         let responseData = JSON.parse(response);
+//
+//         if (responseData != null) {
+//             console.dir(responseData);
+//             exchangeOneCurrency(settings.exchangeUrl, responseData);
+//         } else {
+//             return null;
+//         }
+//     };
+//
+//
+//     request.fail = function(error) {
+//         let err = new Error();
+//         console.log(err.stack);
+//         console.error(error);
+//     };
+//
+//     request.send();
+// }
 
 function currencyGraphHistory(initData) {
 
-    var timeFormat = d3.timeFormat("%I:%M %p %a %Y");
+    let timeFormat = d3.timeFormat("%I:%M %p %a %Y");
 
     data = [];
     console.dir(initData);
@@ -339,14 +350,14 @@ function currencyGraphHistory(initData) {
 
     d3.selectAll('rect.bar').each(function() {
         this.setAttribute('tabindex', 0);
-    })
+    });
 
     // let xRange = d3.scaleTime().range([0, width]);
     //
     // let xAxis = d3.axisBottom(xRange)
     //     .tickFormat(d3.timeFormat("%Y-%m-%d"));
 
-    console.dir(xAxis)
+    //console.dir(xAxis)
 
 }
 
@@ -390,23 +401,24 @@ function exchangeOneCurrency(url, data) {
 }
 
 function convertCurrencyToEur (responseData, convertedData, data) {
-    if (Object.keys(data) != 'EUR') {
-        for (let c in responseData.rates) {
-            data[Object.keys(data)[0]].forEach(function (d) {
+    if (Object.keys(responseData) != 'EUR') {
+        for (let c in responseData) {
+            responseData[c].forEach(function (d) {
                 if (c == d.currency) {
                     convertedData.push({
                         rid: d.rid,
                         currency: d.currency,
                         modified: d.modified,
-                        last: Math.round(d.last / responseData.rates[c] * 100) / 100
+                        // last: Math.round(d.last / responseData[c] * 100) / 100,
+                        last: Math.round(d.last / TRXDATA.rates[c] * 100) / 100
                     });
                 }
             })
         }
     } else {
-        convertedData = data[Object.keys(data)[0]];
+        convertedData = responseData[Object.keys(data)[0]];
     }
-    return convertedData;
+    return convertedData.reverse();
 }
 
 function convertAllCurrenciesEur(responseData, convertedData, data) {
@@ -418,4 +430,22 @@ function convertAllCurrenciesEur(responseData, convertedData, data) {
         })
     }
     return convertedData;
+}
+
+function dateListeners() {
+    let observer = new MutationObserver(function(mutations) {
+        formatDates();
+    });
+
+    let config = {attributes: true, childList: true, characterData: true};
+
+    observer.observe(document.getElementById('trx-graph'), config);
+}
+
+function formatDates() {
+    let ticks = Array.from(document.querySelectorAll('#trx-graph g.tick text'));
+
+    ticks.forEach(function (t) {
+        t.innerHTML = new Date(t.innerHTML * 1000);
+    });
 }
