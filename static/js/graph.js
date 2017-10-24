@@ -427,9 +427,9 @@ function convertCurrencyToEur (responseData, convertedData, data) {
             })
         }
     } else {
-        convertedData = responseData[Object.keys(data)[0]];
+        convertedData = responseData[Object.keys(responseData)[0]];
     }
-    return convertedData.reverse();
+    return convertedData !== undefined ? convertedData.reverse() : null;
 }
 
 function convertAllCurrenciesEur(responseData, convertedData, data) {
