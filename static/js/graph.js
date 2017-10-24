@@ -213,7 +213,7 @@ function currencyFilterListen() {
 function currencyFilter(lang) {
     if (TRXDATA.data !== null) {
         clearSvg();
-        requestGraph(settings.localUrl + '/prices/graph/currency?currency=' + lang, TRXDATA.data, convertCurrencyToEur, currencyGraphHistory);
+        requestGraph(settings.liveUrl + '/prices/graph/currency?currency=' + lang, TRXDATA.data, convertCurrencyToEur, currencyGraphHistory);
     }
 }
 
