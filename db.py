@@ -14,6 +14,8 @@ import asyncio
 
 from aiopg.sa import create_engine as async_engine
 
+from mypy import *
+
 import json
 import re
 import time
@@ -90,7 +92,7 @@ class User(Base):
         s = Serializer(trxapp.config['SECRET_KEY'], expires_in=expiration)
         return s.dumps({'id': self.id})
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             'id': self.id,
             'name': self.name,
@@ -100,7 +102,7 @@ class User(Base):
         }
 
     @staticmethod
-    def verify_password(email_or_token, password):
+    def verify_password(email_or_token, password) -> bool:
         user = User.verify_auth_token(email_or_token)
         print('78')
         # print(str(user))
@@ -144,7 +146,7 @@ class CXPrice(Base):
     modified = Column(Integer)
     revisions = relationship("CXPriceRevision", back_populates="cx_price", lazy="select")
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             'id': self.id,
             'currency': self.currency,
@@ -287,14 +289,35 @@ def latest_prices():
         session.rollback()
 
 
-def latest_price(currency):
+async def latest_prices_async():
+    try:
+        result = await session.query(CXPrice).all()
+        data = {}
+        for r in result:
+            if isinstance(r, CXPrice):
+                data.update(r.serialize())
+        print(data)
+        return result
+    except exc.SQLAlchemyError as err:
+        print(err.args)
+        session.rollback()
+
+
+def latest_price(currency: str) -> str:
     result = session.query(CXPrice).filter(CXPrice.currency == currency).one_or_none()
     if result is not None:
         print(result.serialize())
         return 'jigga'
 
 
-def latest_price_history(currency):
+async def latest_price_async(currency: str) -> str:
+    result = await session.query(CXPrice).filter(CXPrice.currency == currency).one_or_none()
+    if result is not None:
+        print(result.serialize())
+        return 'jigga'
+
+
+def latest_price_history(currency: str):
     result = session.query(CXPriceRevision).filter(CXPriceRevision.currency == currency).order_by(CXPriceRevision.rid.desc()).limit(15).all()
     if result is not None:
         for r in result:

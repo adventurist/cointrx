@@ -7,6 +7,7 @@ import os
 import sys
 import logging
 import warnings
+
 import base64
 import uuid
 
@@ -23,6 +24,7 @@ from tornado.options import define, options, parse_command_line
 
 from utils.mail_helper import Sender as mail_sender
 from utils.cointrx_client import Client
+from tx import trx__tx_out
 
 import db
 
@@ -190,7 +192,7 @@ class CurrencyHandler(RequestHandler):
         if 'currency' in self.request.arguments:
             currency = self.get_argument('currency')
             print(currency)
-            price = db.latest_price(currency)
+            price = db.latest_price_async(currency)
             print(price)
 
         else:
@@ -241,7 +243,7 @@ class GraphHandler(RequestHandler):
 
     def get(self):
 
-        result = (db.latest_prices())
+        result = (db.latest_prices_async())
         data = []
 
         for r in result:
@@ -260,7 +262,7 @@ class GraphJsonHandler(RequestHandler):
 
     def get(self):
 
-        result = (db.latest_prices())
+        result = (db.latest_prices_async())
         data = []
 
         for r in result:
@@ -274,6 +276,41 @@ class GraphJsonHandler(RequestHandler):
 class GraphFilterHandler(RequestHandler):
     def data_received(self, chunk):
         pass
+
+
+class TestTransactionHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self):
+
+        transaction = trx__tx_out.transaction()
+        attempt = transaction.run()
+        # attempt = 'jigggg'
+
+        return self.write(attempt)
+
+addr = "address"
+html = ("""<html>
+
+  <head>
+    <script language=\"javascript\">
+      var ws = new WebSocket(""" + addr +""");
+      ws.onopen = function() {
+         ws.send(\"Hello\");
+      };
+      ws.onmessage = function (evt) {
+         alert(evt.data);
+      };
+    </script>
+  </head>
+
+  <body>
+    <p>sample websocket with Tornado</p>
+  </body>
+
+</html>
+""")
 
 
 class TRXApplication(Application):
@@ -292,6 +329,7 @@ class TRXApplication(Application):
             (r"/prices/graph", GraphHandler),
             (r"/prices/graph/json", GraphJsonHandler),
             (r"/prices/graph/currency", CurrencyRevisionHandler),
+            (r"/transaction/test", TestTransactionHandler),
             (r"/users/all", UserListHandler),
             (r"/static/(.*)", StaticFileHandler, {
                 "path": "/static"})
