@@ -278,12 +278,12 @@ def update_prices(data):
 def latest_prices():
     try:
         result = session.query(CXPrice).all()
-        data = {}
+        data = []
         for r in result:
             if isinstance(r, CXPrice):
-                data.update(r.serialize())
+                data.append(r.serialize())
         print(data)
-        return result
+        return data
     except exc.SQLAlchemyError as err:
         print(err.args)
         session.rollback()
@@ -291,13 +291,13 @@ def latest_prices():
 
 async def latest_prices_async():
     try:
-        result = await session.query(CXPrice).all()
-        data = {}
+        result = session.query(CXPrice).all()
+        data = []
         for r in result:
             if isinstance(r, CXPrice):
-                data.update(r.serialize())
+                data.append(r.serialize())
         print(data)
-        return result
+        return data
     except exc.SQLAlchemyError as err:
         print(err.args)
         session.rollback()
@@ -326,11 +326,12 @@ def latest_price_history(currency: str):
 
 
 async def latest_price_history_async(currency: str):
-    result = await session.query(CXPriceRevision).filter(CXPriceRevision.currency == currency).order_by(CXPriceRevision.rid.desc()).limit(15).all()
+    result = session.query(CXPriceRevision).filter(CXPriceRevision.currency == currency).order_by(CXPriceRevision.rid.desc()).limit(15).all()
+    data = []
     if result is not None:
         for r in result:
-            print(r.serialize())
-    return result
+            data.append(r.serialize())
+    return data
 
 # async def get_users():
 #     engine = await async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'],

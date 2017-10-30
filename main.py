@@ -204,16 +204,13 @@ class CurrencyRevisionHandler(RequestHandler):
         pass
 
     def get(self):
-        # for k,v in arguments.items():
         if 'currency' in self.request.arguments:
-            currencies = []
             currency = self.get_argument('currency')
-            print(currency)
-            prices = db.latest_price_history(currency)
-            for c in prices:
-                if isinstance(c, db.CXPriceRevision):
-                    currencies.append(c.serialize())
-            return self.write({currency: currencies})
+
+            result = looper.run_until_complete(db.latest_price_history_async(currency))
+
+            if result:
+                return self.write({currency: result})
 
         else:
             print('Whatchoo think this is, jigga!?')
@@ -242,18 +239,11 @@ class GraphHandler(RequestHandler):
         pass
 
     def get(self):
+        result = looper.run_until_complete(db.latest_prices_async())
 
-        result = (db.latest_prices_async())
-        data = []
-
-        for r in result:
-            if isinstance(r, db.CXPrice):
-                data.append(r.serialize())
-
-        print(data)
-        self.render("templates/graph.html", title="Price Trends", data=data)
-
-        # self.render("templates/graph.html", title="Price Trends", data=alter_data)
+        if result:
+            print(result)
+            self.render("templates/graph.html", title="Price Trends", data=result)
 
 
 class GraphJsonHandler(RequestHandler):
@@ -261,16 +251,11 @@ class GraphJsonHandler(RequestHandler):
         pass
 
     def get(self):
+        result = looper.run_until_complete(db.latest_prices_async())
 
-        result = (db.latest_prices_async())
-        data = []
-
-        for r in result:
-            if isinstance(r, db.CXPrice):
-                data.append(r.serialize())
-
-        print(data)
-        self.write(escape.json_encode(data))
+        if result:
+            print(result)
+            self.write(escape.json_encode(result))
 
 
 class GraphFilterHandler(RequestHandler):
@@ -286,7 +271,6 @@ class TestTransactionHandler(RequestHandler):
 
         transaction = trx__tx_out.transaction()
         attempt = transaction.run()
-        # attempt = 'jigggg'
 
         return self.write(attempt)
 
