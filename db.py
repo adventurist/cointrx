@@ -324,6 +324,14 @@ def latest_price_history(currency: str):
             print(r.serialize())
     return result
 
+
+async def latest_price_history_async(currency: str):
+    result = await session.query(CXPriceRevision).filter(CXPriceRevision.currency == currency).order_by(CXPriceRevision.rid.desc()).limit(15).all()
+    if result is not None:
+        for r in result:
+            print(r.serialize())
+    return result
+
 # async def get_users():
 #     engine = await async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'],
 #                                 host=db_config.DATABASE['host'], password=db_config.DATABASE['password'])
