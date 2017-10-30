@@ -14,9 +14,9 @@ const TRXDATA = function() {
 };
 
 const settings = {
-    exchangeUrl: 'http://api.fixer.io/latest?symbols=USD,GBP,JPY,THB,ISK,CAD,DKK,EUR,RUB,CNY,INR,AUD,HKD,CHF,BRL,SGD,CLP,TWD,KRW,PLN,NZD,SEK',
+    exchangeUrl: 'https://api.fixer.io/latest?symbols=USD,GBP,JPY,THB,ISK,CAD,DKK,EUR,RUB,CNY,INR,AUD,HKD,CHF,BRL,SGD,CLP,TWD,KRW,PLN,NZD,SEK',
     localUrl: 'http://127.0.0.1:6969',
-    liveUrl: 'http://app.cointrx.com'
+    liveUrl: 'https://app.cointrx.com'
 };
 
 window.onload = function() {
@@ -443,15 +443,6 @@ function convertAllCurrenciesEur(responseData, convertedData, data) {
     return convertedData;
 }
 
-function dateListeners() {
-    let observer = new MutationObserver(function(mutations) {
-        formatDates();
-    });
-
-    let config = {attributes: true, childList: true, characterData: true};
-
-    observer.observe(document.getElementById('trx-graph'), config);
-}
 
 function formatDates() {
     let ticks = Array.from(document.querySelectorAll('#trx-graph text.timestamp'));
