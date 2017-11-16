@@ -7,7 +7,7 @@ from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, Boolean, exc,
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.engine.url import URL
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker, relationship, mapper, load_only
 from sqlalchemy.ext.declarative import declarative_base
 
 import asyncio
@@ -204,6 +204,9 @@ class CADCurRevision(Base):
     volume = Column(DECIMAL(12, 3))
     modified = Column(Integer)
 
+
+class Heartbeat(object):
+    pass
 
 async def test_db():
     engine = await async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'],
@@ -545,3 +548,18 @@ def cx_update_listener(*args):
 
                     # for v in context.mappers.Mapper:
                     #
+
+def heartbeat_get_all():
+
+    heartbeat_engine = create_engine(URL(**db_config.SOCIALBASE), echo=True)
+    metadata = MetaData(heartbeat_engine)
+    heartbeats = Table('heartbeat_field_data', metadata, autoload=True)
+    mapper(Heartbeat, heartbeats)
+    media_session = sessionmaker(bind=heartbeat_engine)()
+    result = media_session.query(Heartbeat).options(load_only('message')).limit(50).all()
+        # (CXPriceRevision.currency == currency).order_by(CXPriceRevision.rid.desc()).limit(15).all()
+    data = []
+    if result is not None:
+        for r in result:
+            data.append(r.message)
+    return data

@@ -1,32 +1,24 @@
-import asyncio
 import argparse
-import decimal
-import json
-import random
-import os
-import sys
+import asyncio
 import logging
-import warnings
-
-import base64
+import sys
 import uuid
 
-import datetime
-
-from iox.loop_handler import IOHandler
-
+import base64
+import os
+import random
+import warnings
 from tornado import escape
 from tornado import gen
-
 from tornado.ioloop import IOLoop
+from tornado.options import define
 from tornado.web import Application, RequestHandler, StaticFileHandler
-from tornado.options import define, options, parse_command_line
-
-from utils.mail_helper import Sender as mail_sender
-from utils.cointrx_client import Client
-from tx import trx__tx_out
 
 import db
+from iox.loop_handler import IOHandler
+from tx import trx__tx_out
+from utils.cointrx_client import Client
+from utils.mail_helper import Sender as mail_sender
 
 parser = argparse.ArgumentParser('debugging asyncio')
 parser.add_argument(
@@ -121,7 +113,10 @@ class LoginHandler(RequestHandler):
             print('text/html, yo')
             print(name)
 
-        message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut", "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time", "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife", "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
+        message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut",
+                                 "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time",
+                                 "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife",
+                                 "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
         self.render("templates/login.html", title="Jiggas Login Handler", message=message)
 
 
@@ -221,7 +216,10 @@ class RegisterHandler(RequestHandler):
         pass
 
     def get(self):
-        message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut", "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time", "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife", "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
+        message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut",
+                                 "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time",
+                                 "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife",
+                                 "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
         self.render("templates/register.html", title="Jiggas Register Handler", message=message)
 
 
@@ -230,7 +228,9 @@ class PasswordHandler(RequestHandler):
         pass
 
     def get(self):
-        message = random.choice(["We gonna DOX you, slut", "A hackathon on yo ass, bitch", "You never gonna be able to log into SHIT", "Now we have all your informations", "We sell your passwords to Nigeria"])
+        message = random.choice(
+            ["We gonna DOX you, slut", "A hackathon on yo ass, bitch", "You never gonna be able to log into SHIT",
+             "Now we have all your informations", "We sell your passwords to Nigeria"])
         self.render("templates/password.html", title="Jiggas Password Handler", message=message)
 
 
@@ -268,37 +268,73 @@ class TestTransactionHandler(RequestHandler):
         pass
 
     def get(self):
-
         transaction = trx__tx_out.transaction()
-        attempt = transaction.run()
+        # attempt = transaction.run()
+        # attempt = transaction.regtest_run()
+        # attempt = transaction.pytool_run()
+        attempt = transaction.testnet_run()
 
-        return self.write(attempt)
+        return self.write({'Try': attempt})
 
-addr = "address"
-html = ("""<html>
 
-  <head>
-    <script language=\"javascript\">
-      var ws = new WebSocket(""" + addr +""");
-      ws.onopen = function() {
-         ws.send(\"Hello\");
-      };
-      ws.onmessage = function (evt) {
-         alert(evt.data);
-      };
-    </script>
-  </head>
+class ReactTestHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
 
-  <body>
-    <p>sample websocket with Tornado</p>
-  </body>
+    def get(self):
+        self.render("templates/test.html", title="React Test")
 
-</html>
-""")
+
+# addr = "address"
+# html = ("""<html>
+#
+#   <head>
+#     <script language=\"javascript\">
+#       var ws = new WebSocket(""" + addr +""");
+#       ws.onopen = function() {
+#          ws.send(\"Hello\");
+#       };
+#       ws.onmessage = function (evt) {
+#          alert(evt.data);
+#       };
+#     </script>
+#   </head>
+#
+#   <body>
+#     <p>sample websocket with Tornado</p>
+#   </body>
+#
+# </html>
+# """)
+
+
+class SendTrawTransactionHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    # def get(self, *args, **kwargs):
+        # if 'txid_out' in self.request.arguments:
+        #     txid_out = self.get_argument('txid_out')
+        #     if len(txid_out) > 0:
+
+
+class HeartbeatHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        result = looper.run_until_complete(db.heartbeat_get_all())
+
+        self.render("templates/heartbeat.html", title="Heartbeat", heartbeats=result)
 
 
 class TRXApplication(Application):
     def __init__(self):
+        settings = {
+            "debug": True,
+            "static_path": os.path.join(os.path.dirname(__file__), "static"),
+            "template_path": os.path.join(os.path.dirname(__file__)),
+        }
         handlers = [
             (r"/", MainHandler),
             (r"/jigga", WunderHandler),
@@ -314,15 +350,13 @@ class TRXApplication(Application):
             (r"/prices/graph/json", GraphJsonHandler),
             (r"/prices/graph/currency", CurrencyRevisionHandler),
             (r"/transaction/test", TestTransactionHandler),
+            (r"/transaction/sendraw", SendTrawTransactionHandler),
+            (r"/react/test", ReactTestHandler),
+            (r"/heartbeat/feed", HeartbeatHandler),
             (r"/users/all", UserListHandler),
             (r"/static/(.*)", StaticFileHandler, {
                 "path": "/static"})
         ]
-        settings = {
-            "debug": True,
-            "static_path": os.path.join(os.path.dirname(__file__), "static"),
-            "template_path": os.path.join(os.path.dirname(__file__)),
-        }
         Application.__init__(self, handlers, **settings)
 
 
