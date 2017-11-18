@@ -3,20 +3,17 @@ import sys
 import hashlib
 
 # from tornado import websocket
-from bitcoin import SelectParams, wallet, main as btc_tools, bci, transaction as tx_func
+from bitcoin import wallet, main as btc_tools, bci, transaction as tx_func
 from bitcoin.core import b2x, lx, COIN, COutPoint, CMutableTxOut, CMutableTxIn, CMutableTransaction, Hash160, b2lx
 from bitcoin.core.script import CScript, OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG, SignatureHash, SIGHASH_ALL
 from bitcoin.core.scripteval import VerifyScript, SCRIPT_VERIFY_P2SH
 from bitcoin.wallet import CBitcoinAddress, CBitcoinSecret
-from bitcoin.rpc import Proxy, RawProxy
+from bitcoin.rpc import Proxy
 
 from pycoin.services import spendables_for_address
 
 from utils import btcd_utils
 
-
-# choose network (testnet for development purposes)
-SelectParams('testnet')
 
 transaction_input = 'eca213168d3683c86591890e766c76ab618e0c245925ebcaddc855aecb2643a1'
 #
@@ -167,64 +164,22 @@ class transaction:
         little_endian_hex = b2lx(txid)
 
     def testnet_run(self):
+        if TestnetData.address1:
+            tx_history = btcd_utils.get_tx_history(TestnetData.address1)
+            for item in tx_history:
+                tempitem = item.keys()
+                item_output = item.keys()
 
-        pubkey = btc_tools.privtopub(TestnetData.priv1)
-        addr = btc_tools.pubtoaddr(pubkey)
-        if addr == TestnetData.address1:
-            interesting_thing = 'this'
+            tx_input_orig = [{'output': TestnetData.txid1, 'value': TestnetData.tx_amount, 'address': TestnetData.address1}]
+            tx_input = [{'output': str((next(iter(v.keys())) + ':0')), 'value': next(iter(v.values())), 'address': TestnetData.address1} for v in tx_history]
 
-        tx_input = [{'output': TestnetData.txid1, 'value': TestnetData.tx_amount, 'address': TestnetData.address1}]
+            tx_input_total = sum(x['value'] for x in tx_input)
+            tx_remain_amount = tx_input_total - TestnetData.send_amount
+            # tx = tx_func.mktx(tx_input, [{'value': TestnetData.send_amount, 'address': TestnetData.address2}, {'value': tx_remain_amount, 'address': TestnetData.address1}])
+            tx = tx_func.mktx(tx_input_orig, [{'value': TestnetData.send_amount, 'address': TestnetData.address2}])
+            signed_tx = tx_func.sign(tx, 0, TestnetData.priv1, SIGHASH_ALL)
 
-        tx_send_amount = TestnetData.send_amount
-        tx_receive_address = TestnetData.address2
-
-        tx = tx_func.mktx(tx_input, [{'value': TestnetData.send_amount, 'address': TestnetData.address2}])
-        signed_tx = tx_func.sign(tx, 0, TestnetData.priv1, SIGHASH_ALL)
-        tx_bytes = signed_tx.encode('utf-8')
-        print('Signed is: \n')
-        print(signed_tx)
-        tx_hex = b2lx(tx_bytes)
-        print('Decoded is: \n')
-        print(tx_hex)
-
-        btcd_utils.send_tx(signed_tx, 'testnet')
-
-        # addr = CBitcoinAddress(TestnetData.address2)
-        #
-        # rpc = Proxy(service_port=18332, btc_conf_file='/data/bitcoin/.bitcoin2/bitcoin.conf')
-        #
-        # tx_raw = rpc.getrawtransaction(lx(TestnetData.txid1))
-        #
-        # vout_tx = [tx_raw.vout.index(x) for x in tx_raw.vout if x.nValue == TestnetData.tx_amount]
-        #
-        # if not len(vout_tx) > 0:
-        #     raise SystemError
-        #
-        # txid = lx(TestnetData.txid1)
-        # vout = vout_tx[0]
-        #
-        # txin = CMutableTxIn(COutPoint(txid, vout))
-        # txout = CMutableTxOut(TestnetData.send_amount, addr)
-        #
-        # tx = CMutableTransaction([txin], [txout])
-        #
-        # pubkey = btc_tools.privtopub(TestnetData.priv1)
-        #
-        # txin_scriptPubKey = CScript([OP_DUP, OP_HASH160, Hash160(pubkey.encode('utf-8')), OP_EQUALVERIFY, OP_CHECKSIG])
-        #
-        # sighash = SignatureHash(txin_scriptPubKey, tx, 0, SIGHASH_ALL)
-        #
-        # sig = tx_func.sign(tx, 0, TestnetData.priv1, SIGHASH_ALL)
-        #
-        # sig = rpc.signrawtransaction(tx, [TestnetData.priv1])
-        #
-        #
-        #
-        # txin_scriptSig = CScript([sig, TestnetData.priv1])
-        # VerifyScript(txin.scriptSig, txin_scriptPubKey, tx, vout, (SCRIPT_VERIFY_P2SH,))
-        #
-        #
-        # result = rpc.sendrawtransaction(tx, allowhighfees=False)
+            # btcd_utils.send_tx(signed_tx, 'testnet')
 
     def pytool_run(self):
         add1 = 'miPtyvZgdXidDug4msfFyBpMy2z8VrkR1C'
@@ -353,10 +308,11 @@ class TestnetData:
     # txid1 = '5381cd7bdee5629b2621dbbb8347f071a8db5a2733404edd7f55caf827e50602'
     # txid1 = u'f160bd9bb06c4f6fb38d1edae178393cabd99df658a08907bf1a138ce407daa2:0'
     # txid1 = u'a0b993b0f3ea76545669b0bc80b1293ababe9304a41a9b16473284b56dae1801:0'
-    txid1 = u'20bbefbd839f50d89720a868c161e25765641cb74dfaadbf056e7ffd5e07945c:0'
+    # txid1 = u'20bbefbd839f50d89720a868c161e25765641cb74dfaadbf056e7ffd5e07945c:0'
+    txid1 = u'43d9ac22dc3fa21b8ca91326b4c294a52d753279e132c44d378ea4ed70007dc2:0'
     # tx_amount = int(0.65 * COIN)
-    # tx_amount = int(1.07901739 * COIN)
-    tx_amount = int(1.29990000 * COIN)
+    tx_amount = int(1.07900739 * COIN)
+    # tx_amount = int(1.72899739 * COIN)
 
     send_amount = int(tx_amount - 1000)
 
@@ -366,16 +322,6 @@ class PyBtcTest:
 
 
 class PycoinScript:
-    import os
-    import argparse
-    from binascii import hexlify, unhexlify
-    import sys
-
-    from urllib.error import HTTPError
-
-    from pycoin.key import Key
-    from pycoin.tx.tx_utils import create_tx, sign_tx
-    import pycoin.services.blockchain_info
 
     def send_all(self):
         parser = argparse.ArgumentParser()

@@ -7,7 +7,7 @@ from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, Boolean, exc,
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.engine.url import URL
-from sqlalchemy.orm import sessionmaker, relationship, mapper, load_only
+from sqlalchemy.orm import sessionmaker, relationship, mapper, load_only, clear_mappers
 from sqlalchemy.ext.declarative import declarative_base
 
 import asyncio
@@ -544,20 +544,14 @@ def cx_update_listener(*args):
                     session.rollback()
 
 
-
-
-                    # for v in context.mappers.Mapper:
-                    #
-
-def heartbeat_get_all():
-
+async def heartbeat_get_all():
+    clear_mappers()
     heartbeat_engine = create_engine(URL(**db_config.SOCIALBASE), echo=True)
     metadata = MetaData(heartbeat_engine)
     heartbeats = Table('heartbeat_field_data', metadata, autoload=True)
     mapper(Heartbeat, heartbeats)
     media_session = sessionmaker(bind=heartbeat_engine)()
     result = media_session.query(Heartbeat).options(load_only('message')).limit(50).all()
-        # (CXPriceRevision.currency == currency).order_by(CXPriceRevision.rid.desc()).limit(15).all()
     data = []
     if result is not None:
         for r in result:

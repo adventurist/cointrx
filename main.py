@@ -334,9 +334,11 @@ class TRXApplication(Application):
             "debug": True,
             "static_path": os.path.join(os.path.dirname(__file__), "static"),
             "template_path": os.path.join(os.path.dirname(__file__)),
+            # "files_path": os.path.join(os.path.dirname(__file__), "sites")
         }
         handlers = [
             (r"/", MainHandler),
+            (r"/sites/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "sites")}),
             (r"/jigga", WunderHandler),
             (r"/login", LoginHandler),
             (r"/register", RegisterHandler),

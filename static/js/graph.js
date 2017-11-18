@@ -212,7 +212,6 @@ function currencyFilterListen() {
 
 function currencyFilter(lang) {
     if (TRXDATA.data !== null) {
-        clearSvg();
         requestGraph(settings.liveUrl + '/prices/graph/currency?currency=' + lang, TRXDATA.data, convertCurrencyToEur, currencyGraphHistory);
     }
 }
@@ -248,7 +247,7 @@ function clearSvg() {
 // }
 
 function currencyGraphHistory(initData) {
-
+    clearSvg();
     let timeFormat = d3.timeFormat("%I:%M %p %a %Y");
 
     data = [];

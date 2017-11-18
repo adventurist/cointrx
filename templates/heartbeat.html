@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="/static/styles.css" />
+        <title>{{ title }}</title>
+    </head>
+    <body>
+        <div class="container="></div>
+        <div class="heartbeat-stream">
+            {% for heartbeat in heartbeats %}
+            <div class="heartbeat-message">
+            <div class="heartbeat-message-wrap">
+                <div class="heartbeat-content hid-69">
+                    {% raw heartbeat %}
+                </div>
+            </div>
+        </div>
+        {% end %}
+        </div>
+        <div id="heartbeat-friendship-action"></div>
+    </body>
+</html>
