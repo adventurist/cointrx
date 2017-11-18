@@ -3,11 +3,11 @@ import sys
 import hashlib
 
 # from tornado import websocket
-from bitcoin import wallet, main as btc_tools, bci, transaction as tx_func
+from bitcoin import main as btc_tools, transaction as tx_func
 from bitcoin.core import b2x, lx, COIN, COutPoint, CMutableTxOut, CMutableTxIn, CMutableTransaction, Hash160, b2lx
 from bitcoin.core.script import CScript, OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG, SignatureHash, SIGHASH_ALL
 from bitcoin.core.scripteval import VerifyScript, SCRIPT_VERIFY_P2SH
-from bitcoin.wallet import CBitcoinAddress, CBitcoinSecret
+# from bitcoin.wallet import CBitcoinAddress, CBitcoinSecret
 from bitcoin.rpc import Proxy
 
 from pycoin.services import spendables_for_address
