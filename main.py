@@ -14,7 +14,7 @@ from tornado.ioloop import IOLoop
 from tornado.options import define
 from tornado.web import Application, RequestHandler, StaticFileHandler
 
-import db
+from db import db
 from iox.loop_handler import IOHandler
 from tx import trx__tx_out
 from utils.cointrx_client import Client
@@ -328,6 +328,16 @@ class HeartbeatHandler(RequestHandler):
         self.render("templates/heartbeat.html", title="Heartbeat", heartbeats=result)
 
 
+class HeartbeatCreateHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        db.create_all_heartbeat()
+
+        self.write('Good boy')
+
+
 class TRXApplication(Application):
     def __init__(self):
         settings = {
@@ -339,6 +349,7 @@ class TRXApplication(Application):
         handlers = [
             (r"/", MainHandler),
             (r"/sites/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "sites")}),
+            (r"/themes/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "themes")}),
             (r"/jigga", WunderHandler),
             (r"/login", LoginHandler),
             (r"/register", RegisterHandler),
@@ -355,6 +366,7 @@ class TRXApplication(Application):
             (r"/transaction/sendraw", SendTrawTransactionHandler),
             (r"/react/test", ReactTestHandler),
             (r"/heartbeat/feed", HeartbeatHandler),
+            (r"/heartbeat/create", HeartbeatCreateHandler),
             (r"/users/all", UserListHandler),
             (r"/static/(.*)", StaticFileHandler, {
                 "path": "/static"})

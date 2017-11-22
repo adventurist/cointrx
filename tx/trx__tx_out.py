@@ -7,10 +7,10 @@ from bitcoin import main as btc_tools, transaction as tx_func
 from bitcoin.core import b2x, lx, COIN, COutPoint, CMutableTxOut, CMutableTxIn, CMutableTransaction, Hash160, b2lx
 from bitcoin.core.script import CScript, OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG, SignatureHash, SIGHASH_ALL
 from bitcoin.core.scripteval import VerifyScript, SCRIPT_VERIFY_P2SH
-# from bitcoin.wallet import CBitcoinAddress, CBitcoinSecret
+from bitcoin.wallet import CBitcoinAddress, CBitcoinSecret
 from bitcoin.rpc import Proxy
 
-from pycoin.services import spendables_for_address
+# from pycoin.services import spendables_for_address
 
 from utils import btcd_utils
 
@@ -39,79 +39,79 @@ def getTxMsg(payload):
 
 class transaction:
     def start(self):
-
-        rpc = Proxy(service_port=18332)
-        addr = wallet.CBitcoinAddress(TestnetData)
-        addr.maketrans()
-        txid = rpc.sendtoaddress(addr, 0.001 * COIN)
-        print(b2lx(txid))
-
-    def run(self):
-        # Send this amount
-        scriptPubKey = None
-        send_amnt = TestnetData.send_amount
-        remain_amnt = TestnetData.tx_amount - send_amnt
-        tx_amount = TestnetData.tx_amount
-
-        rpc = Proxy(service_port=18332)
-        txin_raw = rpc.getrawtransaction(lx(TestnetData.txid1))
-
+        jigga = 'zigga'
+    #     rpc = Proxy(service_port=18332)
+    #     addr = wallet.CBitcoinAddress(TestnetData)
+    #     addr.maketrans()
+    #     txid = rpc.sendtoaddress(addr, 0.001 * COIN)
+    #     print(b2lx(txid))
+    #
+    # def run(self):
+    #     # Send this amount
+    #     scriptPubKey = None
+    #     send_amnt = TestnetData.send_amount
+    #     remain_amnt = TestnetData.tx_amount - send_amnt
+    #     tx_amount = TestnetData.tx_amount
+    #
+    #     rpc = Proxy(service_port=18332)
+    #     txin_raw = rpc.getrawtransaction(lx(TestnetData.txid1))
+    #
         vout_tx = [txin_raw.vout.index(x) for x in txin_raw.vout if x.nValue == tx_amount]
-        if len(vout_tx) > 0:
-            vout = vout_tx[0]
-            scriptPubKey = txin_raw.vout[vout].scriptPubKey
-        # if send_amnt + remain_amnt == input_tx_size:
-        #     print('Amounts are equal')
-        # else:
-        #     raise ArithmeticError('Unequal amounts for transaction. Will likely raise OP_EQUALVERIFY failure')
-
-        # Create brainwallet secret key
-        seckey = CBitcoinSecret.from_secret_bytes(TestnetData.priv1.encode())
-
-        # Create a transaction ID with the lx function
-        txid = lx(TestnetData.txid1)
-        # TODO Check count on next line
-
-        # vout = 0
-        # prev_scriptPubKey = txin_raw.vout[vout].scriptPubKey
-
-        # Create the txin structure
-        txin = CMutableTxIn(COutPoint(txid, vout))
-
-        # noinspection PyPep8Naming and create scriptPubKey
-        txin_scriptPubKey = CScript([OP_DUP, OP_HASH160, Hash160(seckey.pub), OP_EQUALVERIFY, OP_CHECKSIG])
-
-        txout = CMutableTxOut(send_amnt, CBitcoinAddress(TestnetData.address2))
-
-        # Create unsigned transaction
-        tx = CMutableTransaction([txin], [txout])
-
-        # Calculate signature hash
-        sighash = SignatureHash(txin_scriptPubKey, tx, 0, SIGHASH_ALL)
-
-        # hexhash = "".join(map(lambda b: format(b, "02x"), sighash))
-        # hexhscriptPubKey = "".join(map(lambda b: format(b, "02x"), txin_scriptPubKey))
-        # Sign it
-        sig = seckey.sign(sighash) + bytes([SIGHASH_ALL])
-
-        # Set the scriptSig of our transaction appropriately
-        txin.scriptSig = CScript([sig, seckey.pub])
-
-        # Verify signing worked
-        VerifyScript(txin.scriptSig, txin_scriptPubKey, tx, 0, (SCRIPT_VERIFY_P2SH,))
-
-        # Convert transaction to stdout compatible hex
-        transaction_final_out = b2x(tx.serialize())
-
-        transaction_bytesize = sys.getsizeof(tx)
-
-        # proxy = Proxy(btc_conf_file='/data/bitcoin/data/testnet3/bitcoin.conf', service_url='http://127.0.0.1')
-        # proxy = Proxy(service_port=18332) <-- Instantiating this earlier in the method
-
-        proxy_info = rpc.getinfo()
-        r = rpc.sendrawtransaction(tx)
-
-        print(r)
+    #     if len(vout_tx) > 0:
+    #         vout = vout_tx[0]
+    #         scriptPubKey = txin_raw.vout[vout].scriptPubKey
+    #     # if send_amnt + remain_amnt == input_tx_size:
+    #     #     print('Amounts are equal')
+    #     # else:
+    #     #     raise ArithmeticError('Unequal amounts for transaction. Will likely raise OP_EQUALVERIFY failure')
+    #
+    #     # Create brainwallet secret key
+    #     seckey = CBitcoinSecret.from_secret_bytes(TestnetData.priv1.encode())
+    #
+    #     # Create a transaction ID with the lx function
+    #     txid = lx(TestnetData.txid1)
+    #     # TODO Check count on next line
+    #
+    #     # vout = 0
+    #     # prev_scriptPubKey = txin_raw.vout[vout].scriptPubKey
+    #
+    #     # Create the txin structure
+    #     txin = CMutableTxIn(COutPoint(txid, vout))
+    #
+    #     # noinspection PyPep8Naming and create scriptPubKey
+    #     txin_scriptPubKey = CScript([OP_DUP, OP_HASH160, Hash160(seckey.pub), OP_EQUALVERIFY, OP_CHECKSIG])
+    #
+    #     txout = CMutableTxOut(send_amnt, CBitcoinAddress(TestnetData.address2))
+    #
+    #     # Create unsigned transaction
+    #     tx = CMutableTransaction([txin], [txout])
+    #
+    #     # Calculate signature hash
+    #     sighash = SignatureHash(txin_scriptPubKey, tx, 0, SIGHASH_ALL)
+    #
+    #     # hexhash = "".join(map(lambda b: format(b, "02x"), sighash))
+    #     # hexhscriptPubKey = "".join(map(lambda b: format(b, "02x"), txin_scriptPubKey))
+    #     # Sign it
+    #     sig = seckey.sign(sighash) + bytes([SIGHASH_ALL])
+    #
+    #     # Set the scriptSig of our transaction appropriately
+    #     txin.scriptSig = CScript([sig, seckey.pub])
+    #
+    #     # Verify signing worked
+    #     VerifyScript(txin.scriptSig, txin_scriptPubKey, tx, 0, (SCRIPT_VERIFY_P2SH,))
+    #
+    #     # Convert transaction to stdout compatible hex
+    #     transaction_final_out = b2x(tx.serialize())
+    #
+    #     transaction_bytesize = sys.getsizeof(tx)
+    #
+    #     # proxy = Proxy(btc_conf_file='/data/bitcoin/data/testnet3/bitcoin.conf', service_url='http://127.0.0.1')
+    #     # proxy = Proxy(service_port=18332) <-- Instantiating this earlier in the method
+    #
+    #     proxy_info = rpc.getinfo()
+    #     r = rpc.sendrawtransaction(tx)
+    #
+    #     print(r)
 
         # peers = list(
         #     map(
@@ -149,19 +149,19 @@ class transaction:
 
     def regtest_run(self):
         amount_to_send = RegtestData.send_amount
-        satoshis_to_send = RegtestData.send_amount * COIN
-
-        addr = CBitcoinAddress(RegtestData.address1)
-
-        rpc = Proxy(service_port=18444, btc_conf_file='/data/bitcoin/.bitcoin2/bitcoin.conf')
-
-        current_info = rpc.getinfo()
-        verify_attempt1 = rpc.validateaddress(RegtestData.address1)
-        verify_attempt2 = rpc.validateaddress(RegtestData.address2)
-
-        txid = rpc.sendtoaddress(addr, satoshis_to_send)
-
-        little_endian_hex = b2lx(txid)
+        # satoshis_to_send = RegtestData.send_amount * COIN
+        #
+        # addr = CBitcoinAddress(RegtestData.address1)
+        #
+        # rpc = Proxy(service_port=18444, btc_conf_file='/data/bitcoin/.bitcoin2/bitcoin.conf')
+        #
+        # current_info = rpc.getinfo()
+        # verify_attempt1 = rpc.validateaddress(RegtestData.address1)
+        # verify_attempt2 = rpc.validateaddress(RegtestData.address2)
+        #
+        # txid = rpc.sendtoaddress(addr, satoshis_to_send)
+        #
+        # little_endian_hex = b2lx(txid)
 
     def testnet_run(self):
         if TestnetData.address1:

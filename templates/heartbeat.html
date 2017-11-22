@@ -1,6 +1,8 @@
 <html>
     <head>
+        <script src="/static/jquery-3.2.1.min.js"></script>
         <link rel="stylesheet" href="/static/styles.css" />
+        <link rel="stylesheet" href="{{ static_url("heartbeat.css") }}" />
         <title>{{ title }}</title>
     </head>
     <body>
@@ -8,14 +10,48 @@
         <div class="heartbeat-stream">
             {% for heartbeat in heartbeats %}
             <div class="heartbeat-message">
-            <div class="heartbeat-message-wrap">
-                <div class="heartbeat-content hid-69">
-                    {% raw heartbeat %}
+                <div class="heartbeat-message-wrap">
+                    <div class="heartbeat-owner">
+                        <a href="/user/{{ heartbeat['user']['uid'] }}"><img src="/{{ heartbeat['user']['img'] }}" />
+                            {{ heartbeat['user']['name'] }}
+                        </a>
+                        <div class="time-ago">{{ heartbeat['timeago'] }}</div>
+                    </div>
+
+                    <div class="heartbeat-content hid-{{ heartbeat['id'] }}">
+                        {% raw heartbeat['message'] %}
+                    </div>
                 </div>
+                <div class="heartbeat-comment-button">
+                    {% if heartbeat['commentcount'] > 1 %}
+                    {{ heartbeat['commentcount'] }} comments
+                    {% elif heartbeat['commentcount'] == 1 %}
+                    {{ heartbeat['commentcount'] }} comment
+                    {% else %}
+                    Comment
+                    {% end %}
+                </div>
+                <div class="heartbeat-comment">
+                        <div class="heartbeat-comments">
+                            {% for comment in heartbeat['comments'] %}
+                            <div id="heartbeat-comment-69">
+                                <span class="comment-owner">
+                                  <span class="comment-username">{{ comment['user'].name }}</span><br>
+                                  <span class="comment-ago">{{ comment['timeago'] }}</span>
+                                </span>
+                                <span class="comment-body">{{ comment['body'].comment_body_value }}
+                                  <div class="comment-like">COMMENT LIKE</div>
+                                </span>
+                            </div>
+                            {% end %}
+                        </div>
+                    </div>
             </div>
+            {% end %}
+            <div id="heartbeat-friendship-action"></div>
         </div>
-        {% end %}
-        </div>
-        <div id="heartbeat-friendship-action"></div>
+        <script src="{{ static_url("jquery.colorbox-min.js") }}"></script>
+        <script src="{{ static_url("jquery.touchSwipe.min.js") }}"></script>
+        <script src="{{ static_url("heartbeat.js") }}"></script>
     </body>
 </html>
