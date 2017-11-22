@@ -1,38 +1,27 @@
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from passlib.apps import custom_app_context as pwd_context
+from aiopg.sa import create_engine as async_engine
 from sqlalchemy import ForeignKey
-from sqlalchemy import ForeignKeyConstraint
 from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, String, Text, DateTime, DECIMAL, Boolean, exc, event, Table, MetaData, DDL, \
-    join, \
-    select, insert, update, outerjoin
+from sqlalchemy import Column, Integer, String, Text, DECIMAL, Boolean, exc, event, MetaData, select
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.engine.url import URL
-from sqlalchemy.orm import sessionmaker, relationship, mapper, load_only, clear_mappers, backref
+from sqlalchemy.orm import sessionmaker, relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, as_declarative, declared_attr
-
-import asyncio
-import timeago
-
-from aiopg.sa import create_engine as async_engine
-
 from db import db_config
-# from db.heartbeat import *
+from types import SimpleNamespace
 
 from mypy import *
 
-import json
+import asyncio
+import timeago
 import re
 import time
 import datetime
-
-from sqlalchemy.orm.collections import attribute_mapped_collection
-
 import random
 
-from types import SimpleNamespace
 
 Base = declarative_base()
 metadata = MetaData()
@@ -43,37 +32,6 @@ session = Session()
 
 trxapp = SimpleNamespace()
 trxapp.config = {'SECRET_KEY': "jigga does as jigga does"}
-
-
-# async def count(conn):
-#     c1 = (await conn.scalar(jiggas.count()))
-#     c2 = (await conn.scalar(emails.count()))
-#     print("Population consists of", c1, "people with",
-#           c2, "emails in total")
-#     add_join = join(emails, jiggas, jiggas.c.id == emails.c.user_id)
-#     query = (select([jiggas.c.name])
-#              .select_from(add_join)
-#              .where(emails.c.private == False)  # noqa
-#              .group_by(jiggas.c.name)
-#              .having(func.count(emails.c.private) > 0))
-#
-#     print("Users with public emails:")
-#     async for row in conn.execute(query):
-#         print(row.name)
-#
-#     print()
-
-
-# async def show_julia(conn):
-#     print("Lookup for Julia:")
-#     add_join = join(emails, jiggas, jiggas.c.id == emails.c.user_id)
-#     query = (select([jiggas, emails], use_labels=True)
-#              .select_from(add_join).where(jiggas.c.name == 'Julia'))
-#     async for row in conn.execute(query):
-#         print(row.jiggas_name, row.jiggas_birthday,
-#               row.emails_email, row.emails_private)
-#     print()
-
 
 class User(Base):
     __tablename__ = 'users'
@@ -285,7 +243,6 @@ class Heartbeat(Base):
     message = Column(Text)
     created = Column(Integer)
     status = Column(Boolean)
-    # user = relationship("HeartbeatUser", backref="heartbeat_field_data", uselist=False)
     comments = relationship("HeartbeatComment", backref="heartbeat_field_data", uselist=True)
 
     def serialize(self) -> dict:
@@ -305,9 +262,6 @@ class HeartbeatUser(Base):
     uid = Column(Integer, primary_key=True)
     name = Column(String(128))
     heartbeats = relationship("Heartbeat", backref='user', uselist=True)
-    # comment = relationship("HeartbeatComment", uselist=False, back_populates='user')
-    # comment = relationship("HeartbeatComment", backref='user', uselist=False, foreign_keys='comment_field_data.uid')
-    # pic2 = relationship("HeartbeatUserPicture", backref='user_field_data', uselist=False)
 
     def serialize(self) -> dict:
         return {
@@ -328,9 +282,7 @@ class FileManaged(Base):
     __tablename__ = 'file_managed'
     fid = Column(Integer, primary_key=True)
     uid = Column(Integer)
-
     uri = Column(String)
-    # __table_args__ = (ForeignKeyConstraint([fid, uid],[HeartbeatUserPicture.user_picture_target_id, HeartbeatUserPicture.entity_id]), {})
 
 
 class HeartbeatComment(Base):
@@ -340,71 +292,7 @@ class HeartbeatComment(Base):
     entity_type = Column(String)
     uid = Column(Integer, ForeignKey('users_field_data.uid'))
     body = relationship("HeartbeatCommentBody", backref="comment_field_data", uselist=False)
-    # owner_id = Column(Integer, ForeignKey('user_field_data.uid'))
-    # user = relationship("HeartbeatUser", primaryjoin='users_field_data.uid ==' + uid + '"')
-
     entity_id = Column(Integer, ForeignKey(Heartbeat.id))
-    # heartbeat_id = Column(Integer, ForeignKey('heartbeat_field_data.id'))
-    # entity_id = Column(Integer)
-
-    # __mapper_args__ = {
-    #     'polymorphic_on': entity_type,
-    #     'polymorphic_identity': 'comment'
-    # }
-
-    # @reconstructor
-    # def __init__(self):
-    #     # self.__init__()
-    #     if self.entity_type is not None and self.entity_type == 'heartbeat':
-    #         # self.entity_id = Column(Integer, ForeignKey('heartbeat_field_data.id'))
-    # self.entity_id = relationship('HeartbeatComment', remote_side=[HeartbeatComment.cid])
-    # if self.entity_type is not None:
-    # self.sub_comments = relationship("HeartbeatCommentComment", backref="parent", uselist=True, remote_side="HeartbeatCommentComment.entity_id")
-
-
-
-    # class HeartbeatComment(HeartbeatCommentBase):
-    #
-    #     # sub_comments = relationship("HeartbeatCommentComment", backref=backref('HeartbeatComment', uselist=True), remote_side=HeartbeatCommentComment.parent_id)
-    #
-    #     __mapper_args__ = {
-    #         'polymorphic_identity': 'HeartbeatComment'
-    #     }
-    #
-    #     def serialize(self) -> dict:
-    #         return {
-    #             'cid': self.cid,
-    #         }
-
-    # sub_commments = relationship('HeartbeatCommentComment', backref='comment_field_data', remote_side='HeartbeatCommentComment.c_entity_id')
-    # sub_comments = relationship("HeartbeatCommentComment", backref="comment_parent", uselist=True, remote_side="HeartbeatCommentComment.parent_id")
-
-    # cid = Column(Integer,  ForeignKey('comment_field_data.cid'), primary_key=True)
-    # sub_comment_id = Column(Integer, ForeignKey('comment_field_data.entity_id'))
-    # sub_comment = relationship("HeartbeatCommentComment", remote_side="HeartbeatCommentComment.parent_id")
-    # sub_comments = relationship(HeartbeatCommentComment,
-    #                             primaryjoin=sub_comment_id == HeartbeatCommentComment.entity_id)
-
-
-# class HeartbeatCommentComment(HeartbeatComment):
-#     # __tablename__ = 'sub_comment'
-#     # cid = Column(Integer, primary_key=True)
-#     # parent_id = Column(Integer, ForeignKey('comment_field_data.cid'))
-#     entity_id = Column(Integer, ForeignKey(HeartbeatComment.cid))
-#     parent = relationship(HeartbeatComment, backref="sub_comments", remote_side=HeartbeatComment.cid)
-#     # parent_id = Column(Integer, ForeignKey('HeartbeatComment.cid'))
-#     # parent_id = Column(Integer, ForeignKey('comment_field_data.cid'))
-#     # parent = relationship("HeartbeatComment", foreign_keys='HeartbeatCommentComment.parent_id')
-#     # parent = relationship("HeartbeatComment", primaryjoin="HeartbeatCommentComment.entity_id==HeartbeatComment.cid")
-#
-#     __mapper_args__ = {
-#         'polymorphic_identity': 'sub_comment'
-#     }
-#
-#     def serialize(self) -> dict:
-#         return {
-#             'cid': self.cid,
-#         }
 
 
 class HeartbeatFlag(object):
@@ -434,38 +322,6 @@ async def test_db():
             query = select([CXPrice])
             async for row in conn.execute(query):
                 print(row)
-
-
-                # engine = await async_engine(user='coinxadmin',
-                #                             database='coinxdb',
-                #                             host='127.0.0.1',
-                #                             password='coinxadmin')
-                # Session = sessionmaker(bind=engine)
-                # session = Session()
-                # prices = await session.query(CXPrice).all()
-                # async for price in prices:
-                #     print(price)
-
-
-                # @asyncio.coroutine
-                # def test_db():
-                #     engine_instance = yield from trx_db_engine()
-                #     with engine_instance.acquire() as conn:
-                #         yield from conn.execute(tbl.insert().values(val='abc'))
-                #
-                #         for row in conn.execute(tbl.select().where(tbl.c.val=='abc')):
-                #             print(row.id, row.val)
-                # async_e = yield from trx_db_engine()
-                # with (yield from async_e) as conn:
-                #     res = yield from conn.execute("SELECT * from cx_price_revision")
-                #     handle_db_data(res)
-                #
-                #     with engine.async_e() as conn:
-                #
-                #         yield from conn.execute(tbl.insert().values(val='abc'))
-                #
-                #         for row in conn.execute(tbl.select().where(tbl.c.val=='abc'))
-                #             print(row.id, row.val)
 
 
 def db_connect():
@@ -565,21 +421,6 @@ async def latest_price_history_async(currency: str):
     return data
 
 
-# async def get_users():
-#     engine = await async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'],
-#                                 host=db_config.DATABASE['host'], password=db_config.DATABASE['password'])
-#
-#     async with engine:
-#         async with engine.acquire() as conn:
-#             try:
-#                 query = select([User])
-#                 result = await conn.execute(query)
-#                 result = await [r for r, in result]
-#                 return result
-#             except exc.SQLAlchemyError as error:
-#                 print(error)
-#
-
 def get_users():
     result = session.query(User).all()
     data = {}
@@ -592,11 +433,6 @@ def get_users():
 
 async def parse_price_data(data):
     for k, v in data.items():
-        # print('My thing is')
-        # print(k)
-        # print('My value is')
-        # print(json.dumps(v['sell']))
-
         engine = await async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'],
                                     host=db_config.DATABASE['host'], password=db_config.DATABASE['password'])
 
@@ -604,12 +440,7 @@ async def parse_price_data(data):
             async with engine.acquire() as conn:
                 try:
                     query = select([CXPrice]).where(CXPrice.currency == k)
-
                     cur_time = time.time()
-                    # async for row in conn.execute(query):
-                    #     print(row)
-                    #     if row is None:
-                    #         print('jigga')
                     result = await conn.execute(query)
 
                     if result.rowcount < 1:
@@ -627,11 +458,6 @@ async def parse_price_data(data):
                                                                                                last=v['last'],
                                                                                                buy=v['buy'],
                                                                                                modified=cur_time))
-                            # rev_query = await select([CXPriceRevision])
-                            # .where(CXPriceRevision.currency == k).group_by(CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid)))
-                            # async for row in conn.execute(rev_query):
-
-                    # rid = rid if row is None else row.rid + 1
                     query2 = select([CXPriceRevision]).where(CXPriceRevision.currency == k).group_by(
                         CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid)))
                     result2 = await conn.execute(query2)
@@ -650,72 +476,6 @@ async def parse_price_data(data):
 
                 finally:
                     conn.close()
-
-
-
-                    # async with engine:
-                    #     async with engine.acquire() as conn:
-                    #         query = select([CXPrice])
-                    #         async for row in conn.execute(query):
-                    #             print(row)
-
-
-async def fill_data(conn):
-    async with conn.begin():
-        for name in random.sample(names, len(names)):
-            uid = await conn.scalar(
-                users.insert().values(name=name, birthday=gen_birthday()))
-            emails_count = int(random.paretovariate(2))
-            for num in random.sample(range(10000), emails_count):
-                is_private = random.uniform(0, 1) < 0.8
-                await conn.execute(emails.insert().values(
-                    user_id=uid,
-                    email='{}+{}@gmail.com'.format(name, num),
-                    private=is_private))
-                #     query_price = session.query(CXPrice).filter(CXPrice.currency == k).first()
-                #     # TODO move revision insert to trigger
-                #     if query_price is None:
-                #         new_currency = CXPrice(currency=k, last=v['last'], buy=v['buy'], sell=v['sell'], modified=time.time())
-                #         # last = session.query(CXPriceRevision).filter(CXPriceRevision.currency == v.currency).group_by(CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid))).one_or_none()
-                #         new_rev = CXPriceRevision(rid=1, currency=k, last=v['last'], buy=v['buy'], sell=v['sell'], modified=new_currency.modified)
-                #
-                #         try:
-                #             session.add(new_currency)
-                #             session.commit()
-                #             new_rev.currency_id = new_currency.id
-                #             session.add(new_rev)
-                #             session.commit()
-                #         except exc.SQLAlchemyError as error:
-                #             session.rollback()
-                #             print(error)
-                #     else:
-                #         print(query_price.serialize())
-                #
-                #         query_price.last = v['last']
-                #         query_price.buy = v['buy']
-                #         query_price.sell = v['sell']
-                #         query_price.modified = time.time()
-                #         revisions = query_price.revisions
-                #         # last = None
-                #         # last = session.query(CXPriceRevision).filter(CXPriceRevision.id == query_price.id).group_by(CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid))).one_or_none()
-                #         rid = 1 if revisions is None else revisions[0] + 1
-                #         new_rev = CXPriceRevision(rid=rid, currency=k, last=v['last'], buy=v['buy'], sell=v['sell'], modified=query_price.modified)
-                #
-                #         try:
-                #             session.add(query_price)
-                #             session.add(new_rev)
-                #             session.commit()
-                #         except exc.SQLAlchemyError as error:
-                #             session.rollback()
-                #             print(error)
-                #
-                #         # query_price(currency=k, last=v['last'], buy=v['buy'], sell=v['sell'])
-                #
-                #         try:
-                #             session.commit()
-                #         except exc.SQLAlchemyError as error:
-                #             session.rollback()
-                #             print(error)
 
 
 def find_rid(data):
@@ -795,47 +555,14 @@ def build_comments(comments, now, session):
 
 
 async def heartbeat_get_all():
-    # clear_mappers()
-    # create_all()
-    # create_all_heartbeat()
     heartbeat_engine = create_engine(URL(**db_config.SOCIALBASE), echo=True)
     now = datetime.datetime.now() + datetime.timedelta(seconds=60 * 3.4)
-    # mapper(HeartbeatCommentComment, polymorphic_identity='HeartbeatCommentComment', non_primary=True)
-    # mapper(HeartbeatComment, polymorphic_identity='HeartbeatComment', non_primary=True)
-
-    # mapper(Heartbeat, customers_table, properties={
-    #     'orders': relationship(Orders, backref='customer')
-    # })
-    # mapper(Orders, orders_table)
-    # metadata = MetaData(heartbeat_engine)
-    # heartbeats = Table('heartbeat_field_data', metadata, autoload=True)
-    # users = Table('users_field_data', metadata, autoload=True)
-    # comments = Table('comment_field_data', metadata, autoload=True)
-    # comments = Table('heartbeat__comments', metadata, autoload=True)
-    # comment_text = Table('comment__comment_body', metadata, autoload=True)
-    # files = Table('file_managed', metadata, autoload=True)
-    # flags = Table('flagging', metadata, autoload=True)
-    # flag_counts = Table('flag_counts', metadata, autoload=True)
-    # mapper(Heartbeat, heartbeats)
-    # mapper(HeartbeatUser, users)
-    # mapper(HeartbeatComment, comments)
-    # # mapper(HeartbeatCommentComment, comment_comments)
-    # mapper(HeartbeatCommentBody, comment_text)
-    # mapper(HeartbeatFile, files)
-    # mapper(HeartbeatFlag, flags)
-    # mapper(HeartbeatFlagCount, flag_counts)
     media_session = sessionmaker(bind=heartbeat_engine)()
-    # result = media_session.query(Heartbeat).join(HeartbeatUser, Heartbeat.uid == HeartbeatUser.uid).options(
-    #     load_only('message')).limit(50).all()
     result = media_session.query(Heartbeat).outerjoin(HeartbeatComment,
                                                       HeartbeatComment.entity_type == 'heartbeat').filter(Heartbeat.status==1).limit(50).all()
-    # result = media_session.query(Heartbeat).limit(50).all()
     data = []
     if result is not None:
         for r in result:
-            # commentss = r.sub_comments
-            new_user = r.user
-
             data.append(
                 {
                     'id': r.id,
