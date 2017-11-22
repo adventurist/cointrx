@@ -284,6 +284,7 @@ class Heartbeat(Base):
     name = Column(String(128))
     message = Column(Text)
     created = Column(Integer)
+    status = Column(Boolean)
     # user = relationship("HeartbeatUser", backref="heartbeat_field_data", uselist=False)
     comments = relationship("HeartbeatComment", backref="heartbeat_field_data", uselist=True)
 
@@ -827,7 +828,7 @@ async def heartbeat_get_all():
     # result = media_session.query(Heartbeat).join(HeartbeatUser, Heartbeat.uid == HeartbeatUser.uid).options(
     #     load_only('message')).limit(50).all()
     result = media_session.query(Heartbeat).outerjoin(HeartbeatComment,
-                                                      HeartbeatComment.entity_type == 'heartbeat').limit(50).all()
+                                                      HeartbeatComment.entity_type == 'heartbeat').filter(Heartbeat.status==1).limit(50).all()
     # result = media_session.query(Heartbeat).limit(50).all()
     data = []
     if result is not None:
