@@ -279,12 +279,12 @@ class Heartbeat(Base):
     __tablename__ = 'heartbeat_field_data'
     id = Column(Integer, primary_key=True)
     type = Column(String(32))
-    uid = Column(Integer)
+    uid = Column(Integer, ForeignKey('users_field_data.uid'))
     nid = Column(Integer)
     name = Column(String(128))
     message = Column(Text)
     created = Column(Integer)
-    user = relationship("HeartbeatUser", backref="heartbeat_field_data", uselist=False)
+    # user = relationship("HeartbeatUser", backref="heartbeat_field_data", uselist=False)
     comments = relationship("HeartbeatComment", backref="heartbeat_field_data", uselist=True)
 
     def serialize(self) -> dict:
@@ -301,10 +301,10 @@ class Heartbeat(Base):
 
 class HeartbeatUser(Base):
     __tablename__ = 'users_field_data'
-    uid = Column(Integer, ForeignKey('heartbeat_field_data.uid'), primary_key=True)
+    uid = Column(Integer, primary_key=True)
     name = Column(String(128))
     pic = relationship("HeartbeatUserPicture", backref='user_field_data', uselist=False)
-
+    heartbeats = relationship("Heartbeat", backref='user', uselist=True)
     # comment = relationship("HeartbeatComment", uselist=False, back_populates='user')
     # comment = relationship("HeartbeatComment", backref='user', uselist=False, foreign_keys='comment_field_data.uid')
 
