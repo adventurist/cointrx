@@ -303,10 +303,10 @@ class HeartbeatUser(Base):
     __tablename__ = 'users_field_data'
     uid = Column(Integer, primary_key=True)
     name = Column(String(128))
-    pic = relationship("HeartbeatUserPicture", backref='user_field_data', uselist=False)
     heartbeats = relationship("Heartbeat", backref='user', uselist=True)
     # comment = relationship("HeartbeatComment", uselist=False, back_populates='user')
     # comment = relationship("HeartbeatComment", backref='user', uselist=False, foreign_keys='comment_field_data.uid')
+    # pic2 = relationship("HeartbeatUserPicture", backref='user_field_data', uselist=False)
 
     def serialize(self) -> dict:
         return {
@@ -320,6 +320,7 @@ class HeartbeatUserPicture(Base):
     entity_id = Column(Integer, ForeignKey('users_field_data.uid'), primary_key=True)
     user_picture_target_id = Column(Integer)
     image = relationship("FileManaged", backref='file_managed', uselist=False)
+    user = relationship("HeartbeatUser", backref='pic', uselist=False)
 
 
 class FileManaged(Base):
@@ -841,7 +842,7 @@ async def heartbeat_get_all():
                     'timeago': timeago.format(r.created, now),
                     'user': {
                         'name': r.user.name, 'uid': r.user.uid,
-                        'img': r.user.pic.image.uri.replace('public://', 'sites/default/files/styles/thumbnail/public/')
+                        'img': r.user.pic[0].image.uri.replace('public://', 'sites/default/files/styles/thumbnail/public/') if len(r.user.pic) > 0 else None
                     },
                     'comments': build_comments(r.comments, now, media_session),
                     'commentcount': len(r.comments)
