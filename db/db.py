@@ -326,7 +326,7 @@ class HeartbeatUserPicture(Base):
 class FileManaged(Base):
     __tablename__ = 'file_managed'
     fid = Column(Integer, ForeignKey('user__user_picture.user_picture_target_id'), primary_key=True)
-    uid = Column(Integer, primary_key=True)
+    uid = Column(Integer)
 
     uri = Column(String)
     # __table_args__ = (ForeignKeyConstraint([fid, uid],[HeartbeatUserPicture.user_picture_target_id, HeartbeatUserPicture.entity_id]), {})
