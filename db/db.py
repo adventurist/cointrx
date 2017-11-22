@@ -20,8 +20,6 @@ import timeago
 import re
 import time
 import datetime
-import random
-
 
 Base = declarative_base()
 metadata = MetaData()
@@ -32,6 +30,7 @@ session = Session()
 
 trxapp = SimpleNamespace()
 trxapp.config = {'SECRET_KEY': "jigga does as jigga does"}
+
 
 class User(Base):
     __tablename__ = 'users'
@@ -97,7 +96,7 @@ class User(Base):
         except BadSignature:
             return None  # invalid token
         user = session.query(User).get(data['id'])
-        # print(str(user))
+
         if user is None:
             return
         return user
