@@ -156,13 +156,7 @@ class LatestPriceHandler(RequestHandler):
 
     def get(self):
         result = (db.latest_prices())
-        data = []
-        i = 0
-        for r in result:
-            if isinstance(r, db.CXPrice):
-                data.append(r.serialize())
-                i += 1
-        self.write(escape.json_encode({'TRX': data}))
+        self.write(escape.json_encode({'TRX': result}))
 
 
 class UserListHandler(RequestHandler):
