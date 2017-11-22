@@ -318,14 +318,14 @@ class HeartbeatUser(Base):
 class HeartbeatUserPicture(Base):
     __tablename__ = 'user__user_picture'
     entity_id = Column(Integer, ForeignKey('users_field_data.uid'), primary_key=True)
-    user_picture_target_id = Column(Integer)
+    user_picture_target_id = Column(Integer, ForeignKey('file_managed.fid'))
     image = relationship("FileManaged", backref='file_managed', uselist=False)
     user = relationship("HeartbeatUser", backref='pic', uselist=False)
 
 
 class FileManaged(Base):
     __tablename__ = 'file_managed'
-    fid = Column(Integer, ForeignKey('user__user_picture.user_picture_target_id'), primary_key=True)
+    fid = Column(Integer, primary_key=True)
     uid = Column(Integer)
 
     uri = Column(String)
