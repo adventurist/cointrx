@@ -1,0 +1,472 @@
+.token-tree {
+  display: block;
+}
+
+
+.heartbeat-message {
+  border: 1px solid #dfdfdf;
+  padding: 16px;
+}
+
+.heartbeat-message img {
+  display: block;
+  padding: 4px;
+}
+
+
+.heartbeat-message img:first-of-type ~ img {
+  display: inline-block;
+  max-width: 25%;
+}
+
+.heartbeat-message img:last-of-type {
+  max-width: 100%;
+}
+
+.heartbeat-comments {
+  display: none;
+}
+
+.heartbeat-comments > div {
+  margin-top: 4em;
+}
+
+.heartbeat-comments-visible {
+  display: block!important;
+}
+
+/*Imgs displayed in colorbox*/
+
+.cboxPhoto {
+  max-height: 854px;
+  width: auto!important;
+  height: auto!important;
+  position: absolute;
+  top:0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+#colorbox {
+  text-align: center!important;
+  position: fixed!important;
+  top: 0!important;
+  left: 0!important;
+  background: rgba(28, 28, 28, 0.75)!important;
+  height: 100%!important;
+  width: 100%!important;
+}
+
+#cboxContent,
+#cboxLoadedContent,
+#cboxWrapper {
+  width: 100%!important;
+  height: 100%!important;
+}
+
+#cboxNext {
+  position: absolute;
+  right: 5px;
+  top: 45%;
+  color: transparent;
+  background: rgba(45, 45, 45, 0.5) url(/modules/heartbeat/images/forward.png) no-repeat 10px 10px;
+  background-size: 30px;
+  width: 10px;
+  height: 50px;
+}
+
+#cboxPrevious {
+  position: absolute;
+  left: 5px;
+  top: 45%;
+  color: transparent;
+  background: rgba(45, 45, 45, 0.5) url(/modules/heartbeat/images/backward.png) no-repeat 10px 10px;
+  background-size: 30px;
+  width: 10px;
+  height: 50px;
+}
+
+#cboxClose {
+  position: absolute;
+  top: 16%;
+  right: 10%;
+  width: 65px;
+  height: 67px;
+  background: url(/modules/heartbeat/images/cross-circular-button-outline.png) no-repeat center center;
+  color: transparent;
+}
+
+#cboxPrev:hover, #cboxNext:hover, #cboxClose:hover {
+  opacity: 0.5;
+}
+
+/*Main Feed Form*/
+#heartbeat-feed-form input[type="radio"] {
+    -webkit-appearance: none;
+    display: inline-block;
+}
+
+#heartbeat-feed-form .form-type-radio {
+    display: inline-block;
+    position: relative;
+    border-right: 1px solid white;
+}
+#heartbeat-feed-form input.form-radio {
+    background: #12ff00;
+    min-width: 100%;
+    margin-bottom:0;
+    padding: 0em 22em 2.5em 0em;
+    font-weight: 700;
+    display: inline-block;
+}
+
+#heartbeat-feed-form input.form-radio:hover {
+   background: #1E6100;
+ }
+
+
+#heartbeat-feed-form input[type="radio"]:checked {
+   background: #003b00;
+ }
+
+#heartbeat-feed-form label {
+    font-size:1rem;
+    font-weight: 700;
+    color: white;
+    position:absolute;
+    /*top:50%;;*/
+    /*left:50%;*/
+    display:inline-block;
+    width:auto;
+    transform:translate(5%, -150%);
+}
+
+#heartbeat-feed-form .form-item-feedtabs {
+    display: inline-block;
+}
+
+#heartbeat-feed-form .form-item-feedsearch,
+#heartbeat-feed-form #edit-submit {
+  display: none;
+}
+
+/*Heartbeat feed re-render block
+Temporarily hiding all irrelevant content */
+
+#block-heartbeatblock a.visually-hidden,
+#block-heartbeatblock #toolbar-administration,
+#block-heartbeatblock header,
+#block-heartbeatblock footer,
+#block-heartbeatblock .highlighted,
+#block-heartbeatblock .region-breadcrumb,
+#block-heartbeatblock #sidebar-first,
+#block-heartbeatblock .block-page-title-block,
+#block-heartbeatblock .contextual-region { display: none}
+
+
+#block-heartbeatblock #content {
+  margin-left: 0!important;
+  width: 100%!important;
+}
+
+
+#heartbeat-loader {
+  display: none;
+  position: fixed;
+  bottom: 48px;
+  left: 62.5%;
+  width: 96px;
+  height: 96px;
+  background: url('../images/drupal-loader.gif') no-repeat;
+  background-size: contain;
+}
+
+
+/*heartbeat-stream section.section {*/
+  /*padding: 0;*/
+/*}*/
+
+.heartbeat-youtube {
+  display: block;
+}
+
+.heartbeat-owner .time-ago {
+    font-size:11px;
+    color: grey;
+}
+
+.heartbeat-message-wrap {
+    float: left;
+    width: 100%;
+}
+
+.heartbeat-interaction-wrap {
+    width: 100%;
+    float: right;
+    padding-top: 12px;
+}
+
+@media (max-width: 768px) {
+    .heartbeat-interaction-wrap {
+        width: 100%;
+    }
+}
+
+.heartbeat-message a {
+    color: #1da1f2;
+}
+
+.heartbeat-like, .heartbeat-unlike {
+    display: inline-block;
+}
+
+.heartbeat-unlike {
+    padding-left: 48px;
+}
+
+
+
+.flag-heartbeat_like_comment a.use-ajax {
+    min-height: 8px;
+    padding-left: 24px;
+    margin-left: 4px;
+    min-width: 8px;
+    background: url(/themes/trx/images/icons/like.png) no-repeat center !important;
+    background-size: 45% !important;
+}
+
+/*like button*/
+.flag-heartbeat_like a {
+    background: url(/themes/trx/images/icons/like.png) no-repeat center ;
+    background-size: contain;
+    margin-left: -11px;
+    padding: 2px 2px 2px 72px;
+}
+
+/*jihad button*/
+.flag-heartbeat_unlike a {
+    background: url(/themes/trx/images/icons/unlike.png) no-repeat center ;
+    background-size: contain;
+    margin-left: -11px;
+    padding: 2px 2px 2px 72px;
+}
+
+/*jihad button hover*/
+.action-unflag.flag-heartbeat_unlike a {
+    opacity: 0.3;
+    background-size: contain;
+    margin-left: -11px;
+    padding: 2px 2px 2px 72px;
+}
+
+
+.flag-heartbeat_like span,
+.flag-heartbeat_unlike span {
+    display: none;
+}
+.flag-heartbeat_like span:first-of-type,
+.flag-heartbeat_unlike span:first-of-type {
+    display: inline;
+}
+
+.heartbeat-interaction-wrap .action-unflag a {
+    opacity: 0.5;
+}
+
+.praisetip, .jihadtip {
+    transition: all 0.5s ease;
+    color: rgb(0, 178, 0);
+    position: absolute;
+    z-index: 1;
+}
+
+.jihadtip {
+    color: red;
+}
+
+.flag-heartbeat_like.selected::after {
+    content: 'Like';
+    color: rgb(0, 178, 0);
+    transition: all 0.5s ease;
+    position: absolute;
+}
+
+.flag-heartbeat_unlike.selected::after {
+    content: 'Unlike';
+    color: red;
+    transition: all 0.5s ease;
+}
+/***********************
+***Heartbeat Comments***
+***********************/
+
+.heartbeat-comments {
+    font-size: 13px;
+    padding-top: 12px
+}
+
+.heartbeat-comment-button {
+    float: left;
+    width: 100%;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: normal;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 0;
+    padding: 0 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    text-align: center;
+    margin-right: 0.1rem;
+    background-color: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.7);
+    transition: background-color 1000ms linear;
+}
+
+.heartbeat-comment-button:hover {
+    background-color: #70a978;
+}
+
+.comment-form-hidden {
+    display: none!important;
+}
+
+.comment-owner, .comment-body {
+    display: inline-block;
+}
+
+.comment-owner {
+    width: 25%;
+    font-size: 12px;
+}
+
+.comment-owner .comment-username,
+.sub-comment-username {
+    font-weight: 700;
+}
+
+.comment-body {
+    vertical-align: top;
+    padding-top: 16px;
+    width: 73%;
+}
+
+.heartbeat-comment-form textarea,
+.heartbeat-sub-comment-form textarea{
+    height: 45px;
+}
+
+.heartbeat-comment-form .form-submit,
+.heartbeat-sub-comment-form .form-submit {
+    float: right;
+    font-size: 14px;
+}
+
+.heartbeat-sub-comment-form .form-submit {
+    margin-bottom: 10px;
+}
+
+.heartbeat-comment-form label {
+    display: none;
+}
+
+.heartbeat-subcomment {
+    padding-left: 24px;
+    display: flex;
+}
+
+.heartbeat-sub-comment-form,
+.sub-comment a.button-action {
+    padding-left: 36px;
+}
+
+.heartbeat-message {
+    padding: 12px!important;
+    word-wrap: break-word;
+    float: left;
+    width: 99%;
+    margin: 4px;
+    background: #FFF;
+}
+
+.heartbeat-stream .heartbeat-message:first-of-type {
+    margin-top: 0px;
+}
+
+
+
+/*.heartbeat-message a.heartbeat-user {*/
+/*color: green;*/
+/*}*/
+
+.heartbeat-hashtag,
+.heartbeat-username {
+    display: inline-block;
+    padding: 0px 3px 0px 3px;
+}
+
+.heartbeat-owner {
+    display: inline-block;
+    width: 100%;
+    float: left;
+    padding-bottom: 10px;
+}
+
+/*node main image and user image */
+a.heartbeat-node img {
+    margin-bottom: 5px;
+}
+
+.heartbeat-content {
+    display: inline-block;
+    width: 100%;
+    border-top: 1px solid #dbbf2e;
+    padding: 10px 0px 0px 0px;
+}
+
+.heartbeat-username a {
+    color: #6e6e6e;
+}
+
+.heartbeat-hashtag a {
+    color: #ca28b4;
+}
+
+video.heartbeat-video,
+.heartbeat-message video,
+.heartbeat-youtube {
+    width: 100%;
+}
+
+.heartbeat-youtube {
+    /*min-height: 240px;*/
+}
+
+/** Heartbeat changes for sidebar use**/
+
+#sidebar-first .heartbeat-stream {
+    font-size: 13px;
+}
+
+
+
+/** Status Messages **/
+#edit-message--description {
+    display: none;
+}
+
+/*post button on status message*/
+.status-post {
+
+}
+
+
+#status-form #edit-post {
+    float: right!important;
+    max-width: 5em;
+    font-size: 14px;
+    max-height: 3em;
+    margin-right: 0em;
+}

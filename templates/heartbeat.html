@@ -32,15 +32,38 @@
                     {% end %}
                 </div>
                 <div class="heartbeat-comment">
-                        <div class="heartbeat-comments">
+                    <div class="heartbeat-comments">
+                        <form class="heartbeat-comment-form" action="/" method="post" id="heartbeat-comment-form-{{ heartbeat['id'] }}" accept-charset="UTF-8">
+                            <div class="js-form-item-comment-body">
+                                <label for="edit-comment-body-{{ heartbeat['id'] }}">Comment Body</label>
+                                <div>
+                                    <textarea id="edit-comment-body-{{ heartbeat['id'] }}" name="comment_body" rows="5" cols="60" class="form-textarea"></textarea>
+                                </div>
+                            </div>
+                            <input type="submit" id="edit-post-{{ heartbeat['id'] }}" name="op" value="Submit" class="button js-form-submit form-submit">
+                        </form>
                             {% for comment in heartbeat['comments'] %}
-                            <div id="heartbeat-comment-69">
+                            <div id="heartbeat-comment-{{ comment['cid'] }}">
                                 <span class="comment-owner">
                                   <span class="comment-username">{{ comment['user'].name }}</span><br>
                                   <span class="comment-ago">{{ comment['timeago'] }}</span>
                                 </span>
                                 <span class="comment-body">{{ comment['body'].comment_body_value }}
                                   <div class="comment-like">COMMENT LIKE</div>
+                                </span>
+                                <span class ="sub-comment">
+                                {% for subcomment in comment['subcomments'] %}
+                                    <div class="heartbeat-subcomment" id="sub-comment-{{ subcomment['cid'] }}">
+                                        <span class="sub-comment-owner">{{ subcomment['user'].name}}
+                                          <span class="sub-comment-username">{{ subcomment['user'].name }}</span><br>
+                                          <span class="sub-comment-ago">{{ subcomment['timeago'] }}</span>
+                                        </span>
+                                        <span class="sub-comment-body">{{ subcomment['body'].comment_body_value }}
+                                          <div class="sub-comment-like">SUB COMMENT LIKE</div>
+                                        </span>
+                                    </div>
+                                {% end %}
+                                    <a href="/heartbeat/subcommentrequest/{{ comment['cid'] }}" class="button comment-reply">Reply</a>
                                 </span>
                             </div>
                             {% end %}

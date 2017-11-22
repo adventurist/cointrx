@@ -272,9 +272,9 @@ const trxSettings = {};
 
   const commentListen = function(e) {
 
-    if (trxSettings.user.uid > 0) {
-
-      let commentBlock = e.srcElement.parentNode.parentNode.querySelector('.heartbeat-comments');
+    // if (trxSettings.user.uid > 0) {
+      console.dir(e.srcElement);
+      let commentBlock = e.srcElement.parentNode.querySelector('.heartbeat-comments');
 
       if (!commentBlock.classList.contains('heartbeat-comments-visible')) {
         commentBlock.className += ' heartbeat-comments-visible';
@@ -287,10 +287,11 @@ const trxSettings = {};
       for (let c = 0; c < childs.length; c++) {
         toggleCommentElements(childs[c]);
       }
-    } else {
-      loginModal();
-    }
-  };
+    };
+    // else {
+    //   loginModal();
+
+
 
   const refreshState = () => {
 

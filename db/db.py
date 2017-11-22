@@ -771,12 +771,24 @@ def cx_update_listener(*args):
                     session.rollback()
 
 
+def build_sub_comments(comments, now, session):
+    if comments is not None:
+        return [{
+                    'cid': x.cid,
+                    'body': x.body,
+                    'user': session.query(HeartbeatUser).filter(HeartbeatUser.uid == x.uid).one(),
+                    'timeago': timeago.format(x.created, now),
+                } for x in comments]
+
+
 def build_comments(comments, now, session):
     if comments is not None:
         return [{
+                    'cid': x.cid,
                     'body': x.body,
                     'user': session.query(HeartbeatUser).filter(HeartbeatUser.uid == x.uid).one(),
-                    'timeago': timeago.format(x.created, now)
+                    'timeago': timeago.format(x.created, now),
+                    'subcomments': build_sub_comments(session.query(HeartbeatComment).filter(HeartbeatComment.entity_id==x.cid, HeartbeatComment.entity_type=='comment').all(), now, session)
                 } for x in comments]
 
 
