@@ -232,8 +232,8 @@ class GraphHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def get(self):
-        result = looper.run_until_complete(db.latest_prices_async())
+    async def get(self):
+        result = await db.latest_prices_async()
 
         if result:
             print(result)
@@ -244,8 +244,8 @@ class GraphJsonHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def get(self):
-        result = looper.run_until_complete(db.latest_prices_async())
+    async def get(self):
+        result = await db.latest_prices_async()
 
         if result:
             print(result)
