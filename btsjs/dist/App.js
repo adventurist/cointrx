@@ -4,6 +4,7 @@ const express = require("express");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const routerSrc = require("./routes");
+let consolidate = require('consolidate');
 let router = routerSrc.routes;
 // Creates and configures an ExpressJS web server.
 class App {
@@ -18,6 +19,12 @@ class App {
         this.express.use(logger('dev'));
         this.express.use(bodyParser.json());
         this.express.use(bodyParser.urlencoded({ extended: false }));
+        this.express.use(express.static('static'));
+        // this.express.engine('html', require('ejs').renderFile);
+        this.express.engine('html', consolidate.swig);
+        this.express.set('view engine', 'html');
+        console.log(__dirname);
+        this.express.set('views', __dirname + '/../templates/');
     }
     // Configure API endpoints.
     routes() {

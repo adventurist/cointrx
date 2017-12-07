@@ -5,6 +5,7 @@ import App from './App';
 
 debug('ts-express:server');
 
+//noinspection TypeScriptUnresolvedVariable
 const port = normalizePort(process.env.PORT || 3000);
 App.set('port', port);
 

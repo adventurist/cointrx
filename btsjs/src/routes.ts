@@ -1,19 +1,24 @@
 import { Router } from 'express'
+import { jiggaloo } from './transaction'
 
 const router: Router = Router();
 
 
 // placeholder route handler
 router.get('/', (req, res, next) => {
-    res.json({
-        message: 'Hello World!'
-    });
+    res.render('../templates/home.html', {jigga:'jiggga'})
 });
 
+
 router.post('/transaction', (req, res, next) => {
-    console.dir(req.body);
+    if (req.body.hasOwnProperty('privateKey')) {
+        console.log(req.body['privateKey']);
+    }
+
+
+    let number = jiggaloo()
     res.json({
-        message: 'Hello Jigga!'
+        message: 'Hello Jigga number ' + number
     });
 });
 

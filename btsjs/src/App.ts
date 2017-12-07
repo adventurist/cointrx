@@ -4,6 +4,9 @@ import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 import * as routerSrc from './routes';
 
+let consolidate = require('consolidate');
+
+
 let router: express.Router = routerSrc.routes;
 
 // Creates and configures an ExpressJS web server.
@@ -24,6 +27,13 @@ class App {
     this.express.use(logger('dev'));
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
+    this.express.use(express.static('static'));
+    // this.express.engine('html', require('ejs').renderFile);
+    this.express.engine('html', consolidate.swig);
+    this.express.set('view engine', 'html');
+    console.log(__dirname);
+    this.express.set('views', __dirname + '/../templates/');
+
   }
 
   // Configure API endpoints.
