@@ -83,6 +83,15 @@ class User(Base):
         return True
 
     @staticmethod
+    def verify_password_by_name(name, password) -> bool:
+        user = User.verify_auth_token(name)
+        if not user:
+            user = session.query(User).filter(User.name== name).first()
+            if user is None or not user.compare_hash(password):
+                return False
+        return True
+
+    @staticmethod
     def generate_hash(password):
         return pwd_context.encrypt(password)
 
@@ -491,7 +500,7 @@ def check_authentication(user, password, email):
         if not User.verify_password(email, password):
             return "Login is no good"
 
-        return query_user.serialize()
+        return query_user
     else:
         pass_hash = User.generate_hash(password)
         new_user = User(name=user, hash=pass_hash, email=email,
@@ -501,7 +510,29 @@ def check_authentication(user, password, email):
 
             session.add(new_user)
             session.commit()
-            return new_user.serialize()
+            return new_user
+
+        except exc.SQLAlchemyError as error:
+            return error
+
+
+def check_auth_by_name(user, password):
+    query_user = session.query(User).filter(User.name == user).first()
+    if query_user is not None:
+        if not User.verify_password_by_name(user, password):
+            return "Login is no good"
+
+        return query_user
+    else:
+        pass_hash = User.generate_hash(password)
+        new_user = User(name=user, hash=pass_hash, email='temp@jigga.com',
+                        created=int(time.mktime(datetime.datetime.now().timetuple())), status=1)
+
+        try:
+
+            session.add(new_user)
+            session.commit()
+            return new_user
 
         except exc.SQLAlchemyError as error:
             return error

@@ -1,5 +1,8 @@
+import 'babel-polyfill'
+import 'core-js/fn/object/entries';
 import { Router } from 'express'
-import { jiggaloo } from './transaction'
+import { transaction, jiggaloo } from './transaction'
+import {isNullOrUndefined} from "util";
 
 const router: Router = Router();
 
@@ -11,11 +14,29 @@ router.get('/', (req, res, next) => {
 
 
 router.post('/transaction', (req, res, next) => {
-    if (req.body.hasOwnProperty('privateKey')) {
-        console.log(req.body['privateKey']);
+    var txIn = [], txOut = [], txAmount
+
+    for (const [key, value] of Object.entries(req.body)) {
+        console.log(`${key} ${value}`)
+        for (const [k, v] of Object.entries(JSON.parse(key))) {
+            console.log(`${k} ::: ${v}`)
+            switch (k) {
+                case 'txIn':
+                    v.forEach((v) => {
+                        txIn.push({id: v.output, key: v.address, value: v.value})
+                    })
+                    break
+
+                case 'txOut':
+                    v.forEach((v) => {
+                        txOut.push({key: v.address, value: v.value})
+                    })
+                    break
+            }
+        }
     }
-
-
+    let txId = 69
+    const transactionResult = transaction(txIn, txOut)
     let number = jiggaloo()
     res.json({
         message: 'Hello Jigga number ' + number

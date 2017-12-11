@@ -292,8 +292,25 @@ const trxSettings = {};
     //   loginModal();
 
 
+    function statusFormListener() {
+        let submitBtn = document.getElementById('edit-post');
+        submitBtn.addEventListener('click', function(e) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
 
-  const refreshState = () => {
+            let statusText = e.srcElement.parentNode.querySelector('#edit-message').value;
+
+            if (statusText.length > 0) {
+                ws = new WebSocket("ws://" + window.location.hostname + ":6969/heartbeat/share/socket-new");
+                ws.onopen = () => {
+                  ws.send(statusText);
+                };
+            }
+        })
+    }
+
+    const refreshState = () => {
 
       // Drupal.AjaxCommands.prototype.viewsScrollTop = null;
       // console.dir(Drupal.AjaxCommands.prototype);
@@ -316,6 +333,7 @@ const trxSettings = {};
       commentFormListeners();
       feedElement = document.querySelector('.heartbeat-stream');
       flagListeners();
+      statusFormListener();
 
       // if (trxSettings.feedUpdate == true) {
       //   updateFeed();

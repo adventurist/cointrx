@@ -1,6 +1,5 @@
 from tornado import gen
-from tornado.httpclient import AsyncHTTPClient
-from tornado.httpclient import HTTPError as Http_Exception
+from tornado import httpclient as tornado_client
 from iox.loop_handler import IOHandler
 
 from types import SimpleNamespace
@@ -8,7 +7,7 @@ from types import SimpleNamespace
 config = SimpleNamespace()
 config.blockchain_url = "http://blockchain.info/ticker"
 
-http_client = AsyncHTTPClient()
+http_client = tornado_client.AsyncHTTPClient()
 io_handler = IOHandler()
 
 
@@ -30,5 +29,31 @@ class Client:
             response = yield http_client.fetch(config.blockchain_url)
             io_handler.handle_price(response)
 
-        except Http_Exception as e:
+        except tornado_client.HTTPError as e:
             print(e.message)
+
+    @staticmethod
+    async def connect(url, body=None, headers=None):
+        try:
+            response = await http_client.fetch(url, method='POST', body=body, headers=headers)
+            return response
+        except tornado_client.HTTPError as e:
+            print(e.message)
+
+    @staticmethod
+    async def get(url):
+        try:
+            response = await http_client.fetch(url)
+            return response
+        except tornado_client.HTTPError as e:
+            print(e.message)
+
+    async def auth_connect(self, url, body, headers, auth_username, auth_password):
+        try:
+            request = tornado_client.HTTPRequest(url=url, body=body, method='POST', headers=headers, auth_username=auth_username, auth_password=auth_password, auth_mode='basic')
+            response = await http_client.fetch(request)
+            return response
+
+        except tornado_client.HTTPError as e:
+            print(e.message)
+

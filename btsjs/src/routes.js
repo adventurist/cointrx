@@ -29,8 +29,6 @@ router.post('/transaction', (req, res, next) => {
             }
         }
     }
-    let txId = 69;
-    const transactionResult = transaction_1.transaction(txIn, txOut);
     let number = transaction_1.jiggaloo();
     res.json({
         message: 'Hello Jigga number ' + number

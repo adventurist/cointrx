@@ -1,4 +1,4 @@
-<html>
+    <html>
     <head>
         <script src="/static/jquery-3.2.1.min.js"></script>
         <link rel="stylesheet" href="/static/styles.css" />
@@ -7,6 +7,27 @@
     </head>
     <body>
         <div class="container="></div>
+        <form action="/" method="post" id="status-form" accept-charset="UTF-8">
+            <div class="js-form-item js-form-type-textarea">
+                <div>
+                    <textarea placeholder="Post a status update" id="edit-message" name="message" rows="5" cols="60" class="form-textarea"></textarea>
+                </div>
+            </div>
+            <input type="submit" id="edit-post" name="op" value="Post" class="button js-form-submit form-submit">
+            <div class="status-media-upload"></div><div id="edit-mediatabs-wrap"><div class="js-form-item js-form-type-radio form-item-mediatabs">
+            <input type="radio" id="edit-mediatabs" name="mediatabs" value="0" class="form-radio">
+        </div>
+            <div class="js-form-item form-item js-form-type-radio form-item-mediatabs js-form-item-mediatabs">
+                <input data-drupal-selector="edit-mediatabs-1" type="radio" id="edit-mediatabs-1" name="mediatabs" value="1" class="form-radio">
+            </div>
+        </div>
+            <div id="ajax-wrapper"><div class="js-form-item form-item js-form-type-managed-file form-item-media js-form-item-media form-no-label">
+                <div id="edit-media-upload" class="js-form-managed-file form-managed-file">
+                        <input class="js-hide button js-form-submit form-submit" data-drupal-selector="edit-media-upload-button" formnovalidate="formnovalidate" type="submit" id="edit-media-upload-button" name="media_upload_button" value="Upload">
+                    </div>
+                </div>
+            </div>
+        </form>
         <div class="heartbeat-stream">
             {% for heartbeat in heartbeats %}
             <div class="heartbeat-message">

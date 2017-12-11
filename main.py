@@ -12,13 +12,17 @@ from tornado import escape
 from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.options import define
+from tornado.websocket import WebSocketHandler
 from tornado.web import Application, RequestHandler, StaticFileHandler
 
 from db import db
 from iox.loop_handler import IOHandler
 from tx import trx__tx_out
+from utils import drupal_utils, session
 from utils.cointrx_client import Client
 from utils.mail_helper import Sender as mail_sender
+
+from requests.auth import HTTPBasicAuth
 
 parser = argparse.ArgumentParser('debugging asyncio')
 parser.add_argument(
@@ -78,7 +82,7 @@ class LoginHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def post(self) -> object:
+    async def post(self) -> object:
         current_header = self.request.headers.get("Content-Type")
         print(current_header)
         if self.request.headers.get("Content-Type") == 'application/json':
@@ -96,6 +100,23 @@ class LoginHandler(RequestHandler):
         elif self.request.headers.get("Content-Type") == 'text/html':
             name = self.get_argument('name')
             print(name)
+
+        elif current_header == 'application/x-www-form-urlencoded':
+
+            name, password = self.get_body_argument('name'), self.get_body_argument('pass')
+
+            if name is not None and password is not None and len(name) > 0:
+                user_verified = db.check_authentication(name, password, 'jigga@riffic.com')
+                if user_verified is not None:
+                    drupal_login = await drupal_utils.attempt_login(
+                        escape.json_encode({'name': name, 'pass': password}))
+                    if drupal_login is not None:
+                        drupal_user_data = escape.json_decode(escape.to_basestring(drupal_login.body))
+                        csrf = user_verified.generate_auth_token(expiration=1200)
+                        application.create_session(csrf=csrf, dcsrf=drupal_user_data['csrf_token'],
+                                                   user={'name': name, 'pass': password})
+                        self.set_secure_cookie("dcsrf", application.session.drupal_token())
+                        reflect = self
 
     def get(self, *args, **kwargs):
         print('get getting get')
@@ -261,12 +282,12 @@ class TestTransactionHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def get(self):
+    async def get(self):
         transaction = trx__tx_out.transaction()
         # attempt = transaction.run()
         # attempt = transaction.regtest_run()
         # attempt = transaction.pytool_run()
-        attempt = transaction.testnet_run()
+        attempt = await transaction.testnet_run()
 
         return self.write({'Try': attempt})
 
@@ -306,7 +327,7 @@ class SendTrawTransactionHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    # def get(self, *args, **kwargs):
+        # def get(self, *args, **kwargs):
         # if 'txid_out' in self.request.arguments:
         #     txid_out = self.get_argument('txid_out')
         #     if len(txid_out) > 0:
@@ -332,13 +353,58 @@ class HeartbeatCreateHandler(RequestHandler):
         self.write('Good boy')
 
 
+class HeartbeatShareHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def post(self, *args, **kwargs):
+        self_cookie = self.get_secure_cookie("dcsrf")
+        client_cookie = self.get_argument("dcsrf")
+        client_cookies = self.request.cookies
+        compare = self_cookie == client_cookie
+
+
+class HeartbeatSocketShareHandler(WebSocketHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def on_message(self, message):
+        print(message)
+        user = application.session.drupal_user()
+        decoded_user = application.session.drupal_user()
+        credString = user['name'] + ':' + user['pass']
+        encodedCreds = base64.b64encode(credString.encode())
+        # encodedCreds = base64.b64encode(str(user['name'] + ':' + user['pass']).encode())
+
+        post_attempt = await drupal_utils.post_status_message(escape.json_encode({'message': message, 'name': user['name'], 'pass': user['pass']}), headers={'X-CSRF-Token': application.session.drupal_token()}, user=user)
+
+        # post_attempt = await drupal_utils.post_status_message(
+        #     escape.json_encode({'message': message, 'name': user['name'], 'pass': user['pass']}),
+        #     headers=drupal_utils.make_headers(user['name'], user['pass'], application.session))
+        # {'X-CSRF-Token': application.session.drupal_token(), 'Authorization': 'Basic ' + str(
+        #     base64.b64encode(str(user['name'] + ':' + user['pass']).encode())),
+        #          })
+        done = 'done'
+
+    def open(self):
+        dcsrf = self.request.cookies
+        dcsrf_decoded = self.get_secure_cookie('dcsrf')
+        print(str(dcsrf))
+        cookies = application.session.drupal_token()
+        if cookies.encode() == dcsrf_decoded:
+            status_message = self.get
+        else:
+            self.close(403, 'You should know not to, punk')
+
+
 class TRXApplication(Application):
     def __init__(self):
+        self.session = None
         settings = {
             "debug": True,
             "static_path": os.path.join(os.path.dirname(__file__), "static"),
             "template_path": os.path.join(os.path.dirname(__file__)),
-            # "files_path": os.path.join(os.path.dirname(__file__), "sites")
+            "cookie_secret": "8a573v89h7jociauroj435897j34"
         }
         handlers = [
             (r"/", MainHandler),
@@ -361,11 +427,17 @@ class TRXApplication(Application):
             (r"/react/test", ReactTestHandler),
             (r"/heartbeat/feed", HeartbeatHandler),
             (r"/heartbeat/create", HeartbeatCreateHandler),
+            (r"/heartbeat/share/new", HeartbeatShareHandler),
+            (r"/heartbeat/share/socket-new", HeartbeatSocketShareHandler),
             (r"/users/all", UserListHandler),
             (r"/static/(.*)", StaticFileHandler, {
                 "path": "/static"})
         ]
+
         Application.__init__(self, handlers, **settings)
+
+    def create_session(self, csrf, dcsrf, user):
+        self.session = session.Session(csrf=csrf, dcsrf=dcsrf, user=user)
 
 
 if __name__ == "__main__":
@@ -380,3 +452,10 @@ if __name__ == "__main__":
     db.Base.metadata.create_all(bind=db.engine)
 
     IOLoop.instance().start()
+
+'''
+Set-Cookie: dcsrf="2|1:0|10:1511755712|5:dcsrf|60:MUxHTG51aGxkZENydjFFOWZRVjZITVVmUEw1QkhQeXc0SGlFUmIyMjhrWQ==|a54c835c228a53880392c224b0683ec664067673dea9d5acd7bcc1dda8bf48cd"
+
+'1LGLnuhlddCrv1E9fQV6HMUfPL5BHPyw4HiERb228kY'
+
+'''

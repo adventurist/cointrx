@@ -470,3 +470,42 @@ video.heartbeat-video,
     max-height: 3em;
     margin-right: 0em;
 }
+
+#status-form #edit-post {
+    background-color: #555;
+    border: 0;
+    border-radius: 2px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.75em 1.5em;
+    text-decoration: none;
+    transition: background-color 150ms ease;
+    user-select: none;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+#edit-post:hover {
+    background-color: #444444;
+}
+
+#edit-mediatabs-wrap input,
+#edit-media-upload-button {
+    display: none;
+}
+
+.status-media-upload {
+    display: inline-block;
+    min-width: 32px;
+    min-height: 32px;
+    content: "Jigga";
+    margin-left: 4px;
+    background: url(/themes/trx/images/icons/mountains-picture.png) no-repeat;
+    background-size: contain;
+}
