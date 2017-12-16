@@ -10,7 +10,7 @@ router.get('/', (req, res, next) => {
     res.render('../templates/home.html', { jigga: 'jiggga' });
 });
 router.post('/transaction', (req, res, next) => {
-    var txIn = [], txOut = [], txAmount;
+    var txIn = [], txOut = [], network = '';
     for (const [key, value] of Object.entries(req.body)) {
         console.log(`${key} ${value}`);
         for (const [k, v] of Object.entries(JSON.parse(key))) {
@@ -18,22 +18,23 @@ router.post('/transaction', (req, res, next) => {
             switch (k) {
                 case 'txIn':
                     v.forEach((v) => {
-                        txIn.push({ id: v.output, key: v.address, value: v.value });
+                        txIn.push({ id: v.output, address: v.address, value: v.value, key: v.wif });
                     });
                     break;
                 case 'txOut':
                     v.forEach((v) => {
-                        txOut.push({ key: v.address, value: v.value });
+                        txOut.push({ address: v.address, value: v.value });
                     });
                     break;
+                case 'network':
+                    network = v;
             }
         }
     }
     let txId = 69;
-    const transactionResult = transaction_1.transaction(txIn, txOut);
-    let number = transaction_1.jiggaloo();
+    const transactionResult = transaction_1.transaction(txIn, txOut, network);
     res.json({
-        message: 'Hello Jigga number ' + number
+        message: 'Hello Jigga'
     });
 });
 exports.routes = router;
