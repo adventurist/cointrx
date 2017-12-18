@@ -37,10 +37,9 @@ router.post('/transaction', (req, res, next) => {
             }
         }
     }
-    let txId = 69
-    const transactionResult = transaction(txIn, txOut, network)
-    res.json({
-        message: 'Hello Jigga'
+
+    res.json({ result:
+        transaction(txIn, txOut, network)
     });
 });
 

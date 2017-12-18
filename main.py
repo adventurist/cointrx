@@ -283,7 +283,7 @@ class TestTransactionHandler(RequestHandler):
         pass
 
     async def get(self):
-        transaction = trx__tx_out.transaction()
+        transaction = trx__tx_out.Transaction()
         # attempt = transaction.run()
         # attempt = transaction.regtest_run()
         # attempt = transaction.pytool_run()

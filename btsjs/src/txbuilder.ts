@@ -6,7 +6,8 @@ const satoshi = 100000000
 export const txFactory = (config) => {
     const tx = new TrxTransaction(config);
     if (typeof tx !== 'undefined') {
-        return tx.createTransaction(tx.input, tx.output)
+        txResult = tx.createTransaction(tx.input, tx.output)
+        return txResult.error === 0 ? txResult : 'error'
     }
 }
 
@@ -33,7 +34,9 @@ class TrxTransaction {
             .to(txOutFinal)
             .sign(keys);
 
-        return transaction.serialize()
+        let errors = typeof transaction !== 'undefined' ? 0 : 1
+
+        return { tx: transaction.serialize(), error: errors }
     }
 }
 
