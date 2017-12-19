@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/jquery-3.2.1.min.js"></script>
+</head>
+<body>
+
+<div id="tx-container">
+    <div id="form-wrap">
+        <form action="javascript:void(0);" method="post" id="status-form" accept-charset="UTF-8">
+            <div class="js-form-item">
+                <div>
+                    <input id="from-secret" type="text" placeholder="Your Wallet Secret">
+                    <input id="to-address" type="text" placeholder="To this address">
+                </div>
+            </div>
+            <div class="js-form-item">
+            <select id="satoshis" name="text"> <!--Supplement an id here instead of using 'text'-->
+                <option value="5000">5000 Satoshi</option>
+                <option value="25000" selected>25000 Satoshi</option>
+                <option value="500000">500000 Satoshi</option>
+                <option value="2500000">2500000 Satoshi</option>
+                <option value="50000000">50000000 Satoshi (0.5 BTC)</option>
+                <option value="100000000">100000000 Satoshi (1 BTC)</option>
+                <option value="200000000">200000000 Satoshi (2 BTC)</option>
+                <option value="300000000">300000000 Satoshi (3 BTC)</option>
+                <option value="400000000">400000000 Satoshi (4 BTC)</option>
+                <option value="500000000">500000000 Satoshi (5 BTC)</option>
+            </select>
+            </div>
+            <input type="submit" id="submit-tx" name="op" value="Send" class="button js-form-submit form-submit">
+        </form>
+    </div>
+</div>
+<script src="/static/txgui.js"></script>
+</body>
+</html>

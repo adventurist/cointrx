@@ -11,8 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
     "bitcore-lib": "^0.15.0",
     "body-parser": "^1.18.2",
+    "consolidate": "^0.15.0",
     "debug": "^3.1.0",
     "express": "^4.16.2",
     "morgan": "^1.9.0",

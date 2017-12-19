@@ -397,6 +397,16 @@ class HeartbeatSocketShareHandler(WebSocketHandler):
             self.close(403, 'You should know not to, punk')
 
 
+class TxGuiHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        self.render("templates/tx.html", title="TRX TX Interface")
+
+    def post(self, *args, **kwargs):
+        pass
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -424,6 +434,7 @@ class TRXApplication(Application):
             (r"/prices/graph/currency", CurrencyRevisionHandler),
             (r"/transaction/test", TestTransactionHandler),
             (r"/transaction/sendraw", SendTrawTransactionHandler),
+            (r"/transaction/tx-gui", TxGuiHandler),
             (r"/react/test", ReactTestHandler),
             (r"/heartbeat/feed", HeartbeatHandler),
             (r"/heartbeat/create", HeartbeatCreateHandler),

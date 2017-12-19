@@ -309,6 +309,48 @@ details, summary {
         vertical-align: top;
         width: 29.5%;
     }
+}
 
 
+/*********
+* TX GUI *
+*********/
+
+body, html {
+    max-width: 1440px;
+    text-align: center;
+    background-color: #004341;
+}
+
+#tx-container {
+    max-width: 1170px;
+    min-height: 900px;
+    text-align: center;
+    background-color: #333333;
+}
+
+#form-wrap {
+    padding: 40px;
+}
+
+#form-wrap input, #form-wrap select, #form-wrap select option {
+    min-height: 2.5em;
+    margin: 8px;
+    padding: 8px;
+    color: black;
+    font-weight: 700;
+    background-color: #6A9094;
+}
+
+#form-wrap input:hover, #form-wrap select, #form-wrap select option:hover {
+    background-color: #799b9f;
+    color: #edf1f2;
+}
+
+#submit-tx {
+    width: 8em;
+}
+
+#from-secret, #to-address {
+    width: 15em;
 }
