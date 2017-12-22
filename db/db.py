@@ -32,6 +32,29 @@ trxapp = SimpleNamespace()
 trxapp.config = {'SECRET_KEY': "jigga does as jigga does"}
 
 
+class TrxKey(Base):
+    __tablename__ = 'trxkey'
+    id = Column(Integer, primary_key=True)
+    uid = Column(Integer, ForeignKey('users.id'))
+    value = Column(String)
+
+
+class SKey(Base):
+    __tablename__ = 'skey'
+    id = Column(Integer, primary_key=True)
+    uid = Column(Integer, ForeignKey('users.id'))
+    kid = Column(Integer, ForeignKey('trxkey.id'))
+    value = Column(String)
+
+
+class MKey(Base):
+    __tablename__ = 'mkey'
+    id = Column(Integer, primary_key=True)
+    uid = Column(Integer, ForeignKey('users.id'))
+    kid = Column(Integer, ForeignKey('trxkey.id'))
+    pub = Column(String)
+
+
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -40,6 +63,7 @@ class User(Base):
     email = Column(String(64))
     created = Column(Integer)
     status = Column(Integer)
+    trxkey = relationship("TrxKey", backref='user', uselist=True)
 
     def hash_password(self, password):
         self.hash = pwd_context.encrypt(password)
@@ -607,3 +631,48 @@ async def heartbeat_get_all():
                 }
             )
     return data
+
+async def addMultiSigAddress(pub_addr: str, keys: list, uid: int):
+    if pub_addr is not None and len(keys) > 0:
+        for key in keys:
+            trx_key = TrxKey(value=key, uid=uid)
+            session.add(trx_key)
+            session.flush()
+            multi_sig_key = MKey(pub=pub_addr, uid=uid, kid=trx_key.id)
+            session.add(multi_sig_key)
+
+        try:
+            session.commit()
+            return multi_sig_key.id
+
+        except exc.SQLAlchemyError as err:
+            print(err.args)
+            session.rollback()
+
+async def addSingleKey(key: str, uid: int):
+    if key is not None and uid is not None:
+        trx_key = TrxKey(value=key, uid=uid)
+        session.add(trx_key)
+        session.flush()
+        single_key = SKey(value=key, uid=uid, kid=trx_key.id)
+        session.add(single_key)
+
+        try:
+            session.commit()
+            return single_key.id
+
+        except exc.SQLAlchemyError as err:
+            print(err.args)
+            session.rollback()
+            return err
+
+async def findKey(key: str):
+    existing_key = session.query(TrxKey).filter(TrxKey.value == key).first()
+
+    if existing_key is None:
+        return False
+    else:
+        return existing_key.id
+
+
+    # user = session.query(User).filter(User.email == email_or_token).first()

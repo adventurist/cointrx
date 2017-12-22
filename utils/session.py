@@ -1,5 +1,5 @@
 class Session:
-    def __init__(self, csrf, dcsrf, user):
+    def __init__(self, user, csrf=0, dcsrf=0):
         self.csrf = csrf
         self.dcsrf = dcsrf
         self.user = user

@@ -96,6 +96,7 @@ class LoginHandler(RequestHandler):
                 self.write_error(401)
             else:
                 new_user = db.check_authentication(name, password, email)
+                application.create_session(user={'name': name, 'pass': password, 'id': new_user.id})
                 print(str(new_user))
         elif self.request.headers.get("Content-Type") == 'text/html':
             name = self.get_argument('name')
@@ -113,8 +114,7 @@ class LoginHandler(RequestHandler):
                     if drupal_login is not None:
                         drupal_user_data = escape.json_decode(escape.to_basestring(drupal_login.body))
                         csrf = user_verified.generate_auth_token(expiration=1200)
-                        application.create_session(csrf=csrf, dcsrf=drupal_user_data['csrf_token'],
-                                                   user={'name': name, 'pass': password})
+                        application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id}, csrf=csrf, dcsrf=drupal_user_data['csrf_token'])
                         self.set_secure_cookie("dcsrf", application.session.drupal_token())
                         reflect = self
 
@@ -283,7 +283,7 @@ class TestTransactionHandler(RequestHandler):
         pass
 
     async def get(self):
-        transaction = trx__tx_out.Transaction()
+        transaction = trx__tx_out.Transaction(application.session)
         # attempt = transaction.run()
         # attempt = transaction.regtest_run()
         # attempt = transaction.pytool_run()
@@ -407,6 +407,18 @@ class TxGuiHandler(RequestHandler):
     def post(self, *args, **kwargs):
         pass
 
+
+class TxRequestHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def post(self, *args, **kwargs):
+        tx_request_data = escape.json_decode(self.request.body)
+
+        if 'privKey' in tx_request_data and 'recipient' in tx_request_data and 'amount' in tx_request_data:
+            transaction_result = await trx__tx_out.Transaction.request_transaction({'private_key': tx_request_data['privKey'] , 'recipient': tx_request_data['recipient'], 'amount': tx_request_data['amount']})
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -432,6 +444,7 @@ class TRXApplication(Application):
             (r"/prices/graph", GraphHandler),
             (r"/prices/graph/json", GraphJsonHandler),
             (r"/prices/graph/currency", CurrencyRevisionHandler),
+            (r"/transaction/request", TxRequestHandler),
             (r"/transaction/test", TestTransactionHandler),
             (r"/transaction/sendraw", SendTrawTransactionHandler),
             (r"/transaction/tx-gui", TxGuiHandler),
@@ -447,8 +460,8 @@ class TRXApplication(Application):
 
         Application.__init__(self, handlers, **settings)
 
-    def create_session(self, csrf, dcsrf, user):
-        self.session = session.Session(csrf=csrf, dcsrf=dcsrf, user=user)
+    def create_session(self, user, csrf=0, dcsrf=0):
+        self.session = session.Session(user=user, csrf=csrf, dcsrf=dcsrf)
 
 
 if __name__ == "__main__":

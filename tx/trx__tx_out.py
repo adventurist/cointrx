@@ -1,14 +1,16 @@
 import struct
 import sys
 import hashlib
+import ecdsa
 
+import codecs
 # from tornado import websocket
 from bitcoin import main as btc_tools, transaction as tx_func, mksend, multisign, sendmultitx, mk_multisig_script, \
     scriptaddr, apply_multisignatures
-from bitcoin.core import b2x, lx, COIN, COutPoint, CMutableTxOut, CMutableTxIn, CMutableTransaction, Hash160, b2lx
+from bitcoin.core import x, b2x, lx, COIN, COutPoint, CMutableTxOut, CMutableTxIn, CMutableTransaction, Hash160, b2lx
 from bitcoin.core.script import CScript, OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG, SignatureHash, SIGHASH_ALL
 from bitcoin.core.scripteval import VerifyScript, SCRIPT_VERIFY_P2SH
-from bitcoin.wallet import CBitcoinAddress, CBitcoinSecret
+from bitcoin.wallet import CBitcoinAddress, CBitcoinSecret, P2PKHBitcoinAddress,P2SHBitcoinAddress
 from bitcoin.rpc import Proxy
 
 # from pycoin.services import spendables_for_address
@@ -16,7 +18,8 @@ from bitcoin.rpc import Proxy
 from utils.cointrx_client import Client
 from utils import btcd_utils
 from tornado.escape import json_encode, json_decode
-from functools import reduce
+from db import db
+
 
 
 transaction_input = 'eca213168d3683c86591890e766c76ab618e0c245925ebcaddc855aecb2643a1'
@@ -31,21 +34,81 @@ input_tx_size = 5.10131318 * COIN
 
 magic = 0xd9b4bef9
 
+b58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+
+def countLeadingChars(s, ch):
+    count = 0
+    for c in s:
+        if c == ch:
+            count += 1
+        else:
+            break
+    return count
+
+def base58encode(n):
+    result = ''
+    while n > 0:
+        result = b58[n%58] + result
+        n /= 58
+    return result
+
+def base256decode(s):
+    result = 0
+    for c in s:
+        result = result * 256 + ord(c)
+    return result
+
+def base58CheckEncode(version, payload):
+    s = chr(version) + payload
+    checksum = hashlib.sha256(hashlib.sha256(s).digest()).digest()[0:4]
+    result = s + checksum
+    leadingZeros = countLeadingChars(result, '\0')
+    return '1' * leadingZeros + base58encode(base256decode(result))
+
+def privateKeyToPubKey(s):
+    sk = ecdsa.SigningKey.from_string(s, curve=ecdsa.SECP256k1)
+    return codecs.hex('\04' + str(sk.verifying_key))
+
+def pubKeyToAddr(s,p):
+    ripemd160 = hashlib.new('ripemd160')
+    ripemd160.update(hashlib.sha256(s.decode('hex')).digest())
+    return base58CheckEncode(p, ripemd160.digest())
+
+def keyToAddr(s,testnet=False):
+    # see https://en.bitcoin.it/wiki/List_of_address_prefixes
+    # ie: mainnet --> 0 and testnet --> 111
+    prefix = 111 if testnet else 0
+    return pubKeyToAddr(privateKeyToPubKey(s),prefix)
+
 class TestnetData:
     start_fee = 2000
-    address1 = 'miPtyvZgdXidDug4msfFyBpMy2z8VrkR1C'
-    address2 = 'migrBFM4Xd4LNBui6XwEkU74Zehh7ZkR4M'
-    priv1 = 'cTbUQ5gLKwt1PEXJiuhkgFE3pxij6TMRseuiEK8oFdvSKpSgDn7o'
-    priv2 = 'cSfUQtuJ1sYPtbahUPDB8ZvL3cG7Dkd7m5VVAPGVJCebHxV7zmzh'
+    address2 = 'miPtyvZgdXidDug4msfFyBpMy2z8VrkR1C'
+    address1 = 'migrBFM4Xd4LNBui6XwEkU74Zehh7ZkR4M'
+    priv2 = 'cTbUQ5gLKwt1PEXJiuhkgFE3pxij6TMRseuiEK8oFdvSKpSgDn7o'
+    priv1 = 'cSfUQtuJ1sYPtbahUPDB8ZvL3cG7Dkd7m5VVAPGVJCebHxV7zmzh'
     txid1 = u'f34c411aed0e707854f39f603835bd8575504950c781a1bf13598c2806f61327:0'
-    tx_amount = int(1.9 * COIN)
+    tx_amount = int(1.69 * COIN)
 
-    send_amount = int(tx_amount - 3000)
+    send_amount = int(tx_amount - 2000)
+
+
+class TestTx:
+
+    def __init__(self, r, v, k):
+        self.recipient = r
+        self.amount = v
+        self.private_key = k
 
 
 class Transaction:
+
+    def __init__(self, session):
+        self.session = session
+
     async def testnet_run(self):
         if TestnetData.address1:
+            if not await db.findKey(TestnetData.priv1):
+                result = await db.addSingleKey(TestnetData.priv1, self.session.user['id'])
 
             tx_history = btcd_utils.get_tx_history(TestnetData.address1)
             tx_input = []
@@ -81,6 +144,76 @@ class Transaction:
 
             # tx_input_total = sum(x['value'] for x in tx_input)
 
+
+    @staticmethod
+    async def send_text_tx(to, amount, key):
+        new_tx = TestTx(r=to, v=amount, k=key)
+        if new_tx:
+
+            tx_history = btcd_utils.get_tx_history(TestnetData.address1)
+            tx_input = []
+            tx_input_amount = 0
+
+            for v in tx_history:
+                if tx_input_amount < TestnetData.send_amount:
+                    tx_input.append({'output': str((next(iter(v.keys())) + ':0')), 'value': next(iter(v.values())),
+                                     'address': TestnetData.address1, 'wif': TestnetData.priv1})
+                    tx_input_amount += next(iter(v.values()))
+                else:
+                    break
+
+            tx_input_total = sum(x['value'] for x in tx_input)
+            tx_remain_amount = tx_input_total - TestnetData.send_amount
+            tx_output = [{'value': TestnetData.send_amount - 1000, 'address': TestnetData.address2},
+                         {'value': tx_remain_amount, 'address': TestnetData.address1}]
+
+            client = Client()
+            response = await client.connect('http://localhost:3000/transaction', json_encode({'txIn': tx_input, 'txOut': tx_output, 'network': 'testnet'}))
+
+            if response:
+                print(response)
+                data = json_decode(response.body.decode())
+                result = data.get('result', 'error')
+                if result != 'error':
+                    btcd_utils.send_tx(result, 'testnet')
+
+    @staticmethod
+    async def request_transaction(*kwargs):
+
+        if kwargs[0] is not None:
+            new_tx = TestTx(r=kwargs[0]['recipient'], v=kwargs[0]['amount'], k=kwargs[0]['private_key'])
+            if new_tx:
+                h = hashlib.sha256(str(new_tx.private_key).encode()).digest()
+                sender_addr = keyToAddr(h, testnet=True)
+                # sender_priv_decoded = btc_tools.sha256(new_tx.private_key)
+                # sender_pub = btc_tools.privtopub(sender_priv_decoded)
+                # sender_addr = btc_tools.pubtoaddr(sender_pub)
+                tx_history = btcd_utils.get_tx_history(sender_addr)
+                tx_input = []
+                tx_input_amount = 0
+
+                for v in tx_history:
+                    if tx_input_amount < new_tx.amount:
+                        tx_input.append({'output': str((next(iter(v.keys())) + ':0')), 'value': next(iter(v.values())),
+                                         'address': sender_addr, 'wif': new_tx.private_key})
+                        tx_input_amount += next(iter(v.values()))
+                    else:
+                        break
+
+                tx_input_total = sum(x['value'] for x in tx_input)
+                tx_remain_amount = tx_input_total - new_tx.amount
+                tx_output = [{'value': new_tx.amount - 1000, 'address': new_tx.recipient},
+                             {'value': tx_remain_amount, 'address': sender_addr}]
+
+                client = Client()
+                response = await client.connect('http://localhost:3000/transaction', json_encode({'txIn': tx_input, 'txOut': tx_output, 'network': 'testnet'}))
+
+                if response:
+                    print(response)
+                    data = json_decode(response.body.decode())
+                    result = data.get('result', 'error')
+                    if result != 'error':
+                        btcd_utils.send_tx(result, 'testnet')
 
 
     @staticmethod
