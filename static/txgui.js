@@ -1,3 +1,4 @@
+import { PrivateKey, Networks } from 'bitcore-lib'
 
 $('document').ready(() => {
     let sendButton = document.getElementById('submit-tx')
@@ -8,17 +9,23 @@ $('document').ready(() => {
         event.stopPropagation()
 
         const recipient = $('#to-address').val()
-        const senderPrivateKey = $('#from-secret').val()
+        const senderAddress = $('#from-address').val()
+        const senderWIF = $('#from-secret').val()
         const satoshis = $('#satoshis').val()
 
-        console.log("Recipient: " + recipient + "\n" + "Sender Key: " + senderPrivateKey + "\n" + "Amount: " + satoshis)
+        const senderPrivateKey = PrivateKey.fromWIF(senderWIF)
+        // const senderAddress = senderPrivateKey.toAddress(Networks.testnet)
 
-        const xhr = xhrRequest(senderPrivateKey, recipient, satoshis)
+
+
+        console.log("Recipient: " + recipient + "\n" + "Sender Key: " + senderPrivateKey + "\n" + "Sender Address: " + senderAddress + "Amount: " + satoshis)
+
+        const xhr = xhrRequest({address: senderAddress, key: senderPrivateKey.toString()}, recipient, satoshis)
 
     })
 })
 
-const xhrRequest = (senderKey, recipient, amount) => {
+const xhrRequest = (senderData, recipient, amount) => {
     const xhr = new XMLHttpRequest();
     xhr.onload = () => {
         console.dir(arguments)
@@ -31,9 +38,9 @@ const xhrRequest = (senderKey, recipient, amount) => {
 
 
     xhr.setRequestHeader('Content-Type', 'application/json');
-
+// TODO change sender parameter to object with keyed properties for address and private key
     xhr.send(JSON.stringify({
-        privKey: senderKey,
+        sender: senderData,
         recipient: recipient,
         amount: amount
     }));

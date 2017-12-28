@@ -2,17 +2,17 @@ const webpack = require('webpack')
 const path = require('path');
 
 let config = {
-    entry: path.resolve(__dirname, 'index.js'),
+    entry: path.resolve(__dirname, 'txgui.js'),
     output: {
         path: path.resolve(__dirname, ''),
-        filename: 'bundle.js'
+        filename: 'trxgui.js',
     },
     module: {
         loaders: [{
             test: /\.jsx?$/,
             loader: 'babel-loader',
             query: {
-                presets: ['es2015', 'react']
+                presets: ['es2017', 'react']
             }
         }]
     },

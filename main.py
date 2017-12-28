@@ -415,8 +415,8 @@ class TxRequestHandler(RequestHandler):
     async def post(self, *args, **kwargs):
         tx_request_data = escape.json_decode(self.request.body)
 
-        if 'privKey' in tx_request_data and 'recipient' in tx_request_data and 'amount' in tx_request_data:
-            transaction_result = await trx__tx_out.Transaction.request_transaction({'private_key': tx_request_data['privKey'] , 'recipient': tx_request_data['recipient'], 'amount': tx_request_data['amount']})
+        if 'sender' in tx_request_data and 'recipient' in tx_request_data and 'amount' in tx_request_data:
+            transaction_result = await trx__tx_out.Transaction.request_transaction({'sender': tx_request_data['sender'] , 'recipient': tx_request_data['recipient'], 'amount': tx_request_data['amount']})
 
 
 class TRXApplication(Application):
