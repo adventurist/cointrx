@@ -22,7 +22,7 @@ router.post('/transaction', (req, res, next) => {
             switch (k) {
                 case 'txIn':
                     v.forEach((v) => {
-                        txIn.push({id: v.output, address: v.address, value: v.value, key: v.wif})
+                        txIn.push({id: v.output, idx: v.idx, address: v.address, value: v.value, key: v.wif})
                     })
                     break
 
