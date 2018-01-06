@@ -82,7 +82,8 @@ class LoginHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    async def post(self) -> object:
+    async def post(self) -> str:
+        cookie_data = self.get_secure_cookie('trx_cookie')
         current_header = self.request.headers.get("Content-Type")
         print(current_header)
         if self.request.headers.get("Content-Type") == 'application/json':
@@ -95,9 +96,17 @@ class LoginHandler(RequestHandler):
                 self.write("You must supply more arguments")
                 self.write_error(401)
             else:
-                new_user = db.check_authentication(name, password, email)
-                application.create_session(user={'name': name, 'pass': password, 'id': new_user.id})
-                print(str(new_user))
+                user_verify = db.check_authentication(name, password, email)
+                if user_verify is not -1:
+                    csrf = user_verify.generate_auth_token(expiration=1200)
+                    application.create_session(
+                        user={'name': name, 'pass': password, 'id': user_verify.id, 'csrf': csrf})
+                    if application.session is not None and isinstance(application.session, session.Session):
+                        self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                        return self.write(escape.json_encode({'token': str(application.session.user['csrf'], 'utf-8'),
+                                                              'cookie': str(self.get_secure_cookie('trx_cookie'))}))
+
+                    print(str(user_verify))
         elif self.request.headers.get("Content-Type") == 'text/html':
             name = self.get_argument('name')
             print(name)
@@ -114,8 +123,10 @@ class LoginHandler(RequestHandler):
                     if drupal_login is not None:
                         drupal_user_data = escape.json_decode(escape.to_basestring(drupal_login.body))
                         csrf = user_verified.generate_auth_token(expiration=1200)
-                        application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id}, csrf=csrf, dcsrf=drupal_user_data['csrf_token'])
+                        application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
+                                                   csrf=csrf, dcsrf=drupal_user_data['csrf_token'])
                         self.set_secure_cookie("dcsrf", application.session.drupal_token())
+                        self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
                         reflect = self
 
     def get(self, *args, **kwargs):
@@ -338,9 +349,11 @@ class HeartbeatHandler(RequestHandler):
         pass
 
     def get(self, *args, **kwargs):
-        result = looper.run_until_complete(db.heartbeat_get_all())
+        found_cookie = self.get_secure_cookie("trx_cookie")
+        if found_cookie is not None:
+            result = looper.run_until_complete(db.heartbeat_get_all())
 
-        self.render("templates/heartbeat.html", title="Heartbeat", heartbeats=result)
+            self.render("templates/heartbeat.html", title="Heartbeat", heartbeats=result)
 
 
 class HeartbeatCreateHandler(RequestHandler):
@@ -376,7 +389,9 @@ class HeartbeatSocketShareHandler(WebSocketHandler):
         encodedCreds = base64.b64encode(credString.encode())
         # encodedCreds = base64.b64encode(str(user['name'] + ':' + user['pass']).encode())
 
-        post_attempt = await drupal_utils.post_status_message(escape.json_encode({'message': message, 'name': user['name'], 'pass': user['pass']}), headers={'X-CSRF-Token': application.session.drupal_token()}, user=user)
+        post_attempt = await drupal_utils.post_status_message(
+            escape.json_encode({'message': message, 'name': user['name'], 'pass': user['pass']}),
+            headers={'X-CSRF-Token': application.session.drupal_token()}, user=user)
 
         # post_attempt = await drupal_utils.post_status_message(
         #     escape.json_encode({'message': message, 'name': user['name'], 'pass': user['pass']}),
@@ -402,7 +417,11 @@ class TxGuiHandler(RequestHandler):
         pass
 
     def get(self, *args, **kwargs):
-        self.render("templates/tx.html", title="TRX TX Interface")
+        found_cookie = self.get_secure_cookie("trx_cookie")
+        if found_cookie is not None:
+            self.render("templates/tx.html", title="TRX TX Interface")
+        else:
+            self.write("you need to LOGIN")
 
     def post(self, *args, **kwargs):
         pass
@@ -416,7 +435,37 @@ class TxRequestHandler(RequestHandler):
         tx_request_data = escape.json_decode(self.request.body)
 
         if 'sender' in tx_request_data and 'recipient' in tx_request_data and 'amount' in tx_request_data:
-            transaction_result = await trx__tx_out.Transaction.request_transaction({'sender': tx_request_data['sender'] , 'recipient': tx_request_data['recipient'], 'amount': tx_request_data['amount']})
+            transaction_result = await trx__tx_out.Transaction.request_transaction(
+                {'sender': tx_request_data['sender'], 'recipient': tx_request_data['recipient'],
+                 'amount': tx_request_data['amount']})
+
+
+class BCypherInfoHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        blockcypher_data = trx__tx_out.Transaction.bcypher_new_address()
+
+
+class BCypherAddressAllHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        blockcypher_data = await db.bcypher_make_user_addresses()
+        self.write(escape.json_encode(blockcypher_data))
+
+
+class SubProcessHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        from utils import btcd_utils
+
+        result = btcd_utils.make_dir_in_home()
+        self.write(result)
 
 
 class TRXApplication(Application):
@@ -439,6 +488,8 @@ class TRXApplication(Application):
             (r"/sendmail", SendMailHandler),
             (r"/fakenews", FakeNewsHandler),
             (r"/updateprices", UpdatePriceHandler),
+            (r"/bcypher/info", BCypherInfoHandler),
+            (r"/bcypher/address/provision-all", BCypherAddressAllHandler),
             (r"/prices/latest", LatestPriceHandler),
             (r"/prices/currency", CurrencyHandler),
             (r"/prices/graph", GraphHandler),
@@ -454,6 +505,7 @@ class TRXApplication(Application):
             (r"/heartbeat/share/new", HeartbeatShareHandler),
             (r"/heartbeat/share/socket-new", HeartbeatSocketShareHandler),
             (r"/users/all", UserListHandler),
+            (r"/subprocess/test", SubProcessHandler),
             (r"/static/(.*)", StaticFileHandler, {
                 "path": "/static"})
         ]

@@ -1,3 +1,7 @@
+import base64
+import uuid
+
+
 class Session:
     def __init__(self, user, csrf=0, dcsrf=0):
         self.csrf = csrf
@@ -12,3 +16,13 @@ class Session:
 
     def drupal_user(self):
         return self.user
+
+    def set_cookie(self, cookie):
+        self.cookie = cookie
+
+    def get_cookie(self):
+        return self.cookie
+
+    @staticmethod
+    def generate_cookie():
+        return base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)

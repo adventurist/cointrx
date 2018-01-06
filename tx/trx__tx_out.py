@@ -9,7 +9,7 @@ from bitcoin import main as btc_tools, transaction as tx_func, mksend, multisign
 from bitcoin.core import x, b2x, lx, COIN, COutPoint, CMutableTxOut, CMutableTxIn, CMutableTransaction, Hash160, b2lx
 from bitcoin.core.script import CScript, OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG, SignatureHash, SIGHASH_ALL
 from bitcoin.core.scripteval import VerifyScript, SCRIPT_VERIFY_P2SH
-from bitcoin.wallet import CBitcoinAddress, CBitcoinSecret, P2PKHBitcoinAddress,P2SHBitcoinAddress
+from bitcoin.wallet import CBitcoinAddress, CBitcoinSecret, P2PKHBitcoinAddress, P2SHBitcoinAddress
 from bitcoin.rpc import Proxy
 
 # from pycoin.services import spendables_for_address
@@ -20,8 +20,6 @@ from utils.cointrx_client import Client
 from utils import btcd_utils
 from tornado.escape import json_encode, json_decode
 from db import db
-
-
 
 transaction_input = 'eca213168d3683c86591890e766c76ab618e0c245925ebcaddc855aecb2643a1'
 #
@@ -34,6 +32,7 @@ input_tx_size = 5.10131318 * COIN
 # input_tx_size = 1.3 * COIN
 
 magic = 0xd9b4bef9
+
 
 # b58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 #
@@ -87,6 +86,7 @@ class TestnetData:
     address1 = 'migrBFM4Xd4LNBui6XwEkU74Zehh7ZkR4M'
     priv2 = 'cTbUQ5gLKwt1PEXJiuhkgFE3pxij6TMRseuiEK8oFdvSKpSgDn7o'
     priv1 = 'cSfUQtuJ1sYPtbahUPDB8ZvL3cG7Dkd7m5VVAPGVJCebHxV7zmzh'
+
     txid1 = u'f34c411aed0e707854f39f603835bd8575504950c781a1bf13598c2806f61327:0'
     tx_amount = int(1.69 * COIN)
 
@@ -94,7 +94,6 @@ class TestnetData:
 
 
 class TestTx:
-
     def __init__(self, r, v, s):
         self.recipient = r
         self.amount = int(v)
@@ -102,7 +101,6 @@ class TestTx:
 
 
 class Transaction:
-
     def __init__(self, session):
         self.session = session
 
@@ -118,7 +116,7 @@ class Transaction:
             for v in tx_history:
                 if tx_input_amount < TestnetData.send_amount:
                     tx_input.append({'output': str((next(iter(v.keys())) + ':0')), 'value': next(iter(v.values())),
-                                    'address': TestnetData.address1, 'wif': TestnetData.priv1})
+                                     'address': TestnetData.address1, 'wif': TestnetData.priv1})
                     tx_input_amount += next(iter(v.values()))
                 else:
                     break
@@ -129,7 +127,8 @@ class Transaction:
                          {'value': tx_remain_amount, 'address': TestnetData.address1}]
 
             client = Client()
-            response = await client.connect('http://localhost:3000/transaction', json_encode({'txIn': tx_input, 'txOut': tx_output, 'network': 'testnet'}))
+            response = await client.connect('http://localhost:3000/transaction',
+                                            json_encode({'txIn': tx_input, 'txOut': tx_output, 'network': 'testnet'}))
 
             if response:
                 print(response)
@@ -138,13 +137,12 @@ class Transaction:
                 if result != 'error':
                     btcd_utils.send_tx(result, 'testnet')
 
-            #
-            # # locals()["_[1]"]
-            # tx_input = [{'output': str((next(iter(v.keys())) + ':0')), 'value': next(iter(v.values())),
-            #              'address': TestnetData.address1, 'wif': TestnetData.priv1} for v in tx_history]
+                    #
+                    # # locals()["_[1]"]
+                    # tx_input = [{'output': str((next(iter(v.keys())) + ':0')), 'value': next(iter(v.values())),
+                    #              'address': TestnetData.address1, 'wif': TestnetData.priv1} for v in tx_history]
 
-            # tx_input_total = sum(x['value'] for x in tx_input)
-
+                    # tx_input_total = sum(x['value'] for x in tx_input)
 
     @staticmethod
     async def send_text_tx(to, amount, sender):
@@ -169,7 +167,8 @@ class Transaction:
                          {'value': tx_remain_amount, 'address': TestnetData.address1}]
 
             client = Client()
-            response = await client.connect('http://localhost:3000/transaction', json_encode({'txIn': tx_input, 'txOut': tx_output, 'network': 'testnet'}))
+            response = await client.connect('http://localhost:3000/transaction',
+                                            json_encode({'txIn': tx_input, 'txOut': tx_output, 'network': 'testnet'}))
 
             if response:
                 print(response)
@@ -191,13 +190,13 @@ class Transaction:
                 tx_input_amount = 0
 
                 if isinstance(tx_history, list) and len(tx_history) > 0 and isinstance(tx_history[0], dict):
-                    sender_balance = sum([sum(x for k, x in v.items()) for v in tx_history])
+                    sender_balance = sum([v['value'] for v in tx_history])
                     if sender_balance > new_tx.amount:
                         for v in tx_history:
-                            if tx_input_amount < new_tx.amount:
-                                tx_input.append({'output': str((next(iter(v.keys())) + ':0')), 'value': next(iter(v.values())),
+                            if tx_input_amount <= new_tx.amount:
+                                tx_input.append({'output': v['txid'] + ':0', 'value': v['value'], 'idx': v['idx'],
                                                  'address': sender_addr, 'wif': sender_private_key})
-                                tx_input_amount += next(iter(v.values()))
+                                tx_input_amount += v['value']
                             else:
                                 break
 
@@ -207,15 +206,17 @@ class Transaction:
                                      {'value': tx_remain_amount - 1000, 'address': sender_addr}]
                         tx_output_total = new_tx.amount + tx_remain_amount
                         client = Client()
-                        response = await client.connect('http://localhost:3000/transaction', json_encode({'txIn': tx_input, 'txOut': tx_output, 'network': 'testnet'}))
+                        response = await client.connect('http://localhost:3000/transaction', json_encode(
+                            {'txIn': tx_input, 'txOut': tx_output, 'network': 'testnet'}))
 
                         if response:
                             print(response)
                             data = json_decode(response.body.decode())
                             result = data.get('result', 'error')
                             if result != 'error':
-                                btcd_utils.send_tx(result, 'testnet')
-
+                                btcd_utils.send_tx(result['tx'], 'testnet')
+                        else:
+                            print('No response received')
 
     @staticmethod
     def run_alt():
@@ -289,6 +290,19 @@ class Transaction:
 
         print(r)
 
+    @staticmethod
+    def bcypher_info() -> str:
+        details = btcd_utils.BCypher.bcypher_chain_info()
+        print(details)
+        return str(details)
+
+    @staticmethod
+    def bcypher_new_address() -> str:
+        new_address = btcd_utils.BCypher.bcypher_generate_address()
+        print(new_address)
+        return str(new_address)
+
+
 
 # def getVersionMsg():
 #     version = 60002
@@ -307,5 +321,3 @@ class RegtestData:
     vout1 = 0
     address2 = 'mv8p8mR4cWmteUfpz6gcz5ndH3QiKLSYTy'
     send_amount = balance1 - 0.001
-
-

@@ -18,22 +18,19 @@ class TrxTransaction {
         this.network = config.network;
     }
     createTransaction(txIn, txOut) {
-        // let txInFinal = finalizeTxIn(txIn)
-        // let txOutFinal = finalizeTxOut(txOut)
-        // let keys = txIn.map(x => PrivateKey.fromWIF(x.key))
-        //
-        // const transaction = Transaction()
-        //     .from(txInFinal)
-        //     .to(txOutFinal)
-        //     .sign(keys);
-        //
-        // let errors = typeof transaction !== 'undefined' ? 0 : 1
-        // txObject = transaction
-        // return { tx: transaction.serialize(), error: errors }
-        const txBuilder = buildTx(txIn, txOut);
-        const buildResult = txBuilder.build();
-        const errors = typeof buildResult !== 'undefined' ? 0 : 1;
-        return { tx: buildResult.toHex(), error: errors };
+        let txInFinal = finalizeTxIn(txIn);
+        let txOutFinal = finalizeTxOut(txOut);
+        let keys = txIn.map(x => bitcore_lib_1.PrivateKey.fromWIF(x.key));
+        const transaction = bitcore_lib_1.Transaction()
+            .from(txInFinal)
+            .to(txOutFinal)
+            .sign(keys);
+        let errors = typeof transaction !== 'undefined' ? 0 : 1;
+        return { tx: transaction.serialize(), error: errors };
+        // const txBuilder = buildTx(txIn, txOut)
+        // const buildResult = txBuilder.build()
+        // const errors = typeof buildResult !== 'undefined' ? 0 : 1
+        // return { tx: buildResult.toHex(), error: errors }
     }
 }
 var NetworkTypes;
@@ -58,7 +55,7 @@ const buildTxIn = (txRaw) => {
 const buildTx = (txIns, txOuts) => {
     const txBuilder = new bitcoin.TransactionBuilder(bitcoin.networks.testnet);
     txIns.forEach((txIn) => {
-        txBuilder.addInput(bitcoin.Transaction.fromHex(txIn.id.indexOf(':0') ? txIn.id.substr(0, txIn.id.indexOf(':0')) : txIn.id, txIn.idx));
+        txBuilder.addInput(txIn.id.indexOf(':0') ? txIn.id.substr(0, txIn.id.indexOf(':0')) : txIn.id, txIn.idx);
     });
     txOuts.forEach((txOut) => {
         txBuilder.addOutput(txOut.address, txOut.value);

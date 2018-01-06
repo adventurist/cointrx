@@ -1,3 +1,5 @@
+from typing import Union
+
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from passlib.apps import custom_app_context as pwd_context
 from aiopg.sa import create_engine as async_engine
@@ -6,12 +8,14 @@ from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, Text, DECIMAL, Boolean, exc, event, MetaData, select
 from sqlalchemy import desc
 from sqlalchemy import func
+from sqlalchemy.sql.expression import true, false
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker, relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, as_declarative, declared_attr
 from db import db_config
 from types import SimpleNamespace
+from utils import btcd_utils
 
 from mypy import *
 
@@ -37,6 +41,8 @@ class TrxKey(Base):
     id = Column(Integer, primary_key=True)
     uid = Column(Integer, ForeignKey('users.id'))
     value = Column(String)
+    multi = Column(Boolean)
+    status = Column(Boolean)
 
 
 class SKey(Base):
@@ -110,7 +116,7 @@ class User(Base):
     def verify_password_by_name(name, password) -> bool:
         user = User.verify_auth_token(name)
         if not user:
-            user = session.query(User).filter(User.name== name).first()
+            user = session.query(User).filter(User.name == name).first()
             if user is None or not user.compare_hash(password):
                 return False
         return True
@@ -377,10 +383,6 @@ def create_all_heartbeat():
     HeartbeatCommentBase.metadata.create_all(heartbeat_connect())
 
 
-def create_user():
-    print("Stuff here")
-
-
 def handle_db_data(response):
     for row in response:
         if isinstance(row, CXPriceRevision):
@@ -526,18 +528,20 @@ def check_authentication(user, password, email):
 
         return query_user
     else:
-        pass_hash = User.generate_hash(password)
-        new_user = User(name=user, hash=pass_hash, email=email,
-                        created=int(time.mktime(datetime.datetime.now().timetuple())), status=1)
+        return -1
 
-        try:
 
-            session.add(new_user)
-            session.commit()
-            return new_user
+def create_user(user, password, email):
+    pass_hash = User.generate_hash(password)
+    new_user = User(name=user, hash=pass_hash, email=email,
+                    created=int(time.mktime(datetime.datetime.now().timetuple())), status=1)
+    try:
+        session.add(new_user)
+        session.commit()
+        return new_user
 
-        except exc.SQLAlchemyError as error:
-            return error
+    except exc.SQLAlchemyError as error:
+        return error
 
 
 def check_auth_by_name(user, password):
@@ -604,7 +608,10 @@ def build_comments(comments, now, session):
                     'body': x.body,
                     'user': session.query(HeartbeatUser).filter(HeartbeatUser.uid == x.uid).one(),
                     'timeago': timeago.format(x.created, now),
-                    'subcomments': build_sub_comments(session.query(HeartbeatComment).filter(HeartbeatComment.entity_id==x.cid, HeartbeatComment.entity_type=='comment').all(), now, session)
+                    'subcomments': build_sub_comments(
+                        session.query(HeartbeatComment).filter(HeartbeatComment.entity_id == x.cid,
+                                                               HeartbeatComment.entity_type == 'comment').all(), now,
+                        session)
                 } for x in comments]
 
 
@@ -613,7 +620,8 @@ async def heartbeat_get_all():
     now = datetime.datetime.now() + datetime.timedelta(seconds=60 * 3.4)
     media_session = sessionmaker(bind=heartbeat_engine)()
     result = media_session.query(Heartbeat).outerjoin(HeartbeatComment,
-                                                      HeartbeatComment.entity_type == 'heartbeat').filter(Heartbeat.status==1).limit(50).all()
+                                                      HeartbeatComment.entity_type == 'heartbeat').filter(
+        Heartbeat.status == 1).limit(50).all()
     data = []
     if result is not None:
         for r in result:
@@ -624,13 +632,16 @@ async def heartbeat_get_all():
                     'timeago': timeago.format(r.created, now),
                     'user': {
                         'name': r.user.name, 'uid': r.user.uid,
-                        'img': r.user.pic[0].image.uri.replace('public://', 'sites/default/files/styles/thumbnail/public/') if len(r.user.pic) > 0 else None
+                        'img': r.user.pic[0].image.uri.replace('public://',
+                                                               'sites/default/files/styles/thumbnail/public/') if len(
+                            r.user.pic) > 0 else None
                     },
                     'comments': build_comments(r.comments, now, media_session),
                     'commentcount': len(r.comments)
                 }
             )
     return data
+
 
 async def addMultiSigAddress(pub_addr: str, keys: list, uid: int):
     if pub_addr is not None and len(keys) > 0:
@@ -649,22 +660,47 @@ async def addMultiSigAddress(pub_addr: str, keys: list, uid: int):
             print(err.args)
             session.rollback()
 
+
 async def addSingleKey(key: str, uid: int):
     if key is not None and uid is not None:
-        trx_key = TrxKey(value=key, uid=uid)
-        session.add(trx_key)
-        session.flush()
-        single_key = SKey(value=key, uid=uid, kid=trx_key.id)
-        session.add(single_key)
+        new_trx_key = TrxKey(value=key, uid=uid, multi=False, status=True)
+        find_key = await find_key_for_uid(uid)
+        if not find_key:
 
-        try:
-            session.commit()
-            return single_key.id
+            session.add(new_trx_key)
+            session.flush()
+            single_key = SKey(value=key, uid=uid, kid=new_trx_key.id)
+            session.add(single_key)
 
-        except exc.SQLAlchemyError as err:
-            print(err.args)
-            session.rollback()
-            return err
+            try:
+                session.commit()
+                return single_key.id
+
+            except exc.SQLAlchemyError as err:
+                print(err.args)
+                session.rollback()
+                return err
+
+        else:
+            if isinstance(find_key, TrxKey):
+                if not find_key.multi:
+                    s_key = await find_single_key(int(find_key.id))
+                    if s_key:
+                        if isinstance(s_key, SKey):
+                            s_key.value = key
+                            find_key.value = key
+                            session.add(s_key)
+                            session.add(find_key)
+
+                            try:
+                                session.commit()
+                                return find_key.id
+
+                            except exc.SQLAlchemyError as err:
+                                print(err.args)
+                                session.rollback()
+                                return err
+
 
 async def findKey(key: str):
     existing_key = session.query(TrxKey).filter(TrxKey.value == key).first()
@@ -674,5 +710,36 @@ async def findKey(key: str):
     else:
         return existing_key.id
 
+async def find_single_key(kid: int) -> Union[bool, SKey]:
+    existing_key = session.query(SKey).filter(SKey.kid == kid).first()
 
-    # user = session.query(User).filter(User.email == email_or_token).first()
+    if existing_key is None:
+        return False
+    else:
+        return existing_key
+
+
+async def find_key_for_uid(uid: int) -> Union[bool, TrxKey]:
+    key = session.query(TrxKey).filter(TrxKey.uid == uid, TrxKey.status == true()).first()
+
+    if key is None:
+        return False
+    else:
+        return key
+
+
+async def bcypher_make_user_addresses() -> list:
+    users = session.query(User).all()
+    result = []
+    for user in users:
+        new_address = btcd_utils.BCypher.bcypher_generate_address()
+        add_key_attempt = await addSingleKey(new_address['wif'], user.id)
+        verify = btcd_utils.wif_to_address(new_address['wif'])
+
+        if verify == new_address['address']:
+            print('These are equal')
+
+        if add_key_attempt is not None:
+            result.append({user.id: 1})
+
+    return result

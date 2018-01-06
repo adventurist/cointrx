@@ -26,22 +26,22 @@ class TrxTransaction {
     }
 
     createTransaction (txIn: Array<Txin>, txOut: Array<Txout>) {
-        // let txInFinal = finalizeTxIn(txIn)
-        // let txOutFinal = finalizeTxOut(txOut)
-        // let keys = txIn.map(x => PrivateKey.fromWIF(x.key))
-        //
-        // const transaction = Transaction()
-        //     .from(txInFinal)
-        //     .to(txOutFinal)
-        //     .sign(keys);
-        //
-        // let errors = typeof transaction !== 'undefined' ? 0 : 1
-        // txObject = transaction
-        // return { tx: transaction.serialize(), error: errors }
-        const txBuilder = buildTx(txIn, txOut)
-        const buildResult = txBuilder.build()
-        const errors = typeof buildResult !== 'undefined' ? 0 : 1
-        return { tx: buildResult.toHex(), error: errors }
+        let txInFinal = finalizeTxIn(txIn)
+        let txOutFinal = finalizeTxOut(txOut)
+        let keys = txIn.map(x => PrivateKey.fromWIF(x.key))
+
+        const transaction = Transaction()
+            .from(txInFinal)
+            .to(txOutFinal)
+            .sign(keys);
+
+        let errors = typeof transaction !== 'undefined' ? 0 : 1
+
+        return { tx: transaction.serialize(), error: errors }
+        // const txBuilder = buildTx(txIn, txOut)
+        // const buildResult = txBuilder.build()
+        // const errors = typeof buildResult !== 'undefined' ? 0 : 1
+        // return { tx: buildResult.toHex(), error: errors }
     }
 }
 

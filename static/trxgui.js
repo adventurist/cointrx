@@ -31287,7 +31287,7 @@ $('document').ready(() => {
 
         console.log("Recipient: " + recipient + "\n" + "Sender Key: " + senderPrivateKey + "\n" + "Sender Address: " + senderAddress + "Amount: " + satoshis);
 
-        const xhr = xhrRequest({ address: senderAddress, key: senderPrivateKey.toString() }, recipient, satoshis);
+        const xhr = xhrRequest({ address: senderAddress, key: senderWIF }, recipient, satoshis);
     });
 });
 
