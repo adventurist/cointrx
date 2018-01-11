@@ -728,18 +728,37 @@ async def find_key_for_uid(uid: int) -> Union[bool, TrxKey]:
         return key
 
 
-async def bcypher_make_user_addresses() -> list:
+async def regtest_make_user_addresses() -> list:
     users = session.query(User).all()
     result = []
     for user in users:
-        new_address = btcd_utils.BCypher.bcypher_generate_address()
-        add_key_attempt = await addSingleKey(new_address['wif'], user.id)
-        verify = btcd_utils.wif_to_address(new_address['wif'])
+        new_address = btcd_utils.RegTest.get_new_address()
+        if new_address is not None:
+            wif = btcd_utils.RegTest.address_to_wif(new_address)
+            add_key_attempt = await addSingleKey(wif, user.id)
+            verify = btcd_utils.wif_to_address(wif)
 
-        if verify == new_address['address']:
-            print('These are equal')
+            if verify == new_address:
+                print('These are equal')
 
-        if add_key_attempt is not None:
-            result.append({user.id: 1})
+            if add_key_attempt is not None:
+                result.append({user.id: 1})
 
     return result
+
+
+async def regtest_user_data():
+
+    user_data = []
+    users = session.query(User).all()
+    for user in users:
+        print(str(user.trxkey))
+        data = {
+            'id': user.id,
+            'name': user.name,
+            'email': user.email,
+            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status} for x in user.trxkey]
+        }
+        user_data.append(data)
+
+    return user_data

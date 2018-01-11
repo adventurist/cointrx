@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const bitcore_lib_1 = require("bitcore-lib");
 const bitcoin = require("bitcoinjs-lib");
+bitcore_lib_1.Networks.enableRegtest();
 const satoshi = 100000000;
 exports.txFactory = (config) => {
     const tx = new TrxTransaction(config);

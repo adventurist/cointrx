@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/jquery-3.2.1.min.js"></script>
+</head>
+<body>
+
+<div id="user-data-container">
+    {% for user in data %}
+    <div class="user-wrap">
+        <h2 class="user-header">{{ user['name'] }}</h2>
+        <button>Recipient</button>
+        <div class="user-data">
+            <div class="user-id">
+                <span>ID: </span><span class="user-id">{{ user['id'] }}</span>
+            </div>
+            <div class="user-email">
+                <span>Email: </span><span class="user-email">{{ user['email'] }}</span>
+            </div>
+            <h3 class="keys-header">Keys</h3>
+            <div class="user-keys">
+                {% for key in user['keys'] %}
+                <div class="key-data">
+                    <div class="key-row">
+                        <span>ID: </span><span class="key-id">{{ key['id'] }}</span>
+                    </div>
+                    <div class="key-row">
+                        <span>Value: </span><input class="wif-value" value="{{ key['wif'] }}"/><button>Choose</button>
+                    </div>
+                </div>
+                {% end %}
+            </div>
+        </div>
+    </div>
+    {% end %}
+</div>
+
+<div id="tx-container">
+    <div id="form-wrap">
+        <form action="javascript:void(0);" method="post" id="status-form" accept-charset="UTF-8">
+            <div class="js-form-item">
+                <div>
+                    <input id="from-secret" type="text" placeholder="Your Wallet Secret">
+                    <input id="from-address" type="text" placeholder="Your Address">
+                    <input id="to-address" type="text" placeholder="To this address">
+                </div>
+            </div>
+            <div class="js-form-item">
+                <input id="satoshis" type="number" value="0.00" step="0.01"> X 100000000 Satoshi
+            </div>
+            <input type="submit" id="submit-tx" name="op" value="Send" class="button js-form-submit form-submit">
+        </form>
+    </div>
+</div>
+<script src="/static/trxgui.js"></script>
+</body>
+</html>

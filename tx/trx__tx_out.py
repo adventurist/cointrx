@@ -185,7 +185,7 @@ class Transaction:
             if new_tx:
                 sender_addr = new_tx.sender['address']
                 sender_private_key = new_tx.sender['key']
-                tx_history = btcd_utils.get_tx_history(sender_addr)
+                tx_history = await btcd_utils.RegTest.get_tx_history(sender_addr)
                 tx_input = []
                 tx_input_amount = 0
 
@@ -214,7 +214,7 @@ class Transaction:
                             data = json_decode(response.body.decode())
                             result = data.get('result', 'error')
                             if result != 'error':
-                                btcd_utils.send_tx(result['tx'], 'testnet')
+                                btcd_utils.send_tx(result['tx'], 'regtest')
                         else:
                             print('No response received')
 

@@ -354,3 +354,83 @@ body, html {
 #from-secret, #to-address {
     width: 15em;
 }
+
+/**********
+**TX TEST**
+**********/
+
+#user-data-container {
+    float: left;
+    width: 45%;
+    padding: 4px;
+    color: #c3c3c3;
+    text-align: left;
+}
+
+#tx-container {
+    float: right;
+    width: 50%;
+}
+
+.user-data {
+    padding: 20px;
+}
+
+.user-data > div {
+    width: 100%;
+    float: left;
+}
+.user-data > div > span {
+    padding: 4px;
+    width: 45%;
+    text-align: left;
+}
+
+.user-data > div > span:nth-child(2n-1),
+.key-row span:nth-child(2n-1){
+    float: left;
+    width: 40%;
+}
+
+.user-data > div > div > span:nth-child(2n) {
+    float: right;
+
+}
+
+.user-keys {
+    padding-left: 2.5em;
+}
+
+.keys-header {
+    display: inline;
+    float: left;
+}
+
+.user-header {
+    float: left;
+    padding-left: 8px;
+}
+
+.user-wrap {
+    float: left;
+    width: 100%;
+    height: 100%;
+    border: 2px solid #00ffe454;
+}
+
+.key-row {
+    width: 100%;
+    float: left;
+    padding: 8px 0 8px 0;
+}
+
+.key-row button {
+    margin-left: 1em;
+}
+
+.user-wrap > button {
+    float: right;
+    margin: 1em;
+    font-weight: 700;
+    color: #164342;
+}

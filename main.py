@@ -448,24 +448,33 @@ class BCypherInfoHandler(RequestHandler):
         blockcypher_data = trx__tx_out.Transaction.bcypher_new_address()
 
 
-class BCypherAddressAllHandler(RequestHandler):
+class RegTestAddressAllHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
     async def get(self, *args, **kwargs):
-        blockcypher_data = await db.bcypher_make_user_addresses()
+        blockcypher_data = await db.regtest_make_user_addresses()
         self.write(escape.json_encode(blockcypher_data))
 
 
-class SubProcessHandler(RequestHandler):
+class RegTestAllUsers(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def get(self, *args, **kwargs):
-        from utils import btcd_utils
+    async def get(self, *args, **kwargs):
+        user_data = await db.regtest_user_data()
+        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data)
 
-        result = btcd_utils.make_dir_in_home()
-        self.write(result)
+
+class RegTestTxHistory(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        from utils.btcd_utils import RegTest
+
+        tx_history = await RegTest.get_tx_history()
+
 
 
 class TRXApplication(Application):
@@ -489,7 +498,9 @@ class TRXApplication(Application):
             (r"/fakenews", FakeNewsHandler),
             (r"/updateprices", UpdatePriceHandler),
             (r"/bcypher/info", BCypherInfoHandler),
-            (r"/bcypher/address/provision-all", BCypherAddressAllHandler),
+            (r"/regtest/all-users", RegTestAllUsers),
+            (r"/regtest/tx-history", RegTestTxHistory),
+            (r"/regtest/address/provision-all", RegTestAddressAllHandler),
             (r"/prices/latest", LatestPriceHandler),
             (r"/prices/currency", CurrencyHandler),
             (r"/prices/graph", GraphHandler),
@@ -505,7 +516,6 @@ class TRXApplication(Application):
             (r"/heartbeat/share/new", HeartbeatShareHandler),
             (r"/heartbeat/share/socket-new", HeartbeatSocketShareHandler),
             (r"/users/all", UserListHandler),
-            (r"/subprocess/test", SubProcessHandler),
             (r"/static/(.*)", StaticFileHandler, {
                 "path": "/static"})
         ]

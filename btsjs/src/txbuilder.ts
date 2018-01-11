@@ -1,6 +1,8 @@
 import {Address, Networks, Script, PrivateKey, Transaction} from 'bitcore-lib'
 import * as bitcoin from 'bitcoinjs-lib'
 
+Networks.enableRegtest()
+
 const satoshi = 100000000
 
 
