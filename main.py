@@ -476,6 +476,16 @@ class RegTestTxHistory(RequestHandler):
         tx_history = await RegTest.get_tx_history()
 
 
+class TrxRollbackHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        result = db.rollback_transaction()
+
+        if result:
+            self.write('Successfully rolled back')
+
 
 class TRXApplication(Application):
     def __init__(self):
@@ -510,6 +520,7 @@ class TRXApplication(Application):
             (r"/transaction/test", TestTransactionHandler),
             (r"/transaction/sendraw", SendTrawTransactionHandler),
             (r"/transaction/tx-gui", TxGuiHandler),
+            (r"/transaction/secret/rollback", TrxRollbackHandler),
             (r"/react/test", ReactTestHandler),
             (r"/heartbeat/feed", HeartbeatHandler),
             (r"/heartbeat/create", HeartbeatCreateHandler),

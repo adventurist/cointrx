@@ -44,7 +44,7 @@ class RegTest:
     @staticmethod
     async def get_tx_history(address):
         interface = 'bitcoin-cli'
-        command = 'listtransactions'
+        command = 'listunspent'
 
         new_address_result = RegTest.make_command(interface, command)
 

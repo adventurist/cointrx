@@ -89,7 +89,7 @@ export interface Txout {
 const buildTxIn = (txRaw: Txin): Txribute => {
     return {
         txId: txRaw.id.indexOf(':0') ? txRaw.id.substr(0, txRaw.id.indexOf(':0')) : txRaw.id,
-        outputIndex: 0,
+        outputIndex: txRaw.idx,
         address: new Address(txRaw.address, 'testnet'),
         script: new Script(PrivateKey.fromWIF(txRaw.key).toAddress(Networks.testnet)).toHex(),
         satoshis: txRaw.value

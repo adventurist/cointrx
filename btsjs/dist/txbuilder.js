@@ -47,7 +47,7 @@ var TxTypes;
 const buildTxIn = (txRaw) => {
     return {
         txId: txRaw.id.indexOf(':0') ? txRaw.id.substr(0, txRaw.id.indexOf(':0')) : txRaw.id,
-        outputIndex: 0,
+        outputIndex: txRaw.idx,
         address: new bitcore_lib_1.Address(txRaw.address, 'testnet'),
         script: new bitcore_lib_1.Script(bitcore_lib_1.PrivateKey.fromWIF(txRaw.key).toAddress(bitcore_lib_1.Networks.testnet)).toHex(),
         satoshis: txRaw.value

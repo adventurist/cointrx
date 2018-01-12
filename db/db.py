@@ -379,6 +379,13 @@ def create_all():
     Base.metadata.create_all(db_connect())
 
 
+def rollback_transaction():
+    try:
+        session.rollback()
+        return True
+    except exc.SQLAlchemyError as error:
+        return error
+
 def create_all_heartbeat():
     HeartbeatCommentBase.metadata.create_all(heartbeat_connect())
 
