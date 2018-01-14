@@ -31267,31 +31267,31 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bitcore_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bitcore_lib__);
 var _arguments = arguments;
 
+
+const urls = {
+    sendTransaction: txUrl
+};
+
 function updateProgress(oEvent) {
     if (oEvent.lengthComputable) {
         var percentComplete = oEvent.loaded / oEvent.total;
         console.log(percentComplete);
-
     } else {
         // Unable to compute progress information since the total size is unknown
-        }
     }
+}
 
 function transferComplete(evt) {
     console.log("The transfer is complete.");
 }
 
 function transferFailed(evt) {
-     console.log("An error occurred while transferring the file.");
- }
+    console.log("An error occurred while transferring the file.");
+}
 
- function transferCanceled(evt) {
-    console.log('Transfer cancelled')
- }
-
-const urls = {
-    sendTransaction: "http://localhost:6969/transaction/request"
-};
+function transferCanceled(evt) {
+    console.log('Transfer cancelled');
+}
 
 $('document').ready(() => {
     let sendButton = document.getElementById('submit-tx');
@@ -31302,12 +31302,12 @@ $('document').ready(() => {
         event.stopPropagation();
 
         const recipient = $('#to-address').val();
-        const senderAddress = $('#from-address').val()
+        // const senderAddress = $('#from-address').val()
         const senderWIF = $('#from-secret').val();
-        const satoshis = $('#satoshis').val() * 100000000;
+        const satoshis = $('#satoshis').val();
 
         const senderPrivateKey = __WEBPACK_IMPORTED_MODULE_0_bitcore_lib__["PrivateKey"].fromWIF(senderWIF);
-        // const senderAddress = senderPrivateKey.toAddress(__WEBPACK_IMPORTED_MODULE_0_bitcore_lib__["Networks"].testnet);
+        const senderAddress = senderPrivateKey.toAddress(__WEBPACK_IMPORTED_MODULE_0_bitcore_lib__["Networks"].testnet);
 
         console.log("Recipient: " + recipient + "\n" + "Sender Key: " + senderPrivateKey + "\n" + "Sender Address: " + senderAddress + "Amount: " + satoshis);
 
@@ -31340,7 +31340,7 @@ const xhrRequest = (url, senderData, recipient, amount) => {
     return xhr;
 };
 
-const wifToAddress = (wif) => {
+const wifToAddress = wif => {
     const address = __WEBPACK_IMPORTED_MODULE_0_bitcore_lib__["PrivateKey"].fromWIF(wif).toAddress(__WEBPACK_IMPORTED_MODULE_0_bitcore_lib__["Networks"].testnet);
 
     return address;

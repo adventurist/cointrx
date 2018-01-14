@@ -15,6 +15,7 @@ from tornado.options import define
 from tornado.websocket import WebSocketHandler
 from tornado.web import Application, RequestHandler, StaticFileHandler
 
+from config import config as TRXConfig
 from db import db
 from iox.loop_handler import IOHandler
 from tx import trx__tx_out
@@ -418,8 +419,9 @@ class TxGuiHandler(RequestHandler):
 
     def get(self, *args, **kwargs):
         found_cookie = self.get_secure_cookie("trx_cookie")
+        tx_url = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])['tx_request']
         if found_cookie is not None:
-            self.render("templates/tx.html", title="TRX TX Interface")
+            self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url)
         else:
             self.write("you need to LOGIN")
 
@@ -462,8 +464,9 @@ class RegTestAllUsers(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
+        tx_url = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])['tx_request']
         user_data = await db.regtest_user_data()
-        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data)
+        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data, tx_url=tx_url)
 
 
 class RegTestTxHistory(RequestHandler):
@@ -487,6 +490,15 @@ class TrxRollbackHandler(RequestHandler):
             self.write('Successfully rolled back')
 
 
+class RegTestBlockGenerateHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        from utils.btcd_utils import RegTest
+        self.write(RegTest.create_new_block())
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -494,7 +506,8 @@ class TRXApplication(Application):
             "debug": True,
             "static_path": os.path.join(os.path.dirname(__file__), "static"),
             "template_path": os.path.join(os.path.dirname(__file__)),
-            "cookie_secret": "8a573v89h7jociauroj435897j34"
+            "cookie_secret": "8a573v89h7jociauroj435897j34",
+            "env": None
         }
         handlers = [
             (r"/", MainHandler),
@@ -510,6 +523,7 @@ class TRXApplication(Application):
             (r"/bcypher/info", BCypherInfoHandler),
             (r"/regtest/all-users", RegTestAllUsers),
             (r"/regtest/tx-history", RegTestTxHistory),
+            (r"/regtest/generate/block", RegTestBlockGenerateHandler),
             (r"/regtest/address/provision-all", RegTestAddressAllHandler),
             (r"/prices/latest", LatestPriceHandler),
             (r"/prices/currency", CurrencyHandler),
@@ -546,6 +560,9 @@ if __name__ == "__main__":
     warnings.simplefilter('always')
     application = TRXApplication()
     application.listen(6969)
+
+    application.settings['env'] = TRXConfig.get_env_variables()
+
     db.Base.metadata.create_all(bind=db.engine)
 
     IOLoop.instance().start()

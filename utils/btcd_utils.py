@@ -1,14 +1,44 @@
 from subprocess import *
 
 import binascii
-import codecs
 import hashlib
+from os import environ
 from tornado.escape import json_decode
 from blockcypher import *
 from pycoin.key import Key
 from config import services
 
 b58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+
+
+def make_command(interface, command, option1=None):
+    if option1 is not None:
+        return run([interface, command, option1], stdout=PIPE)
+    else:
+        return run([interface, command], stdout=PIPE)
+
+
+def get_env_variables():
+
+    return {
+        'NODE_ENV': environ.get('NODE_ENV'),
+        'NODE_PORT': environ.get('NODE_PORT'),
+        'TRX_ENV': environ.get('TRX_ENV')
+    }
+
+    # interface = 'echo'
+    # variables = [
+    #     '$NODE_ENV',
+    #     '$NODE_PORT',
+    #     '$TRX_ENV'
+    # ]
+    # result = {}
+    # for v in variables:
+    #     get_env_result = make_command(interface, v)
+    #     if get_env_result is not None:
+    #         result[v] = get_env_result.stdout
+    #
+    # return result
 
 
 def send_tx(txid: str, network: str):
@@ -26,11 +56,20 @@ def parse_tx_history(stdout, address):
         decoded = json_decode(stdout)
         if decoded is not None:
             print(str(decoded))
-            tx_history = [{'txid': x['txid'], 'value': int(x['amount'] * 100000000), 'idx': x['vout']} for x in decoded if x['address'] == address and x['amount'] > 0]
+            tx_history = [{'txid': x['txid'], 'value': int(x['amount'] * 100000000), 'idx': x['vout']} for x in decoded
+                          if x['address'] == address and x['amount'] > 0]
             return tx_history
 
 
 class RegTest:
+    
+    @staticmethod
+    def make_command(interface, command, option1=None):
+        if option1 is not None:
+            return run([interface, '-regtest', command, option1], stdout=PIPE)
+        else:
+            return run([interface, '-regtest', command], stdout=PIPE)
+        
     @staticmethod
     def get_new_address():
         interface = 'bitcoin-cli'
@@ -62,12 +101,15 @@ class RegTest:
                :-1] if priv_key_result is not None else 'Error retrieving Private Key'
 
     @staticmethod
-    def make_command(interface, command, option1=None):
+    def create_new_block():
+        interface = 'bitcoin-cli'
+        command = 'generate'
+        param = '1'
 
-        if option1 is not None:
-            return run([interface, '-regtest', command, option1], stdout=PIPE)
-        else:
-            return run([interface, '-regtest', command], stdout=PIPE)
+        block_generate_result = RegTest.make_command(interface, command, param)
+
+        return str(block_generate_result.stdout, 'utf-8')[
+               :-1] if block_generate_result is not None else 'Error generating block'
 
 
 def get_tx_history(addr: str):

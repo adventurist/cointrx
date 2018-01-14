@@ -1,8 +1,7 @@
 import base58
 import hashlib
-import ecdsa
-
-import codecs
+import configparser
+import config.config as TRXConfig
 # from tornado import websocket
 from bitcoin import main as btc_tools, transaction as tx_func, mksend, multisign, sendmultitx, mk_multisig_script, \
     scriptaddr, apply_multisignatures
@@ -21,6 +20,19 @@ from utils import btcd_utils
 from tornado.escape import json_encode, json_decode
 from db import db
 
+
+def set_trx_urls():
+    environment_variables = TRXConfig.get_env_variables()
+    if 'TRX_ENV' in environment_variables:
+        return TRXConfig.get_urls(environment_variables['TRX_ENV'])
+    else:
+        import json
+        with open('../config/config.json') as c:
+            url_config = json.load(c)
+            return url_config['LOCAL_DEVELOPMENT']
+
+
+TRX_urls = set_trx_urls()
 transaction_input = 'eca213168d3683c86591890e766c76ab618e0c245925ebcaddc855aecb2643a1'
 #
 sender_address = 'miPtyvZgdXidDug4msfFyBpMy2z8VrkR1C'
@@ -167,7 +179,7 @@ class Transaction:
                          {'value': tx_remain_amount, 'address': TestnetData.address1}]
 
             client = Client()
-            response = await client.connect('http://localhost:3000/transaction',
+            response = await client.connect(TRX_urls['tx_app'],
                                             json_encode({'txIn': tx_input, 'txOut': tx_output, 'network': 'testnet'}))
 
             if response:
@@ -206,8 +218,9 @@ class Transaction:
                                      {'value': tx_remain_amount - 1000, 'address': sender_addr}]
                         tx_output_total = new_tx.amount + tx_remain_amount
                         client = Client()
-                        response = await client.connect('http://localhost:3000/transaction', json_encode(
-                            {'txIn': tx_input, 'txOut': tx_output, 'network': 'testnet'}))
+                        myurls = TRX_urls
+                        response = await client.connect(TRX_urls['tx_app'], json_encode(
+                            {'txIn': tx_input, 'txOut': tx_output, 'network': 'regtest'}))
 
                         if response:
                             print(response)
@@ -301,7 +314,6 @@ class Transaction:
         new_address = btcd_utils.BCypher.bcypher_generate_address()
         print(new_address)
         return str(new_address)
-
 
 
 # def getVersionMsg():

@@ -743,10 +743,10 @@ async def regtest_make_user_addresses() -> list:
         if new_address is not None:
             wif = btcd_utils.RegTest.address_to_wif(new_address)
             add_key_attempt = await addSingleKey(wif, user.id)
-            verify = btcd_utils.wif_to_address(wif)
-
-            if verify == new_address:
-                print('These are equal')
+            # verify = btcd_utils.wif_to_address(wif)
+            #
+            # if verify == new_address:
+            #     print('These are equal')
 
             if add_key_attempt is not None:
                 result.append({user.id: 1})

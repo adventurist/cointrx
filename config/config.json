@@ -1,0 +1,9 @@
+{
+  "SNOWFLAKE": {
+    "tx_app": "https://app.cointrx.com/transaction"
+  },
+  "LOCAL_DEVELOPMENT": {
+    "tx_app": "http://localhost:3000/transaction"
+  }
+}
+
