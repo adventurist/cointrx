@@ -464,9 +464,11 @@ class RegTestAllUsers(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        tx_url = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])['tx_request']
+        trx_urls = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])
+        tx_url = trx_urls['tx_request']
+        blockgen_url = trx_urls['blockgen_url']
         user_data = await db.regtest_user_data()
-        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data, tx_url=tx_url)
+        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data, tx_url=tx_url, blockgen_url=blockgen_url)
 
 
 class RegTestTxHistory(RequestHandler):
@@ -499,6 +501,15 @@ class RegTestBlockGenerateHandler(RequestHandler):
         self.write(RegTest.create_new_block())
 
 
+class RegTestUserBalanceHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        address = self.get_argument('address')
+
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -522,6 +533,7 @@ class TRXApplication(Application):
             (r"/updateprices", UpdatePriceHandler),
             (r"/bcypher/info", BCypherInfoHandler),
             (r"/regtest/all-users", RegTestAllUsers),
+            (r"/regtest/user-balance", RegTestUserBalanceHandler),
             (r"/regtest/tx-history", RegTestTxHistory),
             (r"/regtest/generate/block", RegTestBlockGenerateHandler),
             (r"/regtest/address/provision-all", RegTestAddressAllHandler),

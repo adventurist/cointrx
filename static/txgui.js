@@ -1,7 +1,8 @@
 import { PrivateKey, Networks } from 'bitcore-lib'
 
 const urls = {
-    sendTransaction: txUrl
+    sendTransaction: txUrl,
+    blockGenerate: blockgenUrl
 }
 
 function updateProgress(oEvent) {
@@ -77,6 +78,25 @@ const xhrRequest = (url, senderData, recipient, amount) => {
     return xhr
 }
 
+const xhrBaseRequest = (url, params, type) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = () => {
+        console.dir(arguments)
+    }
+    xhr.addEventListener('progress', updateProgress)
+    xhr.addEventListener('abort', transferCanceled)
+    xhr.addEventListener('error', transferFailed)
+
+    xhr.open(type, url);
+
+
+    xhr.setRequestHeader('Content-Type', 'application/json');
+// TODO change sender parameter to object with keyed properties for address and private key
+    xhr.send();
+
+    return xhr
+}
+
 const wifToAddress = (wif) => {
     const address = (PrivateKey.fromWIF(wif)).toAddress(Networks.testnet)
 
@@ -108,6 +128,10 @@ const buttonListeners = () => {
             }
         });
     });
+
+    document.getElementById('trx-add-block').addEventListener('click', () => {
+        const request = xhrBaseRequest(urls.blockGenerate, {}, 'GET')
+    })
 };
 
 const findUserAddress = e => {

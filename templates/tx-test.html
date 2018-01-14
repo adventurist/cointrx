@@ -9,7 +9,7 @@
 <body>
 <script>
     const txUrl = "{% raw tx_url %}";
-    console.log(txUrl)
+    const blockgenUrl = "{% raw blockgen_url %}"
 </script>
 <div id="user-data-container">
     {% for user in data %}
@@ -56,6 +56,9 @@
             </div>
             <input type="submit" id="submit-tx" name="op" value="Send" class="button js-form-submit form-submit">
         </form>
+    </div>
+    <div id="trx-tools">
+        <button id="trx-add-block"></button>
     </div>
 </div>
 <script src="/static/trxgui.js"></script>
