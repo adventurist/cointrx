@@ -11,5 +11,5 @@ def get_urls(trx_env):
         'tx_request': 'https://app.cointrx.com/transaction/request'
     } if trx_env == 'SNOWFLAKE' else {
         'tx_app': 'http://localhost:3000/transaction',
-        'tx_request': 'http://localhost:3000/transaction/request'
+        'tx_request': 'http://localhost:6969/transaction/request'
     }

@@ -211,7 +211,7 @@ class Transaction:
                                 tx_input_amount += v['value']
                             else:
                                 break
-
+                        # TODO what is DUST amount?
                         tx_input_total = sum(x['value'] for x in tx_input)
                         tx_remain_amount = tx_input_total - new_tx.amount
                         tx_output = [{'value': new_tx.amount, 'address': new_tx.recipient},

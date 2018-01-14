@@ -31302,12 +31302,12 @@ $('document').ready(() => {
         event.stopPropagation();
 
         const recipient = $('#to-address').val();
-        // const senderAddress = $('#from-address').val()
+        const senderAddress = $('#from-address').val();
         const senderWIF = $('#from-secret').val();
         const satoshis = $('#satoshis').val();
 
         const senderPrivateKey = __WEBPACK_IMPORTED_MODULE_0_bitcore_lib__["PrivateKey"].fromWIF(senderWIF);
-        const senderAddress = senderPrivateKey.toAddress(__WEBPACK_IMPORTED_MODULE_0_bitcore_lib__["Networks"].testnet);
+        // const senderAddress = senderPrivateKey.toAddress(Networks.testnet)
 
         console.log("Recipient: " + recipient + "\n" + "Sender Key: " + senderPrivateKey + "\n" + "Sender Address: " + senderAddress + "Amount: " + satoshis);
 

@@ -34,12 +34,12 @@ $('document').ready(() => {
         event.stopPropagation()
 
         const recipient = $('#to-address').val()
-        // const senderAddress = $('#from-address').val()
+        const senderAddress = $('#from-address').val()
         const senderWIF = $('#from-secret').val()
         const satoshis = $('#satoshis').val()
 
         const senderPrivateKey = PrivateKey.fromWIF(senderWIF)
-        const senderAddress = senderPrivateKey.toAddress(Networks.testnet)
+        // const senderAddress = senderPrivateKey.toAddress(Networks.testnet)
 
         console.log("Recipient: " + recipient + "\n" + "Sender Key: " + senderPrivateKey + "\n" + "Sender Address: " + senderAddress + "Amount: " + satoshis)
 
