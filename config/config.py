@@ -10,10 +10,12 @@ def get_urls(trx_env):
         'base_url': 'https://app.cointrx.com',
         'trx': 'https://app.cointrx.com/transaction',
         'tx_request': 'https://app.cointrx.com/transaction/request',
-        'blockgen_url': 'https://app.cointrx.com/regtest/generate/block'
+        'blockgen_url': 'https://app.cointrx.com/regtest/generate/block',
+        'userbalance_url': 'https://app.cointrx.com/regtest/user-balance',
     } if trx_env == 'SNOWFLAKE' else {
         'base_url': 'http://localhost',
         'tx_app': 'http://localhost:3000/transaction',
         'tx_request': 'http://localhost:6969/transaction/request',
-        'blockgen_url': 'http://localhost:6969/regtest/generate/block'
+        'blockgen_url': 'http://localhost:6969/regtest/generate/block',
+        'userbalance_url': 'http://localhost:6969/regtest/user-balance',
     }

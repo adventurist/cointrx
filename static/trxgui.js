@@ -31267,11 +31267,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bitcore_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bitcore_lib__);
 var _arguments = arguments;
 
+const btc = 100000000
 
 const urls = {
     sendTransaction: txUrl,
-    blockGenerate: blockgenUrl
+    blockGenerate: blockgenUrl,
+    userBalance: userBalanceUrl
 };
+
+let userTransaction = {
+    sender: undefined,
+    recipient: undefined
+}
 
 function updateProgress(oEvent) {
     if (oEvent.lengthComputable) {
@@ -31298,21 +31305,20 @@ $('document').ready(() => {
     let sendButton = document.getElementById('submit-tx');
 
     sendButton.addEventListener('click', () => {
-
         event.preventDefault();
         event.stopPropagation();
 
         const recipient = $('#to-address').val();
         const senderAddress = $('#from-address').val();
         const senderWIF = $('#from-secret').val();
-        const satoshis = $('#satoshis').val();
+        const satoshis = 100000000 * $('#satoshis').val();
 
         const senderPrivateKey = __WEBPACK_IMPORTED_MODULE_0_bitcore_lib__["PrivateKey"].fromWIF(senderWIF);
         // const senderAddress = senderPrivateKey.toAddress(Networks.testnet)
 
         console.log("Recipient: " + recipient + "\n" + "Sender Key: " + senderPrivateKey + "\n" + "Sender Address: " + senderAddress + "Amount: " + satoshis);
 
-        const xhr = xhrRequest(urls.sendTransaction, {
+        const xhr = xhrFetchRequest(urls.sendTransaction, {
             address: senderAddress,
             key: senderWIF
         }, recipient, satoshis);
@@ -31340,6 +31346,50 @@ const xhrRequest = (url, senderData, recipient, amount) => {
 
     return xhr;
 };
+
+const xhrFetch = (url, method, data) => {
+    let options = {
+        method: method,
+        headers: new Headers({'Content-Type': 'application/json'})
+    }
+    if (method === 'POST' && data !== void 0) {
+        options.body = JSON.stringify(data)
+    }
+    fetch(url, options).then(res =>
+        res.json()
+            .catch(error =>
+                console.error('Error:', error)
+            ))
+        .then(response => {
+            console.log('Success')
+            console.dir(response)
+            updateUserBalance(response)
+        })
+}
+
+const xhrFetchRequest = (url, senderData, recipient, amount) => {
+    fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+            sender: senderData,
+            recipient: recipient,
+            amount: amount
+        }),
+        headers: new Headers({
+            'Content-Type': 'application/json'
+        })
+    }).then(res =>
+        res.json()
+        .catch(error =>
+            console.error('Error:', error)
+        ))
+        .then(response => {
+            if (response.response === 200) {
+                xhrFetch(urls.userBalance + '?sid=' + userTransaction.sender + '&rid=' + userTransaction.recipient, 'GET', userTransaction)
+            }
+            console.log('Success:', response)
+        })
+}
 
 const xhrBaseRequest = (url, params, type) => {
     const xhr = new XMLHttpRequest();
@@ -31376,7 +31426,7 @@ const buttonListeners = () => {
 
             if (addresses !== null && addresses.length > 0) {
                 toElement.value = addresses[addresses.length - 1];
-            }
+            }//
         });
     });
 
@@ -31402,12 +31452,30 @@ const findUserAddress = e => {
         let add = wifToAddress(key.value);
         addresses.push(add.toString());
     });
+    userTransaction.recipient = e.srcElement.nextElementSibling.querySelector('.user-data span.user-id').textContent
     return addresses;
 };
 
 const findUserWif = e => {
+    userTransaction.sender = e.srcElement.parentElement.parentElement.parentElement.parentElement.querySelector('.user-data span.user-id').textContent
     return e.srcElement.previousElementSibling.value;
 };
+
+const updateUserBalance = (userData) => {
+    if (Object.keys(userData).includes('users')) {
+        const users = userData.users
+        const userContainers = document.getElementById('user-data-container').querySelectorAll('.user-data')
+        for (let uid in users) {
+            userContainers.forEach( (userContainer) => {
+                let userId = userContainer.querySelector('.user-id span.user-id').textContent
+                if (userId === uid && users.hasOwnProperty(uid)) {
+                    let newValue = (users[uid] / btc) + ' BTC'
+                    userContainer.querySelector('.user-balance span.user-balance').textContent = newValue
+                }
+            })
+        }
+    }
+}
 
 buttonListeners();
 

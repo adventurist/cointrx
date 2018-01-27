@@ -8,8 +8,9 @@
 </head>
 <body>
 <script>
-    const txUrl = "{% raw tx_url %}";
+    const txUrl = "{% raw tx_url %}"
     const blockgenUrl = "{% raw blockgen_url %}"
+    const userBalanceUrl = "{% raw userbalance_url %}"
 </script>
 <div id="user-data-container">
     {% for user in data %}
@@ -35,6 +36,9 @@
                     </div>
                 </div>
                 {% end %}
+            </div>
+            <div class="user-balance">
+                <span>Balance: </span><span class="user-balance">{{ user['balance'] }} BTC</span>
             </div>
         </div>
     </div>

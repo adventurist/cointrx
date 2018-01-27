@@ -439,7 +439,8 @@ class TxRequestHandler(RequestHandler):
         if 'sender' in tx_request_data and 'recipient' in tx_request_data and 'amount' in tx_request_data:
             transaction_result = await trx__tx_out.Transaction.request_transaction(
                 {'sender': tx_request_data['sender'], 'recipient': tx_request_data['recipient'],
-                 'amount': tx_request_data['amount']})
+                 'amount': int(round(tx_request_data['amount']))})
+            self.write(escape.json_encode({'response': 200} if transaction_result is not None else {'response': 500}))
 
 
 class BCypherInfoHandler(RequestHandler):
@@ -467,8 +468,9 @@ class RegTestAllUsers(RequestHandler):
         trx_urls = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])
         tx_url = trx_urls['tx_request']
         blockgen_url = trx_urls['blockgen_url']
+        userbalance_url = trx_urls['userbalance_url']
         user_data = await db.regtest_user_data()
-        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data, tx_url=tx_url, blockgen_url=blockgen_url)
+        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data, tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url)
 
 
 class RegTestTxHistory(RequestHandler):
@@ -506,8 +508,11 @@ class RegTestUserBalanceHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        address = self.get_argument('address')
-
+        sid = self.get_argument('sid')
+        rid = self.get_argument('rid')
+        sender_balance = await db.regtest_user_balance(uid=sid)
+        recipient_balance = await db.regtest_user_balance(uid=rid)
+        self.write(escape.json_encode({'users': {sid: sender_balance, rid: recipient_balance}, 'response': 200} if sender_balance is not None and isinstance(sender_balance, int) else {'response': 404}))
 
 
 class TRXApplication(Application):

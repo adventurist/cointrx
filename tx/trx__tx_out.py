@@ -227,7 +227,8 @@ class Transaction:
                             data = json_decode(response.body.decode())
                             result = data.get('result', 'error')
                             if result != 'error':
-                                btcd_utils.send_tx(result['tx'], 'regtest')
+                                send_tx_result = btcd_utils.send_tx(result['tx'], 'regtest')
+                                return send_tx_result
                         else:
                             print('No response received')
 

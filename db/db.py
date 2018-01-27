@@ -386,6 +386,7 @@ def rollback_transaction():
     except exc.SQLAlchemyError as error:
         return error
 
+
 def create_all_heartbeat():
     HeartbeatCommentBase.metadata.create_all(heartbeat_connect())
 
@@ -717,6 +718,7 @@ async def findKey(key: str):
     else:
         return existing_key.id
 
+
 async def find_single_key(kid: int) -> Union[bool, SKey]:
     existing_key = session.query(SKey).filter(SKey.kid == kid).first()
 
@@ -755,7 +757,6 @@ async def regtest_make_user_addresses() -> list:
 
 
 async def regtest_user_data():
-
     user_data = []
     users = session.query(User).all()
     for user in users:
@@ -764,8 +765,16 @@ async def regtest_user_data():
             'id': user.id,
             'name': user.name,
             'email': user.email,
+            'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
             'keys': [{'id': x.id, 'wif': x.value, 'status': x.status} for x in user.trxkey]
         }
         user_data.append(data)
 
     return user_data
+
+
+async def regtest_user_balance(uid: str):
+    user = session.query(User).filter(User.id == uid, User.status == 1).one_or_none()
+    if user is not None:
+        balance = await btcd_utils.RegTest.get_user_balance(user.trxkey)
+        return sum(balance) if isinstance(balance, list) else balance

@@ -111,6 +111,16 @@ class RegTest:
         return str(block_generate_result.stdout, 'utf-8')[
                :-1] if block_generate_result is not None else 'Error generating block'
 
+    @staticmethod
+    async def get_user_balance(keys: list):
+        balance_array = []
+        for key in keys:
+            if key.status is True:
+                balance_for_key = await RegTest.get_tx_history(wif_to_address(key.value))
+                balance_for_key = sum(k['value'] for k in balance_for_key)
+                balance_array.append(balance_for_key)
+        return sum(balance_array)
+
 
 def get_tx_history(addr: str):
     if not isinstance(addr, str):
