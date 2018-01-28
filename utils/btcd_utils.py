@@ -121,6 +121,24 @@ class RegTest:
                 balance_array.append(balance_for_key)
         return sum(balance_array)
 
+    @staticmethod
+    async def get_info():
+        interface = 'bitcoin-cli'
+        command = 'getinfo'
+
+        get_info_result = RegTest.make_command(interface, command)
+
+        return str(get_info_result.stdout, 'utf-8') if get_info_result is not None else 'Error retrieving block info'
+
+    @staticmethod
+    async def list_unspent():
+        interface = 'bitcoin-cli'
+        command = 'listunspent'
+
+        list_unspent_result = RegTest.make_command(interface, command)
+
+        return str(list_unspent_result.stdout, 'utf-8') if list_unspent_result is not None else 'Error retrieving unspent transactions'
+
 
 def get_tx_history(addr: str):
     if not isinstance(addr, str):

@@ -5,6 +5,7 @@ import sys
 import uuid
 
 import base64
+import json
 import os
 import random
 import warnings
@@ -470,7 +471,8 @@ class RegTestAllUsers(RequestHandler):
         blockgen_url = trx_urls['blockgen_url']
         userbalance_url = trx_urls['userbalance_url']
         user_data = await db.regtest_user_data()
-        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data, tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url)
+        blockchain_info = await db.regtest_block_info()
+        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data, blockchain_info=blockchain_info, tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url)
 
 
 class RegTestTxHistory(RequestHandler):

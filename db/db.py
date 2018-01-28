@@ -24,6 +24,7 @@ import timeago
 import re
 import time
 import datetime
+import json
 
 Base = declarative_base()
 metadata = MetaData()
@@ -778,3 +779,9 @@ async def regtest_user_balance(uid: str):
     if user is not None:
         balance = await btcd_utils.RegTest.get_user_balance(user.trxkey)
         return sum(balance) if isinstance(balance, list) else balance
+
+
+async def regtest_block_info():
+    block_info = json.loads(await btcd_utils.RegTest.get_info())
+    unspent_transactions = json.loads(await btcd_utils.RegTest.list_unspent())
+    return json.dumps({'info': block_info, 'unspent': unspent_transactions}, indent=4, sort_keys=True)

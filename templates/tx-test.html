@@ -32,7 +32,7 @@
                         <span>ID: </span><span class="key-id">{{ key['id'] }}</span>
                     </div>
                     <div class="key-row">
-                        <span>Value: </span><input class="wif-value" value="{{ key['wif'] }}"/><button>Choose</button>
+                        <span>Value: </span><input class="wif-value" value="{{ key['wif'] }}"/><button>Sender</button>
                     </div>
                 </div>
                 {% end %}
@@ -64,6 +64,9 @@
     <div id="trx-tools">
         <button id="trx-add-block">CoinTRX Add Block</button>
     </div>
+</div>
+<div id="trx-info">
+    <textarea rows="36" id="trx-block-info">{% raw blockchain_info %}</textarea>
 </div>
 <script src="/static/trxgui.js"></script>
 </body>
