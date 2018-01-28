@@ -8,7 +8,7 @@ def env_variables():
 def get_urls(trx_env):
     return {
         'base_url': 'https://app.cointrx.com',
-        'tx_app': 'https://app.cointrx.com/transaction',
+        'tx_app': 'http://localhost:3000/transaction',
         'tx_request': 'https://app.cointrx.com/transaction/request',
         'blockgen_url': 'https://app.cointrx.com/regtest/generate/block',
         'userbalance_url': 'https://app.cointrx.com/regtest/user-balance',
