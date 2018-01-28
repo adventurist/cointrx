@@ -13,6 +13,9 @@ let userTransaction = {
     recipient: undefined
 }
 
+let trxPendingTransactions = []
+let trxPendingCounter = 1
+
 function updateProgress(oEvent) {
     if (oEvent.lengthComputable) {
         var percentComplete = oEvent.loaded / oEvent.total;
@@ -35,38 +38,10 @@ function transferCanceled(evt) {
 }
 
 $('document').ready(() => {
-    let sendButton = document.getElementById('submit-tx')
+    const queueButton = document.getElementById('submit-tx')
+    const sendMasterButton = document.getElementById('trx-send-transactions')
 
-    sendButton.addEventListener('click', () => {
-
-        event.preventDefault()
-        event.stopPropagation()
-
-        const recipient = $('#to-address').val()
-        const senderAddress = $('#from-address').val()
-        const senderWIF = $('#from-secret').val()
-        const satoshis = $('#satoshis').val()
-
-        const senderPrivateKey = PrivateKey.fromWIF(senderWIF)
-        // const senderAddress = senderPrivateKey.toAddress(Networks.testnet)
-
-        console.log("Recipient: " + recipient + "\n" + "Sender Key: " + senderPrivateKey + "\n" + "Sender Address: " + senderAddress + "Amount: " + satoshis)
-
-        const xhr = xhrRequest(
-            urls.sendTransaction, {
-                address: senderAddress,
-                key: senderWIF
-            },
-            recipient,
-            satoshis)
-        console.dir(xhr)
-    })
-})
-
-$('document').ready(() => {
-    let sendButton = document.getElementById('submit-tx');
-
-    sendButton.addEventListener('click', () => {
+    queueButton.addEventListener('click', () => {
         event.preventDefault();
         event.stopPropagation();
 
@@ -80,12 +55,83 @@ $('document').ready(() => {
 
         console.log("Recipient: " + recipient + "\n" + "Sender Key: " + senderPrivateKey + "\n" + "Sender Address: " + senderAddress + "Amount: " + satoshis);
 
-        const xhr = xhrFetchRequest(urls.sendTransaction, {
+        addPendingTransaction({
             address: senderAddress,
             key: senderWIF
-        }, recipient, satoshis);
+        }, recipient, satoshis)
     });
+
+    sendMasterButton.addEventListener('click', () => {
+        if (trxPendingTransactions.length > 0) {
+            try {
+                trxPendingTransactions.forEach( (pendingTrx) => {
+                    const xhr = xhrFetchRequest(urls.sendTransaction, {
+                        address: pendingTrx.sender.address,
+                        key: pendingTrx.sender.key
+                    }, pendingTrx.recipient, pendingTrx.satoshis);
+                })
+                // TODO Find a better way to verify transactions were sent before replacing trxPending with empty array
+                clearPendingTransactions()
+            } catch (err) {
+                console.error(err)
+            }
+        }
+    })
 });
+
+function clearPendingTransactions() {
+    trxPendingTransactions = []
+    const pendingContainer = document.getElementById('trx-pending')
+    while (pendingContainer.hasChildNodes()) {
+        pendingContainer.removeChild(pendingContainer.lastChild)
+    }
+}
+function addPendingTransaction (address, recipient, satoshis) {
+    trxPendingTransactions.push({
+        sender: {
+            address: address.address,
+            key: address.key
+        },
+        recipient: recipient,
+        satoshis: satoshis
+    })
+    const pendingWrap = document.getElementById('trx-pending')
+    const trxHeader = document.createElement('h3')
+    const wrap = document.createElement('div')
+    const senderArea = document.createElement('textarea')
+    const senderLabel = document.createElement('label')
+    const recipientArea = document.createElement('textarea')
+    const recipientLabel = document.createElement('label')
+    const amountArea = document.createElement('textarea')
+    const amountLabel = document.createElement('label')
+
+    senderArea.className = 'trx-pending-sender'
+    senderArea.textContent = JSON.stringify(address)
+    senderLabel.className = 'trx-pending-sender-label'
+    senderLabel.textContent = 'Sender'
+    recipientArea.className = 'trx-pending-recipient'
+    recipientArea.textContent = JSON.stringify(recipient)
+    recipientLabel.className = 'trx-pending-recipient-label'
+    recipientLabel.textContent = 'Recipient'
+    amountArea.className = 'trx-pending-amount'
+    amountArea.textContent = satoshis
+    amountLabel.className = 'trx-pending-amount-label'
+    amountLabel.textContent = 'Amount (Satoshis)'
+
+    trxHeader.textContent = 'TX: ' + trxPendingCounter
+
+    wrap.appendChild(trxHeader)
+    wrap.appendChild(senderLabel)
+    wrap.appendChild(senderArea)
+    wrap.appendChild(recipientLabel)
+    wrap.appendChild(recipientArea)
+    wrap.appendChild(amountLabel)
+    wrap.appendChild(amountArea)
+
+    pendingWrap.appendChild(wrap)
+
+    trxPendingCounter++;
+}
 
 const xhrRequest = (url, senderData, recipient, amount) => {
     const xhr = new XMLHttpRequest();
