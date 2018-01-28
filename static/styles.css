@@ -346,9 +346,24 @@ body, html {
     background-color: #799b9f;
     color: #edf1f2;
 }
+#status-form, #trx-tools {
+    text-align: center;
+}
 
-#submit-tx {
-    width: 8em;
+/*#trx-tools button {*/
+    /*width: 100%;*/
+/*}*/
+#submit-tx, #trx-tools button {
+    text-align: center;
+    display: inline-block;
+    min-width: 24em;
+    text-transform: uppercase;
+    min-height: 2.5em;
+    margin: 8px;
+    padding: 8px;
+    color: black;
+    font-weight: 700;
+    background-color: #6A9094;
 }
 
 #from-secret, #to-address {
@@ -430,13 +445,32 @@ body, html {
 
 .user-wrap > button {
     float: right;
+    width: 7em;
     margin: 1em;
+    transform: translateY(10em);
     font-weight: 700;
     color: #164342;
 }
 
-#trx-block-info {
+button.sender-choose {
+    width: 7em;
+    margin: 1em 1em 1em 2.5em;
+    font-weight: 700;
+    color: #164342;
+}
+
+#trx-block-info, #trx-pending textarea, #trx-pending label {
     width: 100%;
     background: #333333;
     color: #54ff20;
+}
+
+#trx-pending label {
+    font-weight: 700;
+}
+
+#trx-pending h3 {
+    background-color: #5eff1f;
+    margin-left: 4em;
+    margin-right: 4em;
 }
