@@ -55,7 +55,6 @@ def parse_tx_history(stdout, address):
     if stdout is not None and isinstance(stdout, str):
         decoded = json_decode(stdout)
         if decoded is not None:
-            print(str(decoded))
             tx_history = [{'txid': x['txid'], 'value': int(x['amount'] * 100000000), 'idx': x['vout']} for x in decoded
                           if x['address'] == address and x['amount'] > 0]
             return tx_history
