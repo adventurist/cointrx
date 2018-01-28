@@ -191,7 +191,7 @@ class Transaction:
 
     @staticmethod
     async def request_transaction(*kwargs):
-
+        print(kwargs)
         if kwargs[0] is not None:
             new_tx = TestTx(r=kwargs[0]['recipient'], v=kwargs[0]['amount'], s=kwargs[0]['sender'])
             if new_tx:

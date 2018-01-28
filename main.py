@@ -441,6 +441,7 @@ class TxRequestHandler(RequestHandler):
             transaction_result = await trx__tx_out.Transaction.request_transaction(
                 {'sender': tx_request_data['sender'], 'recipient': tx_request_data['recipient'],
                  'amount': int(round(tx_request_data['amount']))})
+            print(transaction_result)
             self.write(escape.json_encode({'response': 200} if transaction_result is not None else {'response': 500}))
 
 
