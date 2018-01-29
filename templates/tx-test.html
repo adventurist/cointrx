@@ -16,6 +16,20 @@
     {% for user in data %}
     <div class="user-wrap">
         <h2 class="user-header">{{ user['name'] }}</h2>
+        <div class="led-indicators">
+            <div class="led-send">
+                <div class="led-box">
+                    <div class="led led-blue"></div>
+                    <p>Send</p>
+                </div>
+            </div>
+            <div class="led-receive">
+                <div class="led-box">
+                    <div class="led led-blue"></div>
+                    <p>Receive</p>
+                </div>
+            </div>
+        </div>
         <button>Recipient</button>
         <div class="user-data">
             <div class="user-id">
