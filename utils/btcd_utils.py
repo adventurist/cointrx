@@ -19,7 +19,6 @@ def make_command(interface, command, option1=None):
 
 
 def get_env_variables():
-
     return {
         'NODE_ENV': environ.get('NODE_ENV'),
         'NODE_PORT': environ.get('NODE_PORT'),
@@ -61,14 +60,15 @@ def parse_tx_history(stdout, address):
 
 
 class RegTest:
-    
     @staticmethod
-    def make_command(interface, command, option1=None):
-        if option1 is not None:
+    def make_command(interface, command, option1=None, option2=None):
+        if option1 and option2 is not None:
+            return run([interface, '-regtest', command, option1, option2], stdout=PIPE)
+        elif option1 is not None:
             return run([interface, '-regtest', command, option1], stdout=PIPE)
         else:
             return run([interface, '-regtest', command], stdout=PIPE)
-        
+
     @staticmethod
     def get_new_address():
         interface = 'bitcoin-cli'
@@ -136,7 +136,18 @@ class RegTest:
 
         list_unspent_result = RegTest.make_command(interface, command)
 
-        return str(list_unspent_result.stdout, 'utf-8') if list_unspent_result is not None else 'Error retrieving unspent transactions'
+        return str(list_unspent_result.stdout,
+                   'utf-8') if list_unspent_result is not None else 'Error retrieving unspent transactions'
+
+    @staticmethod
+    async def give_user_balance(address: str, satoshis: int):
+        interface = 'bitcoin-cli'
+        command = 'sendtoaddress'
+
+        send_to_address_result = RegTest.make_command(interface, command, address, str(satoshis))
+
+        return str(send_to_address_result.stdout,
+                   'utf-8') if send_to_address_result is not None else 'Error retrieving unspent transactions'
 
 
 def get_tx_history(addr: str):

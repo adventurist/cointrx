@@ -756,6 +756,14 @@ async def regtest_make_user_addresses() -> list:
 
     return result
 
+async def regtest_make_user_address(uid):
+    user = session.query(User).filter(User.id == uid).order_by(User.created.desc()).one_or_none()
+    if user is not None:
+        new_address = btcd_utils.RegTest.get_new_address()
+        if new_address is not None:
+            wif = btcd_utils.RegTest.address_to_wif(new_address)
+            add_key_attempt = await addSingleKey(wif, user.id)
+            return new_address if add_key_attempt is not None else false
 
 async def regtest_user_data():
     user_data = []
@@ -773,9 +781,20 @@ async def regtest_user_data():
 
     return user_data
 
+async def regtest_pay_user(uid: str, amount: str):
+    key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).one_or_none()
+    if key is not None:
+        address = btcd_utils.wif_to_address(key.value)
+    else:
+        address = await regtest_make_user_address(int(uid))
+
+    if address is not None:
+        user_pay_result = await btcd_utils.RegTest.give_user_balance(address, int(amount))
+        return user_pay_result
+
 
 async def regtest_user_balance(uid: str):
-    user = session.query(User).filter(User.id == uid, User.status == 1).one_or_none()
+    user = session.query(User).filter(User.id == int(uid), User.status == true()).one_or_none()
     if user is not None:
         balance = await btcd_utils.RegTest.get_user_balance(user.trxkey)
         return sum(balance) if isinstance(balance, list) else balance

@@ -539,6 +539,19 @@ class RegTestUserBalanceHandler(RequestHandler):
         self.write(escape.json_encode({'users': {sid: sender_balance, rid: recipient_balance}, 'response': 200} if sender_balance is not None and isinstance(sender_balance, int) else {'response': 404}))
 
 
+class RegTestPayUserHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        uid = self.get_argument('uid')
+        amount = self.get_argument('amount')
+
+        if uid and amount is not None:
+            user_pay_result = await db.regtest_pay_user(uid, amount)
+            self.write(str(user_pay_result))
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -562,6 +575,7 @@ class TRXApplication(Application):
             (r"/updateprices", UpdatePriceHandler),
             (r"/bcypher/info", BCypherInfoHandler),
             (r"/regtest/all-users", RegTestAllUsers),
+            (r"/regtest/user/pay", RegTestPayUserHandler),
             (r"/regtest/user-balance", RegTestUserBalanceHandler),
             (r"/regtest/tx-history", RegTestTxHistory),
             (r"/regtest/generate/block", RegTestBlockGenerateHandler),
