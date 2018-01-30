@@ -119,7 +119,7 @@ class LoginHandler(RequestHandler):
 
             if name is not None and password is not None and len(name) > 0:
                 user_verified = db.check_authentication(name, password, 'jigga@riffic.com')
-                if user_verified is not None:
+                if user_verified is not None and user_verified is not -1:
                     drupal_login = await drupal_utils.attempt_login(
                         escape.json_encode({'name': name, 'pass': password}))
                     if drupal_login is not None:
@@ -249,6 +249,27 @@ class RegisterHandler(RequestHandler):
                                  "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife",
                                  "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
         self.render("templates/register.html", title="Jiggas Register Handler", message=message)
+
+    def post(self, *args, **kwargs):
+        if self.request.headers.get("Content-Type") == 'application/x-www-form-urlencoded':
+            name, password, email = self.get_body_argument('name'), self.get_body_argument('pass'), self.get_body_argument('email')
+
+            if email is None or password is None or name is None:
+                self.write("You must supply more arguments")
+                self.write_error(401)
+            else:
+                user_verify = db.check_authentication(name, password, email)
+                if user_verify is -1 or None:
+                    user_verify = db.create_user(name, password, email)
+
+                csrf = user_verify.generate_auth_token(expiration=1200)
+                application.create_session(
+                    user={'name': name, 'pass': password, 'id': user_verify.id, 'csrf': csrf})
+                print(str(user_verify))
+                if application.session is not None and isinstance(application.session, session.Session):
+                    self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                    return self.write(escape.json_encode({'token': str(application.session.user['csrf'], 'utf-8'),
+                                                          'cookie': str(self.get_secure_cookie('trx_cookie'))}))
 
 
 class PasswordHandler(RequestHandler):
