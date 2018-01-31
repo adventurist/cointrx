@@ -552,6 +552,14 @@ class RegTestPayUserHandler(RequestHandler):
             self.write(str(user_pay_result))
 
 
+class UiReactHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        self.render("templates/ui-main.html", title="TRX UI MAIN")
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -591,6 +599,7 @@ class TRXApplication(Application):
             (r"/transaction/tx-gui", TxGuiHandler),
             (r"/transaction/secret/rollback", TrxRollbackHandler),
             (r"/react/test", ReactTestHandler),
+            (r"/ui/main", UiReactHandler),
             (r"/heartbeat/feed", HeartbeatHandler),
             (r"/heartbeat/create", HeartbeatCreateHandler),
             (r"/heartbeat/share/new", HeartbeatShareHandler),
