@@ -7,3 +7,18 @@ p {
   font-size: 36px;
 }
 
+#root {
+  max-height: 3.5em;
+}
+
+.raised-button {
+  margin-top: 2em;
+}
+
+#container {
+  margin-top: 3em;
+}
+
+.trx-mui-layout {
+  min-height: 0!important;
+}

@@ -319,7 +319,9 @@ details, summary {
 body, html {
     max-width: 1440px;
     text-align: center;
-    background-color: #004341;
+    /*background-color: #004341;*/
+    background-color: rgb(0, 58, 69);
+    /*background-color: #32cb00;*/
 }
 
 #tx-container {
@@ -333,16 +335,16 @@ body, html {
     padding: 40px;
 }
 
-#form-wrap input, #form-wrap select, #form-wrap select option {
+#user-data-container input, #form-wrap input, #form-wrap select, #form-wrap select option {
     min-height: 2.5em;
     margin: 8px;
     padding: 8px;
     color: black;
     font-weight: 700;
-    background-color: #6A9094;
+    background-color: #008ba3;
 }
 
-#form-wrap input:hover, #form-wrap select, #form-wrap select option:hover {
+#user-data-container input:hover, #form-wrap input:hover, #form-wrap select, #form-wrap select option:hover {
     background-color: #799b9f;
     color: #edf1f2;
 }
@@ -366,8 +368,9 @@ body, html {
     background-color: #6A9094;
 }
 
-#from-secret, #to-address {
-    width: 15em;
+#from-secret, #to-address, #from-address {
+    display: block;
+    width: 100%;
 }
 
 /**********
@@ -378,7 +381,7 @@ body, html {
     float: left;
     width: 45%;
     padding: 4px;
-    color: #c3c3c3;
+    color: #FFFFFF;
     text-align: left;
 }
 
@@ -416,6 +419,11 @@ body, html {
     padding-left: 2.5em;
 }
 
+.user-balance {
+    color: gold;
+    font-weight: 700;
+}
+
 .keys-header {
     display: inline;
     float: left;
@@ -442,14 +450,25 @@ body, html {
 .key-row button {
     margin-left: 1em;
 }
-
+#user-data-container button, #trx-tools button {
+    color: #5eff1f;
+    background: transparent;
+}
 .user-wrap > button {
     float: right;
     width: 7em;
     margin: 1em;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
     transform: translate(9em, 12em);
     font-weight: 700;
-    color: #164342;
+    /*color: #164342;*/
+    color: #5eff1f;
+    background: transparent;
+}
+
+#user-data-container button:hover, #trx-tools button:hover {
+background: rgba(255, 64, 129, 0.2);
 }
 
 button.sender-choose {
@@ -501,6 +520,20 @@ button.sender-choose {
     animation: blinkRed 0.5s infinite;
 }
 
+.led-accent {
+    margin: 0 auto;
+    width: 16px;
+    height: 16px;
+    background-color: rgb(255, 64, 129);
+    border-radius: 50%;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset rgb(67, 16, 37) 0 -1px 9px, rgb(128, 30, 70) 0 2px 12px;
+    -webkit-animation: blinkPink 0.5s infinite;
+    -moz-animation: blinkPink 0.5s infinite;
+    -ms-animation: blinkPink 0.5s infinite;
+    -o-animation: blinkPink 0.5s infinite;
+    animation: blinkPink 0.5s infinite;
+}
+
 @-webkit-keyframes blinkRed {
     from { background-color: #F00; }
     50% { background-color: #A00; box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 0;}
@@ -524,6 +557,32 @@ button.sender-choose {
 @keyframes blinkRed {
     from { background-color: #F00; }
     50% { background-color: #A00; box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 0;}
+    to { background-color: #F00; }
+}
+
+@-webkit-keyframes blinkPink {
+    from { background-color: rgb(255, 64, 129); }
+    50% { background-color: rgb(168, 39, 92); box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgb(128, 30, 70) 0 2px 0;}
+    to { background-color: #F00; }
+}
+@-moz-keyframes blinkRed {
+    from { background-color: rgb(255, 64, 129); }
+    50% { background-color: rgb(168, 39, 92); box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgb(128, 30, 70) 0 2px 0;}
+    to { background-color: #F00; }
+}
+@-ms-keyframes blinkRed {
+    from { background-color: rgb(255, 64, 129); }
+    50% { background-color: rgb(168, 39, 92); box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgb(128, 30, 70) 0 2px 0;}
+    to { background-color: #F00; }
+}
+@-o-keyframes blinkRed {
+    from { background-color: rgb(255, 64, 129); }
+    50% { background-color: rgb(168, 39, 92); box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgb(128, 30, 70) 0 2px 0;}
+    to { background-color: #F00; }
+}
+@keyframes blinkRed {
+    from { background-color: rgb(255, 64, 129); }
+    50% { background-color: rgb(168, 39, 92); box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgb(128, 30, 70) 0 2px 0;}
     to { background-color: #F00; }
 }
 

@@ -85,9 +85,12 @@ class RegTest:
         command = 'listunspent'
 
         new_address_result = RegTest.make_command(interface, command)
+        if len(new_address_result.stdout) > 0:
+            result_for_tx = parse_tx_history(str(new_address_result.stdout, 'utf-8'), address)
 
-        result_for_tx = parse_tx_history(str(new_address_result.stdout, 'utf-8'), address)
-        return result_for_tx if new_address_result is not None else 'Error retrieving TX History'
+            return result_for_tx if result_for_tx is not None else 'Error retrieving TX History'
+
+        return None
 
     @staticmethod
     def address_to_wif(address):
@@ -116,8 +119,9 @@ class RegTest:
         for key in keys:
             if key.status is True:
                 balance_for_key = await RegTest.get_tx_history(wif_to_address(key.value))
-                balance_for_key = sum(k['value'] for k in balance_for_key)
-                balance_array.append(balance_for_key)
+                if balance_for_key is not None:
+                    balance_for_key = sum(k['value'] for k in balance_for_key)
+                    balance_array.append(balance_for_key)
         return sum(balance_array)
 
     @staticmethod

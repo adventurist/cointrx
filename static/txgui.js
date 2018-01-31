@@ -131,6 +131,17 @@ function addPendingTransaction (address, recipient, satoshis) {
     pendingWrap.appendChild(wrap)
 
     trxPendingCounter++;
+
+    document.querySelectorAll('.user-id span.user-id').forEach( (userElem) => {
+        if (userElem.textContent === userTransaction.sender) {
+            const ledSend = userElem.parentNode.parentNode.parentNode.querySelector('.led-send .led-box')
+            ledSend.children[0].className = 'led led-accent'
+        }
+        if (userElem.textContent === userTransaction.recipient) {
+            const ledReceive = userElem.parentNode.parentNode.parentNode.querySelector('.led-receive .led-box')
+            ledReceive.children[0].className = 'led led-accent'
+        }
+    })
 }
 
 const xhrRequest = (url, senderData, recipient, amount) => {
