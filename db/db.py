@@ -794,7 +794,7 @@ async def regtest_pay_user(uid: str, amount: str):
 
 
 async def regtest_user_balance(uid: str):
-    user = session.query(User).filter(User.id == int(uid), User.status == true()).one_or_none()
+    user = session.query(User).filter(User.id == int(uid), User.status == 1).one_or_none()
     if user is not None:
         balance = await btcd_utils.RegTest.get_user_balance(user.trxkey)
         return sum(balance) if isinstance(balance, list) else balance
