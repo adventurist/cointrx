@@ -213,7 +213,7 @@ const xhrFetchRequest = (url, senderData, recipient, amount) => {
 const xhrBaseRequest = (url, params, type) => {
     const xhr = new XMLHttpRequest();
     xhr.onload = () => {
-        console.dir(_arguments);
+        console.dir(arguments);
     };
     xhr.addEventListener('progress', updateProgress);
     xhr.addEventListener('abort', transferCanceled);
@@ -285,7 +285,8 @@ function updateUserBalance(userData) {
         document.getElementById('user-data-container').querySelectorAll('.user-data').forEach( (userContainer) => {
             let userId = userContainer.querySelector('.user-id span.user-id').textContent
             if (userId == uid) {
-                userContainer.querySelector('.user-balance span.user-balance').textContent = `${(user.uid / btc)} BTC`
+                let newValue = (users[uid] / btc) + ' BTC'
+                userContainer.querySelector('.user-balance span.user-balance').textContent = newValue
             }
         })
     })
