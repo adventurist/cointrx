@@ -414,7 +414,7 @@ class HeartbeatSocketShareHandler(WebSocketHandler):
 
         post_attempt = await drupal_utils.post_status_message(
             escape.json_encode({'message': message, 'name': user['name'], 'pass': user['pass']}),
-            headers={'X-CSRF-Token': application.session.drupal_token()}, user=user)
+            headers={'X-CSRF-TOKEN': application.session.drupal_token()}, user=user)
 
         # post_attempt = await drupal_utils.post_status_message(
         #     escape.json_encode({'message': message, 'name': user['name'], 'pass': user['pass']}),
