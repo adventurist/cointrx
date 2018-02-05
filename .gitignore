@@ -3,5 +3,6 @@ coinenv/*
 .git
 .idea
 __pycache__
+node_modules
 */node_modules
 Coin\ X.iml
