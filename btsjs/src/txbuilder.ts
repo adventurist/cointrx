@@ -1,5 +1,4 @@
 import {Address, Networks, Script, PrivateKey, Transaction} from 'bitcore-lib'
-import * as bitcoin from 'bitcoinjs-lib'
 
 Networks.enableRegtest()
 
@@ -40,10 +39,6 @@ class TrxTransaction {
         let errors = typeof transaction !== 'undefined' ? 0 : 1
 
         return { tx: transaction.serialize(), error: errors }
-        // const txBuilder = buildTx(txIn, txOut)
-        // const buildResult = txBuilder.build()
-        // const errors = typeof buildResult !== 'undefined' ? 0 : 1
-        // return { tx: buildResult.toHex(), error: errors }
     }
 }
 
@@ -96,25 +91,6 @@ const buildTxIn = (txRaw: Txin): Txribute => {
     }
 }
 
-const buildTx = (txIns: Array<Txin>, txOuts: Array<Txout>): bitcoin.TransactionBuilder => {
-
-    const txBuilder = new bitcoin.TransactionBuilder(bitcoin.networks.testnet)
-    txIns.forEach((txIn) => {
-        txBuilder.addInput(txIn.id.indexOf(':0') ? txIn.id.substr(0, txIn.id.indexOf(':0')) : txIn.id, txIn.idx)
-    })
-    txOuts.forEach((txOut) => {
-        txBuilder.addOutput(txOut.address, txOut.value)
-    })
-    txIns.forEach((txIn) => {
-        try {
-            txBuilder.sign(txIn.idx, bitcoin.ECPair.fromWIF(txIn.key, bitcoin.networks.testnet))
-        } catch (e) {
-            console.log(e)
-        }
-    })
-
-    return txBuilder
-}
 
 const buildTxOut = function(txRaw: Txout) {
     return {
@@ -133,6 +109,5 @@ const finalizeTxOut = (txOut: Array<Txout>) => {
 
 const findTxType = (txIn: any): TxTypes => {
     const isMulti = !!txIn.reduce((a, b) => { return ( a.address === b.address ) })
-
     return isMulti ? TxTypes.multi : TxTypes.simple
 }
