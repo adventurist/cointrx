@@ -118,7 +118,7 @@ class LoginHandler(RequestHandler):
             name, password = self.get_body_argument('name'), self.get_body_argument('pass')
 
             if name is not None and password is not None and len(name) > 0:
-                user_verified = db.check_authentication(name, password, 'jigga@riffic.com')
+                user_verified = db.check_auth_by_name(name, password)
                 if user_verified is not None and user_verified is not -1:
                     drupal_login = await drupal_utils.attempt_login(
                         escape.json_encode({'name': name, 'pass': password}))
@@ -129,7 +129,12 @@ class LoginHandler(RequestHandler):
                                                    csrf=csrf, dcsrf=drupal_user_data['csrf_token'])
                         self.set_secure_cookie("dcsrf", application.session.drupal_token())
                         self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
-                        reflect = self
+                    else:
+                        csrf = user_verified.generate_auth_token(expiration=1200)
+                        application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
+                                                   csrf=csrf)
+                        self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                        self.write(user_verified.name)
 
     def get(self, *args, **kwargs):
         print('get getting get')
@@ -439,11 +444,16 @@ class TxGuiHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def get(self, *args, **kwargs):
+    async def get(self, *args, **kwargs):
         found_cookie = self.get_secure_cookie("trx_cookie")
-        tx_url = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])['tx_request']
+        trx_urls = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])
+        tx_url = trx_urls['tx_request']
+        blockgen_url = trx_urls['blockgen_url']
+        userbalance_url = trx_urls['userbalance_url']
+        user_data = await db.regtest_user_data(application.session.user['id'])
+
         if found_cookie is not None:
-            self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url)
+            self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url, user_data=user_data)
         else:
             self.write("you need to LOGIN")
 
@@ -492,7 +502,7 @@ class RegTestAllUsers(RequestHandler):
         tx_url = trx_urls['tx_request']
         blockgen_url = trx_urls['blockgen_url']
         userbalance_url = trx_urls['userbalance_url']
-        user_data = await db.regtest_user_data()
+        user_data = await db.regtest_all_user_data()
         blockchain_info = await db.regtest_block_info()
         self.render("templates/tx-test.html", title="Test TX Interface", data=user_data, blockchain_info=blockchain_info, tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url)
 
