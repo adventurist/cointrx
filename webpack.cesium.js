@@ -2,10 +2,10 @@ const webpack = require('webpack')
 const path = require('path');
 
 let config = {
-    entry: path.resolve(__dirname, 'index.js'),
+    entry: path.resolve(__dirname, 'src/cesium/index.js'),
     output: {
         path: path.resolve(__dirname, ''),
-        filename: 'bundle.js'
+        filename: 'static/bundle.js'
     },
     module: {
         loaders: [{
