@@ -540,6 +540,17 @@ def check_authentication(user, password, email):
         return -1
 
 
+def check_authentication_by_name(user, password):
+    query_user = session.query(User).filter(User.name == user).first()
+    if query_user is not None:
+        if not User.verify_password_by_name(user, password):
+            return "Login is no good"
+
+        return query_user
+    else:
+        return -1
+
+
 def create_user(user, password, email):
     pass_hash = User.generate_hash(password)
     new_user = User(name=user, hash=pass_hash, email=email,
@@ -765,7 +776,7 @@ async def regtest_make_user_address(uid):
             add_key_attempt = await addSingleKey(wif, user.id)
             return new_address if add_key_attempt is not None else false
 
-async def regtest_user_data():
+async def regtest_all_user_data():
     user_data = []
     users = session.query(User).all()
     for user in users:
@@ -780,6 +791,19 @@ async def regtest_user_data():
         user_data.append(data)
 
     return user_data
+
+async def regtest_user_data(uid: str):
+    user_data = []
+    user = session.query(User).filter(User.id == uid).one_or_none()
+    if user is not None:
+        data = {
+            'id': user.id,
+            'name': user.name,
+            'email': user.email,
+            'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
+            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status} for x in user.trxkey]
+        }
+        user_data.append(data)
 
 async def regtest_pay_user(uid: str, amount: str):
     key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).one_or_none()
