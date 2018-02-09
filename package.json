@@ -4,7 +4,8 @@
   "description": "Front end for Coin TRX",
   "main": "index.js",
   "scripts": {
-    "build": "node_modules/webpack/bin/webpack.js --config webpack.ui-tx.js",
+    "build:register": "node_modules/webpack/bin/webpack.js --config webpack-register.config.js",
+    "build:uitx": "node_modules/webpack/bin/webpack.js --config webpack.ui-tx.js",
     "build:navtest": "node_modules/webpack/bin/webpack.js --config webpack.ui-main.js",
     "build:cesium": "node_modules/webpack/bin/webpack.js --config webpack.cesium.js",
     "build:txtest": "node_modules/webpack/bin/webpack.js --config webpack-txgui.config.js",
@@ -39,6 +40,7 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "jquery": "^3.3.1",
     "material-ui": "^0.20.0",
+    "react-rangeslider": "^2.2.0",
     "react-toolbox": "^2.0.0-beta.12",
     "semantic-ui-react": "^0.78.2",
     "semantic-ui-react-numberpicker": "^0.0.1-b"
