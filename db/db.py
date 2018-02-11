@@ -403,9 +403,9 @@ def update_prices(data):
     loop.run_until_complete(parse_price_data(data))
 
 
-def latest_prices():
+async def latest_prices():
     try:
-        result = session.query(CXPrice).all()
+        result = await session.query(CXPrice).all()
         data = []
         for r in result:
             if isinstance(r, CXPrice):
