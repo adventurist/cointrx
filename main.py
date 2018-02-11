@@ -193,8 +193,8 @@ class LatestPriceHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def get(self):
-        result = (db.latest_prices())
+    async def get(self):
+        result = db.latest_prices()
         self.write(escape.json_encode({'TRX': result}))
 
 
@@ -409,6 +409,7 @@ class HeartbeatSocketShareHandler(WebSocketHandler):
     def data_received(self, chunk):
         pass
 
+    # TODO - Sort this shit out
     async def on_message(self, message):
         print(message)
         user = application.session.drupal_user()
@@ -451,9 +452,10 @@ class TxGuiHandler(RequestHandler):
         blockgen_url = trx_urls['blockgen_url']
         userbalance_url = trx_urls['userbalance_url']
         user_data = await db.regtest_user_data(application.session.user['id'])
+        prices = await db.latest_prices_async()
 
         if found_cookie is not None:
-            self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url, user_data=user_data)
+            self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
         else:
             self.write("you need to LOGIN")
 
@@ -476,14 +478,6 @@ class TxRequestHandler(RequestHandler):
             self.write(escape.json_encode({'response': 200} if transaction_result is not None else {'response': 500}))
 
 
-class BCypherInfoHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
-    def get(self, *args, **kwargs):
-        blockcypher_data = trx__tx_out.Transaction.bcypher_new_address()
-
-
 class RegTestAddressAllHandler(RequestHandler):
     def data_received(self, chunk):
         pass
@@ -504,6 +498,7 @@ class RegTestAllUsers(RequestHandler):
         userbalance_url = trx_urls['userbalance_url']
         user_data = await db.regtest_all_user_data()
         blockchain_info = await db.regtest_block_info()
+        currencies = db.latest_prices_async()
         self.render("templates/tx-test.html", title="Test TX Interface", data=user_data, blockchain_info=blockchain_info, tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url)
 
 
@@ -573,6 +568,77 @@ class UiReactHandler(RequestHandler):
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
+        handlers = [
+            # Home
+            (r"/", MainHandler),
+
+
+            # User GUI
+
+            # - Primary
+            (r"/login", LoginHandler),
+            (r"/register", RegisterHandler),
+            (r"/transaction/tx-gui", TxGuiHandler),
+            (r"/heartbeat/feed", HeartbeatHandler),
+
+            # - Dev/Testing
+            (r"/react/test", ReactTestHandler),
+            (r"/ui/main", UiReactHandler),
+
+
+            # Regression Testing
+            (r"/regtest/all-users", RegTestAllUsers),
+            (r"/regtest/user/pay", RegTestPayUserHandler),
+            (r"/regtest/user-balance", RegTestUserBalanceHandler),
+            (r"/regtest/tx-history", RegTestTxHistory),
+            (r"/regtest/generate/block", RegTestBlockGenerateHandler),
+            (r"/regtest/address/provision-all", RegTestAddressAllHandler),
+
+
+            # CRON Processes
+            (r"/updateprices", UpdatePriceHandler),
+
+
+            # REST API
+
+            # - Transactions
+            (r"/transaction/request", TxRequestHandler),
+            (r"/transaction/test", TestTransactionHandler),
+            (r"/transaction/sendraw", SendTrawTransactionHandler),
+            (r"/transaction/secret/rollback", TrxRollbackHandler),
+
+            # - Prices
+            # -- Graph
+            (r"/prices/graph", GraphHandler),
+            (r"/prices/graph/currency", CurrencyRevisionHandler),
+
+            # -- JSON
+            (r"/prices/graph/json", GraphJsonHandler),
+            (r"/prices/latest", LatestPriceHandler),
+            (r"/prices/currency", CurrencyHandler),
+
+            # -- Heartbeat / Social Media
+            (r"/heartbeat/create", HeartbeatCreateHandler),
+            (r"/heartbeat/share/new", HeartbeatShareHandler),
+            (r"/heartbeat/share/socket-new", HeartbeatSocketShareHandler),
+
+
+            # Private Utilities
+            (r"/users/all", UserListHandler),
+
+
+            # CRUFT
+            (r"/jigga", WunderHandler),
+            (r"/password", PasswordHandler),
+            (r"/sendmail", SendMailHandler),
+            (r"/fakenews", FakeNewsHandler),
+
+            # Static
+            (r"/static/(.*)", StaticFileHandler, {"path": "/static"}),
+            (r"/sites/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "sites")}),
+            (r"/themes/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "themes")})
+        ]
+
         settings = {
             "debug": True,
             "static_path": os.path.join(os.path.dirname(__file__), "static"),
@@ -580,44 +646,6 @@ class TRXApplication(Application):
             "cookie_secret": "8a573v89h7jociauroj435897j34",
             "env": None
         }
-        handlers = [
-            (r"/", MainHandler),
-            (r"/sites/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "sites")}),
-            (r"/themes/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "themes")}),
-            (r"/jigga", WunderHandler),
-            (r"/login", LoginHandler),
-            (r"/register", RegisterHandler),
-            (r"/password", PasswordHandler),
-            (r"/sendmail", SendMailHandler),
-            (r"/fakenews", FakeNewsHandler),
-            (r"/updateprices", UpdatePriceHandler),
-            (r"/bcypher/info", BCypherInfoHandler),
-            (r"/regtest/all-users", RegTestAllUsers),
-            (r"/regtest/user/pay", RegTestPayUserHandler),
-            (r"/regtest/user-balance", RegTestUserBalanceHandler),
-            (r"/regtest/tx-history", RegTestTxHistory),
-            (r"/regtest/generate/block", RegTestBlockGenerateHandler),
-            (r"/regtest/address/provision-all", RegTestAddressAllHandler),
-            (r"/prices/latest", LatestPriceHandler),
-            (r"/prices/currency", CurrencyHandler),
-            (r"/prices/graph", GraphHandler),
-            (r"/prices/graph/json", GraphJsonHandler),
-            (r"/prices/graph/currency", CurrencyRevisionHandler),
-            (r"/transaction/request", TxRequestHandler),
-            (r"/transaction/test", TestTransactionHandler),
-            (r"/transaction/sendraw", SendTrawTransactionHandler),
-            (r"/transaction/tx-gui", TxGuiHandler),
-            (r"/transaction/secret/rollback", TrxRollbackHandler),
-            (r"/react/test", ReactTestHandler),
-            (r"/ui/main", UiReactHandler),
-            (r"/heartbeat/feed", HeartbeatHandler),
-            (r"/heartbeat/create", HeartbeatCreateHandler),
-            (r"/heartbeat/share/new", HeartbeatShareHandler),
-            (r"/heartbeat/share/socket-new", HeartbeatSocketShareHandler),
-            (r"/users/all", UserListHandler),
-            (r"/static/(.*)", StaticFileHandler, {
-                "path": "/static"})
-        ]
 
         Application.__init__(self, handlers, **settings)
 
@@ -640,10 +668,3 @@ if __name__ == "__main__":
     db.Base.metadata.create_all(bind=db.engine)
 
     IOLoop.instance().start()
-
-'''
-Set-Cookie: dcsrf="2|1:0|10:1511755712|5:dcsrf|60:MUxHTG51aGxkZENydjFFOWZRVjZITVVmUEw1QkhQeXc0SGlFUmIyMjhrWQ==|a54c835c228a53880392c224b0683ec664067673dea9d5acd7bcc1dda8bf48cd"
-
-'1LGLnuhlddCrv1E9fQV6HMUfPL5BHPyw4HiERb228kY'
-
-'''
