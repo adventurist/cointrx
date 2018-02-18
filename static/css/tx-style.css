@@ -1,0 +1,15 @@
+#container {
+    width: 100%;
+}
+
+.trx-mui-layout {
+    min-height: 10vh!important;
+}
+#trade-left {
+    float: left;
+    width: 33.5%
+}
+#trade-right {
+    float: right;
+    width: 66.5%
+}
