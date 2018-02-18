@@ -457,7 +457,7 @@ class TxGuiHandler(RequestHandler):
         if found_cookie is not None:
             self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
         else:
-            self.write("you need to LOGIN")
+            self.redirect('/login')
 
     def post(self, *args, **kwargs):
         pass
