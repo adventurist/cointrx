@@ -62,6 +62,8 @@ define("port", default=6969, help="Default port for the WebServer")
 #             return str(obj)
 #         return super(MJSONEncoder, self).default(obj)
 
+def check_attribute(obj, att):
+    return getattr(obj, att, None) is not None
 
 class MainHandler(RequestHandler):
     def data_received(self, chunk):
@@ -105,6 +107,7 @@ class LoginHandler(RequestHandler):
                         user={'name': name, 'pass': password, 'id': user_verify.id, 'csrf': csrf})
                     if application.session is not None and isinstance(application.session, session.Session):
                         self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+
                         return self.write(escape.json_encode({'token': str(application.session.user['csrf'], 'utf-8'),
                                                               'cookie': str(self.get_secure_cookie('trx_cookie'))}))
 
@@ -134,6 +137,10 @@ class LoginHandler(RequestHandler):
                         application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
                                                    csrf=csrf)
                         self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                        if self.get_secure_cookie('redirect_target') is not None:
+                            redirect_target = self.get_secure_cookie('redirect_target')
+                            self.clear_cookie('redirect_target')
+                            return self.redirect(redirect_target)
                         self.write(user_verified.name)
 
     def get(self, *args, **kwargs):
@@ -452,7 +459,7 @@ class TxGuiHandler(RequestHandler):
         blockgen_url = trx_urls['blockgen_url']
         userbalance_url = trx_urls['userbalance_url']
 
-        if application.session.user is not None:
+        if check_attribute(application.session, 'user'):
             user_data = await db.regtest_user_data(application.session.user['id'])
             prices = await db.latest_prices_async()
 
@@ -460,6 +467,7 @@ class TxGuiHandler(RequestHandler):
                 self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
 
         else:
+            self.set_secure_cookie('redirect_target', '/transaction/tx-gui')
             self.redirect('/login')
 
     def post(self, *args, **kwargs):
@@ -654,6 +662,7 @@ class TRXApplication(Application):
 
     def create_session(self, user, csrf=0, dcsrf=0):
         self.session = session.Session(user=user, csrf=csrf, dcsrf=dcsrf)
+        self.session.redirect_login = False
 
 
 if __name__ == "__main__":
