@@ -451,11 +451,14 @@ class TxGuiHandler(RequestHandler):
         tx_url = trx_urls['tx_request']
         blockgen_url = trx_urls['blockgen_url']
         userbalance_url = trx_urls['userbalance_url']
-        user_data = await db.regtest_user_data(application.session.user['id'])
-        prices = await db.latest_prices_async()
 
-        if found_cookie is not None:
-            self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
+        if application.session.user is not None:
+            user_data = await db.regtest_user_data(application.session.user['id'])
+            prices = await db.latest_prices_async()
+
+            if found_cookie is not None:
+                self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
+
         else:
             self.redirect('/login')
 
