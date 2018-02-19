@@ -4,13 +4,13 @@ import {Layout, NavDrawer, Panel} from 'react-toolbox/lib/layout';
 import Navigation from 'react-toolbox/lib/navigation';
 import * as theme from '../../static/css/nav.css'
 import Checkbox from 'react-toolbox/lib/checkbox';
-import { makeData, Logo, Tips } from "./Utils";
+import { TrxAppBar } from '../App.jsx'
 import 'react-virtualized/styles.css'
 // Import React Table
-import ReactTable from "react-table";
 import "react-table/react-table.css";
 import ReactDataGrid from 'react-data-grid'
 import { TextField, RaisedButton } from 'material-ui'
+import { TrxNav } from '../TrxAppBar.jsx'
 
 const styles = {
     container: {
@@ -172,18 +172,7 @@ export class TrxLayout extends React.Component {
 
     render() {
         return (
-                <Layout className="trx-mui-layout">
-                    <NavDrawer active={this.state.drawerActive} pinned={this.state.drawerPinned} permanentAt='xxxl' onOverlayClick={this.toggleDrawerActive}>
-                    </NavDrawer>
-                    <Panel>
-                        <AppBar styleName="theme.AppBar" theme={theme} leftIcon='menu' onLeftIconClick={this.toggleDrawerActive}>
-                            <Navigation type='horizontal'>
-                                {/*<Link href='https://cointrx.com' label='Main' icon='inbox' />*/}
-                                {/*<Link href='https://app.cointrx.com/prices/graph/json' active label='' icon='person' />*/}
-                            </Navigation>
-                        </AppBar>
-                    </Panel>
-                </Layout>
+                <TrxNav />
         )
     }
 }
