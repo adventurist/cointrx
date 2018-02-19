@@ -804,6 +804,7 @@ async def regtest_user_data(uid: str):
             'keys': [{'id': x.id, 'wif': x.value, 'status': x.status} for x in user.trxkey]
         }
         user_data.append(data)
+    return user_data
 
 async def regtest_pay_user(uid: str, amount: str):
     key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).one_or_none()
