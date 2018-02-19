@@ -65,6 +65,7 @@ define("port", default=6969, help="Default port for the WebServer")
 def check_attribute(obj, att):
     return getattr(obj, att, None) is not None
 
+
 class MainHandler(RequestHandler):
     def data_received(self, chunk):
         pass
@@ -264,7 +265,8 @@ class RegisterHandler(RequestHandler):
 
     def post(self, *args, **kwargs):
         if self.request.headers.get("Content-Type") == 'application/x-www-form-urlencoded':
-            name, password, email = self.get_body_argument('name'), self.get_body_argument('pass'), self.get_body_argument('email')
+            name, password, email = self.get_body_argument('name'), self.get_body_argument(
+                'pass'), self.get_body_argument('email')
 
             if email is None or password is None or name is None:
                 self.write("You must supply more arguments")
@@ -464,7 +466,8 @@ class TxGuiHandler(RequestHandler):
             prices = await db.latest_prices_async()
 
             if found_cookie is not None:
-                self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
+                self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url, blockgen_url=blockgen_url,
+                            userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
 
         else:
             self.set_secure_cookie('redirect_target', '/transaction/tx-gui')
@@ -510,7 +513,9 @@ class RegTestAllUsers(RequestHandler):
         user_data = await db.regtest_all_user_data()
         blockchain_info = await db.regtest_block_info()
         currencies = db.latest_prices_async()
-        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data, blockchain_info=blockchain_info, tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url)
+        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data,
+                    blockchain_info=blockchain_info, tx_url=tx_url, blockgen_url=blockgen_url,
+                    userbalance_url=userbalance_url)
 
 
 class RegTestTxHistory(RequestHandler):
@@ -552,7 +557,10 @@ class RegTestUserBalanceHandler(RequestHandler):
         rid = self.get_argument('rid')
         sender_balance = await db.regtest_user_balance(uid=sid)
         recipient_balance = await db.regtest_user_balance(uid=rid)
-        self.write(escape.json_encode({'users': {sid: sender_balance, rid: recipient_balance}, 'response': 200} if sender_balance is not None and isinstance(sender_balance, int) else {'response': 404}))
+        self.write(escape.json_encode({'users': {sid: sender_balance, rid: recipient_balance},
+                                       'response': 200} if sender_balance is not None and isinstance(sender_balance,
+                                                                                                     int) else {
+            'response': 404}))
 
 
 class RegTestPayUserHandler(RequestHandler):
@@ -576,6 +584,37 @@ class UiReactHandler(RequestHandler):
         self.render("templates/ui-main.html", title="TRX UI MAIN")
 
 
+class UserProfileHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        # if self.get_secure_cookie("trx_cookie") is not None:
+        if check_attribute(application.session, 'user'):
+            user_data, prices = await retrieve_user_data()
+            tx_url, blockgen_url, userbalance_url = retrieve_user_urls()
+            self.render("templates/user.html", title="TRX USER PROFILE", tx_url=tx_url, blockgen_url=blockgen_url,
+                        userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
+        else:
+            self.set_secure_cookie('redirect_target', '/user')
+            self.redirect('/login')
+
+
+async def retrieve_user_data():
+    user_data = await db.regtest_user_data(application.session.user['id'])
+    prices = await db.latest_prices_async()
+    return user_data, prices
+
+
+def retrieve_user_urls():
+    trx_urls = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])
+    tx_url = trx_urls['tx_request']
+    blockgen_url = trx_urls['blockgen_url']
+    userbalance_url = trx_urls['userbalance_url']
+
+    return tx_url, blockgen_url, userbalance_url
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -583,9 +622,10 @@ class TRXApplication(Application):
             # Home
             (r"/", MainHandler),
 
-
             # User GUI
 
+            # - Profile
+            (r"/user", UserProfileHandler),
             # - Primary
             (r"/login", LoginHandler),
             (r"/register", RegisterHandler),
@@ -596,7 +636,6 @@ class TRXApplication(Application):
             (r"/react/test", ReactTestHandler),
             (r"/ui/main", UiReactHandler),
 
-
             # Regression Testing
             (r"/regtest/all-users", RegTestAllUsers),
             (r"/regtest/user/pay", RegTestPayUserHandler),
@@ -605,10 +644,8 @@ class TRXApplication(Application):
             (r"/regtest/generate/block", RegTestBlockGenerateHandler),
             (r"/regtest/address/provision-all", RegTestAddressAllHandler),
 
-
             # CRON Processes
             (r"/updateprices", UpdatePriceHandler),
-
 
             # REST API
 
@@ -633,10 +670,8 @@ class TRXApplication(Application):
             (r"/heartbeat/share/new", HeartbeatShareHandler),
             (r"/heartbeat/share/socket-new", HeartbeatSocketShareHandler),
 
-
             # Private Utilities
             (r"/users/all", UserListHandler),
-
 
             # CRUFT
             (r"/jigga", WunderHandler),
