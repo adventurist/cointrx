@@ -9,7 +9,8 @@
     "build:navtest": "node_modules/webpack/bin/webpack.js --config webpack.ui-main.js",
     "build:cesium": "node_modules/webpack/bin/webpack.js --config webpack.cesium.js",
     "build:txtest": "node_modules/webpack/bin/webpack.js --config webpack-txgui.config.js",
-    "build:txgui": "node_modules/webpack/bin/webpack.js --config webpack-txgui.config.js"
+    "build:txgui": "node_modules/webpack/bin/webpack.js --config webpack-txgui.config.js",
+    "build:user": "node_modules/webpack/bin/webpack.js --config webpack-user.config.js"
   },
   "repository": "git@git.stronglogic.xyz:/logicp/coinx.git",
   "author": "adventurist@gmail.com",
@@ -42,6 +43,7 @@
     "d3-time-format": "^2.1.1",
     "jquery": "^3.3.1",
     "material-ui": "^0.20.0",
+    "material-ui-image": "^2.1.1",
     "namor": "^1.0.1",
     "react-data-grid": "^3.0.11",
     "react-rangeslider": "^2.2.0",
