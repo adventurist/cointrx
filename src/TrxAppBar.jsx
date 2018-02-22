@@ -4,6 +4,8 @@ import {Layout, NavDrawer, Panel} from 'react-toolbox/lib/layout';
 import Navigation from 'react-toolbox/lib/navigation';
 import * as theme from '../static/css/nav.css'
 import Link from 'react-toolbox/lib/link';
+import Avatar from 'material-ui/Avatar';
+
 
 export class TrxNav extends React.Component {
     constructor(props) {
@@ -61,8 +63,10 @@ export class TrxNav extends React.Component {
                 <Panel>
                     <AppBar className="TrxAppBar" title="Coin TRX" styleName="theme.AppBar" theme={theme} leftIcon='menu' onLeftIconClick={this.toggleDrawerActive}>
                         <Navigation className='trx-appbar-nav' type='horizontal'>
+                            <Link className="app-bar-icon app-bar-user" href='/user' active label=''>
+                                <Avatar src="https://cointrx.com/sites/default/files/2017-09/X58Q4cA.jpg" size={30} />
+                            </Link>
                             <Link className="app-bar-icon app-bar-trade" href='/transaction/tx-gui' label='' icon='inbox'/>
-                            <Link className="app-bar-icon app-bar-user" href='/user' active label='' icon='person'/>
                         </Navigation>
                     </AppBar>
                 </Panel>
