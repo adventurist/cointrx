@@ -41035,7 +41035,7 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                 'id': key.id,
                 'hex': key.value,
                 'bal': key.balance,
-                'btn': React.createElement(_materialUi.RaisedButton, { label: 'Secondary', secondary: true, id: key.id })
+                'btn': React.createElement(_materialUi.RaisedButton, { label: 'Edit', secondary: true, id: key.id })
             };
         }
     }]);

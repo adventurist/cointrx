@@ -154,7 +154,7 @@ export class UserKeys extends React.Component {
             'id': key.id,
             'hex': key.value,
             'bal': key.balance,
-            'btn': <RaisedButton label="Secondary" secondary={true} id={key.id} />
+            'btn': <RaisedButton label="Edit" secondary={true} id={key.id} />
         }
 
     }
