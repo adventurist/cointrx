@@ -403,9 +403,9 @@ def update_prices(data):
     loop.run_until_complete(parse_price_data(data))
 
 
-def latest_prices():
+async def latest_prices():
     try:
-        result = session.query(CXPrice).all()
+        result = await session.query(CXPrice).all()
         data = []
         for r in result:
             if isinstance(r, CXPrice):
@@ -540,6 +540,17 @@ def check_authentication(user, password, email):
         return -1
 
 
+def check_authentication_by_name(user, password):
+    query_user = session.query(User).filter(User.name == user).first()
+    if query_user is not None:
+        if not User.verify_password_by_name(user, password):
+            return "Login is no good"
+
+        return query_user
+    else:
+        return -1
+
+
 def create_user(user, password, email):
     pass_hash = User.generate_hash(password)
     new_user = User(name=user, hash=pass_hash, email=email,
@@ -653,6 +664,7 @@ async def heartbeat_get_all():
 
 
 async def addMultiSigAddress(pub_addr: str, keys: list, uid: int):
+
     if pub_addr is not None and len(keys) > 0:
         for key in keys:
             trx_key = TrxKey(value=key, uid=uid)
@@ -671,6 +683,13 @@ async def addMultiSigAddress(pub_addr: str, keys: list, uid: int):
 
 
 async def addSingleKey(key: str, uid: int):
+
+    """
+    :param key:
+    :param uid:
+    :return:
+    """
+
     if key is not None and uid is not None:
         new_trx_key = TrxKey(value=key, uid=uid, multi=False, status=True)
         find_key = await find_key_for_uid(uid)
@@ -765,7 +784,7 @@ async def regtest_make_user_address(uid):
             add_key_attempt = await addSingleKey(wif, user.id)
             return new_address if add_key_attempt is not None else false
 
-async def regtest_user_data():
+async def regtest_all_user_data():
     user_data = []
     users = session.query(User).all()
     for user in users:
@@ -779,6 +798,24 @@ async def regtest_user_data():
         }
         user_data.append(data)
 
+    return user_data
+
+async def regtest_user_data(uid: str):
+    user_data = []
+    user = session.query(User).filter(User.id == uid).one_or_none()
+    if user is not None:
+        data = {
+            'id': user.id,
+            'name': user.name,
+            'email': user.email,
+            'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
+            'keys': [{'id': x.id, 'value': x.value, 'status': x.status} for x in user.trxkey]
+        }
+
+        for key in data['keys']:
+            key['balance'] = await btcd_utils.RegTest.get_key_balance(key)
+
+        user_data.append(data)
     return user_data
 
 async def regtest_pay_user(uid: str, amount: str):

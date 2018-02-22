@@ -62,6 +62,9 @@ define("port", default=6969, help="Default port for the WebServer")
 #             return str(obj)
 #         return super(MJSONEncoder, self).default(obj)
 
+def check_attribute(obj, att):
+    return getattr(obj, att, None) is not None
+
 
 class MainHandler(RequestHandler):
     def data_received(self, chunk):
@@ -105,6 +108,7 @@ class LoginHandler(RequestHandler):
                         user={'name': name, 'pass': password, 'id': user_verify.id, 'csrf': csrf})
                     if application.session is not None and isinstance(application.session, session.Session):
                         self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+
                         return self.write(escape.json_encode({'token': str(application.session.user['csrf'], 'utf-8'),
                                                               'cookie': str(self.get_secure_cookie('trx_cookie'))}))
 
@@ -118,7 +122,7 @@ class LoginHandler(RequestHandler):
             name, password = self.get_body_argument('name'), self.get_body_argument('pass')
 
             if name is not None and password is not None and len(name) > 0:
-                user_verified = db.check_authentication(name, password, 'jigga@riffic.com')
+                user_verified = db.check_auth_by_name(name, password)
                 if user_verified is not None and user_verified is not -1:
                     drupal_login = await drupal_utils.attempt_login(
                         escape.json_encode({'name': name, 'pass': password}))
@@ -129,7 +133,16 @@ class LoginHandler(RequestHandler):
                                                    csrf=csrf, dcsrf=drupal_user_data['csrf_token'])
                         self.set_secure_cookie("dcsrf", application.session.drupal_token())
                         self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
-                        reflect = self
+                    else:
+                        csrf = user_verified.generate_auth_token(expiration=1200)
+                        application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
+                                                   csrf=csrf)
+                        self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                        if self.get_secure_cookie('redirect_target') is not None:
+                            redirect_target = self.get_secure_cookie('redirect_target')
+                            self.clear_cookie('redirect_target')
+                            return self.redirect(redirect_target)
+                        self.write(user_verified.name)
 
     def get(self, *args, **kwargs):
         print('get getting get')
@@ -188,8 +201,8 @@ class LatestPriceHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def get(self):
-        result = (db.latest_prices())
+    async def get(self):
+        result = db.latest_prices()
         self.write(escape.json_encode({'TRX': result}))
 
 
@@ -252,7 +265,8 @@ class RegisterHandler(RequestHandler):
 
     def post(self, *args, **kwargs):
         if self.request.headers.get("Content-Type") == 'application/x-www-form-urlencoded':
-            name, password, email = self.get_body_argument('name'), self.get_body_argument('pass'), self.get_body_argument('email')
+            name, password, email = self.get_body_argument('name'), self.get_body_argument(
+                'pass'), self.get_body_argument('email')
 
             if email is None or password is None or name is None:
                 self.write("You must supply more arguments")
@@ -404,6 +418,7 @@ class HeartbeatSocketShareHandler(WebSocketHandler):
     def data_received(self, chunk):
         pass
 
+    # TODO - Sort this shit out
     async def on_message(self, message):
         print(message)
         user = application.session.drupal_user()
@@ -439,13 +454,24 @@ class TxGuiHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def get(self, *args, **kwargs):
+    async def get(self, *args, **kwargs):
         found_cookie = self.get_secure_cookie("trx_cookie")
-        tx_url = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])['tx_request']
-        if found_cookie is not None:
-            self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url)
+        trx_urls = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])
+        tx_url = trx_urls['tx_request']
+        blockgen_url = trx_urls['blockgen_url']
+        userbalance_url = trx_urls['userbalance_url']
+
+        if check_attribute(application.session, 'user'):
+            user_data = await db.regtest_user_data(application.session.user['id'])
+            prices = await db.latest_prices_async()
+
+            if found_cookie is not None:
+                self.render("templates/tx.html", title="TRX TX Interface", tx_url=tx_url, blockgen_url=blockgen_url,
+                            userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
+
         else:
-            self.write("you need to LOGIN")
+            self.set_secure_cookie('redirect_target', '/transaction/tx-gui')
+            self.redirect('/login')
 
     def post(self, *args, **kwargs):
         pass
@@ -466,14 +492,6 @@ class TxRequestHandler(RequestHandler):
             self.write(escape.json_encode({'response': 200} if transaction_result is not None else {'response': 500}))
 
 
-class BCypherInfoHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
-    def get(self, *args, **kwargs):
-        blockcypher_data = trx__tx_out.Transaction.bcypher_new_address()
-
-
 class RegTestAddressAllHandler(RequestHandler):
     def data_received(self, chunk):
         pass
@@ -492,9 +510,12 @@ class RegTestAllUsers(RequestHandler):
         tx_url = trx_urls['tx_request']
         blockgen_url = trx_urls['blockgen_url']
         userbalance_url = trx_urls['userbalance_url']
-        user_data = await db.regtest_user_data()
+        user_data = await db.regtest_all_user_data()
         blockchain_info = await db.regtest_block_info()
-        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data, blockchain_info=blockchain_info, tx_url=tx_url, blockgen_url=blockgen_url, userbalance_url=userbalance_url)
+        currencies = db.latest_prices_async()
+        self.render("templates/tx-test.html", title="Test TX Interface", data=user_data,
+                    blockchain_info=blockchain_info, tx_url=tx_url, blockgen_url=blockgen_url,
+                    userbalance_url=userbalance_url)
 
 
 class RegTestTxHistory(RequestHandler):
@@ -536,7 +557,10 @@ class RegTestUserBalanceHandler(RequestHandler):
         rid = self.get_argument('rid')
         sender_balance = await db.regtest_user_balance(uid=sid)
         recipient_balance = await db.regtest_user_balance(uid=rid)
-        self.write(escape.json_encode({'users': {sid: sender_balance, rid: recipient_balance}, 'response': 200} if sender_balance is not None and isinstance(sender_balance, int) else {'response': 404}))
+        self.write(escape.json_encode({'users': {sid: sender_balance, rid: recipient_balance},
+                                       'response': 200} if sender_balance is not None and isinstance(sender_balance,
+                                                                                                     int) else {
+            'response': 404}))
 
 
 class RegTestPayUserHandler(RequestHandler):
@@ -560,9 +584,107 @@ class UiReactHandler(RequestHandler):
         self.render("templates/ui-main.html", title="TRX UI MAIN")
 
 
+class UserProfileHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        # if self.get_secure_cookie("trx_cookie") is not None:
+        if check_attribute(application.session, 'user'):
+            user_data, prices = await retrieve_user_data()
+            tx_url, blockgen_url, userbalance_url = retrieve_user_urls()
+            self.render("templates/user.html", title="TRX USER PROFILE", tx_url=tx_url, blockgen_url=blockgen_url,
+                        userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
+        else:
+            self.set_secure_cookie('redirect_target', '/user')
+            self.redirect('/login')
+
+
+async def retrieve_user_data():
+    user_data = await db.regtest_user_data(application.session.user['id'])
+    prices = await db.latest_prices_async()
+    return user_data, prices
+
+
+def retrieve_user_urls():
+    trx_urls = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])
+    tx_url = trx_urls['tx_request']
+    blockgen_url = trx_urls['blockgen_url']
+    userbalance_url = trx_urls['userbalance_url']
+
+    return tx_url, blockgen_url, userbalance_url
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
+        handlers = [
+            # Home
+            (r"/", MainHandler),
+
+            # User GUI
+
+            # - Profile
+            (r"/user", UserProfileHandler),
+            # - Primary
+            (r"/login", LoginHandler),
+            (r"/register", RegisterHandler),
+            (r"/transaction/tx-gui", TxGuiHandler),
+            (r"/heartbeat/feed", HeartbeatHandler),
+
+            # - Dev/Testing
+            (r"/react/test", ReactTestHandler),
+            (r"/ui/main", UiReactHandler),
+
+            # Regression Testing
+            (r"/regtest/all-users", RegTestAllUsers),
+            (r"/regtest/user/pay", RegTestPayUserHandler),
+            (r"/regtest/user-balance", RegTestUserBalanceHandler),
+            (r"/regtest/tx-history", RegTestTxHistory),
+            (r"/regtest/generate/block", RegTestBlockGenerateHandler),
+            (r"/regtest/address/provision-all", RegTestAddressAllHandler),
+
+            # CRON Processes
+            (r"/updateprices", UpdatePriceHandler),
+
+            # REST API
+
+            # - Transactions
+            (r"/transaction/request", TxRequestHandler),
+            (r"/transaction/test", TestTransactionHandler),
+            (r"/transaction/sendraw", SendTrawTransactionHandler),
+            (r"/transaction/secret/rollback", TrxRollbackHandler),
+
+            # - Prices
+            # -- Graph
+            (r"/prices/graph", GraphHandler),
+            (r"/prices/graph/currency", CurrencyRevisionHandler),
+
+            # -- JSON
+            (r"/prices/graph/json", GraphJsonHandler),
+            (r"/prices/latest", LatestPriceHandler),
+            (r"/prices/currency", CurrencyHandler),
+
+            # -- Heartbeat / Social Media
+            (r"/heartbeat/create", HeartbeatCreateHandler),
+            (r"/heartbeat/share/new", HeartbeatShareHandler),
+            (r"/heartbeat/share/socket-new", HeartbeatSocketShareHandler),
+
+            # Private Utilities
+            (r"/users/all", UserListHandler),
+
+            # CRUFT
+            (r"/jigga", WunderHandler),
+            (r"/password", PasswordHandler),
+            (r"/sendmail", SendMailHandler),
+            (r"/fakenews", FakeNewsHandler),
+
+            # Static
+            (r"/static/(.*)", StaticFileHandler, {"path": "/static"}),
+            (r"/sites/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "sites")}),
+            (r"/themes/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "themes")})
+        ]
+
         settings = {
             "debug": True,
             "static_path": os.path.join(os.path.dirname(__file__), "static"),
@@ -570,49 +692,12 @@ class TRXApplication(Application):
             "cookie_secret": "8a573v89h7jociauroj435897j34",
             "env": None
         }
-        handlers = [
-            (r"/", MainHandler),
-            (r"/sites/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "sites")}),
-            (r"/themes/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "themes")}),
-            (r"/jigga", WunderHandler),
-            (r"/login", LoginHandler),
-            (r"/register", RegisterHandler),
-            (r"/password", PasswordHandler),
-            (r"/sendmail", SendMailHandler),
-            (r"/fakenews", FakeNewsHandler),
-            (r"/updateprices", UpdatePriceHandler),
-            (r"/bcypher/info", BCypherInfoHandler),
-            (r"/regtest/all-users", RegTestAllUsers),
-            (r"/regtest/user/pay", RegTestPayUserHandler),
-            (r"/regtest/user-balance", RegTestUserBalanceHandler),
-            (r"/regtest/tx-history", RegTestTxHistory),
-            (r"/regtest/generate/block", RegTestBlockGenerateHandler),
-            (r"/regtest/address/provision-all", RegTestAddressAllHandler),
-            (r"/prices/latest", LatestPriceHandler),
-            (r"/prices/currency", CurrencyHandler),
-            (r"/prices/graph", GraphHandler),
-            (r"/prices/graph/json", GraphJsonHandler),
-            (r"/prices/graph/currency", CurrencyRevisionHandler),
-            (r"/transaction/request", TxRequestHandler),
-            (r"/transaction/test", TestTransactionHandler),
-            (r"/transaction/sendraw", SendTrawTransactionHandler),
-            (r"/transaction/tx-gui", TxGuiHandler),
-            (r"/transaction/secret/rollback", TrxRollbackHandler),
-            (r"/react/test", ReactTestHandler),
-            (r"/ui/main", UiReactHandler),
-            (r"/heartbeat/feed", HeartbeatHandler),
-            (r"/heartbeat/create", HeartbeatCreateHandler),
-            (r"/heartbeat/share/new", HeartbeatShareHandler),
-            (r"/heartbeat/share/socket-new", HeartbeatSocketShareHandler),
-            (r"/users/all", UserListHandler),
-            (r"/static/(.*)", StaticFileHandler, {
-                "path": "/static"})
-        ]
 
         Application.__init__(self, handlers, **settings)
 
     def create_session(self, user, csrf=0, dcsrf=0):
         self.session = session.Session(user=user, csrf=csrf, dcsrf=dcsrf)
+        self.session.redirect_login = False
 
 
 if __name__ == "__main__":
@@ -630,10 +715,3 @@ if __name__ == "__main__":
     db.Base.metadata.create_all(bind=db.engine)
 
     IOLoop.instance().start()
-
-'''
-Set-Cookie: dcsrf="2|1:0|10:1511755712|5:dcsrf|60:MUxHTG51aGxkZENydjFFOWZRVjZITVVmUEw1QkhQeXc0SGlFUmIyMjhrWQ==|a54c835c228a53880392c224b0683ec664067673dea9d5acd7bcc1dda8bf48cd"
-
-'1LGLnuhlddCrv1E9fQV6HMUfPL5BHPyw4HiERb228kY'
-
-'''

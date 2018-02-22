@@ -1,0 +1,35 @@
+#container {
+    width: 100%;
+}
+
+.trx-mui-layout {
+    min-height: 10vh!important;
+}
+
+.user-photo {
+    min-width: 0!important;
+    width: 20em!important;
+    max-width: 20em!important;
+    padding-bottom: 5em!important;
+}
+
+.userimage-file {
+    display: none;
+}
+
+.user-form {
+    background-color: rgb(48, 48, 48);
+}
+
+.app-bar-icon {
+    float: right;
+}
+
+.trx-appbar-nav {
+    width: 100%;
+}
+
+.TrxAppBar h1 {
+    width: 100%!important;
+    text-align: right;
+}

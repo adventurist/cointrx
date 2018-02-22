@@ -6,7 +6,7 @@ client = Client()
 async def attempt_login(json_body):
     # csrf_token = await client.get('http://trxdrup.dev/session/token')
     # if csrf_token is not None:
-    login_attempt = await client.connect('http://trxdrup.dev/user/login?_format=json', body=json_body)
+    login_attempt = await client.connect('http://cointrx.com/user/login?_format=json', body=json_body)
     return login_attempt
 
 async def post_status_message(json_body, user=None, headers=None):

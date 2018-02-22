@@ -3,22 +3,22 @@ const path = require('path');
 
 let config = {
     entry: {
-        main: "./src/index.jsx"
+        main: path.resolve(__dirname, 'src/index.jsx')
     },
     output: {
         path: path.resolve(__dirname, 'static'),
         publicPath: "/static/",
         filename: 'js/ui-bundle.js'
     },
-    resolve: {
-        extensions: [
-            '.jsx', '.js', '.json'
-        ],
-        modules: [
-            'node_modules',
-            path.resolve(__dirname, './node_modules')
-        ]
-    },
+    // resolve: {
+    //     extensions: [
+    //         '.jsx', '.js', '.json'
+    //     ],
+    //     modules: [
+    //         'node_modules',
+    //         path.resolve(__dirname, './node_modules')
+    //     ]
+    // },
     module: {
         loaders: [{
                 test: /\.css$/,
@@ -27,7 +27,8 @@ let config = {
             {
             test: /\.jsx?$/,
             loader: 'babel-loader',
-            query: {
+                include: [path.resolve(__dirname, './src')],
+                query: {
                 presets: ['env', 'stage-0', 'react']
             }
         }]

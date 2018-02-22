@@ -5,4 +5,8 @@ coinenv/*
 __pycache__
 node_modules
 */node_modules
+sites
+sites2
+themes
 Coin\ X.iml
+*.iml
