@@ -1,12 +1,6 @@
 import * as React from 'react';
-import {AppBar} from 'react-toolbox/lib/app_bar';
-import {Layout, NavDrawer, Panel} from 'react-toolbox/lib/layout';
-import Navigation from 'react-toolbox/lib/navigation';
-import { TrxNav } from '../TrxAppBar.jsx'
-import * as theme from '../../static/css/nav.css'
 import 'react-virtualized/styles.css'
 // Import React Table
-import Link from 'react-toolbox/lib/link';
 import "react-table/react-table.css";
 import ReactDataGrid from 'react-data-grid'
 import { TextField, RaisedButton } from 'material-ui'
@@ -14,6 +8,7 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle} from 'material-ui/C
 import FlatButton from 'material-ui/FlatButton';
 
 const userProfileData = JSON.parse(userData.replace(/'/g, '"'))
+const keyData = [...JSON.parse(userData.replace(/'/g, '"'))['keys']]
 
 const UserCard = () => (
     <Card>
@@ -51,12 +46,19 @@ export class UserForm extends React.Component {
     constructor (props, context) {
         super(props, context)
 
+        this.initData()
+
         this.state = {
             editing: false,
             files: null,
             username: userProfileData.name,
             email: userProfileData.email
         }
+    }
+
+    initData = () => {
+        // const userProfileData = JSON.parse(userData.replace(/'/g, '"'))
+        console.dir(userData)
     }
 
     handleChange = (field, value) => {
@@ -127,6 +129,47 @@ export class UserForm extends React.Component {
                     </form>
                 </div>
         )
+    }
+}
+
+export class UserKeys extends React.Component {
+    constructor(props, context) {
+        super(props, context);
+        this.createRows();
+        this._columns = [
+            { key: 'id', name: 'ID' },
+            { key: 'hex', name: 'Hex' },
+            { key: 'bal', name: 'Balance' },
+            {key: 'btn', name: 'Modify'}];
+        this.state = null;
+    }
+
+    createRows = () => {
+        let rows = keyData.map(x => UserKeys.buildRows(x))
+        this._rows = rows;
+    };
+
+    static buildRows(key) {
+        return {
+            'id': key.id,
+            'hex': key.value,
+            'bal': key.balance,
+            'btn': <RaisedButton label="Secondary" secondary={true} id={key.id} />
+        }
+
+    }
+
+    rowGetter = (i) => {
+        return this._rows[i];
+    };
+
+    render() {
+        return  (
+            <ReactDataGrid
+                columns={this._columns}
+                rowGetter={this.rowGetter}
+                rowsCount={this._rows.length}
+                minHeight={500} />);
     }
 }
 

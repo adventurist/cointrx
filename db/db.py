@@ -664,6 +664,7 @@ async def heartbeat_get_all():
 
 
 async def addMultiSigAddress(pub_addr: str, keys: list, uid: int):
+
     if pub_addr is not None and len(keys) > 0:
         for key in keys:
             trx_key = TrxKey(value=key, uid=uid)
@@ -682,6 +683,13 @@ async def addMultiSigAddress(pub_addr: str, keys: list, uid: int):
 
 
 async def addSingleKey(key: str, uid: int):
+
+    """
+    :param key:
+    :param uid:
+    :return:
+    """
+
     if key is not None and uid is not None:
         new_trx_key = TrxKey(value=key, uid=uid, multi=False, status=True)
         find_key = await find_key_for_uid(uid)
@@ -801,8 +809,12 @@ async def regtest_user_data(uid: str):
             'name': user.name,
             'email': user.email,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
-            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status} for x in user.trxkey]
+            'keys': [{'id': x.id, 'value': x.value, 'status': x.status} for x in user.trxkey]
         }
+
+        for key in data['keys']:
+            key['balance'] = await btcd_utils.RegTest.get_key_balance(key)
+
         user_data.append(data)
     return user_data
 

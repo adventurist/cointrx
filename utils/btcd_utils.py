@@ -2,11 +2,10 @@ from subprocess import *
 
 import binascii
 import hashlib
+from blockcypher import get_address_details
 from os import environ
 from tornado.escape import json_decode
-from blockcypher import *
 from pycoin.key import Key
-from config import services
 
 b58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
@@ -125,6 +124,13 @@ class RegTest:
         return sum(balance_array)
 
     @staticmethod
+    async def get_key_balance(key):
+        if key['status'] is True:
+            unspent_tx = await RegTest.get_tx_history(wif_to_address(key['value']))
+            if unspent_tx is not None and len(unspent_tx) > 0:
+                return sum(x['value'] for x in unspent_tx)
+
+    @staticmethod
     async def get_info():
         interface = 'bitcoin-cli'
         command = 'getinfo'
@@ -218,12 +224,10 @@ def b58_check_encode(version, payload):
 def priv_key_to_wif(key_hex):
     return b58_check_encode(0x80, binascii.unhexlify(key_hex))
 
-
-class BCypher:
-    @staticmethod
-    def bcypher_chain_info():
-        return get_blockchain_overview()
-
-    @staticmethod
-    def bcypher_generate_address():
-        return generate_new_address('bcy', services.BLOCKCYPHER['api_key'])
+def wif_to_private_key(wif):
+    private_key = Key.from_text(wif, is_compressed=False)
+    secret = private_key.sec_as_hex()
+    text = private_key.as_text
+    address = private_key.bitcoin_address
+    ser = private_key.serialize()
+    return private_key
