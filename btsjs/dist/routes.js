@@ -4,6 +4,7 @@ require("babel-polyfill");
 require("core-js/fn/object/entries");
 const express_1 = require("express");
 const transaction_1 = require("./transaction");
+const keytool_1 = require("./keytool");
 const router = express_1.Router();
 // placeholder route handler
 router.get('/', (req, res, next) => {
@@ -33,5 +34,22 @@ router.post('/transaction', (req, res, next) => {
     }
     res.json({ result: transaction_1.transaction(txIn, txOut, network)
     });
+});
+router.post('/key/from-wif', (req, res, next) => {
+    console.dir(req.body)
+    let wif = null
+    for (const [key, value] of Object.entries(req.body)) {
+        console.log(`${key} ${value}`);
+        for (const [k, v] of Object.entries(JSON.parse(key))) {
+            if (k === 'wif') {
+                wif = JSON.parse(key).wif;
+            }
+        }
+    }
+
+    if (wif) {
+        const result = keytool_1.convertWifToPrivate({ wif: wif, multi: false })
+        res.json({ result: keytool_1.convertWifToPrivate({ wif: wif, multi: false }) });
+    }
 });
 exports.routes = router;

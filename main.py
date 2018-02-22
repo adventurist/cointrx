@@ -615,6 +615,20 @@ def retrieve_user_urls():
     return tx_url, blockgen_url, userbalance_url
 
 
+class KeyWTPHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        wif = self.get_argument('wif')
+        if wif is not None:
+            response = await http_client.connect(TRXConfig.get_urls(application.settings['env']['TRX_ENV'])['wif_to_private_url'], escape.json.dumps({'wif': wif}))
+            if response:
+                print(response)
+                data = escape.json_decode(response.body.decode())
+                self.write(data)
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -654,6 +668,10 @@ class TRXApplication(Application):
             (r"/transaction/test", TestTransactionHandler),
             (r"/transaction/sendraw", SendTrawTransactionHandler),
             (r"/transaction/secret/rollback", TrxRollbackHandler),
+
+            # KEYS
+
+            (r"/key/convert/wiftoprivate", KeyWTPHandler),
 
             # - Prices
             # -- Graph
