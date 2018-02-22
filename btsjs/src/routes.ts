@@ -2,6 +2,7 @@ import 'babel-polyfill'
 import 'core-js/fn/object/entries';
 import { Router } from 'express'
 import { transaction } from './transaction'
+import { convertWifToPrivate } from './keytool'
 
 const router: Router = Router();
 
@@ -42,5 +43,13 @@ router.post('/transaction', (req, res, next) => {
         transaction(txIn, txOut, network)
     });
 });
+
+router.post('/key/from-wif', (req, res, next) => {
+    console.dir(req.body)
+    const wif = JSON.parse(req.body)
+    if (wif) {
+        res.json({ result: convertWifToPrivate({wif: wif, multi: false})})
+    }
+})
 
 export const routes: Router = router;
