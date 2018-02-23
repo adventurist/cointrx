@@ -121,7 +121,8 @@ class RegTest:
                 if balance_for_key is not None:
                     balance_for_key = sum(k['value'] for k in balance_for_key)
                     balance_array.append(balance_for_key)
-        return sum(balance_array)
+                    return sum(balance_array)
+        return 0
 
     @staticmethod
     async def get_key_balance(key):
@@ -129,6 +130,8 @@ class RegTest:
             unspent_tx = await RegTest.get_tx_history(wif_to_address(key['value']))
             if unspent_tx is not None and len(unspent_tx) > 0:
                 return sum(x['value'] for x in unspent_tx)
+            return 0
+
 
     @staticmethod
     async def get_info():
