@@ -7,12 +7,14 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="/static/jquery-3.2.1.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
 </head>
 <body>
 <script>
     const txUrl = "{% raw tx_url %}"
     const blockgenUrl = "{% raw blockgen_url %}"
     const userBalanceUrl = "{% raw userbalance_url %}"
+    const keygenUrl = "{% raw keygen_url %}"
     const trxPrices = "{% raw trx_prices %}"
     const userData = "{% raw user_data %}".substr(1).slice(0, -1).replace(/True/g, 1)
 </script>

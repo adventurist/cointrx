@@ -1,14 +1,40 @@
 import * as React from 'react';
 import 'react-virtualized/styles.css'
-// Import React Table
-import "react-table/react-table.css";
+import "react-table/react-table.css"
+import PropTypes from 'prop-types';
 import ReactDataGrid from 'react-data-grid'
 import { TextField, RaisedButton } from 'material-ui'
-import {Card, CardActions, CardHeader, CardMedia, CardTitle} from 'material-ui/Card';
-import FlatButton from 'material-ui/FlatButton';
+import {Card, CardActions, CardHeader, CardMedia, CardTitle} from 'material-ui/Card'
+import FlatButton from 'material-ui/FlatButton'
+import FloatingActionButton from 'material-ui/FloatingActionButton'
+import ContentAdd from 'material-ui/svg-icons/content/add'
+import FontIcon from 'material-ui/FontIcon';
+import Tooltip from 'material-ui/internal/Tooltip';
 
-const userProfileData = JSON.parse(userData.replace(/'/g, '"'))
-const keyData = [...JSON.parse(userData.replace(/'/g, '"'))['keys']]
+const userProfileData = parseProfileDataJson(userData)
+const keyData = parseKeyDataJson(userData)
+
+console.dir(keyData)
+
+function parseKeyDataJson (userData) { return [...JSON.parse(userData.replace(/'/g, '"'))['keys']]}
+function parseProfileDataJson (userData) { return JSON.parse(userData.replace(/'/g, '"')) }
+
+const keyBtnStyles = {
+    float: 'right',
+    // margin: 0,
+    // top: 'auto',
+    right: '20px',
+    bottom: '4em',
+    left: 'auto',
+    position: 'fixed'
+}
+
+const styles = {
+    container: {
+        textAlign: 'center',
+        paddingTop: 16
+    }
+}
 
 const UserCard = () => (
     <Card>
@@ -33,13 +59,6 @@ const UserCard = () => (
         </CardMedia>
     </Card>
 );
-
-const styles = {
-    container: {
-        textAlign: 'center',
-        paddingTop: 16
-    }
-}
 
 
 export class UserForm extends React.Component {
@@ -135,19 +154,65 @@ export class UserForm extends React.Component {
 export class UserKeys extends React.Component {
     constructor(props, context) {
         super(props, context);
-        this.createRows();
-        this._columns = [
-            { key: 'id', name: 'ID' },
-            { key: 'hex', name: 'Hex' },
-            { key: 'bal', name: 'Balance' },
-            {key: 'btn', name: 'Modify'}];
-        this.state = null;
+        this.state = {
+            btnHovered: false,
+            _columns: [
+                    { key: 'id', name: 'ID' },
+                    { key: 'hex', name: 'Hex' },
+                    { key: 'bal', name: 'Balance' },
+                    { key: 'btn', name: 'Modify'}
+                ],
+            _rows: this.createRows(keyData)
+        }
+        this._rows = this.state._rows
+        this.rowsCount = this.state._rows.length
     }
 
-    createRows = () => {
-        let rows = keyData.map(x => UserKeys.buildRows(x))
-        this._rows = rows;
+    static propTypes = {
+        // className: PropTypes.string,
+        // icon: PropTypes.string.isRequired, // fontawesome
+        mini: PropTypes.bool,
+        tooltip: PropTypes.string,
+        tooltipPosition: PropTypes.oneOf(['bottom-center', 'top-center', 'bottom-right', 'top-right', 'bottom-left', 'top-left']),
+        onClick: PropTypes.func
     };
+
+    static defaultProps = {
+        mini: false,
+        tooltipPosition: 'top-center'
+    };
+
+    state = {
+        btnHovered: false
+    };
+
+    requestBtcKey = async () => {
+        console.log('requestBtcKey')
+        const cookies = (document.cookie.split(';'))
+        const cookie = cookies.filter(cookie => cookie.trim().substr(0, 4) === 'csrf')
+        if (cookie && cookie.length > 0) {
+            const csrf = cookie[0].trim().substr(5)
+            console.dir(csrf)
+            const newUserData = await fetchKey(keygenUrl, csrf)
+            console.dir(newUserData)
+            console.log('updating')
+            if (newUserData && Array.isArray(newUserData) && newUserData.length > 0) {
+                const _newRows = newUserData[0].keys
+                this.updateState(_newRows)
+            }
+        }
+    }
+
+    updateState(rows) {
+        console.log('updateState called')
+        this.setState({btnHovered: false, _rows: this.createRows(rows)})
+        // this._rows = this.state._rows
+        // this.rowsCount = this.state._rows.length
+    }
+
+    getRows () { return this.state._rows }
+
+    createRows = (keyData) => keyData.map(x => UserKeys.buildRows(x))
 
     static buildRows(key) {
         return {
@@ -156,20 +221,42 @@ export class UserKeys extends React.Component {
             'bal': key.balance,
             'btn': <RaisedButton label="Edit" secondary={true} id={key.id} />
         }
-
     }
 
     rowGetter = (i) => {
-        return this._rows[i];
+        return this.state._rows[i];
     };
 
     render() {
+        const {mini, tooltip, tooltipPosition} = this.props;
+        const tooltipPos = tooltipPosition.split('-');
+
         return  (
-            <ReactDataGrid
-                columns={this._columns}
-                rowGetter={this.rowGetter}
-                rowsCount={this._rows.length}
-                minHeight={500} />);
+            <div id="key-container">
+                <ReactDataGrid
+                    columns={this.state._columns}
+                    rowGetter={this.rowGetter}
+                    rowsCount={this.state._rows.length}
+                    minHeight={500} />
+                <div style={{position: 'relative'}} id="fab-container">
+                    <FloatingActionButton style={keyBtnStyles} id="btc-key-btn"
+                    mini={mini}
+                    onClick={this.requestBtcKey}
+                    onMouseEnter={() => this.setState({btnHovered: true})}
+                    onMouseLeave={() => this.setState({btnHovered: false})}>
+
+                    </FloatingActionButton>
+                    {tooltip &&
+                    <Tooltip
+                        show={this.state.btnHovered}
+                        label={tooltip}
+                        style={keyBtnStyles}
+                        horizontalPosition={tooltipPos[1]}
+                        verticalPosition={tooltipPos[0]}/>
+                    }
+                </div>
+            </div>
+        )
     }
 }
 
@@ -211,58 +298,94 @@ export class TrxGrid extends React.Component {
                 columns={this._columns}
                 rowGetter={this.rowGetter}
                 rowsCount={this._rows.length}
-                minHeight={500} />);
+                minHeight={500} />
+        );
     }
 }
 
-// export class TrxLayout extends React.Component {
+function fetchKey (url, csrf) {
+    return new Promise( (resolve) => {
+        console.log('fetchKey called')
+        let options = {
+            method: 'POST',
+            headers: new Headers({'Content-Type': 'application/json', 'csrf-token': csrf})
+        }
+
+        if (options.method === 'POST' && csrf !== void 0) {
+            options.body = JSON.stringify({csrf: csrf})
+        }
+
+        fetch(url, options).then(res =>
+            res.json()
+                .catch(error =>
+                    console.error('Error:', error)
+                ))
+            .then(response => {
+                console.log('Success')
+                console.dir(response)
+                return resolve(response)
+            })
+    })
+}
+
+
+
+
+
+
+
+
+// export class KeyAddBtn extends React.PureComponent {
+//     static propTypes = {
+//         className: PropTypes.string,
+//         icon: PropTypes.string.isRequired, // fontawesome
+//         mini: PropTypes.bool,
+//         tooltip: PropTypes.string,
+//         tooltipPosition: PropTypes.oneOf(['bottom-center', 'top-center', 'bottom-right', 'top-right', 'bottom-left', 'top-left']),
+//         onClick: PropTypes.func
+//     };
 //
-//     constructor(props) {
-//         super(props);
-//         this.state = {
-//             open: false,
-//         };
-//     }
+//     static defaultProps = {
+//         mini: false,
+//         tooltipPosition: 'top-center'
+//     };
 //
 //     state = {
-//         drawerActive: false,
-//         drawerPinned: false,
-//         sidebarPinned: false
+//         hovered: false
 //     };
 //
-//     handleClick = () => {
-//         this.setState({
-//             open: true,
-//         });
-//     };
-//
-//     handleRequestClose = () => {
-//         this.setState({
-//             open: false,
-//         });
-//     };
-//
-//     toggleDrawerActive = () => {
-//         this.setState({
-//             drawerActive: !this.state.drawerActive
-//         });
-//     };
-//
-//     toggleDrawerPinned = () => {
-//         this.setState({
-//             drawerPinned: !this.state.drawerPinned
-//         });
+//     requestBtcKey () {
+//         const cookies = (document.cookie.split(';'))
+//         const cookie = cookies.filter(cookie => cookie.trim().substr(0, 4) === 'csrf')
+//         if (cookie && cookie.length > 0) {
+//             const csrf = cookie[0].trim().substr(5)
+//             console.dir(csrf)
+//             fetchKey(keygenUrl, csrf)
+//         }
 //     }
 //
-//     toggleSidebar = () => {
-//         this.setState({
-//             sidebarPinned: !this.state.sidebarPinned
-//         });
-//     };
-//
 //     render() {
+//         const {className, icon, mini, tooltip, tooltipPosition} = this.props;
+//         const tooltipPos = tooltipPosition.split('-');
+//
 //         return (
-//             <TrxNav />
-//         )
+//             <div style={{position: 'relative'}} className={className}>
+//                 <FloatingActionButton style={keyBtnStyles} id="btc-key-btn"
+//                                       mini={mini}
+//                                       onClick={this.requestBtcKey}
+//                                       onMouseEnter={() => this.setState({hovered: true})}
+//                                       onMouseLeave={() => this.setState({hovered: false})}>
+//
+//                 </FloatingActionButton>
+//                 {tooltip &&
+//                 <Tooltip
+//                     show={this.state.hovered}
+//                     label={tooltip}
+//                     style={keyBtnStyles}
+//                     horizontalPosition={tooltipPos[1]}
+//                     verticalPosition={tooltipPos[0]}/>
+//                 }
+//             </div>
+//         );
 //     }
 // }

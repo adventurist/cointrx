@@ -12,7 +12,7 @@ render(
         <div id="container">
             <TrxNav />
             <UserForm />
-            <UserKeys />
+            <UserKeys className="user-key-grid" tooltip="Create new Bitcoin Key" />
         </div>
 
     </MuiThemeProvider>
