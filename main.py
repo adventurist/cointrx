@@ -138,6 +138,7 @@ class LoginHandler(RequestHandler):
                         application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
                                                    csrf=csrf)
                         self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                        self.set_cookie(name='csrf', value=csrf)
                         if self.get_secure_cookie('redirect_target') is not None:
                             redirect_target = self.get_secure_cookie('redirect_target')
                             self.clear_cookie('redirect_target')
@@ -592,8 +593,9 @@ class UserProfileHandler(RequestHandler):
         # if self.get_secure_cookie("trx_cookie") is not None:
         if check_attribute(application.session, 'user'):
             user_data, prices = await retrieve_user_data()
-            tx_url, blockgen_url, userbalance_url = retrieve_user_urls()
-            self.render("templates/user.html", title="TRX USER PROFILE", tx_url=tx_url, blockgen_url=blockgen_url,
+            tx_url, blockgen_url, userbalance_url, btckeygen_url = retrieve_user_urls()
+            self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+            self.render("templates/user.html", title="TRX USER PROFILE", keygen_url=btckeygen_url, tx_url=tx_url, blockgen_url=blockgen_url,
                         userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
         else:
             self.set_secure_cookie('redirect_target', '/user')
@@ -611,8 +613,9 @@ def retrieve_user_urls():
     tx_url = trx_urls['tx_request']
     blockgen_url = trx_urls['blockgen_url']
     userbalance_url = trx_urls['userbalance_url']
+    btckeygen_url = trx_urls['key_gen_url']
 
-    return tx_url, blockgen_url, userbalance_url
+    return tx_url, blockgen_url, userbalance_url, btckeygen_url
 
 
 class KeyWTPHandler(RequestHandler):
@@ -627,6 +630,29 @@ class KeyWTPHandler(RequestHandler):
                 print(response)
                 data = escape.json_decode(response.body.decode())
                 self.write(data)
+
+
+class RegTestUserKeyGenerateHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        found_cookie = self.get_secure_cookie("trx_cookie")
+
+        if found_cookie is not None and application.session.user is not None:
+            new_address = await db.regtest_make_user_address(application.session.user['id'])
+            user_data = await db.regtest_user_data(application.session.user['id'])
+            self.write(escape.json_encode(user_data))
+
+    async def post(self, *args, **kwargs):
+        content_type = self.request.headers.get('Content-Type')
+        if content_type == 'application/json':
+            csrf = self.request.headers.get('csrf-token')
+            if db.User.verify_auth_token(csrf):
+                new_address = await db.regtest_make_user_address(application.session.user['id'])
+                user_data = await db.regtest_user_data(application.session.user['id'])
+                self.write(escape.json_encode(user_data))
+
 
 
 class TRXApplication(Application):
@@ -657,6 +683,7 @@ class TRXApplication(Application):
             (r"/regtest/tx-history", RegTestTxHistory),
             (r"/regtest/generate/block", RegTestBlockGenerateHandler),
             (r"/regtest/address/provision-all", RegTestAddressAllHandler),
+            (r"/keys/btc/regtest/generate", RegTestUserKeyGenerateHandler),
 
             # CRON Processes
             (r"/updateprices", UpdatePriceHandler),
