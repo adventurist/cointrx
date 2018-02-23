@@ -590,7 +590,7 @@ class UserProfileHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        # if self.get_secure_cookie("trx_cookie") is not None:
+        cookie = self.get_secure_cookie("trx_cookie")
         if check_attribute(application.session, 'user'):
             user_data, prices = await retrieve_user_data()
             tx_url, blockgen_url, userbalance_url, btckeygen_url = retrieve_user_urls()
