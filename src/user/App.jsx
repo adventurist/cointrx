@@ -7,26 +7,22 @@ import { TextField, RaisedButton } from 'material-ui'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle} from 'material-ui/Card'
 import FlatButton from 'material-ui/FlatButton'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
-import ContentAdd from 'material-ui/svg-icons/content/add'
-import FontIcon from 'material-ui/FontIcon';
-import Tooltip from 'material-ui/internal/Tooltip';
-
-const userProfileData = parseProfileDataJson(userData)
-const keyData = parseKeyDataJson(userData)
-
-console.dir(keyData)
+import Tooltip from 'material-ui/internal/Tooltip'
 
 function parseKeyDataJson (userData) { return [...JSON.parse(userData.replace(/'/g, '"'))['keys']]}
 function parseProfileDataJson (userData) { return JSON.parse(userData.replace(/'/g, '"')) }
 
+const userProfileData = parseProfileDataJson(userData)
+const keyData = parseKeyDataJson(userData)
+const rowData = JSON.parse(trxPrices.replace(/'/g, '"'))
+
 const keyBtnStyles = {
     float: 'right',
-    // margin: 0,
-    // top: 'auto',
-    right: '20px',
+    right: '3em',
     bottom: '4em',
     left: 'auto',
-    position: 'fixed'
+    position: 'fixed',
+    zIndex: '5555'
 }
 
 const styles = {
@@ -172,7 +168,6 @@ export class UserKeys extends React.Component {
         // className: PropTypes.string,
         // icon: PropTypes.string.isRequired, // fontawesome
         mini: PropTypes.bool,
-        tooltip: PropTypes.string,
         tooltipPosition: PropTypes.oneOf(['bottom-center', 'top-center', 'bottom-right', 'top-right', 'bottom-left', 'top-left']),
         onClick: PropTypes.func
     };
@@ -206,8 +201,6 @@ export class UserKeys extends React.Component {
     updateState(rows) {
         console.log('updateState called')
         this.setState({btnHovered: false, _rows: this.createRows(rows)})
-        // this._rows = this.state._rows
-        // this.rowsCount = this.state._rows.length
     }
 
     getRows () { return this.state._rows }
@@ -228,9 +221,9 @@ export class UserKeys extends React.Component {
     };
 
     render() {
-        const {mini, tooltip, tooltipPosition} = this.props;
+        const {mini, tooltipPosition} = this.props;
         const tooltipPos = tooltipPosition.split('-');
-
+        const tooltip = 'Create new Bitcoin Address'
         return  (
             <div id="key-container">
                 <ReactDataGrid
@@ -238,19 +231,23 @@ export class UserKeys extends React.Component {
                     rowGetter={this.rowGetter}
                     rowsCount={this.state._rows.length}
                     minHeight={500} />
-                <div style={{position: 'relative'}} id="fab-container">
-                    <FloatingActionButton style={keyBtnStyles} id="btc-key-btn"
+                <div style={keyBtnStyles} id="fab-container">
+                    <FloatingActionButton  id="btc-key-btn"
                     mini={mini}
                     onClick={this.requestBtcKey}
                     onMouseEnter={() => this.setState({btnHovered: true})}
                     onMouseLeave={() => this.setState({btnHovered: false})}>
+
+                        <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                            <path fill="#000000" d="M4.5,5H8V2H10V5H11.5V2H13.5V5C19,5 19,11 16,11.25C20,11 21,19 13.5,19V22H11.5V19H10V22H8V19H4.5L5,17H6A1,1 0 0,0 7,16V8A1,1 0 0,0 6,7H4.5V5M10,7V11C10,11 14.5,11.25 14.5,9C14.5,6.75 10,7 10,7M10,12.5V17C10,17 15.5,17 15.5,14.75C15.5,12.5 10,12.5 10,12.5Z" />
+                        </svg>
 
                     </FloatingActionButton>
                     {tooltip &&
                     <Tooltip
                         show={this.state.btnHovered}
                         label={tooltip}
-                        style={keyBtnStyles}
+                        style={{fontSize: '9pt'}}
                         horizontalPosition={tooltipPos[1]}
                         verticalPosition={tooltipPos[0]}/>
                     }
@@ -260,16 +257,16 @@ export class UserKeys extends React.Component {
     }
 }
 
-const rowData = JSON.parse(trxPrices.replace(/'/g, '"'))
+
 
 export class TrxGrid extends React.Component {
     constructor(props, context) {
-        super(props, context);
-        this.createRows();
+        super(props, context)
+        this.createRows()
         this._columns = [
             { key: 'cur', name: 'Currency' },
             { key: 'sell', name: 'Sell' },
-            { key: 'buy', name: 'Buy' } ];
+            { key: 'buy', name: 'Buy' } ]
 
         this.state = null;
     }
@@ -285,12 +282,11 @@ export class TrxGrid extends React.Component {
             'sell': price.sell,
             'buy': price.buy
         }
-
     }
 
     rowGetter = (i) => {
         return this._rows[i];
-    };
+    }
 
     render() {
         return  (
@@ -327,65 +323,3 @@ function fetchKey (url, csrf) {
             })
     })
 }
-
-
-
-
-
-
-
-
-// export class KeyAddBtn extends React.PureComponent {
-//     static propTypes = {
-//         className: PropTypes.string,
-//         icon: PropTypes.string.isRequired, // fontawesome
-//         mini: PropTypes.bool,
-//         tooltip: PropTypes.string,
-//         tooltipPosition: PropTypes.oneOf(['bottom-center', 'top-center', 'bottom-right', 'top-right', 'bottom-left', 'top-left']),
-//         onClick: PropTypes.func
-//     };
-//
-//     static defaultProps = {
-//         mini: false,
-//         tooltipPosition: 'top-center'
-//     };
-//
-//     state = {
-//         hovered: false
-//     };
-//
-//     requestBtcKey () {
-//         const cookies = (document.cookie.split(';'))
-//         const cookie = cookies.filter(cookie => cookie.trim().substr(0, 4) === 'csrf')
-//         if (cookie && cookie.length > 0) {
-//             const csrf = cookie[0].trim().substr(5)
-//             console.dir(csrf)
-//             fetchKey(keygenUrl, csrf)
-//         }
-//     }
-//
-//     render() {
-//         const {className, icon, mini, tooltip, tooltipPosition} = this.props;
-//         const tooltipPos = tooltipPosition.split('-');
-//
-//         return (
-//             <div style={{position: 'relative'}} className={className}>
-//                 <FloatingActionButton style={keyBtnStyles} id="btc-key-btn"
-//                                       mini={mini}
-//                                       onClick={this.requestBtcKey}
-//                                       onMouseEnter={() => this.setState({hovered: true})}
-//                                       onMouseLeave={() => this.setState({hovered: false})}>
-//
-//                 </FloatingActionButton>
-//                 {tooltip &&
-//                 <Tooltip
-//                     show={this.state.hovered}
-//                     label={tooltip}
-//                     style={keyBtnStyles}
-//                     horizontalPosition={tooltipPos[1]}
-//                     verticalPosition={tooltipPos[0]}/>
-//                 }
-//             </div>
-//         );
-//     }
-// }
