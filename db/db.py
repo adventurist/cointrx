@@ -692,42 +692,40 @@ async def addSingleKey(key: str, uid: int):
 
     if key is not None and uid is not None:
         new_trx_key = TrxKey(value=key, uid=uid, multi=False, status=True)
-        find_key = await find_key_for_uid(uid)
-        if not find_key:
+        # TODO we should be checking if a key exists with the same hash
+        # find_key = await find_key_for_uid(uid)
+        session.add(new_trx_key)
+        session.flush()
+        single_key = SKey(value=key, uid=uid, kid=new_trx_key.id)
+        session.add(single_key)
 
-            session.add(new_trx_key)
-            session.flush()
-            single_key = SKey(value=key, uid=uid, kid=new_trx_key.id)
-            session.add(single_key)
+        try:
+            session.commit()
+            return single_key.id
 
-            try:
-                session.commit()
-                return single_key.id
+        except exc.SQLAlchemyError as err:
+            print(err.args)
+            session.rollback()
+            return err
 
-            except exc.SQLAlchemyError as err:
-                print(err.args)
-                session.rollback()
-                return err
-
-        else:
-            if isinstance(find_key, TrxKey):
-                if not find_key.multi:
-                    s_key = await find_single_key(int(find_key.id))
-                    if s_key:
-                        if isinstance(s_key, SKey):
-                            s_key.value = key
-                            find_key.value = key
-                            session.add(s_key)
-                            session.add(find_key)
-
-                            try:
-                                session.commit()
-                                return find_key.id
-
-                            except exc.SQLAlchemyError as err:
-                                print(err.args)
-                                session.rollback()
-                                return err
+            # if isinstance(find_key, TrxKey):
+            #     if not find_key.multi:
+            #         s_key = await find_single_key(int(find_key.id))
+            #         if s_key:
+            #             if isinstance(s_key, SKey):
+            #                 s_key.value = key
+            #                 find_key.value = key
+            #                 session.add(s_key)
+            #                 session.add(find_key)
+            #
+            #                 try:
+            #                     session.commit()
+            #                     return find_key.id
+            #
+            #                 except exc.SQLAlchemyError as err:
+            #                     print(err.args)
+            #                     session.rollback()
+            #                     return err
 
 
 async def findKey(key: str):
