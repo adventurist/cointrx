@@ -78362,11 +78362,13 @@ var TrxNav = exports.TrxNav = function (_React$Component) {
                 { className: 'trx-mui-layout' },
                 _react2.default.createElement(
                     _layout.NavDrawer,
-                    { active: this.state.drawerActive, pinned: this.state.drawerPinned, permanentAt: 'xxxl', onOverlayClick: this.toggleDrawerActive },
+                    { active: this.state.drawerActive, pinned: this.state.drawerPinned, permanentAt: 'xxxl',
+                        onOverlayClick: this.toggleDrawerActive },
                     _react2.default.createElement(
                         'p',
                         null,
-                        _react2.default.createElement(_link2.default, { href: 'https://app.cointrx.com/regtest/all-users', label: 'TX Test Interface', icon: 'bug_report' }),
+                        _react2.default.createElement(_link2.default, { href: 'https://app.cointrx.com/regtest/all-users', label: 'TX Test Interface',
+                            icon: 'bug_report' }),
                         _react2.default.createElement(_link2.default, { href: 'https://app.cointrx.com/prices/graph', active: true, label: 'D3 Graphs', icon: 'trending_up' })
                     )
                 ),
@@ -78375,35 +78377,46 @@ var TrxNav = exports.TrxNav = function (_React$Component) {
                     null,
                     _react2.default.createElement(
                         _app_bar.AppBar,
-                        { className: 'TrxAppBar', title: 'Coin TRX', styleName: 'theme.AppBar', theme: theme, leftIcon: 'menu', onLeftIconClick: this.toggleDrawerActive },
+                        { className: 'TrxAppBar',
+                            title: 'Coin TRX',
+                            styleName: 'theme.AppBar',
+                            theme: theme,
+                            leftIcon: 'menu',
+                            onLeftIconClick: this.toggleDrawerActive },
                         _react2.default.createElement(
                             _navigation2.default,
                             { className: 'trx-appbar-nav', type: 'horizontal' },
                             _react2.default.createElement(
                                 'div',
                                 { className: 'app-bar-icons' },
-                                _react2.default.createElement(_link2.default, { className: 'app-bar-icon app-bar-trade', href: '/transaction/tx-gui', label: '', icon: 'inbox' }),
+                                _react2.default.createElement(_link2.default, { className: 'app-bar-icon app-bar-trade',
+                                    href: '/transaction/tx-gui', label: '', icon: 'inbox' }),
                                 _react2.default.createElement(
                                     _link2.default,
-                                    { className: 'app-bar-icon app-bar-user', href: '/user', active: true, label: '' },
-                                    _react2.default.createElement(_Avatar2.default, { src: 'https://cointrx.com/sites/default/files/2017-09/X58Q4cA.jpg', size: 30 })
+                                    { className: 'app-bar-icon app-bar-user',
+                                        href: '/user', active: true, label: '' },
+                                    _react2.default.createElement(_Avatar2.default, {
+                                        src: 'https://cointrx.com/sites/default/files/2017-09/X58Q4cA.jpg',
+                                        size: 30 })
                                 ),
                                 _react2.default.createElement(
                                     _link2.default,
-                                    { className: 'app-bar-icon app-bar-user-menu', href: '#' },
+                                    { className: 'app-bar-icon app-bar-user-menu',
+                                        href: '#' },
                                     _react2.default.createElement(
                                         _IconMenu2.default,
-                                        {
+                                        { className: 'user-menu',
                                             iconButtonElement: _react2.default.createElement(
                                                 _IconButton2.default,
-                                                null,
+                                                { className: 'user-menu-iconbutton' },
                                                 _react2.default.createElement(_moreVert2.default, null)
                                             ),
-                                            anchorOrigin: { horizontal: 'left', vertical: 'top' },
-                                            targetOrigin: { horizontal: 'left', vertical: 'top' } },
+                                            anchorOrigin: { horizontal: 'right', vertical: 'bottom' },
+                                            targetOrigin: { horizontal: 'right', vertical: 'top' } },
                                         _react2.default.createElement(
                                             _link2.default,
-                                            { className: 'user-logout', href: '/logout' },
+                                            { className: 'user-logout',
+                                                href: '/logout' },
                                             _react2.default.createElement(_MenuItem2.default, { primaryText: 'Log Out' })
                                         )
                                     )

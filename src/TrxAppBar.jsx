@@ -58,27 +58,43 @@ export class TrxNav extends React.Component {
     render() {
         return (
             <Layout className="trx-mui-layout">
-                <NavDrawer active={this.state.drawerActive} pinned={this.state.drawerPinned} permanentAt='xxxl' onOverlayClick={this.toggleDrawerActive}>
+                <NavDrawer active={this.state.drawerActive} pinned={this.state.drawerPinned} permanentAt='xxxl'
+                           onOverlayClick={this.toggleDrawerActive}>
                     <p>
-                        <Link href='https://app.cointrx.com/regtest/all-users' label='TX Test Interface' icon='bug_report' />
-                        <Link href='https://app.cointrx.com/prices/graph' active label='D3 Graphs' icon='trending_up' />
+                        <Link href='https://app.cointrx.com/regtest/all-users' label='TX Test Interface'
+                              icon='bug_report'/>
+                        <Link href='https://app.cointrx.com/prices/graph' active label='D3 Graphs' icon='trending_up'/>
                     </p>
                 </NavDrawer>
                 <Panel>
-                    <AppBar className="TrxAppBar" title="Coin TRX" styleName="theme.AppBar" theme={theme} leftIcon='menu' onLeftIconClick={this.toggleDrawerActive}>
+                    <AppBar className="TrxAppBar"
+                            title="Coin TRX"
+                            styleName="theme.AppBar"
+                            theme={theme}
+                            leftIcon='menu'
+                            onLeftIconClick={this.toggleDrawerActive}>
+
                         <Navigation className='trx-appbar-nav' type='horizontal'>
                             <div className="app-bar-icons">
-                                <Link className="app-bar-icon app-bar-trade" href='/transaction/tx-gui' label='' icon='inbox'/>
-                                <Link className="app-bar-icon app-bar-user" href='/user' active label=''>
-                                    <Avatar src="https://cointrx.com/sites/default/files/2017-09/X58Q4cA.jpg" size={30} />
+                                <Link className="app-bar-icon app-bar-trade"
+                                      href='/transaction/tx-gui' label='' icon='inbox'/>
+                                <Link className="app-bar-icon app-bar-user"
+                                      href='/user' active label=''>
+                                    <Avatar
+                                        src="https://cointrx.com/sites/default/files/2017-09/X58Q4cA.jpg"
+                                        size={30}/>
                                 </Link>
-                                <Link className="app-bar-icon app-bar-user-menu" href="#">
-                                <IconMenu
-                                    iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
-                                    anchorOrigin={{horizontal: 'left', vertical: 'top'}}
-                                    targetOrigin={{horizontal: 'left', vertical: 'top'}}>
-                                    <Link className="user-logout" href="/logout"><MenuItem primaryText="Log Out" /></Link>
-                                </IconMenu>
+                                <Link className="app-bar-icon app-bar-user-menu"
+                                      href="#">
+                                    <IconMenu className="user-menu"
+                                              iconButtonElement={<IconButton className="user-menu-iconbutton">
+                                                  <MoreVertIcon />
+                                              </IconButton>}
+                                              anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+                                              targetOrigin={{horizontal: 'right', vertical: 'top'}}>
+                                        <Link className="user-logout"
+                                              href="/logout"><MenuItem primaryText="Log Out"/></Link>
+                                    </IconMenu>
                                 </Link>
                             </div>
                         </Navigation>
