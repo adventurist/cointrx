@@ -577,6 +577,19 @@ class RegTestPayUserHandler(RequestHandler):
             self.write(str(user_pay_result))
 
 
+class RegTestPayKeyHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        wif = self.get_argument('wif')
+        amount = self.get_argument('amount')
+
+        if wif and amount is not None:
+            key_pay_result = await db.regtest_pay_key(wif, amount)
+            self.write(str(key_pay_result))
+
+
 class UiReactHandler(RequestHandler):
     def data_received(self, chunk):
         pass
@@ -595,7 +608,8 @@ class UserProfileHandler(RequestHandler):
             user_data, prices = await retrieve_user_data()
             tx_url, blockgen_url, userbalance_url, btckeygen_url = retrieve_user_urls()
             self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
-            self.render("templates/user.html", title="TRX USER PROFILE", keygen_url=btckeygen_url, tx_url=tx_url, blockgen_url=blockgen_url,
+            self.render("templates/user.html", title="TRX USER PROFILE", keygen_url=btckeygen_url, tx_url=tx_url,
+                        blockgen_url=blockgen_url,
                         userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
         else:
             self.set_secure_cookie('redirect_target', '/user')
@@ -625,7 +639,9 @@ class KeyWTPHandler(RequestHandler):
     async def get(self, *args, **kwargs):
         wif = self.get_argument('wif')
         if wif is not None:
-            response = await http_client.connect(TRXConfig.get_urls(application.settings['env']['TRX_ENV'])['wif_to_private_url'], escape.json.dumps({'wif': wif}))
+            response = await http_client.connect(
+                TRXConfig.get_urls(application.settings['env']['TRX_ENV'])['wif_to_private_url'],
+                escape.json.dumps({'wif': wif}))
             if response:
                 print(response)
                 data = escape.json_decode(response.body.decode())
@@ -652,8 +668,37 @@ class RegTestUserKeyGenerateHandler(RequestHandler):
                 new_address = await db.regtest_make_user_address(application.session.user['id'])
                 user_data = await db.regtest_user_data(application.session.user['id'])
                 self.write(escape.json_encode(user_data))
+            else:
+                self.write(escape.json_encode({'error': 'Token not valid', 'code': 401}))
 
 
+def check_content_types(handler: RequestHandler):
+    return handler.request.headers.get('Content-Type')
+
+
+def get_csrf(handler: RequestHandler):
+    return handler.request.headers.get('csrf-token')
+
+
+class RegTestKillKeyHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def post(self, *args, **kwargs):
+        if check_content_types(self) == 'application/json':
+            csrf = self.request.headers.get('csrf-token')
+            if db.User.verify_auth_token(csrf):
+                key_id = self.request.headers.get('key') # TODO make this work
+
+
+class LogoutHandler(RequestHandler):
+    def data_received(self, chunk):
+        print(chunk)
+
+    def get(self, *args, **kwargs):
+        self.clear_all_cookies()
+        application.session = None
+        self.write("Logout successful")
 
 class TRXApplication(Application):
     def __init__(self):
@@ -668,6 +713,7 @@ class TRXApplication(Application):
             (r"/user", UserProfileHandler),
             # - Primary
             (r"/login", LoginHandler),
+            (r"/logout", LogoutHandler),
             (r"/register", RegisterHandler),
             (r"/transaction/tx-gui", TxGuiHandler),
             (r"/heartbeat/feed", HeartbeatHandler),
@@ -679,6 +725,8 @@ class TRXApplication(Application):
             # Regression Testing
             (r"/regtest/all-users", RegTestAllUsers),
             (r"/regtest/user/pay", RegTestPayUserHandler),
+            (r"/regtest/key/pay", RegTestPayKeyHandler),
+            (r"/regtest/key/retire", RegTestKillKeyHandler),
             (r"/regtest/user-balance", RegTestUserBalanceHandler),
             (r"/regtest/tx-history", RegTestTxHistory),
             (r"/regtest/generate/block", RegTestBlockGenerateHandler),
