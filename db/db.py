@@ -424,10 +424,9 @@ async def latest_prices_async():
         for r in result:
             if isinstance(r, CXPrice):
                 data.append(r.serialize())
-        print(data)
         return data
     except exc.SQLAlchemyError as err:
-        print(err.args)
+
         session.rollback()
 
 
@@ -754,6 +753,21 @@ async def find_key_for_uid(uid: int) -> Union[bool, TrxKey]:
     else:
         return key
 
+async def disable_key(kid: int) -> bool:
+    key = session.query(TrxKey).filter(TrxKey.id == kid).one_or_none()
+    if key is not None:
+        key.status = false()
+        session.add(key)
+
+        try:
+            session.commit()
+            session.flush()
+            return True
+        except exc.SQLAlchemyError as err:
+            print(err)
+
+    return False
+
 
 async def regtest_make_user_addresses() -> list:
     users = session.query(User).all()
@@ -817,7 +831,12 @@ async def regtest_user_data(uid: str):
     return user_data
 
 async def regtest_pay_user(uid: str, amount: str):
-    key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).one_or_none()
+    """
+    :param uid:
+    :param amount:
+    :return:
+    """
+    key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).all()
     if key is not None:
         address = btcd_utils.wif_to_address(key.value)
     else:
@@ -826,6 +845,19 @@ async def regtest_pay_user(uid: str, amount: str):
     if address is not None:
         user_pay_result = await btcd_utils.RegTest.give_user_balance(address, int(amount))
         return user_pay_result
+
+async def regtest_pay_key(wif: str, amount: str):
+    """
+    :param wif:
+    :param amount:
+    :return:
+    """
+    key = session.query(TrxKey).filter(TrxKey.value == wif, TrxKey.status == true()).one_or_none()
+    if key is not None:
+        address = btcd_utils.wif_to_address(key.value)
+        if address is not None:
+            user_pay_result = await btcd_utils.RegTest.give_user_balance(address, int(amount))
+            return user_pay_result
 
 
 async def regtest_user_balance(uid: str):
