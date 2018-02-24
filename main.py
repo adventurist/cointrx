@@ -23,8 +23,7 @@ from tx import trx__tx_out
 from utils import drupal_utils, session
 from utils.cointrx_client import Client
 from utils.mail_helper import Sender as mail_sender
-
-from requests.auth import HTTPBasicAuth
+from tornado.log import app_log
 
 parser = argparse.ArgumentParser('debugging asyncio')
 parser.add_argument(
@@ -669,7 +668,7 @@ class RegTestUserKeyGenerateHandler(RequestHandler):
                 user_data = await db.regtest_user_data(application.session.user['id'])
                 self.write(escape.json_encode(user_data))
             else:
-                self.write(escape.json_encode({'error': 'Token not valid', 'code': 401}))
+                self.write(escape.json_encode([{'error': 'Token not valid', 'code': 401}]))
 
 
 def check_content_types(handler: RequestHandler):
@@ -699,6 +698,8 @@ class LogoutHandler(RequestHandler):
         self.clear_all_cookies()
         application.session = None
         self.write("Logout successful")
+        self.redirect('/login')
+
 
 class TRXApplication(Application):
     def __init__(self):

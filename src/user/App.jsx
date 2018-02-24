@@ -182,18 +182,22 @@ export class UserKeys extends React.Component {
     };
 
     requestBtcKey = async () => {
-        console.log('requestBtcKey')
+        console.log('New BTC Key requested')
         const cookies = (document.cookie.split(';'))
         const cookie = cookies.filter(cookie => cookie.trim().substr(0, 4) === 'csrf')
         if (cookie && cookie.length > 0) {
             const csrf = cookie[0].trim().substr(5)
-            console.dir(csrf)
             const newUserData = await fetchKey(keygenUrl, csrf)
-            console.dir(newUserData)
-            console.log('updating')
             if (newUserData && Array.isArray(newUserData) && newUserData.length > 0) {
-                const _newRows = newUserData[0].keys
-                this.updateState(_newRows)
+                const keys = Object.keys(newUserData[0])
+                if (!keys.includes('error')) {
+                    console.log('Updating user data')
+                    const _newRows = newUserData[0].keys
+                    this.updateState(_newRows)
+                } else {
+                    console.log('Token no longer valid. Please log back in')
+                    window.location.replace('/login')
+                }
             }
         }
     }
