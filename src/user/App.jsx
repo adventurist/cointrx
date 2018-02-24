@@ -41,8 +41,8 @@ const UserCard = () => (
             showExpandableButton={true}
         />
         <CardActions>
-            <FlatButton label="Change me" />
-            <FlatButton label="Change you" />
+            <FlatButton label="Settings" />
+            <FlatButton label="Security" />
         </CardActions>
         <CardMedia
             expandable={true}

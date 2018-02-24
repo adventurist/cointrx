@@ -21,8 +21,14 @@
     background-color: rgb(48, 48, 48);
 }
 
-.app-bar-icon {
+.app-bar-icons {
     float: right;
+    display: inline-block;
+}
+
+.app-bar-icon {
+    /* padding: 4px; */
+    display: inline!important;
 }
 
 .trx-appbar-nav {
