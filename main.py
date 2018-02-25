@@ -18,8 +18,8 @@ from tornado.web import Application, RequestHandler, StaticFileHandler
 
 from config import config as TRXConfig
 from db import db
-from iox.loop_handler import IOHandler
-from tx import trx__tx_out
+from utils.loop_handler import IOHandler
+from utils.tx import trx__tx_out
 from utils import drupal_utils, session
 from utils.cointrx_client import Client
 from utils.mail_helper import Sender as mail_sender

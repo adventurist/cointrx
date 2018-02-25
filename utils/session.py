@@ -1,6 +1,6 @@
 import base64
 import uuid
-
+from tornado import log
 
 class Session:
     def __init__(self, user, csrf=0, dcsrf=0):
@@ -26,3 +26,9 @@ class Session:
     @staticmethod
     def generate_cookie():
         return base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
+
+    @staticmethod
+    def end_session(session):
+        if isinstance(session, Session):
+            session = None
+            print('Session destroyed')
