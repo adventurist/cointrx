@@ -1,6 +1,6 @@
 from tornado import gen
 from tornado import httpclient as tornado_client
-from iox.loop_handler import IOHandler
+from utils.loop_handler import IOHandler
 
 from types import SimpleNamespace
 
