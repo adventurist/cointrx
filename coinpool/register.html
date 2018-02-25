@@ -1,0 +1,57 @@
+<html>
+<head>
+    <link rel="stylesheet" href="{{ static_url("styles.css") }}" />
+    <title>{{ title }}</title>
+</head>
+<body>
+
+
+<div class="register-welcome"><h3>Please register or GTFO</h3></div>
+<div id="trx-register-nav">
+    <nav class="tabs" role="navigation" aria-label="Tabs">
+        <h2>{{ message }} </h2>
+        <ul class="tabs primary">
+            <li class="tab"><a href="/login">Log in</a></li>
+            <li class="tab"><a href="/register">Create new account</a></li>
+            <li class="tab"><a href="/password">Reset your password</a></li>
+        </ul>
+    </nav>
+    <div class="user-register-form block-kek-custom block-kekregisterblock" data-drupal-selector="user-register-form" id="block-kekregisterblock">
+
+        <form method="post" id="register-form" accept-charset="UTF-8">
+            <div class="user-register-form">
+                <label for="register-name" class="register-name-label">Username</label>
+                <input autocorrect="none" autocapitalize="none" spellcheck="false" autofocus="autofocus" type="text" id="register-name" name="name" value="" size="60" maxlength="60" class="register-form-text" required="required" aria-required="true">
+
+                <div id="register-name-description" class="description">
+                    Enter your CoinTRX Username
+                </div>
+            </div>
+            <div class="user-register-form">
+                <label for="register-email" class="register-email-label">Email</label>
+                <input autocorrect="none" autocapitalize="none" spellcheck="false" autofocus="autofocus" type="text" id="register-email" name="email" value="" size="60" maxlength="60" class="register-form-text" required="required" aria-required="true">
+
+                <div id="register-email-description" class="description">
+                    Enter your email address
+                </div>
+            </div>
+            <div class="user-register-form">
+                <label for="register-pass" class="register-pass-label">Password</label>
+                <input type="password" id="register-pass" name="pass" size="60" maxlength="128" class="register-pass" required="required" aria-required="true">
+                <div id="register-pass-description" class="description">
+                    Enter your Password
+                </div>
+            </div>
+            <div class="user-register-form" id="edit-actions">
+                <input type="submit" id="register-submit" name="op" value="Log in" class="register-form-submit">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="register-end">
+    <h2>register motherfucker</h2>
+</div>
+
+</body>
+</html>
