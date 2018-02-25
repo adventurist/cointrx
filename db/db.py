@@ -800,7 +800,6 @@ async def regtest_all_user_data():
     user_data = []
     users = session.query(User).all()
     for user in users:
-        print(str(user.trxkey))
         data = {
             'id': user.id,
             'name': user.name,
@@ -826,6 +825,7 @@ async def regtest_user_data(uid: str):
 
         for key in data['keys']:
             key['balance'] = await btcd_utils.RegTest.get_key_balance(key)
+            key['address'] = btcd_utils.wif_to_address(key.pop('value'))
 
         user_data.append(data)
     return user_data

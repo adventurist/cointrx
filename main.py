@@ -636,6 +636,14 @@ class KeyWTPHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
+        """
+        @API
+
+        Convert a WIF secret to private key
+        :param args:
+        :param kwargs:
+        :return:
+        """
         wif = self.get_argument('wif')
         if wif is not None:
             response = await http_client.connect(
