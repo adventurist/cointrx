@@ -41277,7 +41277,7 @@ var UserForm = exports.UserForm = function (_React$Component) {
                         defaultValue: this.state.language
                     }),
                     React.createElement('br', null),
-                    React.createElement(_materialUi.RaisedButton, { type: 'submit', label: 'Submit', primary: true })
+                    React.createElement(_materialUi.RaisedButton, { type: 'submit', label: 'Save', primary: true })
                 )
             );
         }
@@ -41436,6 +41436,7 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
     }, {
         key: 'buildRows',
         value: function buildRows(key) {
+            console.dir(key);
             return {
                 'id': key.id,
                 'adr': key.address,
@@ -41447,9 +41448,10 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
     }, {
         key: 'buildBtns',
         value: function buildBtns(row) {
+            console.dir(row);
             return {
                 'id': row.id,
-                'adr': row.address,
+                'adr': row.adr,
                 'bal': row.balance,
                 'btn': React.createElement(
                     'div',
@@ -41460,6 +41462,33 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                 )
             };
         }
+    }, {
+        key: 'setKeyFutureDisable',
+        value: function () {
+            var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
+                var csrf;
+                return _regenerator2.default.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                console.log('BTC Key Future Disable requested: ' + id);
+                                csrf = getCsrfToken();
+                                // const keyDeleteResult = await deleteKey('temp', csrf)
+
+                            case 2:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function setKeyFutureDisable() {
+                return _ref3.apply(this, arguments);
+            }
+
+            return setKeyFutureDisable;
+        }()
     }, {
         key: 'render',
         value: function render() {
@@ -41484,6 +41513,7 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                     columns: this.state._columns,
                     rowGetter: this.rowGetter,
                     rowsCount: this.state._rows.length,
+                    rowHeight: 48,
                     minHeight: 500 }),
                 React.createElement(
                     'div',
@@ -41522,8 +41552,13 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                         open: this.state.dialogOpen,
                         onRequestClose: this.handleClose
                     },
-                    'Open a Date Picker dialog from within a dialog.',
-                    React.createElement(_DatePicker2.default, { hintText: 'Date to disable' })
+                    'Open dialog',
+                    React.createElement(
+                        'div',
+                        { className: 'datepicker' },
+                        React.createElement(_DatePicker2.default, { hintText: 'Date Picker' }),
+                        React.createElement(_FlatButton2.default, { label: 'Set', secondary: true, keyboardFocused: true, onClick: this.setKeyFutureDisable })
+                    )
                 )
             );
         }
@@ -41559,6 +41594,16 @@ UserKeys.propTypes = {
 UserKeys.defaultProps = {
     mini: false,
     tooltipPosition: 'top-center'
+};
+
+
+var BTCSVG = function BTCSVG() {
+    return React.createElement(
+        'svg',
+        { style: 'width:24px;height:24px', viewBox: '0 0 24 24' },
+        React.createElement('path', { fill: '#000000',
+            d: 'M4.5,5H8V2H10V5H11.5V2H13.5V5C19,5 19,11 16,11.25C20,11 21,19 13.5,19V22H11.5V19H10V22H8V19H4.5L5,17H6A1,1 0 0,0 7,16V8A1,1 0 0,0 6,7H4.5V5M10,7V11C10,11 14.5,11.25 14.5,9C14.5,6.75 10,7 10,7M10,12.5V17C10,17 15.5,17 15.5,14.75C15.5,12.5 10,12.5 10,12.5Z' })
+    );
 };
 
 var TrxGrid = exports.TrxGrid = function (_React$Component3) {
@@ -41646,6 +41691,8 @@ var KeyDialog = function (_React$Component4) {
     (0, _inherits3.default)(KeyDialog, _React$Component4);
 
     function KeyDialog(props, context) {
+        var _this7 = this;
+
         (0, _classCallCheck3.default)(this, KeyDialog);
 
         var _this6 = (0, _possibleConstructorReturn3.default)(this, (KeyDialog.__proto__ || (0, _getPrototypeOf2.default)(KeyDialog)).call(this, props, context));
@@ -41660,6 +41707,30 @@ var KeyDialog = function (_React$Component4) {
             _this6.setState({ open: false });
         };
 
+        _this6.requestBtcKeyDelete = function () {
+            var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(id) {
+                var csrf;
+                return _regenerator2.default.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                console.log('BTC Key deletion requested: ' + id);
+                                csrf = getCsrfToken();
+                                //   const keyDeleteResult = await deleteKey('temp', csrf)
+
+                            case 2:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, _this7);
+            }));
+
+            return function (_x2) {
+                return _ref4.apply(this, arguments);
+            };
+        }();
+
         _this6.props = {
             keyId: 0,
             show: false
@@ -41669,13 +41740,18 @@ var KeyDialog = function (_React$Component4) {
     }
 
     (0, _createClass3.default)(KeyDialog, [{
+        key: 'disableKey',
+        value: function disableKey() {
+            this.requestBtcKeyDelete(this.props.keyId).then(alert('Eat some clams'));
+        }
+    }, {
         key: 'render',
         value: function render() {
             var actions = [React.createElement(_FlatButton2.default, {
                 label: 'Delete',
                 secondary: true,
                 keyboardFocused: true,
-                onClick: this.disableKey(this.props.keyid)
+                onClick: this.disableKey(this.props.keyId)
             }), React.createElement(_FlatButton2.default, {
                 label: 'OK',
                 primary: true,
