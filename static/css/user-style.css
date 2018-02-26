@@ -57,3 +57,13 @@
     left: auto;
     position: fixed;
 }
+.user-form {
+    padding-bottom: 12px;
+}
+.userform:last-of-type {
+    margin-bottom: 12px;
+}
+
+.react-grid-HeaderRow {
+    overflow: hidden!important;
+}

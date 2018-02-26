@@ -145,7 +145,7 @@ export class UserForm extends React.Component {
                         defaultValue={this.state.language}
                     />
                     <br />
-                    <RaisedButton type='submit' label='Submit' primary/>
+                    <RaisedButton type='submit' label='Save' primary/>
                 </form>
             </div>
         )
@@ -247,6 +247,7 @@ export class UserKeys extends React.Component {
     addBtnRows = (rows) => rows.map(x => this.buildBtns(x))
 
     buildRows(key) {
+        console.dir(key)
         return {
             'id': key.id,
             'adr': key.address,
@@ -257,9 +258,10 @@ export class UserKeys extends React.Component {
     }
 
     buildBtns (row) {
+        console.dir(row)
         return ({
             'id': row.id,
-            'adr': row.address,
+            'adr': row.adr,
             'bal': row.balance,
             'btn': <div><RaisedButton label="Edit" secondary={true} id={row.id}
                                       onClick={this.openEditKeyDialog.bind(this)}/>
@@ -290,6 +292,12 @@ export class UserKeys extends React.Component {
         return this.state._rows[i];
     };
 
+    async setKeyFutureDisable () {
+        console.log(`BTC Key Future Disable requested: ${id}`)
+        const csrf = getCsrfToken()
+        // const keyDeleteResult = await deleteKey('temp', csrf)
+    }
+
     render() {
         const {mini, tooltipPosition} = this.props;
         const tooltipPos = tooltipPosition.split('-');
@@ -308,6 +316,7 @@ export class UserKeys extends React.Component {
                     columns={this.state._columns}
                     rowGetter={this.rowGetter}
                     rowsCount={this.state._rows.length}
+                    rowHeight={48}
                     minHeight={500}/>
                 <div style={keyBtnStyles} id="fab-container">
                     <FloatingActionButton id="btc-key-btn"
@@ -331,21 +340,30 @@ export class UserKeys extends React.Component {
                         verticalPosition={tooltipPos[0]}/>
                     }
                 </div>
-                <Dialog
-                    title="Key Editor"
-                    actions={actions}
-                    modal={false}
-                    open={this.state.dialogOpen}
-                    onRequestClose={this.handleClose}
-                >
-                    Open a Date Picker dialog from within a dialog.
-                    <DatePicker hintText="Date to disable"/>
-                </Dialog>
-            </div>
+            <Dialog
+                title="Key Editor"
+                actions={actions}
+                modal={false}
+                open={this.state.dialogOpen}
+                onRequestClose={this.handleClose}
+            >
+                Open dialog
+                <div className="datepicker">
+                    <DatePicker hintText="Date Picker" />
+                    <FlatButton label="Set" secondary={true} keyboardFocused={true} onClick={this.setKeyFutureDisable}/>
+                </div>
+            </Dialog>
+
+    </div>
         )
     }
 }
 
+const BTCSVG = () => (
+    <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+        <path fill="#000000"
+              d="M4.5,5H8V2H10V5H11.5V2H13.5V5C19,5 19,11 16,11.25C20,11 21,19 13.5,19V22H11.5V19H10V22H8V19H4.5L5,17H6A1,1 0 0,0 7,16V8A1,1 0 0,0 6,7H4.5V5M10,7V11C10,11 14.5,11.25 14.5,9C14.5,6.75 10,7 10,7M10,12.5V17C10,17 15.5,17 15.5,14.75C15.5,12.5 10,12.5 10,12.5Z"/>
+    </svg>)
 
 export class TrxGrid extends React.Component {
     constructor(props, context) {
@@ -441,13 +459,25 @@ class KeyDialog extends React.Component {
         this.setState({open: false});
     };
 
+    requestBtcKeyDelete = async(id) => {
+        console.log(`BTC Key deletion requested: ${id}`)
+        const csrf = getCsrfToken()
+        //   const keyDeleteResult = await deleteKey('temp', csrf)
+    }
+
+    disableKey() {
+        this.requestBtcKeyDelete(this.props.keyId).then(
+            alert('Eat some clams')
+        )
+    }
+
     render() {
         const actions = [
             <FlatButton
                 label="Delete"
                 secondary={true}
                 keyboardFocused={true}
-                onClick={this.disableKey(this.props.keyid)}
+                onClick={this.disableKey(this.props.keyId)}
             />,
             <FlatButton
                 label="OK"
