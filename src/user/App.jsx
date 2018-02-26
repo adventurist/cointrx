@@ -309,6 +309,12 @@ export class UserKeys extends React.Component {
                 keyboardFocused={true}
                 onClick={this.disableKey}
             />,
+            <FlatButton
+                label="Okay"
+                primary={true}
+                keyboardFocused={true}
+                onClick={this.handleClose}
+            />
         ];
         return (
             <div id="key-container">
@@ -347,7 +353,7 @@ export class UserKeys extends React.Component {
                 open={this.state.dialogOpen}
                 onRequestClose={this.handleClose}
             >
-                Open dialog
+                Set a date to automatically disable this key
                 <div className="datepicker">
                     <DatePicker hintText="Date Picker" />
                     <FlatButton label="Set" secondary={true} keyboardFocused={true} onClick={this.setKeyFutureDisable}/>
