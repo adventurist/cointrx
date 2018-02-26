@@ -262,7 +262,7 @@ export class UserKeys extends React.Component {
         return ({
             'id': row.id,
             'adr': row.adr,
-            'bal': row.balance,
+            'bal': row.bal,
             'btn': <div><RaisedButton label="Edit" secondary={true} id={row.id}
                                       onClick={this.openEditKeyDialog.bind(this)}/>
                 {this.state.dialogOpen && UserKeys.isObjectEquivalent(this.props.row, this.state.dialogCursor) ? (

@@ -41452,7 +41452,7 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
             return {
                 'id': row.id,
                 'adr': row.adr,
-                'bal': row.balance,
+                'bal': row.bal,
                 'btn': React.createElement(
                     'div',
                     null,
