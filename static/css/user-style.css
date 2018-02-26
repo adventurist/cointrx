@@ -67,3 +67,7 @@
 .react-grid-HeaderRow {
     overflow: hidden!important;
 }
+
+.datepicker, .datepicker > button, .datepicker > div {
+    display: inline-block;
+}

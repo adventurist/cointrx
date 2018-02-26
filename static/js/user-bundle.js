@@ -41505,6 +41505,11 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                 secondary: true,
                 keyboardFocused: true,
                 onClick: this.disableKey
+            }), React.createElement(_FlatButton2.default, {
+                label: 'Okay',
+                primary: true,
+                keyboardFocused: true,
+                onClick: this.handleClose
             })];
             return React.createElement(
                 'div',
@@ -41552,7 +41557,7 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                         open: this.state.dialogOpen,
                         onRequestClose: this.handleClose
                     },
-                    'Open dialog',
+                    'Set a date to automatically disable this key',
                     React.createElement(
                         'div',
                         { className: 'datepicker' },
