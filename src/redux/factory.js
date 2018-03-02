@@ -94,3 +94,5 @@ export function factory(plugins) {
 
     return publicAPI
 }
+
+const rootReducer = combineReducers()
