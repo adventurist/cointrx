@@ -5,7 +5,7 @@ from passlib.apps import custom_app_context as pwd_context
 from aiopg.sa import create_engine as async_engine
 from sqlalchemy import ForeignKey
 from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, String, Text, DECIMAL, Boolean, exc, event, MetaData, select
+from sqlalchemy import Column, Integer, String, Text, DECIMAL, Boolean, exc, event, MetaData, select, DateTime
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.sql.expression import true, false
@@ -36,11 +36,16 @@ session = Session()
 trxapp = SimpleNamespace()
 trxapp.config = {'SECRET_KEY': "jigga does as jigga does"}
 
+# metadata.create_all(bind=engine)
+
 
 class TrxKey(Base):
     __tablename__ = 'trxkey'
     id = Column(Integer, primary_key=True)
     uid = Column(Integer, ForeignKey('users.id'))
+    # label = relationship("KeyLabel", backref='keylabel', uselist=False)
+    # user = relationship("HeartbeatUser", backref='pic', uselist=False)
+    label = relationship("KeyLabel", uselist=False, back_populates="trxkey")
     value = Column(String)
     multi = Column(Boolean)
     status = Column(Boolean)
@@ -62,6 +67,22 @@ class MKey(Base):
     pub = Column(String)
 
 
+class KeySchedule(Base):
+    __tablename__ = 'keyschedule'
+    id = Column(Integer, primary_key=True)
+    kid = Column(Integer, ForeignKey('trxkey.id'))
+    end_date = Column(DateTime(timezone=True))
+
+
+class KeyLabel(Base):
+    __tablename__ = 'keylabel'
+    id = Column(Integer, primary_key=True)
+    text = Column(String, server_default="Unnamed")
+    kid = Column(Integer, ForeignKey('trxkey.id'))
+    # trxkey = relationship("TrxKey", backref='label', uselist=True)
+    trxkey = relationship("TrxKey", back_populates='label')
+
+
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -71,6 +92,7 @@ class User(Base):
     created = Column(Integer)
     status = Column(Integer)
     trxkey = relationship("TrxKey", backref='user', uselist=True)
+    utc_offset = Column(Integer)
 
     def hash_password(self, password):
         self.hash = pwd_context.encrypt(password)
@@ -532,11 +554,10 @@ def check_authentication(user, password, email):
     query_user = session.query(User).filter(User.name == user).first()
     if query_user is not None:
         if not User.verify_password(email, password):
-            return "Login is no good"
-
+            return -1
         return query_user
     else:
-        return -1
+        return -2
 
 
 def check_authentication_by_name(user, password):
@@ -768,6 +789,21 @@ async def disable_key(kid: int) -> bool:
 
     return False
 
+async def update_key(kid: int, label: str) -> dict:
+    key = session.query(TrxKey).filter(TrxKey.id == kid).one_or_none()
+    if key is not None:
+        key.label.text = label
+        session.add(key)
+        try:
+            session.commit()
+            session.flush()
+            return True
+        except exc.SQLAlchemyError as err:
+            print(err)
+            return err
+
+
+
 
 async def regtest_make_user_addresses() -> list:
     users = session.query(User).all()
@@ -805,7 +841,7 @@ async def regtest_all_user_data():
             'name': user.name,
             'email': user.email,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
-            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status} for x in user.trxkey]
+            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey]
         }
         user_data.append(data)
 
@@ -820,12 +856,13 @@ async def regtest_user_data(uid: str):
             'name': user.name,
             'email': user.email,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
-            'keys': [{'id': x.id, 'value': x.value, 'status': x.status} for x in user.trxkey]
+            'keys': [{'id': x.id, 'value': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey]
         }
 
         for key in data['keys']:
             key['balance'] = await btcd_utils.RegTest.get_key_balance(key)
             key['address'] = btcd_utils.wif_to_address(key.pop('value'))
+            key['label'] = key['label'].text
 
         user_data.append(data)
     return user_data
