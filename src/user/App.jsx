@@ -1,15 +1,18 @@
-import * as React from 'react';
+import * as React from 'react'
 import 'react-virtualized/styles.css'
-import "react-table/react-table.css"
-import PropTypes from 'prop-types';
+import 'react-table/react-table.css'
+import PropTypes from 'prop-types'
 import ReactDataGrid from 'react-data-grid'
 import {TextField, RaisedButton} from 'material-ui'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle} from 'material-ui/Card'
 import FlatButton from 'material-ui/FlatButton'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import Tooltip from 'material-ui/internal/Tooltip'
-import Dialog from 'material-ui/Dialog';
-import DatePicker from 'material-ui/DatePicker';
+import Dialog from 'material-ui/Dialog'
+import DatePicker from 'material-ui/DatePicker'
+import TimezonePicker from 'react-timezone';
+import { some } from 'lodash'
+
 
 function parseKeyDataJson(userData) {
     return [...JSON.parse(userData.replace(/'/g, '"'))['keys']]
@@ -145,12 +148,18 @@ export class UserForm extends React.Component {
                         defaultValue={this.state.language}
                     />
                     <br />
+                    <div id="timezone-container">
+                        <TimezonePicker
+                        />
+                    </div>
+
                     <RaisedButton type='submit' label='Save' primary/>
                 </form>
             </div>
         )
     }
 }
+
 
 export class UserKeys extends React.Component {
     constructor(props, context) {
@@ -159,6 +168,7 @@ export class UserKeys extends React.Component {
             btnHovered: false,
             _columns: [
                 {key: 'id', name: 'ID'},
+                {key: 'lbl', name: 'Label'},
                 {key: 'adr', name: 'Address'},
                 {key: 'bal', name: 'Balance'},
                 {key: 'btn', name: 'Modify'}
@@ -166,6 +176,8 @@ export class UserKeys extends React.Component {
             _rows: this.createRows(keyData),
             dialogOpen: false,
             dialogCursor: 0,
+            dialogText: ''
+
         }
         this._rows = null
         this.rowsCount = null
@@ -224,7 +236,11 @@ export class UserKeys extends React.Component {
     }
 
     openEditKeyDialog(id) {
-        this.setState({dialogOpen: true, dialogCursor: id})
+        this.updateDialogState(id)
+    }
+
+    updateDialogState(id) {
+        this.setState({dialogOpen: true, dialogCursor: id, dialogText: this.getKeyLabel(id)})
     }
 
     handleOpen = () => {
@@ -250,6 +266,7 @@ export class UserKeys extends React.Component {
         console.dir(key)
         return {
             'id': key.id,
+            'lbl': key.label,
             'adr': key.address,
             'bal': key.balance,
             'btn': ''
@@ -261,36 +278,64 @@ export class UserKeys extends React.Component {
         console.dir(row)
         return ({
             'id': row.id,
+            'lbl': row.lbl,
             'adr': row.adr,
             'bal': row.bal,
-            'btn': <div><RaisedButton label="Edit" secondary={true} id={row.id}
-                                      onClick={this.openEditKeyDialog.bind(this)}/>
-                {this.state.dialogOpen && UserKeys.isObjectEquivalent(this.props.row, this.state.dialogCursor) ? (
+            'btn': <div><RaisedButton label="Edit" secondary={true} id={row.id} value={row.id}
+                                      onClick={this.openEditKeyDialog.bind(this, row.id)}/>
+                {this.state.dialogOpen && isObjectEquivalent(this.props.row, this.state.dialogCursor) ? (
                         <KeyDialog show={this.state.dialogOpen}/>) : null}
             </div>
         })
     }
 
-    static isObjectEquivalent(a, b) {
-        const aProps = Object.getOwnPropertyNames(a);
-        const bProps = Object.getOwnPropertyNames(b);
-
-        if (aProps.length != bProps.length) {
-            return false;
-        }
-
-        for (let i = 0; i < aProps.length; i++) {
-            const propName = aProps[i];
-            if (a[propName] !== b[propName]) {
-                return false;
-            }
-        }
-        return true
-    }
 
     rowGetter = (i) => {
         return this.state._rows[i];
     };
+
+    keyLabelAtCursor = () => {
+        const currentKey = keyData.find(key => key.id == this.state.dialogCursor)
+        if (isKeyObject(currentKey)) {
+            return currentKey.label
+        }
+        return false
+    }
+
+    getKeyLabel = (id) => {
+        const key = keyData.find(key => key.id = id)
+        if (isKeyObject(key)) {
+            return key.label
+        }
+    }
+    dialogTextChange = (event, value) => {
+        this.setState({dialogText: value})
+    }
+
+    saveKey () {
+
+        if (isKeyLabelChanged(this.state.dialogText, this.state.dialogCursor)) {
+            this.requestBtcKeyUpdate(this.state.dialogCursor, this.state.dialogText)
+        }
+    }
+
+    requestBtcKeyUpdate = async(id, label) => {
+        const csrf = getCsrfToken()
+        if (csrf && csrf.length > 0) {
+            const keyUpdateResponse = await fetchKeyUpdate(id, label, csrf)
+            // if (newUserData && Array.isArray(newUserData) && newUserData.length > 0) {
+            //     const keys = Object.keys(newUserData[0])
+            //     if (!keys.includes('error')) {
+            //         console.log('Updating user data')
+            //         const _newRows = newUserData[0].keys
+            //         this.updateState(_newRows)
+            //     } else {
+            //         console.log('Token no longer valid. Please log back in')
+            //         window.location.replace('/login')
+            //     }
+            // }
+        }
+    }
 
     async setKeyFutureDisable () {
         console.log(`BTC Key Future Disable requested: ${id}`)
@@ -304,10 +349,16 @@ export class UserKeys extends React.Component {
         const tooltip = 'Create new Bitcoin Address'
         const actions = [
             <FlatButton
+                label="Save"
+                primary={true}
+                keyboardFocused={true}
+                onClick={this.saveKey.bind(this)}
+            />,
+            <FlatButton
                 label="Delete"
                 secondary={true}
                 keyboardFocused={true}
-                onClick={this.disableKey}
+                onClick={this.disableKey.bind(this)}
             />,
             <FlatButton
                 label="Okay"
@@ -353,7 +404,15 @@ export class UserKeys extends React.Component {
                 open={this.state.dialogOpen}
                 onRequestClose={this.handleClose}
             >
-                Set a date to automatically disable this key
+                <TextField
+                    value={this.state.dialogText}
+                    ref='keylabel'
+                    className='keylabel'
+                    floatingLabelText='Key Label'
+                    onChange={this.dialogTextChange}
+                />
+                <br />
+                Set a date to automatically disable this key <br/>
                 <div className="datepicker">
                     <DatePicker hintText="Date Picker" />
                     <FlatButton label="Set" secondary={true} keyboardFocused={true} onClick={this.setKeyFutureDisable}/>
@@ -436,78 +495,145 @@ function fetchKey(url, csrf) {
     })
 }
 
+function fetchKeyUpdate(id, label, csrf) {
+    return new Promise((resolve) => {
+        const keyId = String('0000' + id).slice(-4)
+        let url = `/api/key/${keyId}/update`
+        let options = {
+            method: 'POST',
+            headers: new Headers({'Content-Type': 'application/json', 'csrf-token': csrf})
+        }
+
+        if (options.method === 'POST' && csrf !== void 0) {
+            options.body = JSON.stringify({id: id, label: label})
+        }
+
+        fetch(url, options).then(res =>
+            res.json()
+                .catch(error =>
+                    console.error('Error:', error)
+                ))
+            .then(response => {
+                console.log('Success')
+                console.dir(response)
+                return resolve(response)
+            })
+    })
+}
+
 function getCsrfToken() {
-    const cookie = cookies.filter(cookie => cookie.trim().substr(0, 4) === 'csrf')
+    return getToken('csrf')
+}
+
+function getTrxCookie() {
+    return getToken('trx_cookie')
+}
+
+function getToken(name) {
+    const cookie = document.cookie.split(';').filter(cookie => cookie.trim().substr(0, name.length) === name)
     if (cookie && cookie.length > 0) {
         return cookie[0].trim().substr(5)
-
     }
 }
 
 
-class KeyDialog extends React.Component {
-    constructor(props, context) {
-        super(props, context)
-        this.props = {
-            keyId: 0,
-            show: false
+// class KeyDialog extends React.Component {
+//     constructor(props, context) {
+//         super(props, context)
+//         this.props = {
+//             keyId: 0,
+//             show: false
+//         }
+//         this.state = {open: true}
+//     }
+//
+//     state = {}
+//
+//     handleOpen = () => {
+//         this.setState({open: true});
+//     };
+//
+//     handleClose = () => {
+//         this.setState({open: false});
+//     };
+//
+//     requestBtcKeyDelete = async(id) => {
+//         console.log(`BTC Key deletion requested: ${id}`)
+//         const csrf = getCsrfToken()
+//         //   const keyDeleteResult = await deleteKey('temp', csrf)
+//     }
+//
+//     disableKey() {
+//         this.requestBtcKeyDelete(this.props.keyId).then(
+//             alert('Eat some clams')
+//         )
+//     }
+//
+//     saveKey() {
+//         console.log(this)
+//     }
+//
+//     render() {
+//         const actions = [
+//             <FlatButton
+//                 label="Save"
+//                 primary={true}
+//                 keyboardFocused={true}
+//                 onClick={this.saveKey.bind(this)}
+//             />,
+//             <FlatButton
+//                 label="Delete"
+//                 secondary={true}
+//                 keyboardFocused={true}
+//                 onClick={this.disableKey(this.props.keyId)}
+//             />,
+//             <FlatButton
+//                 label="Cancel"
+//                 primary={true}
+//                 keyboardFocused={true}
+//                 onClick={this.handleClose()}
+//             />,
+//         ];
+//
+//         return (
+//             <div>
+//                 <Dialog
+//                     title="Dialog With Date Picker"
+//                     actions={actions}
+//                     modal={false}
+//                     open={this.props.show}
+//                     onRequestClose={this.handleClose}
+//                 >
+//                     <div className="datepicker">
+//                         <DatePicker hintText="Date Picker" />
+//                         <FlatButton label="Set" secondary={true} keyboardFocused={true} onClick=""/>
+//                     </div>
+//                 </Dialog>
+//             </div>
+//         );
+//     }
+// }
+
+const legitArray = (arg) => typeof arg !== 'undefined' && Array.isArray(arg) && arg.length > 0
+const isKeyObject = (key) => typeof key !== 'undefined' && 'id' in key
+
+const isObjectEquivalent = (a, b) => {
+    const aProps = Object.getOwnPropertyNames(a);
+    const bProps = Object.getOwnPropertyNames(b);
+
+    if (aProps.length != bProps.length) {
+        return false;
+    }
+
+    for (let i = 0; i < aProps.length; i++) {
+        const propName = aProps[i];
+        if (a[propName] !== b[propName]) {
+            return false;
         }
-        this.state = {open: true}
     }
+    return true
+}
 
-    state = {}
-
-    handleOpen = () => {
-        this.setState({open: true});
-    };
-
-    handleClose = () => {
-        this.setState({open: false});
-    };
-
-    requestBtcKeyDelete = async(id) => {
-        console.log(`BTC Key deletion requested: ${id}`)
-        const csrf = getCsrfToken()
-        //   const keyDeleteResult = await deleteKey('temp', csrf)
-    }
-
-    disableKey() {
-        this.requestBtcKeyDelete(this.props.keyId).then(
-            alert('Eat some clams')
-        )
-    }
-
-    render() {
-        const actions = [
-            <FlatButton
-                label="Delete"
-                secondary={true}
-                keyboardFocused={true}
-                onClick={this.disableKey(this.props.keyId)}
-            />,
-            <FlatButton
-                label="OK"
-                primary={true}
-                keyboardFocused={true}
-                onClick={this.handleClose()}
-            />,
-        ];
-
-        return (
-            <div>
-                <Dialog
-                    title="Dialog With Date Picker"
-                    actions={actions}
-                    modal={false}
-                    open={this.props.show}
-                    onRequestClose={this.handleClose}
-                >
-                    <div className="datepicker">
-                        <DatePicker hintText="Date Picker" />
-                        <FlatButton label="Set" secondary={true} keyboardFocused={true} onClick=""/>
-                    </div>
-                </Dialog>
-            </div>
-        );
-    }
+const isKeyLabelChanged = (label, cursor) => {
+    return label !== keyData.find(key => key.id == cursor).label
 }
