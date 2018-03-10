@@ -23,29 +23,12 @@ from utils.tx import trx__tx_out
 from utils import drupal_utils, session
 from utils.cointrx_client import Client
 from utils.mail_helper import Sender as mail_sender
-from tornado.log import app_log
 
-parser = argparse.ArgumentParser('debugging asyncio')
-parser.add_argument(
-    '-v',
-    dest='verbose',
-    default=False,
-    action='store_true',
-)
-args = parser.parse_args()
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(levelname)7s: %(message)s',
-    stream=sys.stderr,
-)
-
-LOG = logging.getLogger('')
+from utils.login_helpers import retrieve_api_request_headers, retrieve_json_login_headers, retrieve_json_login_credentials, check_basic_auth, create_user_session_data, \
+    retrieve_login_credentials
 
 io_handler = IOHandler()
 http_client = Client()
-
-static_path = os.path.join(os.path.dirname(__file__), "static")
 
 define("port", default=6969, help="Default port for the WebServer")
 
@@ -84,41 +67,113 @@ class WunderHandler(RequestHandler):
 
 class LoginHandler(RequestHandler):
     def data_received(self, chunk):
-        pass
+        print('Receiving data')
 
-    async def post(self) -> str:
-        cookie_data = self.get_secure_cookie('trx_cookie')
-        current_header = self.request.headers.get("Content-Type")
-        print(current_header)
-        if self.request.headers.get("Content-Type") == 'application/json':
-            request_data = {k: ''.join(v) for k, v in escape.json_decode(self.request.body).items()}
-            email = request_data.get('email')
-            password = request_data.get('password')
-            name = request_data.get('name')
+    async def post(self, *args, **kwargs) -> str:
+        """
 
-            if email is None or password is None or name is None:
+        .. http:post:: /login
+
+        ---------------
+        REQUEST EXAMPLE
+
+        :POST: /login
+        :Accept: application/json
+        :Content-Type: application/json
+        :Authorization: Basic aGVsaW9zOmphc2tqYTg5cjN5dW9yaWFzamY=
+        :Body: {"name":"yourname", "password":"yourpassword", "email":"youremail"}
+
+        |
+
+        :HEADERS:
+
+        |
+
+        :Accept: application/json
+
+        - Declare your expectation to receive a response in JSON format
+
+        **Example** ``Accept: application/json``
+
+        |
+
+        :Authorization: Basic (Base64 encoding of name:password)
+
+        - Basic Auth is expected in the header (with a key of `Authorization` and a value of `Basic base64encoded` where base64encoded is the base64 encoding of `name:password`
+
+        **Example** ``Authorization: Basic aGVsaW9zOmphc2tqYTg5cjN5dW9yaWFzamY=``
+
+        |
+
+        :Content-Type: application/json
+
+            - Requests must state that that Content-Type will be application/json
+
+            **Example** ``Content-Type: application/json``
+
+        |
+
+        :**BODY**:
+        :Body content {string}: JSON object containing `name`, `email` and `password` keys
+
+        - POST Parameters should be provided as the request body in JSON format
+
+        **Example** ``{"email":"johannes@composers.com", "name":"JSBach", "password":"k0wnTT||er}@{RER3point{@LGkillah"}``
+
+        |
+
+        :**RESPONSE CODES**:
+        :200: No error
+        :400: Malformed request
+        :401: Unauthorized
+        :404: User not found
+
+        |
+
+        :**RESPONSE DATA**:
+        :return: Session data as JSON: ``{"csrf-token":"value", "trx-cookie":"value"}``
+
+        *Use the returned session data for all subsquent authenticated requests*
+
+        """
+
+        basic_auth, content_type = retrieve_json_login_headers(self.request.headers)
+
+        if content_type == 'application/json':
+            auth_name, auth_pass = check_basic_auth(basic_auth)
+            email, name, password = retrieve_json_login_credentials(
+                {k: ''.join(v) for k, v in escape.json_decode(self.request.body).items()})
+
+            if email or name is None or password is None:
                 self.write("You must supply more arguments")
-                self.write_error(401)
+                self.write_error(400)
             else:
+                if auth_name != name or auth_pass != password:
+                    self.write(escape.json_encode({'statuscode': 400}))
+
                 user_verify = db.check_authentication(name, password, email)
-                if user_verify is not -1:
+                if user_verify > -1:
                     csrf = user_verify.generate_auth_token(expiration=1200)
-                    application.create_session(
-                        user={'name': name, 'pass': password, 'id': user_verify.id, 'csrf': csrf})
+                    application.create_session(user=create_user_session_data(name, password, user_verify, csrf))
                     if application.session is not None and isinstance(application.session, session.Session):
                         self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
 
-                        return self.write(escape.json_encode({'token': str(application.session.user['csrf'], 'utf-8'),
-                                                              'cookie': str(self.get_secure_cookie('trx_cookie'))}))
+                        return self.write(escape.json_encode(
+                            {'statuscode': 200, 'token': str(application.session.user['csrf'], 'utf-8'),
+                             'trx_cookie': str(self.get_secure_cookie('trx_cookie'))}))
 
-                    print(str(user_verify))
+                elif user_verify < -1:
+                    return self.write(escape.json_encode({'statuscode': 404}))
+                else:
+                    return self.write(escape.json_encode({'statuscode': 401}))
+
         elif self.request.headers.get("Content-Type") == 'text/html':
             name = self.get_argument('name')
             print(name)
 
-        elif current_header == 'application/x-www-form-urlencoded':
+        elif content_type == 'application/x-www-form-urlencoded':
 
-            name, password = self.get_body_argument('name'), self.get_body_argument('pass')
+            name, password = retrieve_login_credentials(self)
 
             if name is not None and password is not None and len(name) > 0:
                 user_verified = db.check_auth_by_name(name, password)
@@ -695,7 +750,7 @@ class RegTestKillKeyHandler(RequestHandler):
         if check_content_types(self) == 'application/json':
             csrf = self.request.headers.get('csrf-token')
             if db.User.verify_auth_token(csrf):
-                key_id = self.request.headers.get('key') # TODO make this work
+                key_id = self.request.headers.get('key')  # TODO make this work
 
 
 class LogoutHandler(RequestHandler):
@@ -707,6 +762,40 @@ class LogoutHandler(RequestHandler):
         application.session = None
         self.write("Logout successful")
         self.redirect('/login')
+
+
+class TestKeyHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        jigga = self.get_argument('jigga')
+        print(jigga)
+        key_id = self.request.path.split('/api/key/')[1].split('/update')[0]
+        print(key_id)
+
+    async def post(self, *args, **kwargs):
+        csrf, content_type = retrieve_api_request_headers(self.request.headers)
+        if content_type == 'application/json':
+            # TODO Check this properly cookie = self.get_secure_cookie("trx_cookie")
+            if check_attribute(application.session, 'user'):
+                if db.User.verify_auth_token(csrf):
+                    key_id = self.request.path.split('/api/key/')[1].split('/update')[0].lstrip('0')
+                    key_data = json.loads(self.request.body.decode())
+                    if 'label' in key_data:
+                        if await db.update_key(key_id, key_data['label']):
+                            self.write(escape.json_encode([{'Update': 'Successful', 'code': 204}]))
+                        else:
+                            self.write(escape.json_encode([{'error': 'Key not found', 'code': 404}]))
+                    else:
+                        self.write(escape.json_encode([{'error': 'Bad request', 'code': 400}]))
+                else:
+                    self.write(escape.json_encode([{'error': 'Not authorized', 'code': 401}]))
+
+
+            else:
+                login_redirect(self, self.request.path)
+
 
 
 class TRXApplication(Application):
@@ -756,6 +845,7 @@ class TRXApplication(Application):
             # KEYS
 
             (r"/key/convert/wiftoprivate", KeyWTPHandler),
+            (r"/api/key/[0-9][0-9][0-9][0-9]/update", TestKeyHandler),
 
             # - Prices
             # -- Graph
@@ -802,7 +892,33 @@ class TRXApplication(Application):
         self.session.redirect_login = False
 
 
+def env_setup():
+    parser = argparse.ArgumentParser('debugging asyncio')
+    parser.add_argument(
+        '-v',
+        dest='verbose',
+        default=False,
+        action='store_true',
+    )
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(levelname)7s: %(message)s',
+        stream=sys.stderr,
+    )
+
+    LOG = logging.getLogger('')
+
+    static_path = os.path.join(os.path.dirname(__file__), "static")
+
+
+def login_redirect(handler: RequestHandler, origin: str):
+    handler.set_secure_cookie('redirect_target', origin)
+    handler.redirect('/login')
+
 if __name__ == "__main__":
+    env_setup()
     logging.basicConfig(level=logging.DEBUG)
     looper = asyncio.get_event_loop()
     looper.set_debug(True)
