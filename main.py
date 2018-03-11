@@ -797,6 +797,13 @@ class TestKeyHandler(RequestHandler):
                 login_redirect(self, self.request.path)
 
 
+class RegTestPayAllKeyHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        result = await db.regtest_pay_keys('10')
+        self.write(result)
 
 class TRXApplication(Application):
     def __init__(self):
@@ -823,6 +830,7 @@ class TRXApplication(Application):
             # Regression Testing
             (r"/regtest/all-users", RegTestAllUsers),
             (r"/regtest/user/pay", RegTestPayUserHandler),
+            [r"/regtest/key/pay-all", RegTestPayAllKeyHandler],
             (r"/regtest/key/pay", RegTestPayKeyHandler),
             (r"/regtest/key/retire", RegTestKillKeyHandler),
             (r"/regtest/user-balance", RegTestUserBalanceHandler),
