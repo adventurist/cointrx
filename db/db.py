@@ -3,7 +3,7 @@ from typing import Union
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from passlib.apps import custom_app_context as pwd_context
 from aiopg.sa import create_engine as async_engine
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, CheckConstraint
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, Text, DECIMAL, Boolean, exc, event, MetaData, select, DateTime
 from sqlalchemy import desc
@@ -79,7 +79,6 @@ class KeyLabel(Base):
     id = Column(Integer, primary_key=True)
     text = Column(String, server_default="Unnamed")
     kid = Column(Integer, ForeignKey('trxkey.id'))
-    # trxkey = relationship("TrxKey", backref='label', uselist=True)
     trxkey = relationship("TrxKey", back_populates='label')
 
 
@@ -93,6 +92,8 @@ class User(Base):
     status = Column(Integer)
     trxkey = relationship("TrxKey", backref='user', uselist=True)
     utc_offset = Column(Integer)
+    level = Column(Integer, nullable=False, server_default='0')
+    CheckConstraint('level BETWEEN 0 and 4')
 
     def hash_password(self, password):
         self.hash = pwd_context.encrypt(password)
@@ -840,6 +841,7 @@ async def regtest_all_user_data():
             'id': user.id,
             'name': user.name,
             'email': user.email,
+            'level': user.level,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
             'keys': [{'id': x.id, 'wif': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey]
         }
@@ -855,6 +857,7 @@ async def regtest_user_data(uid: str):
             'id': user.id,
             'name': user.name,
             'email': user.email,
+            'level': user.level,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
             'keys': [{'id': x.id, 'value': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey]
         }
@@ -895,6 +898,12 @@ async def regtest_pay_key(wif: str, amount: str):
         if address is not None:
             user_pay_result = await btcd_utils.RegTest.give_user_balance(address, int(amount))
             return user_pay_result
+
+async def regtest_pay_keys(amount: str):
+    keys = session.query(TrxKey).filter(TrxKey.status == true()).all()
+    for key in keys:
+        pay_result = await regtest_pay_key(wif=key.value, amount=amount)
+        print(pay_result)
 
 
 async def regtest_user_balance(uid: str):
