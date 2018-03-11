@@ -42287,7 +42287,7 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
 
         _this2.getKeyLabel = function (id) {
             var key = keyData.find(function (key) {
-                return key.id = id;
+                return key.id == id;
             });
             if (isKeyObject(key)) {
                 return key.label;
@@ -42300,7 +42300,7 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
 
         _this2.requestBtcKeyUpdate = function () {
             var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(id, label) {
-                var csrf, keyUpdateResponse;
+                var csrf, keyUpdateResult;
                 return _regenerator2.default.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
@@ -42308,7 +42308,7 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                                 csrf = getCsrfToken();
 
                                 if (!(csrf && csrf.length > 0)) {
-                                    _context3.next = 5;
+                                    _context3.next = 6;
                                     break;
                                 }
 
@@ -42316,9 +42316,13 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                                 return fetchKeyUpdate(id, label, csrf);
 
                             case 4:
-                                keyUpdateResponse = _context3.sent;
+                                keyUpdateResult = _context3.sent;
 
-                            case 5:
+                                if (!keyUpdateResult.error) {
+                                    _this2.updateKeys(id, label);
+                                }
+
+                            case 6:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -42352,97 +42356,6 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
             this._rows = this.state._rows;
             this.rowsCount = this.state._rows.length;
         }
-    }, {
-        key: 'disableKey',
-        value: function disableKey() {
-            this.requestBtcKeyDelete(this.state.dialogCursor).then(alert('Eat some clams'));
-        }
-    }, {
-        key: 'openEditKeyDialog',
-        value: function openEditKeyDialog(id) {
-            this.updateDialogState(id);
-        }
-    }, {
-        key: 'updateDialogState',
-        value: function updateDialogState(id) {
-            this.setState({ dialogOpen: true, dialogCursor: id, dialogText: this.getKeyLabel(id) });
-        }
-    }, {
-        key: 'updateState',
-        value: function updateState(rows) {
-            this.setState({ btnHovered: false, _rows: this.createRows(rows) });
-        }
-    }, {
-        key: 'getRows',
-        value: function getRows() {
-            return this.state._rows;
-        }
-    }, {
-        key: 'buildRows',
-        value: function buildRows(key) {
-            console.dir(key);
-            return {
-                'id': key.id,
-                'lbl': key.label,
-                'adr': key.address,
-                'bal': key.balance,
-                'btn': ''
-
-            };
-        }
-    }, {
-        key: 'buildBtns',
-        value: function buildBtns(row) {
-            console.dir(row);
-            return {
-                'id': row.id,
-                'lbl': row.lbl,
-                'adr': row.adr,
-                'bal': row.bal,
-                'btn': React.createElement(
-                    'div',
-                    null,
-                    React.createElement(_materialUi.RaisedButton, { label: 'Edit', secondary: true, id: row.id, value: row.id,
-                        onClick: this.openEditKeyDialog.bind(this, row.id) }),
-                    this.state.dialogOpen && isObjectEquivalent(this.props.row, this.state.dialogCursor) ? React.createElement(KeyDialog, { show: this.state.dialogOpen }) : null
-                )
-            };
-        }
-    }, {
-        key: 'saveKey',
-        value: function saveKey() {
-
-            if (isKeyLabelChanged(this.state.dialogText, this.state.dialogCursor)) {
-                this.requestBtcKeyUpdate(this.state.dialogCursor, this.state.dialogText);
-            }
-        }
-    }, {
-        key: 'setKeyFutureDisable',
-        value: function () {
-            var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4() {
-                var csrf;
-                return _regenerator2.default.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                console.log('BTC Key Future Disable requested: ' + id);
-                                csrf = getCsrfToken();
-                                // const keyDeleteResult = await deleteKey('temp', csrf)
-
-                            case 2:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this);
-            }));
-
-            function setKeyFutureDisable() {
-                return _ref4.apply(this, arguments);
-            }
-
-            return setKeyFutureDisable;
-        }()
     }, {
         key: 'render',
         value: function render() {
@@ -42497,7 +42410,8 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                             'svg',
                             { style: 'width:24px;height:24px', viewBox: '0 0 24 24' },
                             React.createElement('path', { fill: '#000000',
-                                d: 'M4.5,5H8V2H10V5H11.5V2H13.5V5C19,5 19,11 16,11.25C20,11 21,19 13.5,19V22H11.5V19H10V22H8V19H4.5L5,17H6A1,1 0 0,0 7,16V8A1,1 0 0,0 6,7H4.5V5M10,7V11C10,11 14.5,11.25 14.5,9C14.5,6.75 10,7 10,7M10,12.5V17C10,17 15.5,17 15.5,14.75C15.5,12.5 10,12.5 10,12.5Z' })
+                                d: 'M4.5,5H8V2H10V5H11.5V2H13.5V5C19,5 19,11 16,11.25C20,11 21,19 13.5,19V22H11.5V19H10V22H8V19H4.5L5,17H6A1,1 0 0,0 7,16V8A1,1 0 0,0 6,7H4.5V5M10,7V11C10,11 14.5,11.25 14.5,9C14.5,6.75 10,7 10,7M10,12.5V17C10,17 15.5,17 15.5,14.75C15.5,12.5 10,12.5 10,12.5Z'
+                            })
                         )
                     ),
                     tooltip && React.createElement(_Tooltip2.default, {
@@ -42535,13 +42449,120 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                 )
             );
         }
+    }, {
+        key: 'buildBtns',
+        value: function buildBtns(row) {
+            console.dir(row);
+            return {
+                'id': row.id,
+                'lbl': row.lbl,
+                'adr': row.adr,
+                'bal': row.bal,
+                'btn': React.createElement(
+                    'div',
+                    null,
+                    React.createElement(_materialUi.RaisedButton, { label: 'Edit', secondary: true,
+                        id: row.id, value: row.id,
+                        onClick: this.openEditKeyDialog.bind(this, row.id)
+                    }),
+                    this.state.dialogOpen && isObjectEquivalent(this.props.row, this.state.dialogCursor) ? React.createElement(KeyDialog, { show: this.state.dialogOpen }) : null
+                )
+            };
+        }
+    }, {
+        key: 'buildRows',
+        value: function buildRows(key) {
+            console.dir(key);
+            return {
+                'id': key.id,
+                'lbl': key.label,
+                'adr': key.address,
+                'bal': key.balance,
+                'btn': ''
+
+            };
+        }
+    }, {
+        key: 'disableKey',
+        value: function disableKey() {
+            this.requestBtcKeyDelete(this.state.dialogCursor).then(alert('Eat some clams'));
+        }
+    }, {
+        key: 'openEditKeyDialog',
+        value: function openEditKeyDialog(id) {
+            this.updateDialogState(id);
+        }
+    }, {
+        key: 'updateDialogState',
+        value: function updateDialogState(id) {
+            this.setState({ dialogOpen: true, dialogCursor: id, dialogText: this.getKeyLabel(id) });
+        }
+    }, {
+        key: 'updateState',
+        value: function updateState(rows) {
+            this.setState({ btnHovered: false, _rows: this.createRows(rows) });
+        }
+    }, {
+        key: 'getRows',
+        value: function getRows() {
+            return this.state._rows;
+        }
+    }, {
+        key: 'saveKey',
+        value: function saveKey() {
+
+            if (isKeyLabelChanged(this.state.dialogText, this.state.dialogCursor)) {
+                this.requestBtcKeyUpdate(this.state.dialogCursor, this.state.dialogText);
+            }
+        }
+    }, {
+        key: 'updateKeys',
+        value: function updateKeys(id, label) {
+            var keyChanged = false;
+            for (var i = 0; i < keyData.length; i++) {
+                if (keyData[i].id === id) {
+                    keyData[i].label = label;
+                    keyChanged = true;
+                }
+            }
+
+            if (keyChanged) {
+                this.state._rows = this.createRows(keyData);
+                this.setState({ _rows: this.addBtnRows(this.state._rows) });
+            }
+        }
+    }, {
+        key: 'setKeyFutureDisable',
+        value: function () {
+            var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4() {
+                var csrf;
+                return _regenerator2.default.wrap(function _callee4$(_context4) {
+                    while (1) {
+                        switch (_context4.prev = _context4.next) {
+                            case 0:
+                                console.log('BTC Key Future Disable requested: ' + id);
+                                csrf = getCsrfToken();
+                                // const keyDeleteResult = await deleteKey('temp', csrf)
+
+                            case 2:
+                            case 'end':
+                                return _context4.stop();
+                        }
+                    }
+                }, _callee4, this);
+            }));
+
+            function setKeyFutureDisable() {
+                return _ref4.apply(this, arguments);
+            }
+
+            return setKeyFutureDisable;
+        }()
     }]);
     return UserKeys;
 }(React.Component);
 
 UserKeys.propTypes = {
-    // className: PropTypes.string,
-    // icon: PropTypes.string.isRequired, // fontawesome
     mini: _propTypes2.default.bool,
     tooltipPosition: _propTypes2.default.oneOf(['bottom-center', 'top-center', 'bottom-right', 'top-right', 'bottom-left', 'top-left']),
     onClick: _propTypes2.default.func
@@ -42634,7 +42655,7 @@ function fetchKey(url, csrf) {
 }
 
 function fetchKeyUpdate(id, label, csrf) {
-    return new _promise2.default(function (resolve) {
+    return new _promise2.default(function (resolve, reject) {
         var keyId = String('0000' + id).slice(-4);
         var url = '/api/key/' + keyId + '/update';
         var options = {
@@ -42651,9 +42672,12 @@ function fetchKeyUpdate(id, label, csrf) {
                 return console.error('Error:', error);
             });
         }).then(function (response) {
-            console.log('Success');
-            console.dir(response);
-            return resolve(response);
+            var handledResponse = handleResponse(response);
+            if (handledResponse) {
+                return resolve(handledResponse);
+            } else {
+                reject(handledResponse);
+            }
         });
     });
 }
@@ -42673,6 +42697,36 @@ function getToken(name) {
     if (cookie && cookie.length > 0) {
         return cookie[0].trim().substr(5);
     }
+}
+
+function handleResponse(response) {
+    if (Array.isArray(response) && response.length === 1) {
+        response = response[0];
+    } else {
+        console.error(response);
+    }
+    if ('error' in response) {
+        switch (response.code) {
+            case 400:
+                console.log(response.error);
+                break;
+            case 401:
+                window.location.href = '/login';
+                break;
+            case 403:
+                console.log(response.error);
+                break;
+            case 404:
+                console.log(response.error);
+                break;
+            case 406:
+                console.log(response.error);
+                console.log('You must must set acceptable return type in header');
+                break;
+        }
+        console.log(response);
+    }
+    return response;
 }
 
 // class KeyDialog extends React.Component {
