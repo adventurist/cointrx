@@ -42180,7 +42180,7 @@ var UserForm = exports.UserForm = function (_React$Component) {
                             id: 'estimated-value',
                             ref: 'estimated',
                             className: 'estimated-value',
-                            defaultValue: "$" + this.state.estimatedValue + " estimated value"
+                            defaultValue: "$" + Number(this.state.estimatedValue) + " estimated value"
                         })
                     )
                 )
