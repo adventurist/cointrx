@@ -42332,7 +42332,7 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                                 csrf = getCsrfToken();
 
                                 if (!(csrf && csrf.length > 0)) {
-                                    _context3.next = 6;
+                                    _context3.next = 8;
                                     break;
                                 }
 
@@ -42346,7 +42346,13 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                                     _this2.updateKeys(id, label);
                                 }
 
-                            case 6:
+                                _context3.next = 9;
+                                break;
+
+                            case 8:
+                                window.location.replace('/login');
+
+                            case 9:
                             case 'end':
                                 return _context3.stop();
                         }

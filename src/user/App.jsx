@@ -433,6 +433,8 @@ export class UserKeys extends React.Component {
                this.updateKeys(id, label)
             }
 
+        } else {
+            window.location.replace('/login')
         }
     }
 
