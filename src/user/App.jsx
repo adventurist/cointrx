@@ -76,12 +76,18 @@ export class UserForm extends React.Component {
             editing: false,
             files: null,
             username: userProfileData.name,
-            email: userProfileData.email
+            email: userProfileData.email,
+            estimatedValue: userProfileData.estimated,
+            timezone: 'Asia/Yerevan'
         }
     }
 
     initData = () => {
         console.dir(userData)
+    }
+
+    updateTimezone = (value) => {
+        this.setState({timezone: value})
     }
 
     handleChange = (field, value) => {
@@ -150,10 +156,27 @@ export class UserForm extends React.Component {
                     <br />
                     <div id="timezone-container">
                         <TimezonePicker
+                            defaultValue={this.state.timezone}
+                            onChange={this.updateTimezone}
+                            inputProps={{
+                                placeholder: 'Select Timezone...',
+                                name: 'timezone',
+                            }}
                         />
                     </div>
 
                     <RaisedButton type='submit' label='Save' primary/>
+
+                    <hr className="userform-separator" />
+
+                    <div className="estimated-container">
+                        <TextField
+                            id="estimated-value"
+                            ref='estimated'
+                            className='estimated-value'
+                            defaultValue={"$" + this.state.estimatedValue + " estimated value"}
+                        />
+                    </div>
                 </form>
             </div>
         )
