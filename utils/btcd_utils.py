@@ -115,14 +115,17 @@ class RegTest:
     @staticmethod
     async def get_user_balance(keys: list):
         balance_array = []
-        for key in keys:
-            if key.status is True:
-                balance_for_key = await RegTest.get_tx_history(wif_to_address(key.value))
-                if balance_for_key is not None:
-                    balance_for_key = sum(k['value'] for k in balance_for_key)
-                    balance_array.append(balance_for_key)
-                    return sum(balance_array)
-        return 0
+        if keys is not None and len(keys) > 0:
+            for key in keys:
+                if key.status is True:
+                    balance_for_key = await RegTest.get_tx_history(wif_to_address(key.value))
+                    if balance_for_key is not None:
+                        balance_for_key = sum(k['value'] for k in balance_for_key)
+                        balance_array.append(balance_for_key)
+
+            return sum(balance_array)
+        else:
+            return 0
 
     @staticmethod
     async def get_key_balance(key):
