@@ -23,3 +23,5 @@ def get_urls(trx_env):
         'wif_to_private_url': 'http://localhost:3000/key/from-wif',
         'key_gen_url': 'http://localhost:6969/keys/btc/regtest/generate'
     }
+
+DEFAULT_LANGUAGE = 'CAD'
