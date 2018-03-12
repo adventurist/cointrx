@@ -42072,6 +42072,10 @@ var UserForm = exports.UserForm = function (_React$Component) {
             console.dir(userData);
         };
 
+        _this.updateTimezone = function (value) {
+            _this.setState({ timezone: value });
+        };
+
         _this.handleChange = function (field, value) {
             _this.setState((0, _extends4.default)({}, _this.state, (0, _defineProperty3.default)({}, field, value)));
         };
@@ -42104,7 +42108,9 @@ var UserForm = exports.UserForm = function (_React$Component) {
             editing: false,
             files: null,
             username: userProfileData.name,
-            email: userProfileData.email
+            email: userProfileData.email,
+            estimatedValue: userProfileData.estimated,
+            timezone: 'Asia/Yerevan'
         };
         return _this;
     }
@@ -42156,9 +42162,27 @@ var UserForm = exports.UserForm = function (_React$Component) {
                     React.createElement(
                         'div',
                         { id: 'timezone-container' },
-                        React.createElement(_reactTimezone2.default, null)
+                        React.createElement(_reactTimezone2.default, {
+                            defaultValue: this.state.timezone,
+                            onChange: this.updateTimezone,
+                            inputProps: {
+                                placeholder: 'Select Timezone...',
+                                name: 'timezone'
+                            }
+                        })
                     ),
-                    React.createElement(_materialUi.RaisedButton, { type: 'submit', label: 'Save', primary: true })
+                    React.createElement(_materialUi.RaisedButton, { type: 'submit', label: 'Save', primary: true }),
+                    React.createElement('hr', { className: 'userform-separator' }),
+                    React.createElement(
+                        'div',
+                        { className: 'estimated-container' },
+                        React.createElement(_materialUi.TextField, {
+                            id: 'estimated-value',
+                            ref: 'estimated',
+                            className: 'estimated-value',
+                            defaultValue: "$" + this.state.estimatedValue + " estimated value"
+                        })
+                    )
                 )
             );
         }
