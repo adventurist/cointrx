@@ -42838,20 +42838,22 @@ var isKeyObject = function isKeyObject(key) {
 };
 
 var isObjectEquivalent = function isObjectEquivalent(a, b) {
-    var aProps = (0, _getOwnPropertyNames2.default)(a);
-    var bProps = (0, _getOwnPropertyNames2.default)(b);
+    if (a !== null && typeof a !== 'undefined') {
+        var aProps = (0, _getOwnPropertyNames2.default)(a);
+        var bProps = (0, _getOwnPropertyNames2.default)(b);
 
-    if (aProps.length != bProps.length) {
-        return false;
-    }
-
-    for (var i = 0; i < aProps.length; i++) {
-        var propName = aProps[i];
-        if (a[propName] !== b[propName]) {
+        if (aProps.length != bProps.length) {
             return false;
         }
+
+        for (var i = 0; i < aProps.length; i++) {
+            var propName = aProps[i];
+            if (a[propName] !== b[propName]) {
+                return false;
+            }
+        }
+        return true;
     }
-    return true;
 };
 
 var isKeyLabelChanged = function isKeyLabelChanged(label, cursor) {
