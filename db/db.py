@@ -869,7 +869,7 @@ async def regtest_user_data(uid: str):
         for key in data['keys']:
             key['balance'] = await btcd_utils.RegTest.get_key_balance(key)
             key['address'] = btcd_utils.wif_to_address(key.pop('value'))
-            key['label'] = key['label'].text
+            key['label'] = key['label'].text if key['label'] is not None else 'Unnamed'
 
         data['estimated'] = await regtest_user_estimated_value(uid)
 
