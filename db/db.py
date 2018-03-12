@@ -16,7 +16,7 @@ from sqlalchemy.ext.declarative import declarative_base, as_declarative, declare
 from bitcoin.core import COIN
 from db import db_config
 from types import SimpleNamespace
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from utils import btcd_utils
 from config.config import DEFAULT_LANGUAGE
 
@@ -932,7 +932,7 @@ async def regtest_user_estimated_value(uid: str):
         if price and price.last is not None:
             satoshis = Decimal(await btcd_utils.RegTest.get_user_balance(user.trxkey))
             estimated_value = satoshis / COIN * price.last
-            return str(estimated_value)
+            return str(estimated_value.quantize(Decimal('.02'), rounding=ROUND_HALF_UP))
 
 
 async def get_regtest_get_user(uid: str):
