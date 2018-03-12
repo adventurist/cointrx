@@ -13,11 +13,12 @@ from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker, relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, as_declarative, declared_attr
+from bitcoin.core import COIN
 from db import db_config
 from types import SimpleNamespace
+from decimal import Decimal
 from utils import btcd_utils
-
-from mypy import *
+from config.config import DEFAULT_LANGUAGE
 
 import asyncio
 import timeago
@@ -459,6 +460,9 @@ def latest_price(currency: str) -> str:
         print(result.serialize())
         return 'jigga'
 
+async def latest_price_data(currency: str) -> CXPrice:
+    result = session.query(CXPrice).filter(CXPrice.currency == currency).one_or_none()
+    return result if result is not None else False
 
 async def latest_price_async(currency: str) -> str:
     result = await session.query(CXPrice).filter(CXPrice.currency == currency).one_or_none()
@@ -867,6 +871,8 @@ async def regtest_user_data(uid: str):
             key['address'] = btcd_utils.wif_to_address(key.pop('value'))
             key['label'] = key['label'].text
 
+        data['estimated'] = await regtest_user_estimated_value(uid)
+
         user_data.append(data)
     return user_data
 
@@ -917,3 +923,18 @@ async def regtest_block_info():
     block_info = json.loads(await btcd_utils.RegTest.get_info())
     unspent_transactions = json.loads(await btcd_utils.RegTest.list_unspent())
     return json.dumps({'info': block_info, 'unspent': unspent_transactions}, indent=4, sort_keys=True)
+
+
+async def regtest_user_estimated_value(uid: str):
+    user = await get_regtest_get_user(uid)
+    if user and user.trxkey is not None:
+        price = await latest_price_data(DEFAULT_LANGUAGE)
+        if price and price.last is not None:
+            satoshis = Decimal(await btcd_utils.RegTest.get_user_balance(user.trxkey))
+            estimated_value = satoshis / COIN * price.last
+            return str(estimated_value)
+
+
+async def get_regtest_get_user(uid: str):
+    user = session.query(User).filter(User.id == int(uid)).one_or_none()
+    return user if user is not None else False
