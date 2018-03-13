@@ -862,6 +862,7 @@ async def regtest_user_data(uid: str):
             'name': user.name,
             'email': user.email,
             'level': user.level,
+            'utc_offset': user.utc_offset if user.utc_offset is not None else 0,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
             'keys': [{'id': x.id, 'value': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey]
         }
@@ -926,7 +927,7 @@ async def regtest_block_info():
 
 
 async def regtest_user_estimated_value(uid: str):
-    user = await get_regtest_get_user(uid)
+    user = await get_user(uid)
     if user and user.trxkey is not None:
         price = await latest_price_data(DEFAULT_LANGUAGE)
         if price and price.last is not None:
@@ -935,6 +936,25 @@ async def regtest_user_estimated_value(uid: str):
             return str(estimated_value.quantize(Decimal('.02'), rounding=ROUND_HALF_UP))
 
 
-async def get_regtest_get_user(uid: str):
+async def get_user(uid: str):
     user = session.query(User).filter(User.id == int(uid)).one_or_none()
     return user if user is not None else False
+
+async def update_user(uid: str, data: dict):
+    changed = False
+    user = await get_user(uid)
+    if user is not None:
+        for k, v in data.items():
+            if hasattr(user, k):
+                if getattr(user, k) != v:
+                    changed = True
+                    setattr(user, k, v)
+    if changed:
+        try:
+            session.add(user)
+            session.commit()
+            return True
+
+        except exc.SQLAlchemyError as error:
+            print(error)
+            return False
