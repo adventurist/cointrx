@@ -791,8 +791,37 @@ class TestKeyHandler(RequestHandler):
                         self.write(escape.json_encode([{'error': 'Bad request', 'code': 400}]))
                 else:
                     self.write(escape.json_encode([{'error': 'Not authorized', 'code': 401}]))
+            else:
+                login_redirect(self, self.request.path)
 
 
+class UserUpdateHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        jigga = self.get_argument('jigga')
+        print(jigga)
+        key_id = self.request.path.split('/api/key/')[1].split('/update')[0]
+        print(key_id)
+
+    async def post(self, *args, **kwargs):
+        csrf, content_type = retrieve_api_request_headers(self.request.headers)
+        if content_type == 'application/json':
+            # TODO Check this properly cookie = self.get_secure_cookie("trx_cookie")
+            if check_attribute(application.session, 'user'):
+                if db.User.verify_auth_token(csrf):
+                    uid = self.request.path.split('/api/user/')[1].split('/update')[0].lstrip('0')
+                    user_data = json.loads(self.request.body.decode())
+                    if user_data is not None:
+                        if await db.update_user(uid, user_data):
+                            self.write(escape.json_encode([{'Update': 'Successful', 'code': 204}]))
+                        else:
+                            self.write(escape.json_encode([{'error': 'Key not found', 'code': 404}]))
+                    else:
+                        self.write(escape.json_encode([{'error': 'Bad request', 'code': 400}]))
+                else:
+                    self.write(escape.json_encode([{'error': 'Not authorized', 'code': 401}]))
             else:
                 login_redirect(self, self.request.path)
 
@@ -849,6 +878,9 @@ class TRXApplication(Application):
             (r"/transaction/test", TestTransactionHandler),
             (r"/transaction/sendraw", SendTrawTransactionHandler),
             (r"/transaction/secret/rollback", TrxRollbackHandler),
+
+            # USERS
+            (r"/api/user/[0-9][0-9][0-9][0-9]/update", UserUpdateHandler),
 
             # KEYS
 
