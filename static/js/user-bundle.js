@@ -41909,13 +41909,13 @@ var _promise = __webpack_require__(151);
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _regenerator = __webpack_require__(316);
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
 var _keys = __webpack_require__(74);
 
 var _keys2 = _interopRequireDefault(_keys);
+
+var _regenerator = __webpack_require__(316);
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
 
 var _asyncToGenerator2 = __webpack_require__(319);
 
@@ -42064,6 +42064,8 @@ var UserForm = exports.UserForm = function (_React$Component) {
     (0, _inherits3.default)(UserForm, _React$Component);
 
     function UserForm(props, context) {
+        var _this2 = this;
+
         (0, _classCallCheck3.default)(this, UserForm);
 
         var _this = (0, _possibleConstructorReturn3.default)(this, (UserForm.__proto__ || (0, _getPrototypeOf2.default)(UserForm)).call(this, props, context));
@@ -42090,17 +42092,68 @@ var UserForm = exports.UserForm = function (_React$Component) {
 
         _this.onSubmit = function (e) {
             e.preventDefault();
-
-            var username = _this.refs.username.input.value;
-            var language = _this.refs.language.input.value;
-            var email = _this.refs.email.input;
-
-            _this.setState({
-                username: username,
-                language: language,
-                email: email
+            _this.requestUserUpdate(userProfileData.id, { name: _this.refs.username.input.value, email: _this.refs.email.input.value }).then(function (result) {
+                return console.log(result);
             });
+            // const username = this.refs.username.input.value
+            // const language = this.refs.language.input.value
+            // const email = this.refs.email.input
+            //
+            // this.setState({
+            //     username,
+            //     language,
+            //     email,
+            // })
         };
+
+        _this.requestUserUpdate = function () {
+            var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(id, payload) {
+                var csrf, result;
+                return _regenerator2.default.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                csrf = getCsrfToken();
+
+                                if (!(csrf && csrf.length > 0)) {
+                                    _context.next = 9;
+                                    break;
+                                }
+
+                                _context.next = 4;
+                                return fetchUserUpdate(id, payload, csrf);
+
+                            case 4:
+                                result = _context.sent;
+
+                                if (result.error) {
+                                    _context.next = 9;
+                                    break;
+                                }
+
+                                if (!_this.updateUser(id, payload)) {
+                                    _context.next = 9;
+                                    break;
+                                }
+
+                                console.debug('User Updated');
+                                return _context.abrupt('return', true);
+
+                            case 9:
+                                return _context.abrupt('return', false);
+
+                            case 10:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, _this2);
+            }));
+
+            return function (_x, _x2) {
+                return _ref.apply(this, arguments);
+            };
+        }();
 
         _this.initData();
 
@@ -42186,26 +42239,66 @@ var UserForm = exports.UserForm = function (_React$Component) {
                 )
             );
         }
+    }, {
+        key: 'saveUser',
+        value: function saveUser() {
+
+            if (isUserInfoChanged(userProfileData, this.state)) {
+                this.requestUserUpdate(userProfileData.id, this.state);
+            }
+        }
+    }, {
+        key: 'updateUser',
+        value: function updateUser(id, payload) {
+            if (payload !== void 0) {
+                var userChanged = false;
+                payload.name = payload.name !== void 0 ? payload.name : this.state.username;
+                payload.email = payload.email !== void 0 ? payload.email : this.state.email;
+                if (payload.name !== void 0 || payload.email !== void 0) {
+                    userChanged = payload.name !== this.state.username || payload.email !== this.state.email ? !userChanged : userChanged;
+                }
+                if (userChanged) {
+                    this.setState({ username: payload.name, email: payload.email });
+                } else {
+                    console.debug('User not changed');
+                }
+                return true;
+            }
+            console.debug('updateUser called with bogus payload');
+            return false;
+        }
     }]);
     return UserForm;
 }(React.Component);
+
+function isUserInfoChanged(userData, state) {
+    if ('email' in state && 'username' in state) {
+        var changed = userData.find(function (d) {
+            return d.email !== state.email || d.name !== state.username;
+        });
+        if (changed && changed.length > 0) {
+            return true;
+        }
+    }
+    return false;
+}
 
 var UserKeys = exports.UserKeys = function (_React$Component2) {
     (0, _inherits3.default)(UserKeys, _React$Component2);
 
     function UserKeys(props, context) {
-        var _this3 = this;
+        var _this4 = this;
 
         (0, _classCallCheck3.default)(this, UserKeys);
 
-        var _this2 = (0, _possibleConstructorReturn3.default)(this, (UserKeys.__proto__ || (0, _getPrototypeOf2.default)(UserKeys)).call(this, props, context));
+        var _this3 = (0, _possibleConstructorReturn3.default)(this, (UserKeys.__proto__ || (0, _getPrototypeOf2.default)(UserKeys)).call(this, props, context));
 
-        _this2.requestBtcKey = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+        _this3.requestBtcKey = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
             var cookies, cookie, csrf, newUserData, keys, _newRows;
 
-            return _regenerator2.default.wrap(function _callee$(_context) {
+            return _regenerator2.default.wrap(function _callee2$(_context2) {
                 while (1) {
-                    switch (_context.prev = _context.next) {
+                    switch (_context2.prev = _context2.next) {
                         case 0:
                             console.log('New BTC Key requested');
                             cookies = document.cookie.split(';');
@@ -42214,16 +42307,16 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                             });
 
                             if (!(cookie && cookie.length > 0)) {
-                                _context.next = 9;
+                                _context2.next = 9;
                                 break;
                             }
 
                             csrf = cookie[0].trim().substr(5);
-                            _context.next = 7;
+                            _context2.next = 7;
                             return fetchKey(keygenUrl, csrf);
 
                         case 7:
-                            newUserData = _context.sent;
+                            newUserData = _context2.sent;
 
                             if (newUserData && Array.isArray(newUserData) && newUserData.length > 0) {
                                 keys = (0, _keys2.default)(newUserData[0]);
@@ -42232,7 +42325,7 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                                     console.log('Updating user data');
                                     _newRows = newUserData[0].keys;
 
-                                    _this2.updateState(_newRows);
+                                    _this3.updateState(_newRows);
                                 } else {
                                     console.log('Token no longer valid. Please log back in');
                                     window.location.replace('/login');
@@ -42241,67 +42334,67 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
 
                         case 9:
                         case 'end':
-                            return _context.stop();
+                            return _context2.stop();
                     }
                 }
-            }, _callee, _this3);
+            }, _callee2, _this4);
         }));
 
-        _this2.requestBtcKeyDelete = function () {
-            var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(id) {
+        _this3.requestBtcKeyDelete = function () {
+            var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(id) {
                 var csrf, keyDeleteResult;
-                return _regenerator2.default.wrap(function _callee2$(_context2) {
+                return _regenerator2.default.wrap(function _callee3$(_context3) {
                     while (1) {
-                        switch (_context2.prev = _context2.next) {
+                        switch (_context3.prev = _context3.next) {
                             case 0:
                                 console.log('BTC Key deletion requested: ' + id);
                                 csrf = getCsrfToken();
-                                _context2.next = 4;
+                                _context3.next = 4;
                                 return deleteKey('temp', csrf);
 
                             case 4:
-                                keyDeleteResult = _context2.sent;
+                                keyDeleteResult = _context3.sent;
 
                             case 5:
                             case 'end':
-                                return _context2.stop();
+                                return _context3.stop();
                         }
                     }
-                }, _callee2, _this3);
+                }, _callee3, _this4);
             }));
 
-            return function (_x) {
-                return _ref2.apply(this, arguments);
+            return function (_x3) {
+                return _ref3.apply(this, arguments);
             };
         }();
 
-        _this2.handleOpen = function () {
-            _this2.setState({ dialogOpen: true });
+        _this3.handleOpen = function () {
+            _this3.setState({ dialogOpen: true });
         };
 
-        _this2.handleClose = function () {
-            _this2.setState({ dialogOpen: false });
+        _this3.handleClose = function () {
+            _this3.setState({ dialogOpen: false });
         };
 
-        _this2.createRows = function (keyData) {
+        _this3.createRows = function (keyData) {
             return keyData.map(function (x) {
-                return _this2.buildRows(x);
+                return _this3.buildRows(x);
             });
         };
 
-        _this2.addBtnRows = function (rows) {
+        _this3.addBtnRows = function (rows) {
             return rows.map(function (x) {
-                return _this2.buildBtns(x);
+                return _this3.buildBtns(x);
             });
         };
 
-        _this2.rowGetter = function (i) {
-            return _this2.state._rows[i];
+        _this3.rowGetter = function (i) {
+            return _this3.state._rows[i];
         };
 
-        _this2.keyLabelAtCursor = function () {
+        _this3.keyLabelAtCursor = function () {
             var currentKey = keyData.find(function (key) {
-                return key.id == _this2.state.dialogCursor;
+                return key.id == _this3.state.dialogCursor;
             });
             if (isKeyObject(currentKey)) {
                 return currentKey.label;
@@ -42309,7 +42402,7 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
             return false;
         };
 
-        _this2.getKeyLabel = function (id) {
+        _this3.getKeyLabel = function (id) {
             var key = keyData.find(function (key) {
                 return key.id == id;
             });
@@ -42318,35 +42411,35 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
             }
         };
 
-        _this2.dialogTextChange = function (event, value) {
-            _this2.setState({ dialogText: value });
+        _this3.dialogTextChange = function (event, value) {
+            _this3.setState({ dialogText: value });
         };
 
-        _this2.requestBtcKeyUpdate = function () {
-            var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(id, label) {
+        _this3.requestBtcKeyUpdate = function () {
+            var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(id, label) {
                 var csrf, keyUpdateResult;
-                return _regenerator2.default.wrap(function _callee3$(_context3) {
+                return _regenerator2.default.wrap(function _callee4$(_context4) {
                     while (1) {
-                        switch (_context3.prev = _context3.next) {
+                        switch (_context4.prev = _context4.next) {
                             case 0:
                                 csrf = getCsrfToken();
 
                                 if (!(csrf && csrf.length > 0)) {
-                                    _context3.next = 8;
+                                    _context4.next = 8;
                                     break;
                                 }
 
-                                _context3.next = 4;
+                                _context4.next = 4;
                                 return fetchKeyUpdate(id, label, csrf);
 
                             case 4:
-                                keyUpdateResult = _context3.sent;
+                                keyUpdateResult = _context4.sent;
 
                                 if (!keyUpdateResult.error) {
-                                    _this2.updateKeys(id, label);
+                                    _this3.updateKeys(id, label);
                                 }
 
-                                _context3.next = 9;
+                                _context4.next = 9;
                                 break;
 
                             case 8:
@@ -42354,29 +42447,29 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
 
                             case 9:
                             case 'end':
-                                return _context3.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee3, _this3);
+                }, _callee4, _this4);
             }));
 
-            return function (_x2, _x3) {
-                return _ref3.apply(this, arguments);
+            return function (_x4, _x5) {
+                return _ref4.apply(this, arguments);
             };
         }();
 
-        _this2.state = {
+        _this3.state = {
             btnHovered: false,
             _columns: [{ key: 'id', name: 'ID' }, { key: 'lbl', name: 'Label' }, { key: 'adr', name: 'Address' }, { key: 'bal', name: 'Balance' }, { key: 'btn', name: 'Modify' }],
-            _rows: _this2.createRows(keyData),
+            _rows: _this3.createRows(keyData),
             dialogOpen: false,
             dialogCursor: 0,
             dialogText: ''
 
         };
-        _this2._rows = null;
-        _this2.rowsCount = null;
-        return _this2;
+        _this3._rows = null;
+        _this3.rowsCount = null;
+        return _this3;
     }
 
     (0, _createClass3.default)(UserKeys, [{
@@ -42389,7 +42482,7 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
     }, {
         key: 'render',
         value: function render() {
-            var _this4 = this;
+            var _this5 = this;
 
             var _props = this.props,
                 mini = _props.mini,
@@ -42431,10 +42524,10 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
                             mini: mini,
                             onClick: this.requestBtcKey,
                             onMouseEnter: function onMouseEnter() {
-                                return _this4.setState({ btnHovered: true });
+                                return _this5.setState({ btnHovered: true });
                             },
                             onMouseLeave: function onMouseLeave() {
-                                return _this4.setState({ btnHovered: false });
+                                return _this5.setState({ btnHovered: false });
                             } },
                         React.createElement(
                             'svg',
@@ -42482,7 +42575,6 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
     }, {
         key: 'buildBtns',
         value: function buildBtns(row) {
-            console.dir(row);
             return {
                 'id': row.id,
                 'lbl': row.lbl,
@@ -42502,7 +42594,6 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
     }, {
         key: 'buildRows',
         value: function buildRows(key) {
-            console.dir(key);
             return {
                 'id': key.id,
                 'lbl': key.label,
@@ -42564,11 +42655,11 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
     }, {
         key: 'setKeyFutureDisable',
         value: function () {
-            var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4() {
+            var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5() {
                 var csrf;
-                return _regenerator2.default.wrap(function _callee4$(_context4) {
+                return _regenerator2.default.wrap(function _callee5$(_context5) {
                     while (1) {
-                        switch (_context4.prev = _context4.next) {
+                        switch (_context5.prev = _context5.next) {
                             case 0:
                                 console.log('BTC Key Future Disable requested: ' + id);
                                 csrf = getCsrfToken();
@@ -42576,14 +42667,14 @@ var UserKeys = exports.UserKeys = function (_React$Component2) {
 
                             case 2:
                             case 'end':
-                                return _context4.stop();
+                                return _context5.stop();
                         }
                     }
-                }, _callee4, this);
+                }, _callee5, this);
             }));
 
             function setKeyFutureDisable() {
-                return _ref4.apply(this, arguments);
+                return _ref5.apply(this, arguments);
             }
 
             return setKeyFutureDisable;
@@ -42618,24 +42709,24 @@ var TrxGrid = exports.TrxGrid = function (_React$Component3) {
     function TrxGrid(props, context) {
         (0, _classCallCheck3.default)(this, TrxGrid);
 
-        var _this5 = (0, _possibleConstructorReturn3.default)(this, (TrxGrid.__proto__ || (0, _getPrototypeOf2.default)(TrxGrid)).call(this, props, context));
+        var _this6 = (0, _possibleConstructorReturn3.default)(this, (TrxGrid.__proto__ || (0, _getPrototypeOf2.default)(TrxGrid)).call(this, props, context));
 
-        _this5.createRows = function () {
+        _this6.createRows = function () {
             var rows = rowData.map(function (x) {
                 return TrxGrid.buildRows(x);
             });
-            _this5._rows = rows;
+            _this6._rows = rows;
         };
 
-        _this5.rowGetter = function (i) {
-            return _this5._rows[i];
+        _this6.rowGetter = function (i) {
+            return _this6._rows[i];
         };
 
-        _this5.createRows();
-        _this5._columns = [{ key: 'cur', name: 'Currency' }, { key: 'sell', name: 'Sell' }, { key: 'buy', name: 'Buy' }];
+        _this6.createRows();
+        _this6._columns = [{ key: 'cur', name: 'Currency' }, { key: 'sell', name: 'Sell' }, { key: 'buy', name: 'Buy' }];
 
-        _this5.state = null;
-        return _this5;
+        _this6.state = null;
+        return _this6;
     }
 
     (0, _createClass3.default)(TrxGrid, [{
@@ -42681,6 +42772,43 @@ function fetchKey(url, csrf) {
             console.dir(response);
             return resolve(response);
         });
+    });
+}
+
+function fetchUserUpdate(id, data, csrf) {
+    return new _promise2.default(function (resolve, reject) {
+        var uid = String('0000' + id).slice(-4);
+        var url = '/api/user/' + uid + '/update';
+        var headers = new Headers({ 'Content-Type': 'application/json', 'csrf-token': csrf });
+        var options = {
+            method: 'POST',
+            headers: new Headers({ 'Content-Type': 'application/json', 'csrf-token': csrf })
+        };
+
+        if (csrf !== void 0 && data !== void 0) {
+            var payload = {};
+            if (data.name !== void 0) payload.name = data.name;
+            // Object.defineProperty(payload, 'name', {value: data.name, enumerable: true})
+            if (data.email !== void 0) payload.email = data.email;
+            // Object.defineProperty(payload, 'email', {value: data.email, enumerable: true})
+
+            if ((0, _keys2.default)(payload).length > 0) {
+                options.body = (0, _stringify2.default)(payload);
+            }
+
+            fetch(url, options).then(function (res) {
+                return res.json().catch(function (error) {
+                    return console.error('Error:', error);
+                });
+            }).then(function (response) {
+                var handledResponse = handleResponse(response);
+                if (handledResponse) {
+                    return resolve(handledResponse);
+                } else {
+                    reject(handledResponse);
+                }
+            });
+        }
     });
 }
 
