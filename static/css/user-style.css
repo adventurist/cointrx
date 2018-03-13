@@ -62,7 +62,8 @@
 }
 
 #estimated-value {
-    color: rgb(66, 160, 176)!important;
+    color: rgb(89, 229, 252)!important;
+    font-size: 14pt;
 }
 
 .estimated-value hr {
@@ -102,4 +103,13 @@
     width: 100%;
     transform: scaleX(0);
     transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+}
+
+.user-snackbar, .user-snackbar div {
+    background: rgb(0, 151, 167)!important;
+}
+
+.user-snackbar span {
+    color: #333333!important;
+    font-weight: 700!important;
 }
