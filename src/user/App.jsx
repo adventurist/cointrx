@@ -94,6 +94,8 @@ export class UserForm extends React.Component {
         this.setState({...this.state, [field]: value});
     }
 
+
+
     fileChange = (e) => {
         this.setState({files: e.target.files})
     }
@@ -104,16 +106,16 @@ export class UserForm extends React.Component {
 
     onSubmit = e => {
         e.preventDefault()
-
-        const username = this.refs.username.input.value
-        const language = this.refs.language.input.value
-        const email = this.refs.email.input
-
-        this.setState({
-            username,
-            language,
-            email,
-        })
+        this.requestUserUpdate(userProfileData.id, {name: this.refs.username.input.value, email: this.refs.email.input.value}).then((result) => console.log(result))
+        // const username = this.refs.username.input.value
+        // const language = this.refs.language.input.value
+        // const email = this.refs.email.input
+        //
+        // this.setState({
+        //     username,
+        //     language,
+        //     email,
+        // })
     }
 
     render() {
@@ -181,10 +183,59 @@ export class UserForm extends React.Component {
             </div>
         )
     }
+
+    saveUser () {
+
+        if (isUserInfoChanged(userProfileData, this.state)) {
+            this.requestUserUpdate(userProfileData.id, this.state)
+        }
+    }
+
+    requestUserUpdate = async (id, payload) => {
+        const csrf = getCsrfToken()
+        if (csrf && csrf.length > 0) {
+            const result = await fetchUserUpdate(id, payload, csrf)
+            if (!result.error) {
+                if (this.updateUser(id, payload)) {
+                    console.debug('User Updated')
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    updateUser(id, payload) {
+        if (payload !== void 0) {
+            let userChanged = false
+            payload.name = payload.name !== void 0 ? payload.name : this.state.username
+            payload.email = payload.email !== void 0 ? payload.email : this.state.email
+            if (payload.name !== void 0 || payload.email !== void 0) {
+                userChanged = payload.name !== this.state.username || payload.email !== this.state.email ? !userChanged : userChanged
+            }
+            if (userChanged) {
+                this.setState({username: payload.name, email: payload.email})
+            } else {
+                console.debug('User not changed')
+            }
+            return true
+        }
+        console.debug('updateUser called with bogus payload')
+        return false
+    }
 }
 
+function isUserInfoChanged(userData, state) {
+    if ('email' in state && 'username' in state) {
+        const changed = userData.find(d => d.email !== state.email || d.name !== state.username)
+        if (changed && changed.length > 0) {
+            return true
+        }
+    }
+    return false
+}
 
-export class UserKeys extends React.Component {
+    export class UserKeys extends React.Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
@@ -305,7 +356,6 @@ export class UserKeys extends React.Component {
     }
 
     buildBtns (row) {
-        console.dir(row)
         return ({
             'id': row.id,
             'lbl': row.lbl,
@@ -325,7 +375,6 @@ export class UserKeys extends React.Component {
     }
 
     buildRows(key) {
-        console.dir(key)
         return {
             'id': key.id,
             'lbl': key.label,
@@ -424,6 +473,7 @@ export class UserKeys extends React.Component {
             this.requestBtcKeyUpdate(this.state.dialogCursor, this.state.dialogText)
         }
     }
+
 
     requestBtcKeyUpdate = async(id, label) => {
         const csrf = getCsrfToken()
@@ -529,6 +579,45 @@ function fetchKey(url, csrf) {
                 console.dir(response)
                 return resolve(response)
             })
+    })
+}
+
+function fetchUserUpdate(id, data, csrf) {
+    return new Promise((resolve, reject) => {
+        const uid = String('0000' + id).slice(-4)
+        let url = `/api/user/${uid}/update`
+        let headers = new Headers({'Content-Type': 'application/json', 'csrf-token': csrf})
+        let options = {
+            method: 'POST',
+            headers: new Headers({'Content-Type': 'application/json', 'csrf-token': csrf})
+        }
+
+        if (csrf !== void 0 && data!== void 0) {
+            const payload = {}
+            if (data.name !== void 0)
+                payload.name = data.name
+            // Object.defineProperty(payload, 'name', {value: data.name, enumerable: true})
+            if (data.email!== void 0)
+                payload.email = data.email
+                // Object.defineProperty(payload, 'email', {value: data.email, enumerable: true})
+
+            if (Object.keys(payload).length > 0) {
+                options.body = JSON.stringify(payload)
+            }
+
+            fetch(url, options).then(res =>
+                res.json()
+                    .catch(error => console.error('Error:', error)
+                    ))
+                .then(response => {
+                    const handledResponse = handleResponse(response)
+                    if (handledResponse) {
+                        return resolve(handledResponse)
+                    } else {
+                        reject(handledResponse)
+                    }
+                })
+        }
     })
 }
 
