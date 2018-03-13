@@ -11,6 +11,7 @@ import Tooltip from 'material-ui/internal/Tooltip'
 import Dialog from 'material-ui/Dialog'
 import DatePicker from 'material-ui/DatePicker'
 import TimezonePicker from 'react-timezone';
+import Snackbar from 'material-ui/Snackbar';
 import { some } from 'lodash'
 
 
@@ -75,6 +76,8 @@ export class UserForm extends React.Component {
         this.state = {
             editing: false,
             files: null,
+            snackbarMsg: '',
+            snackbarOpen: false,
             username: userProfileData.name,
             email: userProfileData.email,
             estimatedValue: userProfileData.estimated,
@@ -94,7 +97,13 @@ export class UserForm extends React.Component {
         this.setState({...this.state, [field]: value});
     }
 
+    snackbarMsg = (msg) => {
+        this.setState({snackbarMsg: msg, snackbarOpen: true})
+    }
 
+    snackbarClose = () => {
+        this.setState({snackbarOpen: false});
+    };
 
     fileChange = (e) => {
         this.setState({files: e.target.files})
@@ -106,16 +115,7 @@ export class UserForm extends React.Component {
 
     onSubmit = e => {
         e.preventDefault()
-        this.requestUserUpdate(userProfileData.id, {name: this.refs.username.input.value, email: this.refs.email.input.value}).then((result) => console.log(result))
-        // const username = this.refs.username.input.value
-        // const language = this.refs.language.input.value
-        // const email = this.refs.email.input
-        //
-        // this.setState({
-        //     username,
-        //     language,
-        //     email,
-        // })
+        this.requestUserUpdate(userProfileData.id, {name: this.refs.username.input.value, email: this.refs.email.input.value}).then((result) => this.snackbarMsg('User Information has been Updated'))
     }
 
     render() {
@@ -180,6 +180,13 @@ export class UserForm extends React.Component {
                         />
                     </div>
                 </form>
+                <Snackbar
+                    className="user-snackbar"
+                    open={this.state.snackbarOpen}
+                    message={this.state.snackbarMsg}
+                    autoHideDuration={4000}
+                    onRequestClose={this.snackbarClose}
+                />
             </div>
         )
     }
