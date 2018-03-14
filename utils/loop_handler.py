@@ -9,9 +9,9 @@ class IOHandler:
         print(response.body.decode("utf-8"))
 
     @staticmethod
-    def handle_price(response):
+    async def handle_price(response):
         # return response.body.decode("utf-8")
-        db.update_prices(json.loads(response.body.decode("utf-8")))
+        await db.update_prices(json.loads(response.body.decode("utf-8")))
         # print(data)
         # for k, v in data.items():
         #     print('My thing is')

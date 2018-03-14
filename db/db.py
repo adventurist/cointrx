@@ -422,9 +422,9 @@ def handle_db_data(response):
             print(row.serialize())
 
 
-def update_prices(data):
+async def update_prices(data):
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(parse_price_data(data))
+    loop.run_until_complete(await parse_price_data(data))
 
 
 async def latest_prices():
@@ -933,7 +933,7 @@ async def regtest_user_estimated_value(uid: str):
         if price and price.last is not None:
             satoshis = Decimal(await btcd_utils.RegTest.get_user_balance(user.trxkey))
             estimated_value = satoshis / COIN * price.last
-            return str(estimated_value.quantize(Decimal('.02'), rounding=ROUND_HALF_UP))
+            return str(estimated_value.quantize(Decimal(".01"), rounding=ROUND_HALF_UP))
 
 
 async def get_user(uid: str):

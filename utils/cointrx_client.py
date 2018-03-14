@@ -22,12 +22,12 @@ class Client:
             return response.body
 
     @gen.coroutine
-    def get_prices(self):
+    async def get_prices(self):
         print('test')
 
         try:
-            response = yield http_client.fetch(config.blockchain_url)
-            io_handler.handle_price(response)
+            response = await http_client.fetch(config.blockchain_url)
+            await io_handler.handle_price(response)
 
         except tornado_client.HTTPError as e:
             print(e.message)
