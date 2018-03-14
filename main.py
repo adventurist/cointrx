@@ -245,7 +245,6 @@ class UpdatePriceHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    @gen.coroutine
     async def get(self):
         await http_client.get_prices()
 
