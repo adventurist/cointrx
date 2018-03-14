@@ -958,3 +958,25 @@ async def update_user(uid: str, data: dict):
         except exc.SQLAlchemyError as error:
             print(error)
             return False
+
+
+def max_last_hour():
+    engine.execute(""
+
+                   "SELECT to_timestamp(modified), buy "
+                   "FROM cx_price_revision "
+                   "WHERE modified < extract(epoch from now())::int and modified > (extract(epoch from now())::int -3600) "
+                   "AND currency = 'CAD' "
+                   "GROUP BY buy, to_timestamp(modified) "
+                   "ORDER BY buy DESC LIMIT 1;")
+
+
+def min_last_hour():
+    engine.execute(""
+
+                   "SELECT to_timestamp(modified), buy "
+                   "FROM cx_price_revision "
+                   "WHERE modified < extract(epoch from now())::int and modified > (extract(epoch from now())::int -3600) "
+                   "AND currency = 'CAD' "
+                   "GROUP BY buy, to_timestamp(modified) "
+                   "ORDER BY buy ASC LIMIT 1;")
