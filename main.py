@@ -246,8 +246,8 @@ class UpdatePriceHandler(RequestHandler):
         pass
 
     @gen.coroutine
-    def get(self):
-        http_client.get_prices()
+    async def get(self):
+        await http_client.get_prices()
 
         self.write('Sent request')
 
