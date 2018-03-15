@@ -17,3 +17,5 @@ INSTALLATION
  5. Add environment variable to virtual environment
  - edit <CoinTRX>/coinenv/bin/activate 
  - add `TRX_ENX=LOCAL_DEVELOPMENT`
+
+ arbitratus
