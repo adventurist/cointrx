@@ -5,6 +5,8 @@ import "./index.css";
 import { tsvParse, csvParse } from  "d3-dsv";
 import { timeParse } from "d3-time-format";
 
+import jsonParse from './jsonParse'
+
 function parseData(parse) {
     return function(d) {
         d.date = parse(d.date);
@@ -18,13 +20,36 @@ function parseData(parse) {
     };
 }
 
-const parseDate = timeParse("%Y-%m-%d");
+function parseJsonData(parse) {
+    console.dir(parse)
+    return function(d) {
+        console.dir(d)
+        d.date = parse(d.date)
+        d.open = d.low
+        d.low = d.low
+        d.high = d.high
+        d.close = d.close;
+        d.volume = ''
 
-export function getData() {
-    const promiseMSFT = fetch("//rrag.github.io/react-stockcharts/data/MSFT.tsv")
+        return d
+    }
+}
+
+const parseDate = timeParse("%Y-%m-%d");
+const jsonParser = jsonParse("\t")
+
+// export function getData() {
+//     const promiseMSFT = fetch("//rrag.github.io/react-stockcharts/data/MSFT.tsv")
+//         .then(response => response.text())
+//         .then(data => tsvParse(data, parseData(parseDate)))
+//     return promiseMSFT;
+// }
+
+export function getJson() {
+    const promiseJSON = fetch('/api/prices/regtest/btc/cad/minmax/json')
         .then(response => response.text())
-        .then(data => tsvParse(data, parseData(parseDate)))
-    return promiseMSFT;
+        .then(data => jsonParser.parse(JSON.parse(data)))
+    return promiseJSON
 }
 
 
