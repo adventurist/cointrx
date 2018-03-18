@@ -1011,6 +1011,7 @@ async def btc_hour_minmax_price():
                    "(EXTRACT('minute' FROM to_timestamp(modified))::integer %% 30) * interval '1 minute' as date, min(last), max(last) "
                    "FROM cx_price_revision "
                    "WHERE currency='CAD' "
+                    "AND to_timestamp(modified) < CURRENT_TIMESTAMP AND to_timestamp(modified) > (CURRENT_TIMESTAMP - INTERVAL '40 days')"
                    "GROUP BY 1 ORDER BY date;")
 
 
