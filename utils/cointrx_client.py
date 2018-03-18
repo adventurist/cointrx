@@ -1,6 +1,13 @@
 from tornado import gen
 from tornado import httpclient as tornado_client
 from utils.loop_handler import IOHandler
+import aiohttp
+import async_timeout
+from tornado.gen import with_timeout, convert_yielded
+from datetime import timedelta
+
+
+
 
 from types import SimpleNamespace
 
@@ -20,18 +27,6 @@ class Client:
         else:
             print(response.body)
             return response.body
-
-
-    async def get_prices(self):
-        print('test')
-
-        try:
-            response = await http_client.fetch(config.blockchain_url)
-            await io_handler.handle_price(response)
-            return True
-
-        except tornado_client.HTTPError as e:
-            print(e.message)
 
     @staticmethod
     async def connect(url, body=None, headers=None):
@@ -58,3 +53,34 @@ class Client:
         except tornado_client.HTTPError as e:
             print(e.message)
 
+
+    # async def get_prices(self):
+    #     print('test')
+    #
+    #     try:
+    #         response = await http_client.fetch(config.blockchain_url)
+    #         await io_handler.handle_price(response)
+    #         return True
+    #
+    #     except tornado_client.HTTPError as e:
+    #         print(e.message)
+    # @gen.coroutine
+    async def get_prices(self):
+        print('test')
+
+        try:
+            # async with aiohttp.ClientSession() as session:
+            #     response_data = await with_timeout(timedelta(seconds=1), convert_yielded(fetch(session, config.blockchain_url)))
+            #     # response_data = await fetch(session, config.blockchain_url)
+            #     price_handle_result = await io_handler.handle_price(response_data)
+            #     return price_handle_result
+            response = await http_client.fetch(config.blockchain_url)
+            price_handle_result = await io_handler.handle_price(response)
+            return price_handle_result
+
+        except aiohttp.client_exceptions.ClientError as e:
+            print(e.message)
+
+async def fetch(session, url):
+    async with session.get(url) as response:
+            return await response.text()
