@@ -422,9 +422,14 @@ def handle_db_data(response):
             print(row.serialize())
 
 
+# async def update_prices(data):
+#     loop = asyncio.get_event_loop()
+#     loop.run_until_complete(await parse_price_data(data))
+
+
 async def update_prices(data):
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(await parse_price_data(data))
+    # loop = asyncio.get_event_loop()
+    return await parse_price_data(data)
 
 
 async def latest_prices():
@@ -502,57 +507,90 @@ def get_users():
 
 async def parse_price_data(data):
     for k, v in data.items():
-        engine = await async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'],
-                                    host=db_config.DATABASE['host'], password=db_config.DATABASE['password'])
 
-        async with engine:
-            async with engine.acquire() as conn:
-                try:
-                    query = select([CXPrice]).where(CXPrice.currency == k)
-                    cur_time = time.time()
-                    result = await conn.execute(query)
+        result = session.query(CXPrice).filter(CXPrice.currency == k).one_or_none()
+        cur_time = time.time()
+        if result is None:
+            result = CXPrice(currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time)
 
-                    if result.rowcount < 1:
-                        async with conn.begin():
-                            await conn.execute(
-                                CXPrice.__table__.insert().values(currency=k, sell=v['sell'],
-                                                                  last=v['last'],
-                                                                  buy=v['buy'],
-                                                                  modified=cur_time))
+        try:
+            session.add(result)
+            session.commit()
+            session.flush()
 
-                    else:
-                        async with conn.begin():
-                            await conn.execute(
-                                CXPrice.__table__.update().where(CXPrice.currency == k).values(sell=v['sell'],
-                                                                                               last=v['last'],
-                                                                                               buy=v['buy'],
-                                                                                               modified=cur_time))
-                    query2 = select([CXPriceRevision]).where(CXPriceRevision.currency == k).group_by(
-                        CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid)))
-                    result2 = await conn.execute(query2)
-                    rid = find_rid(result2)
-                    rid = rid + 1 if rid is not None else 1
+        except exc.SQLAlchemyError as e:
+            print(e)
+            return False
 
-                    await conn.execute(
-                        CXPriceRevision.__table__.insert().values(rid=rid, currency=k, sell=v['sell'],
-                                                                  last=v['last'],
-                                                                  buy=v['buy'],
-                                                                  modified=cur_time))
+        result2 = session.query(CXPriceRevision).filter(CXPriceRevision.currency == k).group_by(CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid)))
+        rid = find_rid(result2)
+        rid = rid + 1 if rid is not None else 1
 
+        revision_insert = CXPriceRevision(rid=rid, currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time)
+        try:
+            session.add(revision_insert)
+            session.commit()
+            session.flush()
 
-                except exc.SQLAlchemyError as error:
-                    print(error)
+        except exc.SQLAlchemyError as e:
+            print(e)
+            return False
 
-                finally:
-                    conn.close()
+    return True
+
+        # engine = async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'],
+        #                             host=db_config.DATABASE['host'], password=db_config.DATABASE['password'])
+        #
+        # query = select([CXPrice]).where(CXPrice.currency == k)
+        # cur_time = time.time()
+        # result = await conn.execute(query)
+        # async with engine:
+        #     async with engine.acquire() as conn:
+        #         try:
+        #             query = select([CXPrice]).where(CXPrice.currency == k)
+        #             cur_time = time.time()
+        #             result = await conn.execute(query)
+        #
+        #             if result.rowcount < 1:
+        #                 async with conn.begin():
+        #                     await conn.execute(
+        #                         CXPrice.__table__.insert().values(currency=k, sell=v['sell'],
+        #                                                           last=v['last'],
+        #                                                           buy=v['buy'],
+        #                                                           modified=cur_time))
+        #
+        #             else:
+        #                 async with conn.begin():
+        #                     await conn.execute(
+        #                         CXPrice.__table__.update().where(CXPrice.currency == k).values(sell=v['sell'],
+        #                                                                                        last=v['last'],
+        #                                                                                        buy=v['buy'],
+        #                                                                                        modified=cur_time))
+        #             query2 = select([CXPriceRevision]).where(CXPriceRevision.currency == k).group_by(
+        #                 CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid)))
+        #             result2 = await conn.execute(query2)
+        #             rid = find_rid(result2)
+        #             rid = rid + 1 if rid is not None else 1
+        #
+        #             await conn.execute(
+        #                 CXPriceRevision.__table__.insert().values(rid=rid, currency=k, sell=v['sell'],
+        #                                                           last=v['last'],
+        #                                                           buy=v['buy'],
+        #                                                           modified=cur_time))
+        #
+        #         except exc.SQLAlchemyError as error:
+        #             print(error)
+        #
+        #         finally:
+        #             conn.close()
 
 
 def find_rid(data):
-    for d in data:
-        if d is not None and d.rid is not None:
-            return d.rid
-        else:
-            return None
+    if data is not None:
+        for d in data:
+            if d is not None and d.rid is not None:
+                return d.rid
+    return None
 
 
 def check_authentication(user, password, email):
@@ -960,6 +998,29 @@ async def update_user(uid: str, data: dict):
             return False
 
 
+async def regtest_graph_data():
+    minmax_dataset = await btc_hour_minmax_price()
+    hourly_minmax = []
+    for row in minmax_dataset:
+        hourly_minmax.append({'date': row[0].strftime("%Y-%m-%d %H:%M:%S"), 'low': str(row[1]), 'high': str(row[2])})
+    return json.dumps(hourly_minmax)
+
+
+async def btc_hour_minmax_price():
+    return engine.execute("SELECT date_trunc('minute', to_timestamp(modified)) - "
+                   "(EXTRACT('minute' FROM to_timestamp(modified))::integer %% 30) * interval '1 minute' as date, min(last), max(last) "
+                   "FROM cx_price_revision "
+                   "WHERE currency='CAD' "
+                   "GROUP BY 1 ORDER BY date;")
+
+
+def min_30_interval():
+    engine.execute("SELECT date_trunc('hour', to_timestamp(modified)) - "
+                   "(EXTRACT('hour' FROM to_timestamp(modified))::integer % 30) * interval '1 minute' as date, min(last), max(last) "
+                   "FROM cx_price_revision "
+                   "WHERE currency='CAD' "
+                   "GROUP BY 1 ORDER BY date;")
+
 def max_last_hour():
     engine.execute(""
 
@@ -980,3 +1041,9 @@ def min_last_hour():
                    "AND currency = 'CAD' "
                    "GROUP BY buy, to_timestamp(modified) "
                    "ORDER BY buy ASC LIMIT 1;")
+
+
+# SELECT modified,  max(last)
+# FROM cx_price_revision
+# WHERE to_timestamp(modified) > to_timestamp(modified)  - INTERVAL '1 week' and currency='CAD'
+# GROUP BY modified;
