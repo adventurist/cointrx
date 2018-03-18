@@ -245,8 +245,13 @@ class UpdatePriceHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
+    # async def get(self):
+    #     await http_client.get_prices()
+    #
+    #     self.write('Sent request')
+    # @gen.coroutine
     async def get(self):
-        await http_client.get_prices()
+        price_update_result = await http_client.get_prices()
 
         self.write('Sent request')
 
@@ -833,6 +838,16 @@ class RegTestPayAllKeyHandler(RequestHandler):
         result = await db.regtest_pay_keys('10')
         self.write(result)
 
+
+class BtcMinMaxHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        minmax_data = await db.regtest_graph_data()
+        self.write(minmax_data)
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -895,6 +910,7 @@ class TRXApplication(Application):
             (r"/prices/graph/json", GraphJsonHandler),
             (r"/prices/latest", LatestPriceHandler),
             (r"/prices/currency", CurrencyHandler),
+            (r"/api/prices/regtest/btc/cad/minmax/json", BtcMinMaxHandler),
 
             # -- Heartbeat / Social Media
             (r"/heartbeat/create", HeartbeatCreateHandler),
