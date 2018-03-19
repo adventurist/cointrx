@@ -91,7 +91,7 @@ export default function(delimiter) {
 }
 
 function mockRandom() {
-    const max = 0.02, min = 0.001
+    const max = 0.009, min = 0.00001
     return Math.random() * (max - min) + min
 }
 
