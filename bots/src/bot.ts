@@ -1,9 +1,13 @@
-import {Peer} from 'node-jet'
+import * as jet from 'node-jet'
 
-class TradeBot {
-    private peer: Peer;
-    constructor () {
-        this.peer = new Peer
+export class TradeBot {
+    private peer: typeof jet.Peer;
+    constructor (config) {
+        this.peer = new jet.Peer(config)
+    }
+
+    connect() {
+        this.peer.connect()
     }
 }
 

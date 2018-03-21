@@ -1,6 +1,9 @@
+aiohttp==3.0.9
 aiopg==0.13.0
 alabaster==0.7.10
+async-timeout==2.0.1
 asyncio==3.4.3
+attrs==17.4.0
 Babel==2.5.1
 base58==0.2.5
 bitcoin==1.1.42
@@ -21,6 +24,7 @@ graphql-core==2.0
 graphql-relay==0.4.5
 httpsig==1.1.2
 idna==2.6
+idna-ssl==1.0.1
 imagesize==0.7.1
 iso8601==0.1.12
 itermate==1.0.2
@@ -30,6 +34,7 @@ join==0.1.1
 keychain==0.14.2.0
 keylib==0.1.1
 MarkupSafe==1.0
+multidict==4.1.0
 mypy==0.540
 netaddr==0.7.19
 numpydoc==0.7.0
@@ -67,3 +72,4 @@ typing==3.6.2
 urllib3==1.22
 utilitybelt==0.2.6
 where==1.0.2
+yarl==1.1.1
