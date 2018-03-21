@@ -3,28 +3,21 @@ import asyncio
 import logging
 import sys
 import uuid
-import traceback
 
 import base64
 import json
 import os
 import random
 import warnings
-
-from graphql.error import GraphQLError
-from graphql.error import format_error as format_graphql_error
-
-from functools import wraps
-
 from tornado import escape
 from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.options import define
 from tornado.websocket import WebSocketHandler
-from tornado.web import Application, RequestHandler, StaticFileHandler, HTTPError
+from tornado.web import Application, RequestHandler, StaticFileHandler
 
 from config import config as TRXConfig
-from db import db, graphql
+from db import db
 from utils.loop_handler import IOHandler
 from utils.tx import trx__tx_out
 from utils import drupal_utils, session
@@ -50,56 +43,6 @@ define("port", default=6969, help="Default port for the WebServer")
 #         if isinstance(obj, datetime.datetime):
 #             return str(obj)
 #         return super(MJSONEncoder, self).default(obj)
-
-def error_response(func):
-    @wraps(func)
-    def wrapper(self, *args, **kwargs):
-        try:
-            result = func(self, *args, **kwargs)
-        except Exception as ex:
-            if not isinstance(ex, (HTTPError, ExecutionError, GraphQLError)):
-                tb = ''.join(traceback.format_exception(*sys.exc_info()))
-                logging.error('Error: {0} {1}'.format(ex, tb))
-            self.set_status(error_status(ex))
-            error_json = escape.json_encode({'errors': error_format(ex)})
-            logging.debug('error_json: %s', error_json)
-            self.write(error_json)
-        else:
-            return result
-
-    return wrapper
-
-
-class ExecutionError(Exception):
-    def __init__(self, status_code=400, errors=None):
-        self.status_code = status_code
-        if errors is None:
-            self.errors = []
-        else:
-            self.errors = [str(e) for e in errors]
-        self.message = '\n'.join(self.errors)
-
-
-def error_status(exception):
-    if isinstance(exception, HTTPError):
-        return exception.status_code
-    elif isinstance(exception, (ExecutionError, GraphQLError)):
-        return 400
-    else:
-        return 500
-
-
-def error_format(exception):
-    if isinstance(exception, ExecutionError):
-        return [{'message': e} for e in exception.errors]
-    elif isinstance(exception, GraphQLError):
-        return [format_graphql_error(exception)]
-    elif isinstance(exception, HTTPError):
-        return [{'message': exception.log_message,
-                 'reason': exception.reason}]
-    else:
-        return [{'message': 'Unknown server error'}]
-
 
 def check_attribute(obj, att):
     return getattr(obj, att, None) is not None
@@ -905,69 +848,6 @@ class BtcMinMaxHandler(RequestHandler):
         self.write(minmax_data)
 
 
-class GraphQLHandler(RequestHandler):
-
-    def data_received(self, chunk):
-        pass
-
-    def __init__(self, application, request, **kwargs):
-        super().__init__(application, request, **kwargs)
-        self.schema = graphql.schema
-
-    @error_response
-    def get(self, *args, **kwargs):
-        placeholder = 'placeholder'
-
-    def post(self):
-        return self.handle_graqhql()
-
-    def handle_graqhql(self):
-        result = self.execute_graphql()
-        logging.log('DEBUG', 'GraphQL result data: %s errors: %s invalid %s',
-                    result.data, result.errors, result.invalid)
-        if result and result.invalid:
-            ex = ExecutionError(errors=result.errors)
-            logging.warn('GraphQL Error: %s', ex)
-            raise ex
-
-        response = {'data': result.data}
-        self.write(escape.json_encode(response))
-
-    def execute_graphql(self):
-        graphql_req = self.graphql_request
-        return self.schema.execute(
-            graphql_req.get('query'),
-            variable_values=graphql_req.get('variables'),
-            operation_name=graphql_req.get('operationName'),
-            context_value=graphql_req.get('context'),
-            middleware=self.middleware
-        )
-
-    @property
-    def graphql_request(self):
-        return escape.json_decode(self.request.body)
-
-    @property
-    def content_type(self):
-        return self.request.headers.get('Content-Type', 'text/plain').split(';')[0]
-
-    @property
-    def schema(self):
-        raise NotImplementedError('schema must be provided')
-
-    @property
-    def middleware(self):
-        return []
-
-    @property
-    def context(self):
-        return None
-
-    @schema.setter
-    def schema(self, value):
-        self._schema = value
-
-
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -1045,8 +925,6 @@ class TRXApplication(Application):
             (r"/password", PasswordHandler),
             (r"/sendmail", SendMailHandler),
             (r"/fakenews", FakeNewsHandler),
-
-            (r"/graphql", GraphQLHandler),
 
             # Static
             (r"/static/(.*)", StaticFileHandler, {"path": "/static"}),

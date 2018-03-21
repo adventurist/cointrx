@@ -242,7 +242,7 @@ function isUserInfoChanged(userData, state) {
     return false
 }
 
-export class UserKeys extends React.Component {
+    export class UserKeys extends React.Component {
     constructor(props, context) {
         super(props, context);
         this.state = {

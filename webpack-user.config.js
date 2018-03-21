@@ -26,6 +26,8 @@ let config = {
         new webpack.ProvidePlugin({
             "React": "react",
         }),
+    //     ["transform-object-rest-spread", { "useBuiltIns": true }]
+    //
     ]
 };
 

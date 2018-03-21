@@ -1,4 +1,4 @@
-import * as actionTypes from '../actions/user/actionTypes'
+import * as actionTypes from '../actions/actionTypes'
 import { handleActions } from 'redux-actions'
 import { cloneDeep, unionBy, sortBy, find } from 'lodash/fp'
 
