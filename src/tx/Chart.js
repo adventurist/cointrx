@@ -49,7 +49,7 @@ const stoAppearance = {
 
 const candlesAppearance = {
     candleStrokeWidth: 1,
-    widthRatio: 0.8,
+    widthRatio: 1,
     opacity: 1,
 }
 

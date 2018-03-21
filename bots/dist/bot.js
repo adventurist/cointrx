@@ -1,8 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const node_jet_1 = require("node-jet");
+const jet = require("node-jet");
 class TradeBot {
-    constructor() {
-        this.peer = new node_jet_1.Peer;
+    constructor(config) {
+        this.peer = new jet.Peer(config);
+    }
+    connect() {
+        this.peer.connect();
     }
 }
+exports.TradeBot = TradeBot;

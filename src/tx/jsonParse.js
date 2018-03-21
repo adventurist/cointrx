@@ -91,10 +91,10 @@ export default function(delimiter) {
 }
 
 function mockRandom() {
-    const max = 0.009, min = 0.00001
+    const max = 0.000000001, min = 0.0000000001
     return Math.random() * (max - min) + min
 }
 
 function flipCoin() {
-    return Math.random() >= 0.5
+    return Math.random() >= 0.1
 }

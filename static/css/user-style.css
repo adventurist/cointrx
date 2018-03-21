@@ -113,3 +113,7 @@
     color: #333333!important;
     font-weight: 700!important;
 }
+
+.react-grid-Canvas .react-grid-Cell, #trade-left, #trade-right {
+    background-color: #333333;
+}
