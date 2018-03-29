@@ -10,3 +10,5 @@ sites2
 themes
 Coin\ X.iml
 *.iml
+bot/bot.log
+bot/benv
