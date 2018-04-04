@@ -31,7 +31,8 @@ from utils import drupal_utils, session
 from utils.cointrx_client import Client
 from utils.mail_helper import Sender as mail_sender
 
-from utils.login_helpers import retrieve_api_request_headers, retrieve_json_login_headers, retrieve_json_login_credentials, check_basic_auth, create_user_session_data, \
+from utils.login_helpers import retrieve_api_request_headers, retrieve_json_login_headers, \
+    retrieve_json_login_credentials, check_basic_auth, create_user_session_data, \
     retrieve_login_credentials
 
 io_handler = IOHandler()
@@ -197,32 +198,32 @@ class LoginHandler(RequestHandler):
         basic_auth, content_type = retrieve_json_login_headers(self.request.headers)
 
         if content_type == 'application/json':
-            auth_name, auth_pass = check_basic_auth(basic_auth)
+            # auth_name, auth_pass = check_basic_auth(basic_auth)
             email, name, password = retrieve_json_login_credentials(
                 {k: ''.join(v) for k, v in escape.json_decode(self.request.body).items()})
 
-            if email or name is None or password is None:
+            if name is None or password is None:
                 self.write("You must supply more arguments")
+                self.set_status(400)
                 self.write_error(400)
+
+            user_verify = db.check_authentication_by_name(name, password)
+            if user_verify is not None and user_verify is not -1:
+                csrf = user_verify.generate_auth_token(expiration=1200)
+                application.create_session(user=create_user_session_data(name, password, user_verify, csrf))
+                if application.session is not None and isinstance(application.session, session.Session):
+                    self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+
+                    return self.write(escape.json_encode(
+                        {'statuscode': 200, 'token': str(application.session.user['csrf'], 'utf-8'),
+                         'trx_cookie': str(self.get_secure_cookie('trx_cookie'))}))
+
+            elif user_verify < -1:
+                self.set_status(404)
+                return self.write(escape.json_encode({'statuscode': 404}))
             else:
-                if auth_name != name or auth_pass != password:
-                    self.write(escape.json_encode({'statuscode': 400}))
-
-                user_verify = db.check_authentication(name, password, email)
-                if user_verify > -1:
-                    csrf = user_verify.generate_auth_token(expiration=1200)
-                    application.create_session(user=create_user_session_data(name, password, user_verify, csrf))
-                    if application.session is not None and isinstance(application.session, session.Session):
-                        self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
-
-                        return self.write(escape.json_encode(
-                            {'statuscode': 200, 'token': str(application.session.user['csrf'], 'utf-8'),
-                             'trx_cookie': str(self.get_secure_cookie('trx_cookie'))}))
-
-                elif user_verify < -1:
-                    return self.write(escape.json_encode({'statuscode': 404}))
-                else:
-                    return self.write(escape.json_encode({'statuscode': 401}))
+                self.set_status(401)
+                return self.write(escape.json_encode({'statuscode': 401}))
 
         elif self.request.headers.get("Content-Type") == 'text/html':
             name = self.get_argument('name')
@@ -250,6 +251,7 @@ class LoginHandler(RequestHandler):
                                                    csrf=csrf)
                         self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
                         self.set_cookie(name='csrf', value=csrf)
+                        test = self.get_secure_cookie('trx_cookie')
                         if self.get_secure_cookie('redirect_target') is not None:
                             redirect_target = self.get_secure_cookie('redirect_target')
                             self.clear_cookie('redirect_target')
@@ -389,7 +391,7 @@ class RegisterHandler(RequestHandler):
                 self.write_error(401)
             else:
                 user_verify = db.check_authentication(name, password, email)
-                if user_verify is -1 or None:
+                if isinstance(user_verify, int) and user_verify < 0:
                     user_verify = db.create_user(name, password, email)
 
                 csrf = user_verify.generate_auth_token(expiration=1200)
@@ -906,7 +908,6 @@ class BtcMinMaxHandler(RequestHandler):
 
 
 class GraphQLHandler(RequestHandler):
-
     def data_received(self, chunk):
         pass
 
@@ -968,6 +969,18 @@ class GraphQLHandler(RequestHandler):
         self._schema = value
 
 
+class TRCPriceUpdateHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        current_trx_prices = await db.regtest_graph_data()
+        latest_trc_price = await db.
+        for price in current_trx_prices:
+            ex = price
+            print(str(price))
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -1002,6 +1015,9 @@ class TRXApplication(Application):
             (r"/regtest/address/provision-all", RegTestAddressAllHandler),
             (r"/keys/btc/regtest/generate", RegTestUserKeyGenerateHandler),
 
+            # Regression Mock Chain
+            (r"/trc/price/update", TRCPriceUpdateHandler),
+
             # CRON Processes
             (r"/updateprices", UpdatePriceHandler),
 
@@ -1031,6 +1047,7 @@ class TRXApplication(Application):
             (r"/prices/latest", LatestPriceHandler),
             (r"/prices/currency", CurrencyHandler),
             (r"/api/prices/regtest/btc/cad/minmax/json", BtcMinMaxHandler),
+            (r"/api/prices/regtest-mock/btc/cad/minmax/json", BtcMinMaxHandler),
 
             # -- Heartbeat / Social Media
             (r"/heartbeat/create", HeartbeatCreateHandler),
@@ -1094,9 +1111,19 @@ def login_redirect(handler: RequestHandler, origin: str):
     handler.set_secure_cookie('redirect_target', origin)
     handler.redirect('/login')
 
+
 if __name__ == "__main__":
     env_setup()
-    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger('MAIN')
+    logger.setLevel(logging.DEBUG)
+
+    log_handler = logging.FileHandler('trx.log')
+    logger_formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+    log_handler.setFormatter(logger_formatter)
+
+    logger.addHandler(log_handler)
+    logger.info('Logger configured')
+
     looper = asyncio.get_event_loop()
     looper.set_debug(True)
     looper.slow_callback_duration = 0.001
