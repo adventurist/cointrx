@@ -18,9 +18,10 @@ def retrieve_api_request_headers(headers):
 
 
 def check_basic_auth(auth_header):
-    auth_decoded = base64.decodebytes(bytes(auth_header[6:], 'utf-8'))
-    name, password = str(auth_decoded).split(':', 2)
-    return name, password
+    if auth_header is not None:
+        auth_decoded = base64.decodebytes(bytes(auth_header[6:], 'utf-8'))
+        name, password = str(auth_decoded).split(':', 2)
+        return name, password
 
 
 def create_user_session_data(name, password, user, csrf):
