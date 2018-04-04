@@ -1,5 +1,4 @@
 from typing import Union
-
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from passlib.apps import custom_app_context as pwd_context
 from aiopg.sa import create_engine as async_engine
@@ -20,7 +19,6 @@ from decimal import Decimal, ROUND_HALF_UP
 from utils import btcd_utils
 from config.config import DEFAULT_LANGUAGE
 
-import asyncio
 import timeago
 import re
 import time
@@ -83,6 +81,13 @@ class KeyLabel(Base):
     trxkey = relationship("TrxKey", back_populates='label')
 
 
+class TRCHistory(Base):
+    __tablename__ = 'trc_history'
+    id = Column(Integer, primary_key=True)
+    time = Column(DateTime(timezone=True))
+    value = Column(DECIMAL(12, 2))
+
+
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -96,6 +101,7 @@ class User(Base):
     level = Column(Integer, nullable=False, server_default='0')
     CheckConstraint('level BETWEEN 0 and 4')
 
+    # TODO
     def hash_password(self, password):
         self.hash = pwd_context.encrypt(password)
 
@@ -1044,7 +1050,5 @@ def min_last_hour():
                    "ORDER BY buy ASC LIMIT 1;")
 
 
-# SELECT modified,  max(last)
-# FROM cx_price_revision
-# WHERE to_timestamp(modified) > to_timestamp(modified)  - INTERVAL '1 week' and currency='CAD'
-# GROUP BY modified;
+def trc_latest_price():
+    session.query(TRCHistory).
