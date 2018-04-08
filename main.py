@@ -27,7 +27,7 @@ from config import config as TRXConfig
 from db import db, graphql
 from utils.loop_handler import IOHandler
 from utils.tx import trx__tx_out
-from utils import drupal_utils, session
+from utils import drupal_utils, session, trc_utils
 from utils.cointrx_client import Client
 from utils.mail_helper import Sender as mail_sender
 
@@ -974,11 +974,13 @@ class TRCPriceUpdateHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        current_trx_prices = await db.regtest_graph_data()
-        latest_trc_price = await db.
+        current_trx_prices = await db.btc_hour_minmax_price()
+        latest_trc_price = await db.trc_latest_price()
         for price in current_trx_prices:
-            ex = price
-            print(str(price))
+            if price[0] > latest_trc_price.time:
+                trc_price = trc_utils.create_mock_price(price.min, price.max)
+                trc_insert_result = db.trc_insert_price(price.date, trc_price)
+                logger.debug('Insert result is: ' + str(trc_insert_result))
 
 
 class TRXApplication(Application):
