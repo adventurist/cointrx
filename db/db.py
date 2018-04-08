@@ -1050,5 +1050,25 @@ def min_last_hour():
                    "ORDER BY buy ASC LIMIT 1;")
 
 
-def trc_latest_price():
-    session.query(TRCHistory).
+async def trc_latest_price():
+    """
+    Retrieves the latest price recorded on the TRC Mockchain (in CAD)
+    :return:
+    """
+    latest_trc_price = session.query(TRCHistory).group_by(TRCHistory.id).order_by(func.max(TRCHistory.id).desc()).limit(1).one_or_none()
+    return latest_trc_price
+
+
+def trc_insert_price(date, value):
+    new_price = TRCHistory(time=date, value=value)
+
+    try:
+        session.add(new_price)
+        session.commit()
+        session.flush()
+
+        return True
+
+    except exc.SQLAlchemyError as err:
+        print('This should be logged: \n' + str(err))
+        return False
