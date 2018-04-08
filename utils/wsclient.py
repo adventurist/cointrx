@@ -59,6 +59,8 @@ class Bot(object):
         self.number = config.number
         self.credentials = None
         self.session = None
+        self.trc_price_history = None
+        self.trc_struct = TxStruct()
 
     def set_credentials(self, credentials):
         self.credentials = credentials
@@ -78,10 +80,16 @@ class Bot(object):
     async def retrieve_price_history(self):
         price_url = 'http://localhost:6969/api/prices/regtest/btc/cad/minmax/json'
         price_result = await self.http_client.get(url=price_url)
-        print(str(price_result.body))
-        return 'Jigga'
+        return price_result
 
-        # self.logger.debug(price_history)
+    async def digest_price_history(self, data):
+        for row in json.loads(str(data, 'utf-8')):
+            self.logger.debug(str(row))
+            self.trc_struct.entries.append(row)
+
+    # def analyze_price_history(self):
+    #     if self.trc_price_history:
+            # for row in self.trc_price_history:
 
     async def login(self):
         print('login')
@@ -120,3 +128,11 @@ def parse_message(msg):
     return_msg['all'] = msg
 
     return return_msg
+
+class TxStruct(object):
+    def __init__(self):
+        self.low = None
+        self.high = None
+        self.peak = []
+        self.base = []
+        self.entries = []
