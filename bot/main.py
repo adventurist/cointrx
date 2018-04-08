@@ -75,9 +75,15 @@ class BotTrcPriceHandler(RequestHandler):
     async def get(self, *args, **kwargs):
         if len(application.bots) > 0:
             for bot in application.bots:
-                result = await bot.retrieve_price_history()
-                if result:
-                    print(result)
+                price_history = await bot.retrieve_price_history()
+                await bot.digest_price_history(price_history.body)
+
+
+class BotTrcAnalysisHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    # async def get(self, *args, **kwargs):
 
 
 class BotApplication(Application):
@@ -88,7 +94,8 @@ class BotApplication(Application):
             (r"/bots/all", BotAllHandler),
             (r"/bots/dump", BotDumpHandler),
             (r"/bots/login", BotLoginHandler),
-            (r"/bots/trc/prices", BotTrcPriceHandler)
+            (r"/bots/trc/prices", BotTrcPriceHandler),
+            (r"/bots/trc/analyze", BotTrcAnalysisHandler)
         ]
         settings = {
             "debug": True,
