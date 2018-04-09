@@ -3,6 +3,7 @@ from tornado import gen
 from tornado.websocket import websocket_connect
 from uuid import uuid4
 from utils.cointrx_client import Client as http_client
+from datetime import datetime
 import json
 
 
@@ -83,13 +84,113 @@ class Bot(object):
         return price_result
 
     async def digest_price_history(self, data):
-        for row in json.loads(str(data, 'utf-8')):
-            self.logger.debug(str(row))
-            self.trc_struct.entries.append(row)
+        if self.trc_struct is not None:
+            history_data = json.loads(str(data, 'utf-8'))
+            if history_data is not None:
+                self.trc_struct.entries = history_data
 
-    # def analyze_price_history(self):
-    #     if self.trc_price_history:
-            # for row in self.trc_price_history:
+    def is_first_low(self, r):
+        if self.trc_struct.f_low is not None:
+            r_date = datetime.strptime(r['date'])
+            f_date = datetime.strptime(self.trc_struct.f_low['date'])
+            date_comparison = r_date < f_date
+            value_comparison = r['high'] < self.trc_struct.f_low['value']
+
+            return date_comparison and value_comparison
+
+    def is_first_high(self, r):
+        if self.trc_struct.f_high is not None:
+            r_date = datetime.strptime(r['date'])
+            f_date = datetime.strptime(self.trc_struct.f_high['date'])
+            date_comparison = r_date < f_date
+            value_comparison = r['high'] > self.trc_struct.f_high['value']
+
+            return date_comparison and value_comparison
+
+    def is_last_low(self, r):
+        if self.trc_struct.l_low is not None:
+            r_date = datetime.strptime(r['date'])
+            f_date = datetime.strptime(self.trc_struct.l_low['date'])
+            date_comparison = r_date > f_date
+            value_comparison = r['high'] < self.trc_struct.l_low['value']
+
+            return date_comparison and value_comparison
+
+    def is_last_high(self, r):
+        if self.trc_struct.l_high is not None:
+            r_date = datetime.strptime(r['date'])
+            f_date = datetime.strptime(self.trc_struct.l_high['date'])
+            date_comparison = r_date > f_date
+            value_comparison = r['high'] > self.trc_struct.l_high['value']
+
+            return date_comparison and value_comparison
+
+    def offset_f_low(self, r):
+        numerator, denominator = r['value'] / self.trc_struct.f_low['value'], None if r['high'] > self.trc_struct.f_low[
+            'value'] else None, self.trc_struct.f_low['value'] / r['value']
+
+        if numerator:
+            return (1, numerator)
+        else:
+            return (2, denominator)
+
+    def offset_f_high(self, r):
+        numerator, denominator = r['value'] / self.trc_struct.f_high['value'], None if r['high'] > \
+                                                                                       self.trc_struct.f_high[
+                                                                                           'value'] else None, \
+                                 self.trc_struct.f_high['value'] / r['value']
+
+        if numerator:
+            return (1, numerator)
+        else:
+            return (2, denominator)
+
+    def offset_l_low(self, r):
+        numerator, denominator = r['value'] / self.trc_struct.l_low['value'], None if r['high'] > self.trc_struct.l_low[
+            'value'] else None, self.trc_struct.l_low['value'] / r['value']
+
+        if numerator:
+            return (1, numerator)
+        else:
+            return (2, denominator)
+
+    def offset_l_high(self, r):
+        numerator, denominator = r['value'] / self.trc_struct.l_high['value'], None if r['high'] > \
+                                                                                       self.trc_struct.l_high[
+                                                                                           'value'] else None, \
+                                 self.trc_struct.l_high['value'] / r['value']
+
+        if numerator:
+            return (1, numerator)
+        else:
+            return (2, denominator)
+
+    def analyze_price_history(self):
+        if self.trc_struct and hasattr(self.trc_struct, 'entries') and len(self.trc_struct.entries) > 0:
+            for i, row in self.trc_struct.entries:
+
+                offset_l_low = self.offset_l_low(row)
+                offset_l_high = self.offset_l_high(row)
+                offset_f_low = self.offset_f_low(row)
+                offset_f_high = self.offset_f_high(row)
+
+                max_offset = highest_offset(offset_l_high, offset_l_low, offset_f_high, offset_f_low)
+
+                if self.is_first_low(row) is not False:
+                    self.trc_struct.f_low = {'idx': i, 'value': row['high'], 'date': row['date']}
+                    continue
+
+                if self.is_first_high(row) is not False:
+                    self.trc_struct.f_high = {'idx': i, 'value': row['high'], 'date': row['date']}
+                    continue
+
+                if self.is_last_low(row) is not False:
+                    self.trc_struct.l_low = {'idx': i, 'value': row['high'], 'date': row['date']}
+                    continue
+
+                if self.is_last_high(row) is not False:
+                    self.trc_struct.l_high = {'idx': i, 'value': row['high'], 'date': row['date']}
+                    continue
 
     async def login(self):
         print('login')
@@ -129,10 +230,26 @@ def parse_message(msg):
 
     return return_msg
 
+
+def highest_offset(a, b, c, d):
+    cursor = 0 if a > b else 1
+    if cursor == 0:
+        cursor = 0 if a > c else 2
+        if cursor == 0:
+            cursor = 0 if a > d else 3
+    elif cursor == 1:
+        cursor = 1 if b > c else 2
+        if cursor == 1:
+            cursor = 1 if a > d else 3
+    return cursor
+
+
 class TxStruct(object):
     def __init__(self):
-        self.low = None
-        self.high = None
+        self.f_low = None
+        self.f_high = None
+        self.l_low = None
+        self.l_high = None
         self.peak = []
         self.base = []
         self.entries = []
