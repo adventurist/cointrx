@@ -83,7 +83,12 @@ class BotTrcAnalysisHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    # async def get(self, *args, **kwargs):
+    async def get(self, *args, **kwargs):
+        if len(application.bots) > 0:
+            for bot in application.bots:
+                application.logger.info(
+                    'Bot {0} (id {1} performing technical analysis of market data'.format(str(bot.number), str(bot.id)))
+                bot.analyze_price_history()
 
 
 class BotApplication(Application):
@@ -121,7 +126,8 @@ def setup_logger(name, level, json_logging=False):
     logger.setLevel(level)
     log_handler = logging.FileHandler('bot.log')
     logger_formatter = logging.Formatter(
-        '%(name)s - %(levelname)s - %(message)s') if json_logging is False else jsonlogger.JsonFormatter(json_indent=2)
+        '%(name)s - %(levelname)s - %(message)s') \
+        # if json_logging is False else jsonlogger.JsonFormatter(json_indent=2)
     log_handler.setFormatter(logger_formatter)
 
     logger.addHandler(log_handler)
