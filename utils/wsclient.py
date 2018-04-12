@@ -1,9 +1,10 @@
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado import gen
-from tornado.websocket import websocket_connect
+from tornado.websocket import websocket_connect, WebSocketError
 from uuid import uuid4
 from utils.cointrx_client import Client as http_client
 from datetime import datetime
+from decimal import Decimal
 import json
 
 
@@ -24,7 +25,8 @@ class Client(object):
         print("trying to connect")
         try:
             self.ws = yield websocket_connect(url, on_message_callback=receive_message)
-        except Exception as e:
+        except WebSocketError as e:
+            print(str(e))
             print("connection error")
         else:
             print("connected")
@@ -89,108 +91,111 @@ class Bot(object):
             if history_data is not None:
                 self.trc_struct.entries = history_data
 
-    def is_first_low(self, r):
-        if self.trc_struct.f_low is not None:
-            r_date = datetime.strptime(r['date'])
-            f_date = datetime.strptime(self.trc_struct.f_low['date'])
-            date_comparison = r_date < f_date
-            value_comparison = r['high'] < self.trc_struct.f_low['value']
+    def is_first_low(self, r, idx):
+        """ Check to see if row occurs within first historical period """
+        if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[0]):
+            # Only replace with more recent if value is more than 10% lower
+            if more_than_3_percent_lower(r['high'], self.trc_struct.f_low['value']):
+                self.trc_struct.f_low['value'] = Decimal(r['high'])
+                self.trc_struct.f_low['idx'] = idx
+                return True
 
-            return date_comparison and value_comparison
+    def is_first_high(self, r, idx):
+        if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[0]):
+            # Only avoid replacing with more recent if previous value is more than 10% higher
 
-    def is_first_high(self, r):
-        if self.trc_struct.f_high is not None:
-            r_date = datetime.strptime(r['date'])
-            f_date = datetime.strptime(self.trc_struct.f_high['date'])
-            date_comparison = r_date < f_date
-            value_comparison = r['high'] > self.trc_struct.f_high['value']
+            if (is_higher(r['high'], self.trc_struct.f_low['value']) and is_higher(r['high'], self.trc_struct.f_high['value'])) or is_within_3_percent_under(r['high'], self.trc_struct.f_high['value']):
+                self.trc_struct.f_high['value'] = Decimal(r['high'])
+                self.trc_struct.f_high['idx'] = idx
+                return True
 
-            return date_comparison and value_comparison
-
-    def is_last_low(self, r):
+    def is_last_low(self, r, idx):
         if self.trc_struct.l_low is not None:
-            r_date = datetime.strptime(r['date'])
-            f_date = datetime.strptime(self.trc_struct.l_low['date'])
-            date_comparison = r_date > f_date
-            value_comparison = r['high'] < self.trc_struct.l_low['value']
+            r_date = datetime.strptime(r['date'], '%Y-%m-%d %H:%M:%S').strftime('%s')
+            l_date = datetime.strptime(self.trc_struct.entries[self.trc_struct.l_low['idx']]['date'], '%Y-%m-%d %H:%M:%S').strftime('%s')
+            if Decimal(r['high']) < self.trc_struct.l_low['value'] and r_date > l_date:
+                self.trc_struct.l_low['value'] = Decimal(r['high'])
+                self.trc_struct.l_low['idx'] = idx
+                return True
 
-            return date_comparison and value_comparison
-
-    def is_last_high(self, r):
+    def is_last_high(self, r, idx):
         if self.trc_struct.l_high is not None:
-            r_date = datetime.strptime(r['date'])
-            f_date = datetime.strptime(self.trc_struct.l_high['date'])
-            date_comparison = r_date > f_date
-            value_comparison = r['high'] > self.trc_struct.l_high['value']
-
-            return date_comparison and value_comparison
+            r_date = datetime.strptime(r['date'], '%Y-%m-%d %H:%M:%S').strftime('%s')
+            l_date = datetime.strptime(self.trc_struct.entries[self.trc_struct.l_high['idx']]['date'], '%Y-%m-%d %H:%M:%S').strftime('%s')
+            if Decimal(r['high']) > self.trc_struct.l_high['value'] and r_date > l_date:
+                self.trc_struct.l_high['value'] = Decimal(r['high'])
+                self.trc_struct.l_high['idx'] = idx
+                return True
 
     def offset_f_low(self, r):
-        numerator, denominator = r['value'] / self.trc_struct.f_low['value'], None if r['high'] > self.trc_struct.f_low[
-            'value'] else None, self.trc_struct.f_low['value'] / r['value']
-
-        if numerator:
-            return (1, numerator)
+        row_value = Decimal(r['high'])
+        if self.trc_struct.f_low['value'] > row_value:
+            return 1, row_value / Decimal(self.trc_struct.f_low['value'])
         else:
-            return (2, denominator)
+            return 2, self.trc_struct.f_low['value'] / row_value
 
     def offset_f_high(self, r):
-        numerator, denominator = r['value'] / self.trc_struct.f_high['value'], None if r['high'] > \
-                                                                                       self.trc_struct.f_high[
-                                                                                           'value'] else None, \
-                                 self.trc_struct.f_high['value'] / r['value']
-
-        if numerator:
-            return (1, numerator)
+        row_value = Decimal(r['high'])
+        if self.trc_struct.f_high['value'] > row_value:
+            return 1, row_value / Decimal(self.trc_struct.f_high['value'])
         else:
-            return (2, denominator)
+            return 2, self.trc_struct.f_high['value'] / row_value
 
     def offset_l_low(self, r):
-        numerator, denominator = r['value'] / self.trc_struct.l_low['value'], None if r['high'] > self.trc_struct.l_low[
-            'value'] else None, self.trc_struct.l_low['value'] / r['value']
-
-        if numerator:
-            return (1, numerator)
+        row_value = Decimal(r['high'])
+        if self.trc_struct.l_low['value'] > row_value:
+            return 1, row_value / Decimal(self.trc_struct.l_low['value'])
         else:
-            return (2, denominator)
+            return 2, self.trc_struct.l_low['value'] / row_value
 
     def offset_l_high(self, r):
-        numerator, denominator = r['value'] / self.trc_struct.l_high['value'], None if r['high'] > \
-                                                                                       self.trc_struct.l_high[
-                                                                                           'value'] else None, \
-                                 self.trc_struct.l_high['value'] / r['value']
-
-        if numerator:
-            return (1, numerator)
+        row_value = Decimal(r['high'])
+        if self.trc_struct.l_high['value'] > row_value:
+            return 1, row_value / Decimal(self.trc_struct.l_high['value'])
         else:
-            return (2, denominator)
+            return 2, self.trc_struct.l_high['value'] / row_value
 
     def analyze_price_history(self):
+        # Make sure entries are populated
         if self.trc_struct and hasattr(self.trc_struct, 'entries') and len(self.trc_struct.entries) > 0:
-            for i, row in self.trc_struct.entries:
 
+            sort_by_price = sorted(self.trc_struct.entries, key=lambda x: Decimal(x['high']))
+            min_price = sort_by_price[0]
+            max_price = sort_by_price[len(sort_by_price) - 1]
+
+            # Set initial values to first/last low/high
+            self.trc_struct.f_high['value'] = self.trc_struct.f_low['value'] = self.trc_struct.l_high['value'] = \
+                self.trc_struct.l_low['value'] = Decimal(self.trc_struct.entries[0]['high'])
+            for i, row in enumerate(self.trc_struct.entries):
+                # Determine the maximum offset
                 offset_l_low = self.offset_l_low(row)
                 offset_l_high = self.offset_l_high(row)
                 offset_f_low = self.offset_f_low(row)
                 offset_f_high = self.offset_f_high(row)
+                offsets = [offset_f_low, offset_f_high, offset_l_low, offset_l_high]
+                self.update_max_offset(1 - offsets[highest_offset(offset_l_high, offset_l_low, offset_f_high, offset_f_low)][1])
 
-                max_offset = highest_offset(offset_l_high, offset_l_low, offset_f_high, offset_f_low)
+                if close_to_max(row, max_price):
+                    self.trc_struct.peak.append({'value': row['high'], 'idx': i})
 
-                if self.is_first_low(row) is not False:
-                    self.trc_struct.f_low = {'idx': i, 'value': row['high'], 'date': row['date']}
+                elif close_to_min(row, min_price):
+                    self.trc_struct.base.append({'value': row['high'], 'idx': i})
+
+                if self.is_first_low(row, i):
+                    continue
+                if self.is_first_high(row, i):
+                    continue
+                if self.is_last_low(row, i):
+                    continue
+                if self.is_last_high(row, i):
                     continue
 
-                if self.is_first_high(row) is not False:
-                    self.trc_struct.f_high = {'idx': i, 'value': row['high'], 'date': row['date']}
-                    continue
+            self.logger.info('Finished sorting Trc Structure\n')
+            self.logger.debug(str(self.trc_struct))
 
-                if self.is_last_low(row) is not False:
-                    self.trc_struct.l_low = {'idx': i, 'value': row['high'], 'date': row['date']}
-                    continue
-
-                if self.is_last_high(row) is not False:
-                    self.trc_struct.l_high = {'idx': i, 'value': row['high'], 'date': row['date']}
-                    continue
+    def update_max_offset(self, offset):
+        if self.trc_struct.max_offset < offset:
+            self.trc_struct.max_offset = offset
 
     async def login(self):
         print('login')
@@ -232,24 +237,75 @@ def parse_message(msg):
 
 
 def highest_offset(a, b, c, d):
-    cursor = 0 if a > b else 1
+    cursor = 0 if a[1] > b[1] else 1
     if cursor == 0:
-        cursor = 0 if a > c else 2
+        cursor = 0 if a[1] > c[1] else 2
         if cursor == 0:
-            cursor = 0 if a > d else 3
-    elif cursor == 1:
-        cursor = 1 if b > c else 2
+            cursor = 0 if a[1] > d[1] else 3
+    else:
+        cursor = 1 if b[1] > c[1] else 2
         if cursor == 1:
-            cursor = 1 if a > d else 3
+            cursor = 1 if a[1] > d[1] else 3
+
     return cursor
+
+
+def as_unixtime(r):
+    return datetime.strptime(r, '%Y-%m-%d %H:%M:%S').strftime('%s')
+
+
+def date_metrics(a, b):
+    a, b = int(a), int(b)
+    duration = b - a
+    f_period = a + (duration * 0.1)
+    l_period = b - (duration * 0.1)
+
+    return f_period, l_period
+
+
+def is_first_period(a, b):
+    return Decimal(a) < Decimal(b)
+
+
+def is_last_period(a, b):
+    return Decimal(b) > Decimal(a)
+
+
+def is_higher(a, b):
+    return Decimal(a) > Decimal(b)
+
+
+def is_within_3_percent_over(a, b):
+    return Decimal(b) < Decimal(a) < Decimal(b) * Decimal(1.03)
+
+
+def is_within_3_percent_under(a, b):
+    return Decimal(b) > Decimal(a) > Decimal(b) * Decimal(0.97)
+
+
+def more_than_3_percent_higher(a, b):
+    return Decimal(a) > Decimal(b) and Decimal(a) > Decimal(b) * Decimal(1.03)
+
+
+def more_than_3_percent_lower(a, b):
+    return Decimal(a) < Decimal(b) and Decimal(a) < Decimal(b) * Decimal(0.97)
+
+
+def close_to_max(row, max):
+    return Decimal(row['high']) > Decimal(max['high']) * Decimal(0.98)
+
+
+def close_to_min(row, min):
+    return Decimal(row['high']) < Decimal(min['high']) * Decimal(1.02)
 
 
 class TxStruct(object):
     def __init__(self):
-        self.f_low = None
-        self.f_high = None
-        self.l_low = None
-        self.l_high = None
+        self.f_low = {'value': None, 'idx': 0}
+        self.f_high = {'value': None, 'idx': 0}
+        self.l_low = {'value': None, 'idx': 0}
+        self.l_high = {'value': None, 'idx': 0}
+        self.max_offset = Decimal(0)
         self.peak = []
         self.base = []
         self.entries = []
