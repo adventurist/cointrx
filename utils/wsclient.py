@@ -103,8 +103,7 @@ class Bot(object):
     def is_first_high(self, r, idx):
         if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[0]):
             # Only avoid replacing with more recent if previous value is more than 10% higher
-
-            if (is_higher(r['high'], self.trc_struct.f_low['value']) and is_higher(r['high'], self.trc_struct.f_high['value'])) or is_within_3_percent_under(r['high'], self.trc_struct.f_high['value']):
+            if (is_higher(r['high'], self.trc_struct.f_low['value'])) and (is_higher(r['high'], self.trc_struct.f_high['value']) or is_within_3_percent_under(r['high'], self.trc_struct.f_high['value'])):
                 self.trc_struct.f_high['value'] = Decimal(r['high'])
                 self.trc_struct.f_high['idx'] = idx
                 return True
@@ -160,8 +159,8 @@ class Bot(object):
         if self.trc_struct and hasattr(self.trc_struct, 'entries') and len(self.trc_struct.entries) > 0:
 
             sort_by_price = sorted(self.trc_struct.entries, key=lambda x: Decimal(x['high']))
-            min_price = sort_by_price[0]
-            max_price = sort_by_price[len(sort_by_price) - 1]
+            self.trc_struct.min = min_price = sort_by_price[0]
+            self.trc_struct.max = max_price = sort_by_price[len(sort_by_price) - 1]
 
             # Set initial values to first/last low/high
             self.trc_struct.f_high['value'] = self.trc_struct.f_low['value'] = self.trc_struct.l_high['value'] = \
@@ -308,4 +307,6 @@ class TxStruct(object):
         self.max_offset = Decimal(0)
         self.peak = []
         self.base = []
+        self.max = None
+        self.min = None
         self.entries = []
