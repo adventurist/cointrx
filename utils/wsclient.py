@@ -93,17 +93,25 @@ class Bot(object):
 
     def is_first_low(self, r, idx):
         """ Check to see if row occurs within first historical period """
-        if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[0]):
+        if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
+                                                                as_unixtime(self.trc_struct.entries[len(
+                                                                        self.trc_struct.entries) - 1]['date']))[0]):
             # Only replace with more recent if value is more than 10% lower
-            if more_than_3_percent_lower(r['high'], self.trc_struct.f_low['value']):
+            if more_than_3_percent_lower(r['high'], self.trc_struct.f_low['value'], self.trc_struct.max_offset):
                 self.trc_struct.f_low['value'] = Decimal(r['high'])
                 self.trc_struct.f_low['idx'] = idx
                 return True
 
     def is_first_high(self, r, idx):
-        if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[0]):
+        if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
+                                                                as_unixtime(self.trc_struct.entries[len(
+                                                                        self.trc_struct.entries) - 1]['date']))[0]):
             # Only avoid replacing with more recent if previous value is more than 10% higher
-            if (is_higher(r['high'], self.trc_struct.f_low['value'])) and (is_higher(r['high'], self.trc_struct.f_high['value']) or is_within_3_percent_under(r['high'], self.trc_struct.f_high['value'])):
+            if (is_higher(r['high'], self.trc_struct.f_low['value'])) and (
+                is_higher(r['high'], self.trc_struct.f_high['value']) or is_within_3_percent_under(r['high'],
+                                                                                                   self.trc_struct.f_high[
+                                                                                                       'value'],
+                                                                                                   self.trc_struct.max_offset)):
                 self.trc_struct.f_high['value'] = Decimal(r['high'])
                 self.trc_struct.f_high['idx'] = idx
                 return True
@@ -111,7 +119,8 @@ class Bot(object):
     def is_last_low(self, r, idx):
         if self.trc_struct.l_low is not None:
             r_date = datetime.strptime(r['date'], '%Y-%m-%d %H:%M:%S').strftime('%s')
-            l_date = datetime.strptime(self.trc_struct.entries[self.trc_struct.l_low['idx']]['date'], '%Y-%m-%d %H:%M:%S').strftime('%s')
+            l_date = datetime.strptime(self.trc_struct.entries[self.trc_struct.l_low['idx']]['date'],
+                                       '%Y-%m-%d %H:%M:%S').strftime('%s')
             if Decimal(r['high']) < self.trc_struct.l_low['value'] and r_date > l_date:
                 self.trc_struct.l_low['value'] = Decimal(r['high'])
                 self.trc_struct.l_low['idx'] = idx
@@ -120,7 +129,8 @@ class Bot(object):
     def is_last_high(self, r, idx):
         if self.trc_struct.l_high is not None:
             r_date = datetime.strptime(r['date'], '%Y-%m-%d %H:%M:%S').strftime('%s')
-            l_date = datetime.strptime(self.trc_struct.entries[self.trc_struct.l_high['idx']]['date'], '%Y-%m-%d %H:%M:%S').strftime('%s')
+            l_date = datetime.strptime(self.trc_struct.entries[self.trc_struct.l_high['idx']]['date'],
+                                       '%Y-%m-%d %H:%M:%S').strftime('%s')
             if Decimal(r['high']) > self.trc_struct.l_high['value'] and r_date > l_date:
                 self.trc_struct.l_high['value'] = Decimal(r['high'])
                 self.trc_struct.l_high['idx'] = idx
@@ -157,27 +167,25 @@ class Bot(object):
     def analyze_price_history(self):
         # Make sure entries are populated
         if self.trc_struct and hasattr(self.trc_struct, 'entries') and len(self.trc_struct.entries) > 0:
-
+            # Sort entries to determine Max, Min and Range between
             sort_by_price = sorted(self.trc_struct.entries, key=lambda x: Decimal(x['high']))
-            self.trc_struct.min = min_price = sort_by_price[0]
-            self.trc_struct.max = max_price = sort_by_price[len(sort_by_price) - 1]
+            self.trc_struct.min = sort_by_price[0]
+            self.trc_struct.max = sort_by_price[len(sort_by_price) - 1]
+            self.trc_struct.max_offset = Decimal(1) - Decimal(self.trc_struct.min['high']) / Decimal(
+                self.trc_struct.max['high'])
 
             # Set initial values to first/last low/high
             self.trc_struct.f_high['value'] = self.trc_struct.f_low['value'] = self.trc_struct.l_high['value'] = \
                 self.trc_struct.l_low['value'] = Decimal(self.trc_struct.entries[0]['high'])
-            for i, row in enumerate(self.trc_struct.entries):
-                # Determine the maximum offset
-                offset_l_low = self.offset_l_low(row)
-                offset_l_high = self.offset_l_high(row)
-                offset_f_low = self.offset_f_low(row)
-                offset_f_high = self.offset_f_high(row)
-                offsets = [offset_f_low, offset_f_high, offset_l_low, offset_l_high]
-                self.update_max_offset(1 - offsets[highest_offset(offset_l_high, offset_l_low, offset_f_high, offset_f_low)][1])
 
-                if close_to_max(row, max_price):
+            for i, row in enumerate(self.trc_struct.entries):
+                # Add to Peak and Base if value is similar, proximate and has not yet been added
+                if close_to_max(row, self.trc_struct.max, self.trc_struct.max_offset) and len(
+                        [x for x in self.trc_struct.peak if x['idx'] == i]) == 0:
                     self.trc_struct.peak.append({'value': row['high'], 'idx': i})
 
-                elif close_to_min(row, min_price):
+                elif close_to_min(row, self.trc_struct.min, self.trc_struct.max_offset)and len(
+                        [x for x in self.trc_struct.base if x['idx'] == i]) == 0:
                     self.trc_struct.base.append({'value': row['high'], 'idx': i})
 
                 if self.is_first_low(row, i):
@@ -274,28 +282,42 @@ def is_higher(a, b):
     return Decimal(a) > Decimal(b)
 
 
-def is_within_3_percent_over(a, b):
-    return Decimal(b) < Decimal(a) < Decimal(b) * Decimal(1.03)
+def is_within_3_percent_over(a, b, max_offset):
+    margin_of_offset = max_offset * Decimal(0.03)
+    return Decimal(b) < Decimal(a) < Decimal(b) * (Decimal(1) + margin_of_offset)
 
 
-def is_within_3_percent_under(a, b):
-    return Decimal(b) > Decimal(a) > Decimal(b) * Decimal(0.97)
+def is_within_3_percent_under(a, b, max_offset):
+    margin_of_offset = max_offset * Decimal(0.03)
+    return Decimal(b) > Decimal(a) > Decimal(b) * (Decimal(1) - margin_of_offset)
 
 
-def more_than_3_percent_higher(a, b):
-    return Decimal(a) > Decimal(b) and Decimal(a) > Decimal(b) * Decimal(1.03)
+def more_than_3_percent_higher(a, b, max_offset):
+    margin_of_offset = max_offset * Decimal(0.03)
+    return Decimal(a) > Decimal(b) and Decimal(a) > Decimal(b) * (Decimal(1) + margin_of_offset)
 
 
-def more_than_3_percent_lower(a, b):
-    return Decimal(a) < Decimal(b) and Decimal(a) < Decimal(b) * Decimal(0.97)
+def more_than_3_percent_lower(a, b, max_offset):
+    # TODO Fix this function
+    margin_of_offset = max_offset * Decimal(0.03)
+    comparison_1 = Decimal(a) < Decimal(b)
+    comparison_2 = Decimal(a) < Decimal(b) * (Decimal(1) - margin_of_offset)
+    return Decimal(a) < Decimal(b) and Decimal(a) < Decimal(b) * (Decimal(1) - margin_of_offset)
 
 
-def close_to_max(row, max):
-    return Decimal(row['high']) > Decimal(max['high']) * Decimal(0.98)
+def close_to_max(row, max, max_offset):
+    # Determination of proximity to max/min is based on calculating 2.5 % of the maximum variation of value within a
+    # period
+    margin_of_offset = max_offset * Decimal(0.025)
+    return Decimal(row['high']) > Decimal(max['high']) * (Decimal(1) - margin_of_offset)
 
 
-def close_to_min(row, min):
-    return Decimal(row['high']) < Decimal(min['high']) * Decimal(1.02)
+def close_to_min(row, min, max_offset):
+    # Determination of proximity to max/min is based on calculating 2.5 % of the maximum variation of value within a
+    # period
+    margin_of_offset = max_offset * Decimal(0.025)
+    current_min = Decimal(min['high']) * (Decimal(1) - margin_of_offset)
+    return Decimal(row['high']) < Decimal(min['high']) * (Decimal(1) + margin_of_offset)
 
 
 class TxStruct(object):
