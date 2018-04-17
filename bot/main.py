@@ -5,10 +5,24 @@ from utils.wsclient import Bot
 from pythonjsonlogger import jsonlogger
 from types import SimpleNamespace
 
+from lightning import Lightning
+
 import tornado.ioloop
 import logging
 import os
 import json
+
+import numpy as np
+from sklearn import datasets
+from scipy.ndimage.filters import gaussian_filter
+
+from bokeh.layouts import gridplot
+from bokeh.plotting import figure, show, output_file
+from bokeh.sampledata.stocks import AAPL, GOOG, IBM, MSFT
+
+import numpy as np
+import pandas as pd
+from scipy import stats, integrate
 
 enable_pretty_logging()
 socket_handlers = []
@@ -85,10 +99,41 @@ class BotTrcAnalysisHandler(RequestHandler):
 
     async def get(self, *args, **kwargs):
         if len(application.bots) > 0:
-            for bot in application.bots:
-                application.logger.info(
-                    'Bot {0} (id {1} performing technical analysis of market data'.format(str(bot.number), str(bot.id)))
-                bot.analyze_price_history()
+            bot = application.bots[0]
+            application.logger.info(
+                'Bot {0} (id {1} performing technical analysis of market data'.format(str(bot.number), str(bot.id)))
+            bot.analyze_price_history()
+            price_data = await bot.post_data_as_json()
+
+            entry_dates = [x[1] for x in price_data[0]]
+            peak_dates = [x[1] for x in price_data[1]]
+            base_dates = [x[1] for x in price_data[2]]
+
+            entry_prices = [x[0] for x in price_data[0]]
+            peak_prices = [x[0] for x in price_data[1]]
+            base_prices = [x[0] for x in price_data[2]]
+
+            p1 = figure(x_axis_type="datetime", title="BTC Market Analysis")
+            p1.grid.grid_line_alpha = 0.3
+            p1.xaxis.axis_label = 'Date'
+            p1.yaxis.axis_label = 'Price'
+
+            p1.line(datetime(entry_dates), entry_prices, color='#33ff00', legend='BTC')
+            p1.circle(datetime(peak_dates), peak_prices, color='#ff00eb', legend='Peaks', line_width=6)
+            p1.circle(datetime(base_dates), base_prices, color='#ff6a00', legend='Bases', line_width=6)
+            p1.square(datetime([price_data[3][0]]), [price_data[3][1]], color='#2700ff', legend="First Low", line_width=6)
+            p1.triangle(datetime([price_data[4][0]]), [price_data[4][1]], color='#f00000', legend="First High", line_width=6)
+            p1.square(datetime([price_data[5][0]]), [price_data[5][1]], color='#2700ff', legend="Last Low", line_width=6)
+            p1.triangle(datetime([price_data[6][0]]), [price_data[6][1]], color='#f00000', legend="Last High", line_width=6)
+
+            p1.legend.location = "top_right"
+            output_file("analysis" + str(bot.number) + ".html", title="analysis" + str(bot.number) + ".py BTC Price Analysis")
+
+            show(gridplot([[p1]], plot_width=1600, plot_height=960)) # open browser
+
+
+def datetime(x):
+    return np.array(x, dtype=np.datetime64)
 
 
 class BotApplication(Application):
