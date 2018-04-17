@@ -117,21 +117,15 @@ class Bot(object):
                 return True
 
     def is_last_low(self, r, idx):
-        if self.trc_struct.l_low is not None:
-            r_date = datetime.strptime(r['date'], '%Y-%m-%d %H:%M:%S').strftime('%s')
-            l_date = datetime.strptime(self.trc_struct.entries[self.trc_struct.l_low['idx']]['date'],
-                                       '%Y-%m-%d %H:%M:%S').strftime('%s')
-            if Decimal(r['high']) < self.trc_struct.l_low['value'] and r_date > l_date:
-                self.trc_struct.l_low['value'] = Decimal(r['high'])
-                self.trc_struct.l_low['idx'] = idx
-                return True
+        if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[1]):
+            if not (more_than_3_percent_higher(r['high'], self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
+                    self.trc_struct.l_low['value'] = Decimal(r['high'])
+                    self.trc_struct.l_low['idx'] = idx
+                    return True
 
     def is_last_high(self, r, idx):
-        if self.trc_struct.l_high is not None:
-            r_date = datetime.strptime(r['date'], '%Y-%m-%d %H:%M:%S').strftime('%s')
-            l_date = datetime.strptime(self.trc_struct.entries[self.trc_struct.l_high['idx']]['date'],
-                                       '%Y-%m-%d %H:%M:%S').strftime('%s')
-            if Decimal(r['high']) > self.trc_struct.l_high['value'] and r_date > l_date:
+        if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[1]):
+            if not (more_than_3_percent_lower(r['high'], self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
                 self.trc_struct.l_high['value'] = Decimal(r['high'])
                 self.trc_struct.l_high['idx'] = idx
                 return True
@@ -182,11 +176,11 @@ class Bot(object):
                 # Add to Peak and Base if value is similar, proximate and has not yet been added
                 if close_to_max(row, self.trc_struct.max, self.trc_struct.max_offset) and len(
                         [x for x in self.trc_struct.peak if x['idx'] == i]) == 0:
-                    self.trc_struct.peak.append({'value': row['high'], 'idx': i})
+                    self.trc_struct.peak.append({'value': row['high'], 'idx': i, 'date': row['date']})
 
                 elif close_to_min(row, self.trc_struct.min, self.trc_struct.max_offset)and len(
                         [x for x in self.trc_struct.base if x['idx'] == i]) == 0:
-                    self.trc_struct.base.append({'value': row['high'], 'idx': i})
+                    self.trc_struct.base.append({'value': row['high'], 'idx': i, 'date': row['date']})
 
                 if self.is_first_low(row, i):
                     continue
@@ -199,6 +193,17 @@ class Bot(object):
 
             self.logger.info('Finished sorting Trc Structure\n')
             self.logger.debug(str(self.trc_struct))
+
+    async def post_data_as_json(self):
+        entries = [(x['high'], x['date']) for x in self.trc_struct.entries]
+        peaks = [(x['value'], x['date']) for x in self.trc_struct.peak]
+        bases = [(x['value'], x['date']) for x in self.trc_struct.base]
+        f_low = (self.trc_struct.entries[self.trc_struct.f_low['idx']]['date'], self.trc_struct.f_low['value'])
+        f_high = (self.trc_struct.entries[self.trc_struct.f_high['idx']]['date'], self.trc_struct.f_high['value'])
+        l_low = (self.trc_struct.entries[self.trc_struct.l_low['idx']]['date'], self.trc_struct.l_low['value'])
+        l_high = (self.trc_struct.entries[self.trc_struct.l_high['idx']]['date'], self.trc_struct.l_high['value'])
+
+        return entries, peaks, bases, f_low, f_high, l_low, l_high
 
     def update_max_offset(self, offset):
         if self.trc_struct.max_offset < offset:
@@ -264,10 +269,11 @@ def as_unixtime(r):
 def date_metrics(a, b):
     a, b = int(a), int(b)
     duration = b - a
+    mid_point = b - (duration * 0.5)
     f_period = a + (duration * 0.1)
     l_period = b - (duration * 0.1)
 
-    return f_period, l_period
+    return (f_period, l_period) if l_period > mid_point else (f_period, mid_point)
 
 
 def is_first_period(a, b):
@@ -275,7 +281,7 @@ def is_first_period(a, b):
 
 
 def is_last_period(a, b):
-    return Decimal(b) > Decimal(a)
+    return Decimal(a) > Decimal(b)
 
 
 def is_higher(a, b):
@@ -298,10 +304,7 @@ def more_than_3_percent_higher(a, b, max_offset):
 
 
 def more_than_3_percent_lower(a, b, max_offset):
-    # TODO Fix this function
     margin_of_offset = max_offset * Decimal(0.03)
-    comparison_1 = Decimal(a) < Decimal(b)
-    comparison_2 = Decimal(a) < Decimal(b) * (Decimal(1) - margin_of_offset)
     return Decimal(a) < Decimal(b) and Decimal(a) < Decimal(b) * (Decimal(1) - margin_of_offset)
 
 
@@ -316,7 +319,6 @@ def close_to_min(row, min, max_offset):
     # Determination of proximity to max/min is based on calculating 2.5 % of the maximum variation of value within a
     # period
     margin_of_offset = max_offset * Decimal(0.025)
-    current_min = Decimal(min['high']) * (Decimal(1) - margin_of_offset)
     return Decimal(row['high']) < Decimal(min['high']) * (Decimal(1) + margin_of_offset)
 
 
@@ -332,3 +334,19 @@ class TxStruct(object):
         self.max = None
         self.min = None
         self.entries = []
+
+    def serialize(self):
+        return {
+            'f_low': str(self.f_low),
+            'f_high': str(self.f_high),
+            'l_low': str(self.l_low),
+            'l_high': str(self.l_high),
+            'offset': str(self.max_offset),
+            'max': str(self.max),
+            'min': str(self.min),
+            'peak': str(self.peak),
+            'base': str(self.base)
+        }
+
+    def serialize_entries(self):
+        return self.entries
