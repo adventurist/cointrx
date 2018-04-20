@@ -172,6 +172,15 @@ class User(Base):
         return user
 
 
+class ETHPrice(Base):
+    __tablename__ = 'eth_price'
+    id = Column(Integer, primary_key=True)
+    currency = Column(String(4))
+    last = Column(DECIMAL(12, 2))
+    modified = Column(DateTime(timezone=False))
+    revisions = relationship("ETHPriceRevision", back_populates="eth_price", lazy="select")
+
+
 class CXPrice(Base):
     __tablename__ = 'cx_price'
     id = Column(Integer, primary_key=True)
@@ -191,6 +200,17 @@ class CXPrice(Base):
             'sell': re.sub("[^0-9^.]", "", str(self.sell)),
             'modified': self.modified
         }
+
+
+class ETHPriceRevision(Base):
+    __tablename__ = "eth_price_revision"
+    id = Column(Integer, primary_key=True)
+    rid = Column(Integer)
+    currency = Column(String(4))
+    last = Column(DECIMAL(12, 2))
+    date = Column(DateTime(timezone=False))
+    currency_id = Column(Integer, ForeignKey('eth_price.id'))
+    eth_price = relationship("ETHPrice", back_populates="revisions")
 
 
 class CXPriceRevision(Base):
@@ -427,6 +447,9 @@ def handle_db_data(response):
         if isinstance(row, CXPriceRevision):
             print(row.serialize())
 
+async def handle_eth_update_data(data):
+    distilled_data = await parse_eth_price_data(data)
+
 
 # async def update_prices(data):
 #     loop = asyncio.get_event_loop()
@@ -436,6 +459,9 @@ def handle_db_data(response):
 async def update_prices(data):
     # loop = asyncio.get_event_loop()
     return await parse_price_data(data)
+
+async def update_eth_prices(data):
+    await parse_eth_price_data(data)
 
 
 async def latest_prices():
@@ -528,11 +554,11 @@ async def parse_price_data(data):
             print(e)
             return False
 
-        result2 = session.query(CXPriceRevision).filter(CXPriceRevision.currency == k).group_by(CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid)))
+        result2 = session.query(CXPriceRevision).filter(CXPriceRevision.currency == k).group_by(CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid))).first()
         rid = find_rid(result2)
         rid = rid + 1 if rid is not None else 1
 
-        revision_insert = CXPriceRevision(rid=rid, currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time)
+        revision_insert = CXPriceRevision(rid=rid, currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time, currency_id=result.id)
         try:
             session.add(revision_insert)
             session.commit()
@@ -544,58 +570,43 @@ async def parse_price_data(data):
 
     return True
 
-        # engine = async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'],
-        #                             host=db_config.DATABASE['host'], password=db_config.DATABASE['password'])
-        #
-        # query = select([CXPrice]).where(CXPrice.currency == k)
-        # cur_time = time.time()
-        # result = await conn.execute(query)
-        # async with engine:
-        #     async with engine.acquire() as conn:
-        #         try:
-        #             query = select([CXPrice]).where(CXPrice.currency == k)
-        #             cur_time = time.time()
-        #             result = await conn.execute(query)
-        #
-        #             if result.rowcount < 1:
-        #                 async with conn.begin():
-        #                     await conn.execute(
-        #                         CXPrice.__table__.insert().values(currency=k, sell=v['sell'],
-        #                                                           last=v['last'],
-        #                                                           buy=v['buy'],
-        #                                                           modified=cur_time))
-        #
-        #             else:
-        #                 async with conn.begin():
-        #                     await conn.execute(
-        #                         CXPrice.__table__.update().where(CXPrice.currency == k).values(sell=v['sell'],
-        #                                                                                        last=v['last'],
-        #                                                                                        buy=v['buy'],
-        #                                                                                        modified=cur_time))
-        #             query2 = select([CXPriceRevision]).where(CXPriceRevision.currency == k).group_by(
-        #                 CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid)))
-        #             result2 = await conn.execute(query2)
-        #             rid = find_rid(result2)
-        #             rid = rid + 1 if rid is not None else 1
-        #
-        #             await conn.execute(
-        #                 CXPriceRevision.__table__.insert().values(rid=rid, currency=k, sell=v['sell'],
-        #                                                           last=v['last'],
-        #                                                           buy=v['buy'],
-        #                                                           modified=cur_time))
-        #
-        #         except exc.SQLAlchemyError as error:
-        #             print(error)
-        #
-        #         finally:
-        #             conn.close()
+
+async def parse_eth_price_data(data, currency='cad'):
+    result = session.query(ETHPrice).filter(ETHPrice.currency == currency).one_or_none()
+    cur_time = datetime.datetime.now()
+    if result is None:
+        result = ETHPrice(currency=currency, last=data[0], modified=cur_time)
+
+    try:
+        session.add(result)
+        session.commit()
+        session.flush()
+
+    except exc.SQLAlchemyError as e:
+        print(e)
+        return False
+
+    result2 = session.query(ETHPriceRevision).filter(ETHPriceRevision.currency == currency).group_by(ETHPriceRevision.id).order_by(desc(func.max(ETHPriceRevision.rid))).one_or_none()
+    rid = find_rid(result2)
+    rid = rid + 1 if rid is not None else 1
+
+    revision_insert = ETHPriceRevision(rid=rid, currency=currency, last=data[0], date=cur_time, currency_id=result.id)
+    try:
+        session.add(revision_insert)
+        session.commit()
+        session.flush()
+
+    except exc.SQLAlchemyError as e:
+        print(e)
+        return False
+
+    return True
 
 
 def find_rid(data):
-    if data is not None:
-        for d in data:
-            if d is not None and d.rid is not None:
-                return d.rid
+    # TODO Normalize this for both ETH and BTC (aka CXPrice)
+    if data is not None and hasattr(data, 'rid'):
+        return data.rid
     return None
 
 
@@ -1017,7 +1028,7 @@ async def btc_hour_minmax_price():
                    "(EXTRACT('minute' FROM to_timestamp(modified))::integer %% 30) * interval '1 minute' as date, min(last), max(last) "
                    "FROM cx_price_revision "
                    "WHERE currency='CAD' "
-                    "AND to_timestamp(modified) < CURRENT_TIMESTAMP AND to_timestamp(modified) > (CURRENT_TIMESTAMP - INTERVAL '40 days')"
+                    "AND to_timestamp(modified) < CURRENT_TIMESTAMP AND to_timestamp(modified) > (CURRENT_TIMESTAMP - INTERVAL '5 days')"
                    "GROUP BY 1 ORDER BY date;")
 
 
