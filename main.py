@@ -1039,6 +1039,9 @@ class TRXApplication(Application):
             (r"/updateprices", UpdatePriceHandler),
             (r"/eth/price/update", ETHPriceUpdateHandler),
 
+            # Bot Analysis Graphs
+            (r"/analysis/analysis[0-9].html", StaticFileHandler),
+
             # REST API
 
             # - Transactions

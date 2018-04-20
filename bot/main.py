@@ -144,7 +144,7 @@ class BotTrcAnalysisHandler(RequestHandler):
             p1.triangle(datetime([price_data[6][0]]), [price_data[6][1]], color='#f00000', legend="Last High", line_width=6)
 
             p1.legend.location = "bottom_right"
-            output_file("analysis" + str(bot.number) + ".html", title="analysis" + str(bot.number) + ".py BTC Price Analysis")
+            output_file("static/analysis/analysis" + str(bot.number) + ".html", title="analysis" + str(bot.number) + ".py BTC Price Analysis")
 
             show(gridplot([[p1]], plot_width=1600, plot_height=960)) # open browser
 
