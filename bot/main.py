@@ -17,7 +17,8 @@ from sklearn import datasets
 from scipy.ndimage.filters import gaussian_filter
 
 from bokeh.layouts import gridplot
-from bokeh.plotting import figure, show, output_file
+from bokeh.plotting import figure, show, output_file, ColumnDataSource
+from bokeh.models import HoverTool
 from bokeh.sampledata.stocks import AAPL, GOOG, IBM, MSFT
 
 import numpy as np
@@ -113,12 +114,28 @@ class BotTrcAnalysisHandler(RequestHandler):
             peak_prices = [x[0] for x in price_data[1]]
             base_prices = [x[0] for x in price_data[2]]
 
+            source = ColumnDataSource({'date': datetime(entry_dates), 'price': entry_prices})
+
             p1 = figure(x_axis_type="datetime", title="BTC Market Analysis")
             p1.grid.grid_line_alpha = 0.3
             p1.xaxis.axis_label = 'Date'
             p1.yaxis.axis_label = 'Price'
 
-            p1.line(datetime(entry_dates), entry_prices, color='#33ff00', legend='BTC')
+            line = p1.line(x='date', y='price', source=source, color='#33ff00', legend='BTC', line_cap='round', line_width=4)
+
+            p1.add_tools(HoverTool(
+                renderers=[line],
+                tooltips=("""
+                    <div style="padding: 12px; background: #5d5d5d;">
+                        <span style="color: #3fe108; font-size: 20px;">Price: $@price CAD</span><br />
+                        <span style="color: #3fe108; font-size: 16px;">(Date: @date{%D - %H:%m})</span>
+                    </div>
+                """),
+                formatters={
+                    'date': 'datetime'
+                }
+            ))
+
             p1.circle(datetime(peak_dates), peak_prices, color='#ff00eb', legend='Peaks', line_width=6)
             p1.circle(datetime(base_dates), base_prices, color='#ff6a00', legend='Bases', line_width=6)
             p1.square(datetime([price_data[3][0]]), [price_data[3][1]], color='#2700ff', legend="First Low", line_width=6)
@@ -126,7 +143,7 @@ class BotTrcAnalysisHandler(RequestHandler):
             p1.square(datetime([price_data[5][0]]), [price_data[5][1]], color='#2700ff', legend="Last Low", line_width=6)
             p1.triangle(datetime([price_data[6][0]]), [price_data[6][1]], color='#f00000', legend="Last High", line_width=6)
 
-            p1.legend.location = "top_right"
+            p1.legend.location = "bottom_right"
             output_file("analysis" + str(bot.number) + ".html", title="analysis" + str(bot.number) + ".py BTC Price Analysis")
 
             show(gridplot([[p1]], plot_width=1600, plot_height=960)) # open browser
