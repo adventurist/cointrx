@@ -24,4 +24,9 @@ def get_urls(trx_env):
         'key_gen_url': 'http://localhost:6969/keys/btc/regtest/generate'
     }
 
+
+def eth_by_currency(currency):
+    return 'https://api.kraken.com/0/public/Ticker?pair=ETH%s' % currency
+
+
 DEFAULT_LANGUAGE = 'CAD'
