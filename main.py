@@ -24,10 +24,10 @@ from tornado.websocket import WebSocketHandler
 from tornado.web import Application, RequestHandler, StaticFileHandler, HTTPError
 
 from config import config as TRXConfig
-from db import db, graphql
+from db import db
 from utils.loop_handler import IOHandler
 from utils.tx import trx__tx_out
-from utils import drupal_utils, session, trc_utils
+from utils import drupal_utils, session, trc_utils, eth_utils
 from utils.cointrx_client import Client
 from utils.mail_helper import Sender as mail_sender
 
@@ -313,6 +313,21 @@ class UpdatePriceHandler(RequestHandler):
         price_update_result = await http_client.get_prices()
 
         self.write('Sent request')
+
+
+class ETHPriceUpdateHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self):
+        """
+        @api
+        @internal
+        Parse ETH ticker data, store revision data and update current pricing table
+        :return: application/json response
+        """
+
+        eth_data = await eth_utils.update_eth_prices()
 
 
 class LatestPriceHandler(RequestHandler):
@@ -907,66 +922,66 @@ class BtcMinMaxHandler(RequestHandler):
         self.write(minmax_data)
 
 
-class GraphQLHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
-    def __init__(self, application, request, **kwargs):
-        super().__init__(application, request, **kwargs)
-        self.schema = graphql.schema
-
-    @error_response
-    def get(self, *args, **kwargs):
-        placeholder = 'placeholder'
-
-    def post(self):
-        return self.handle_graqhql()
-
-    def handle_graqhql(self):
-        result = self.execute_graphql()
-        logging.log('DEBUG', 'GraphQL result data: %s errors: %s invalid %s',
-                    result.data, result.errors, result.invalid)
-        if result and result.invalid:
-            ex = ExecutionError(errors=result.errors)
-            logging.warn('GraphQL Error: %s', ex)
-            raise ex
-
-        response = {'data': result.data}
-        self.write(escape.json_encode(response))
-
-    def execute_graphql(self):
-        graphql_req = self.graphql_request
-        return self.schema.execute(
-            graphql_req.get('query'),
-            variable_values=graphql_req.get('variables'),
-            operation_name=graphql_req.get('operationName'),
-            context_value=graphql_req.get('context'),
-            middleware=self.middleware
-        )
-
-    @property
-    def graphql_request(self):
-        return escape.json_decode(self.request.body)
-
-    @property
-    def content_type(self):
-        return self.request.headers.get('Content-Type', 'text/plain').split(';')[0]
-
-    @property
-    def schema(self):
-        raise NotImplementedError('schema must be provided')
-
-    @property
-    def middleware(self):
-        return []
-
-    @property
-    def context(self):
-        return None
-
-    @schema.setter
-    def schema(self, value):
-        self._schema = value
+# class GraphQLHandler(RequestHandler):
+#     def data_received(self, chunk):
+#         pass
+#
+#     def __init__(self, application, request, **kwargs):
+#         super().__init__(application, request, **kwargs)
+#         self.schema = graphql.schema
+#
+#     @error_response
+#     def get(self, *args, **kwargs):
+#         placeholder = 'placeholder'
+#
+#     def post(self):
+#         return self.handle_graqhql()
+#
+#     def handle_graqhql(self):
+#         result = self.execute_graphql()
+#         logging.log('DEBUG', 'GraphQL result data: %s errors: %s invalid %s',
+#                     result.data, result.errors, result.invalid)
+#         if result and result.invalid:
+#             ex = ExecutionError(errors=result.errors)
+#             logging.warn('GraphQL Error: %s', ex)
+#             raise ex
+#
+#         response = {'data': result.data}
+#         self.write(escape.json_encode(response))
+#
+#     def execute_graphql(self):
+#         graphql_req = self.graphql_request
+#         return self.schema.execute(
+#             graphql_req.get('query'),
+#             variable_values=graphql_req.get('variables'),
+#             operation_name=graphql_req.get('operationName'),
+#             context_value=graphql_req.get('context'),
+#             middleware=self.middleware
+#         )
+#
+#     @property
+#     def graphql_request(self):
+#         return escape.json_decode(self.request.body)
+#
+#     @property
+#     def content_type(self):
+#         return self.request.headers.get('Content-Type', 'text/plain').split(';')[0]
+#
+#     @property
+#     def schema(self):
+#         raise NotImplementedError('schema must be provided')
+#
+#     @property
+#     def middleware(self):
+#         return []
+#
+#     @property
+#     def context(self):
+#         return None
+#
+#     @schema.setter
+#     def schema(self, value):
+#         self._schema = value
 
 
 class TRCPriceUpdateHandler(RequestHandler):
@@ -1022,6 +1037,7 @@ class TRXApplication(Application):
 
             # CRON Processes
             (r"/updateprices", UpdatePriceHandler),
+            (r"/eth/price/update", ETHPriceUpdateHandler),
 
             # REST API
 
@@ -1065,7 +1081,7 @@ class TRXApplication(Application):
             (r"/sendmail", SendMailHandler),
             (r"/fakenews", FakeNewsHandler),
 
-            (r"/graphql", GraphQLHandler),
+            # (r"/graphql", GraphQLHandler),
 
             # Static
             (r"/static/(.*)", StaticFileHandler, {"path": "/static"}),
