@@ -12,18 +12,11 @@ import logging
 import os
 import json
 
-import numpy as np
-from sklearn import datasets
-from scipy.ndimage.filters import gaussian_filter
-
 from bokeh.layouts import gridplot
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
 from bokeh.models import HoverTool
-from bokeh.sampledata.stocks import AAPL, GOOG, IBM, MSFT
 
 import numpy as np
-import pandas as pd
-from scipy import stats, integrate
 
 enable_pretty_logging()
 socket_handlers = []
