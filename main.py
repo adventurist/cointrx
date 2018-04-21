@@ -910,7 +910,7 @@ class RegTestPayAllKeyHandler(RequestHandler):
 
     async def get(self, *args, **kwargs):
         result = await db.regtest_pay_keys('10')
-        self.write(result)
+        self.write(str(result))
 
 
 class BtcMinMaxHandler(RequestHandler):
