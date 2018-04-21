@@ -938,7 +938,7 @@ async def regtest_pay_user(uid: str, amount: str):
     :param amount:
     :return:
     """
-    key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).all()
+    key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).group_by(TrxKey.id).order_by(func.max(TrxKey.id).desc()).limit(1).one_or_none()
     if key is not None:
         address = btcd_utils.wif_to_address(key.value)
     else:
