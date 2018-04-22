@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% raw title %}</title>
+    <link rel="stylesheet" href="/static/css/bot-style.css" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="/static/jquery-3.2.1.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+</head>
+<body>
+<script>
+    const botUrls= "{% raw bot_gui_urls %}"
+    const botData = "{% raw bot_gui_data %}"
+</script>
+
+<div id="root">
+</div>
+<script src="/static/js/bot-bundle.js"></script>
+</body>
+</html>

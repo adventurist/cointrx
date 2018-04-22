@@ -998,6 +998,22 @@ class TRCPriceUpdateHandler(RequestHandler):
                 logger.debug('Insert result is: ' + str(trc_insert_result))
 
 
+class BotGuiHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+    async def get(self, *args, **kwargs):
+        cookie = self.get_secure_cookie("trx_cookie")
+        if check_attribute(application.session, 'user'):
+            bot_gui_data = {}
+            bot_gui_urls = {}
+
+            self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+            self.render("templates/bot.html", title="TRX BOT GUI", bot_gui_urls=bot_gui_urls, bot_gui_data=bot_gui_data)
+        else:
+            self.set_secure_cookie('redirect_target', '/user')
+            self.redirect('/login')
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -1039,7 +1055,8 @@ class TRXApplication(Application):
             (r"/updateprices", UpdatePriceHandler),
             (r"/eth/price/update", ETHPriceUpdateHandler),
 
-            # Bot Analysis Graphs
+            # Bot Utilities
+            (r"/admin/bot", BotGuiHandler),
             (r"/analysis/analysis[0-9].html", StaticFileHandler),
 
             # REST API
