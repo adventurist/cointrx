@@ -1,0 +1,11 @@
+.trx-mui-layout {
+    min-height: 10vh!important;
+}
+.main-layout {
+    display: -webkit-box!important;
+    display: -moz-box!important;
+    display: -ms-flexbox!important;
+    display: -webkit-flex!important;
+    display: flex!important;
+    -webkit-flex-flow: nowrap!important;
+}

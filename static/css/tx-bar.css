@@ -1,0 +1,19 @@
+.trx-mui-layout {
+    min-height: 10vh!important;
+}
+.app-bar-icons {
+    float: right;
+    display: inline-block;
+}
+.app-bar-icon {
+    /* padding: 4px; */
+    display: inline!important;
+}
+.trx-appbar-nav {
+    width: 100%;
+}
+
+.TrxAppBar h1 {
+    width: 100%!important;
+    text-align: right;
+}
