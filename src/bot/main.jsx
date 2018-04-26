@@ -18,6 +18,11 @@ import { Provider } from 'react-redux'
 // const trxInstance = trx()
 
 const styles = {
+    console: {
+        position: 'static',
+        width: '100%',
+        minHeight: '20em'
+    },
     layout: {
         padding: 4,
         backgroundColor: 'red'
@@ -70,7 +75,7 @@ const buildBotMenuItems = (length) => {
     const items = [];
     items.push(<MenuItem value={'All'} key={-1} primaryText={`All`} />);
     for (let i = 0; i < length; i++ ) {
-        items.push(<MenuItem value={i} key={i} primaryText={`Bot ${i}`} />);
+        items.push(<MenuItem value={i} key={i} primaryText={`Bot ${i + 1}`} />);
     }
 
     return items
@@ -85,7 +90,8 @@ export class TrxLayout extends React.Component {
             open: false,
             botNum: 1,
             selectedBot: -1,
-            botMenuItems: buildBotMenuItems(this.state.botNum)
+            botMenuItems: buildBotMenuItems(this.state.botNum),
+            consoleText: ''
         };
     }
 
@@ -131,9 +137,22 @@ export class TrxLayout extends React.Component {
         });
     };
 
+    consoleOut (incomingText) {
+        const textArr = this.state.consoleText.split('\n')
+        if (textArr.length > 11) {
+            textArr.splice(0, 1)
+        }
+        this.setState({consoleText: `${textArr.join('\n')}\n${incomingText}`})
+    }
+
     botNumberChange = (event, value) => {
         const newItems = buildBotMenuItems(value)
         this.setState({botNum: value, botMenuItems: newItems})
+        this.consoleOut(`Number of bots to be built: ${value}`)
+    }
+
+    handleConsoleChange = (event, index, value) => {
+        this.setState({consoleText: value})
     }
 
     render() {
@@ -141,6 +160,16 @@ export class TrxLayout extends React.Component {
             <div id="main-wrap">
             <TrxNav id="trx-nav" />
                 <Layout id="main-layout" style={styles.mainLayout}>
+                    <Panel id="console" className="console" style={styles.console}>
+                        <TextField
+                            multiLine={true}
+                            rows={12}
+                            rowsMax={12}
+                            hintText='Console'
+                            value={this.state.consoleText}
+                            onChange={this.handleConsoleChange}
+                        />
+                    </Panel>
                     <Panel id="bot-panel" className="trx-panel" style={styles.trxPanel}>
                         <Card>
                             <CardTitle title="Bot Setup" />
@@ -160,10 +189,9 @@ export class TrxLayout extends React.Component {
                             <CardText>
                                 Examine and trade
                             </CardText>
-                            <DropDownMenu maxHeight={300} value={this.state.selectedBot} onChange={this.handleBotSelect}>
+                            <DropDownMenu id="bot-select" maxHeight={300} defaultValue={this.state.selectedBot} onChange={this.handleBotSelect}>
                                 {this.state.botMenuItems}
                             </DropDownMenu>
-
                         </Card>
                     </Panel>
                 </Layout>
@@ -171,9 +199,11 @@ export class TrxLayout extends React.Component {
         )
     }
 
-    handleBotSelect = (value) => {
+    handleBotSelect = (event, index, value) => {
         this.setState({selectedBot: value})
+        this.consoleOut(`Bot ${value + 1} selected`)
     }
+
     updateState = (key, value) => {
         this.setState({
             key: value

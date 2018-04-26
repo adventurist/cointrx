@@ -16778,6 +16778,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // const trxInstance = trx()
 
 var styles = {
+    console: {
+        position: 'static',
+        width: '100%',
+        minHeight: '20em'
+    },
     layout: {
         padding: 4,
         backgroundColor: 'red'
@@ -16829,7 +16834,7 @@ var buildBotMenuItems = function buildBotMenuItems(length) {
     var items = [];
     items.push(React.createElement(_MenuItem2.default, { value: 'All', key: -1, primaryText: 'All' }));
     for (var i = 0; i < length; i++) {
-        items.push(React.createElement(_MenuItem2.default, { value: i, key: i, primaryText: 'Bot ' + i }));
+        items.push(React.createElement(_MenuItem2.default, { value: i, key: i, primaryText: 'Bot ' + (i + 1) }));
     }
 
     return items;
@@ -16883,10 +16888,16 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
         _this.botNumberChange = function (event, value) {
             var newItems = buildBotMenuItems(value);
             _this.setState({ botNum: value, botMenuItems: newItems });
+            _this.consoleOut('Number of bots to be built: ' + value);
         };
 
-        _this.handleBotSelect = function (value) {
+        _this.handleConsoleChange = function (event, index, value) {
+            _this.setState({ consoleText: value });
+        };
+
+        _this.handleBotSelect = function (event, index, value) {
             _this.setState({ selectedBot: value });
+            _this.consoleOut('Bot ' + (value + 1) + ' selected');
         };
 
         _this.updateState = function (key, value) {
@@ -16899,7 +16910,8 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
             open: false,
             botNum: 1,
             selectedBot: -1,
-            botMenuItems: buildBotMenuItems(_this.state.botNum)
+            botMenuItems: buildBotMenuItems(_this.state.botNum),
+            consoleText: ''
         };
         return _this;
     }
@@ -16911,6 +16923,15 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
             this.setState({ botMenuItems: menuItems });
         }
     }, {
+        key: 'consoleOut',
+        value: function consoleOut(incomingText) {
+            var textArr = this.state.consoleText.split('\n');
+            if (textArr.length > 11) {
+                textArr.splice(0, 1);
+            }
+            this.setState({ consoleText: textArr.join('\n') + '\n' + incomingText });
+        }
+    }, {
         key: 'render',
         value: function render() {
             return React.createElement(
@@ -16920,6 +16941,18 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                 React.createElement(
                     _reactToolbox.Layout,
                     { id: 'main-layout', style: styles.mainLayout },
+                    React.createElement(
+                        _reactToolbox.Panel,
+                        { id: 'console', className: 'console', style: styles.console },
+                        React.createElement(_TextField2.default, {
+                            multiLine: true,
+                            rows: 12,
+                            rowsMax: 12,
+                            hintText: 'Console',
+                            value: this.state.consoleText,
+                            onChange: this.handleConsoleChange
+                        })
+                    ),
                     React.createElement(
                         _reactToolbox.Panel,
                         { id: 'bot-panel', className: 'trx-panel', style: styles.trxPanel },
@@ -16957,7 +16990,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                             ),
                             React.createElement(
                                 _DropDownMenu2.default,
-                                { maxHeight: 300, value: this.state.selectedBot, onChange: this.handleBotSelect },
+                                { id: 'bot-select', maxHeight: 300, defaultValue: this.state.selectedBot, onChange: this.handleBotSelect },
                                 this.state.botMenuItems
                             )
                         )
@@ -40406,6 +40439,14 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var trxLogo = function trxLogo() {
+    return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement('img', { id: 'trx-logo-img', height: '64px', src: '/static/images/logo.png' })
+    );
+};
+
 var TrxNav = exports.TrxNav = function (_React$Component) {
     (0, _inherits3.default)(TrxNav, _React$Component);
 
@@ -40480,14 +40521,16 @@ var TrxNav = exports.TrxNav = function (_React$Component) {
                     _react2.default.createElement(
                         _app_bar.AppBar,
                         { className: 'TrxAppBar',
-                            title: 'Coin TRX',
+                            id: 'trx-app-bar',
+                            title: trxLogo(),
                             styleName: 'theme.AppBar',
                             theme: theme,
+                            style: { backgroundColor: '#333333' },
                             leftIcon: 'menu',
                             onLeftIconClick: this.toggleDrawerActive },
                         _react2.default.createElement(
                             _navigation2.default,
-                            { className: 'trx-appbar-nav', type: 'horizontal' },
+                            { className: 'trx-appbar-nav', type: 'horizontal', style: { backgroundColor: '#333333' } },
                             _react2.default.createElement(
                                 'div',
                                 { className: 'app-bar-icons' },

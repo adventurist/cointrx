@@ -9,3 +9,19 @@
     display: flex!important;
     -webkit-flex-flow: nowrap!important;
 }
+
+#console div {
+    width: 100%!important;
+}
+#console textarea {
+    width: 100%!important;
+    background-color: #333333!important;
+    padding: 12px!important;
+    color: #4fb6e1!important;
+    font-family: Roboto, "Open Sans", sans-serif !important;
+}
+
+#TrxAppBar, #main-wrap header {
+    background-color: #333333!important;
+}
+

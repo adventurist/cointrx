@@ -10,6 +10,11 @@ import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
+const trxLogo = () => {
+    return <div>
+        <img id="trx-logo-img" height="64px" src="/static/images/logo.png"/>
+    </div>
+}
 
 export class TrxNav extends React.Component {
     constructor(props) {
@@ -68,13 +73,15 @@ export class TrxNav extends React.Component {
                 </NavDrawer>
                 <Panel>
                     <AppBar className="TrxAppBar"
-                            title="Coin TRX"
+                            id="trx-app-bar"
+                            title={trxLogo()}
                             styleName="theme.AppBar"
                             theme={theme}
-                            leftIcon='menu'
+                            style={{backgroundColor: '#333333'}}
+                            leftIcon="menu"
                             onLeftIconClick={this.toggleDrawerActive}>
 
-                        <Navigation className='trx-appbar-nav' type='horizontal'>
+                        <Navigation className='trx-appbar-nav' type='horizontal' style={{backgroundColor: '#333333'}}>
                             <div className="app-bar-icons">
                                 <Link className="app-bar-icon app-bar-trade"
                                       href='/transaction/tx-gui' label='' icon='inbox'/>
