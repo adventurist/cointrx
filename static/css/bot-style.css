@@ -21,7 +21,23 @@
     font-family: Roboto, "Open Sans", sans-serif !important;
 }
 
+#console, #bot-panel, #analysis-panel {
+    padding: 8px;
+}
+
 #TrxAppBar, #main-wrap header {
     background-color: #333333!important;
 }
 
+#number-container {
+    width: 50%;
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 2px;
+    padding-left: 12px;
+}
+
+#market-select {
+    width: 50%;
+    display: inline-block;
+}

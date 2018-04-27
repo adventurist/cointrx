@@ -6,13 +6,14 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { TrxNav } from '../TrxAppBar.jsx'
 import { Layout, Panel } from 'react-toolbox'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
-import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import {orange500, blue500} from 'material-ui/styles/colors';
+import {orange500} from 'material-ui/styles/colors';
 import NumericInput from 'react-numeric-input';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
-import { Provider } from 'react-redux'
+import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
+import TrendingUp from 'material-ui/svg-icons/action/trending-up';
+import CompareArrows from 'material-ui/svg-icons/action/compare-arrows';
 // import trx from '../redux'
 
 // const trxInstance = trx()
@@ -52,23 +53,13 @@ const styles = {
         display: 'inline-block',
         height: '10em',
         float: 'left'
-    }
-}
-/* padding: 0;
- margin: 0;
- list-style: none;
-
- display: -webkit-box;
- display: -moz-box;
- display: -ms-flexbox;
- display: -webkit-flex;
- display: flex;
-
- -webkit-flex-flow: row wrap;
- justify-content: space-around;*/
-
-const NumberButton = (props) => {
-    return <FlatButton label={props.label} style={styles.numberButton} onClick={props.onClick}/>
+    },
+    block: {
+        maxWidth: 250,
+    },
+    radioButton: {
+        marginBottom: 16,
+    },
 }
 
 const buildBotMenuItems = (length) => {
@@ -77,10 +68,8 @@ const buildBotMenuItems = (length) => {
     for (let i = 0; i < length; i++ ) {
         items.push(<MenuItem value={i} key={i} primaryText={`Bot ${i + 1}`} />);
     }
-
     return items
 }
-
 
 export class TrxLayout extends React.Component {
 
@@ -91,7 +80,8 @@ export class TrxLayout extends React.Component {
             botNum: 1,
             selectedBot: -1,
             botMenuItems: buildBotMenuItems(this.state.botNum),
-            consoleText: ''
+            consoleText: '',
+            market: undefined
         };
     }
 
@@ -131,7 +121,6 @@ export class TrxLayout extends React.Component {
     }
 
     toggleSidebar = () => {
-        // this.updateState('sidebarPinned', !this.state.sidebarPinned)
         this.setState({
             sidebarPinned: !this.state.sidebarPinned
         });
@@ -176,10 +165,35 @@ export class TrxLayout extends React.Component {
                             <CardText>
                                 Configure and create bots
                             </CardText>
-                            <div id="number-container" style={{maxWidth: '5em'}}>
+                            <div id="number-container">
                                 <CardActions className="number-control"  style={styles.numberControl}>
                                     <NumericInput min={0} max={100} value={this.state.botNum} onChange={this.botNumberChange} />
                                 </CardActions>
+                            </div>
+                            <div id="market-select">
+                                <RadioButtonGroup name="market-select" defaultSelected="trx" onChange={this.handleMarketSelect}>
+                                    <RadioButton
+                                        value="TRX"
+                                        label="TRX"
+                                        checkedIcon={<TrendingUp style={{color: '#F44336'}} />}
+                                        uncheckedIcon={<TrendingUp style={{color: '#777777'}}/>}
+                                        style={styles.radioButton}
+                                    />
+                                    <RadioButton
+                                        value="TRC"
+                                        label="TRC"
+                                        checkedIcon={<TrendingUp style={{color: '#F44336'}} />}
+                                        uncheckedIcon={<TrendingUp style={{color: '#777777'}}/>}
+                                        style={styles.radioButton}
+                                    />
+                                    <RadioButton
+                                        value="Exchange"
+                                        label="Exchange TRX/TRC"
+                                        checkedIcon={<CompareArrows style={{color: '#F44336'}} />}
+                                        uncheckedIcon={<CompareArrows style={{color: '#777777'}}/>}
+                                        style={styles.radioButton}
+                                    />
+                                </RadioButtonGroup>
                             </div>
                         </Card>
                     </Panel>
@@ -202,6 +216,11 @@ export class TrxLayout extends React.Component {
     handleBotSelect = (event, index, value) => {
         this.setState({selectedBot: value})
         this.consoleOut(`Bot ${value + 1} selected`)
+    }
+
+    handleMarketSelect = (event, value) => {
+        this.setState({market: value})
+        this.consoleOut(`Market set to ${value}`)
     }
 
     updateState = (key, value) => {
