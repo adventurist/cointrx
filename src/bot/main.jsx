@@ -14,6 +14,10 @@ import MenuItem from 'material-ui/MenuItem';
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import TrendingUp from 'material-ui/svg-icons/action/trending-up';
 import CompareArrows from 'material-ui/svg-icons/action/compare-arrows';
+import AutoRenew from 'material-ui/svg-icons/action/autorenew'
+import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
+import FlatButton from 'material-ui/FlatButton/FlatButton'
+import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
 // import trx from '../redux'
 
 // const trxInstance = trx()
@@ -60,6 +64,9 @@ const styles = {
     radioButton: {
         marginBottom: 16,
     },
+    botSelect: {
+        width: '2em'
+    }
 }
 
 const buildBotMenuItems = (length) => {
@@ -203,9 +210,21 @@ export class TrxLayout extends React.Component {
                             <CardText>
                                 Examine and trade
                             </CardText>
-                            <DropDownMenu id="bot-select" maxHeight={300} defaultValue={this.state.selectedBot} onChange={this.handleBotSelect}>
+                            <DropDownMenu id="bot-select" style={styles.botSelect} maxHeight={300} value={this.state.selectedBot} onChange={this.handleBotSelect}>
                                 {this.state.botMenuItems}
                             </DropDownMenu>
+                            <FlatButton
+                                label="Load Data"
+                                labelPosition="before"
+                                primary={false}
+                                icon={<AutoRenew />}
+                            />
+                            <RaisedButton
+                                label="Analyze"
+                                labelPosition="before"
+                                primary={false}
+                                icon={<PlayCircle />}
+                            />
                         </Card>
                     </Panel>
                 </Layout>
