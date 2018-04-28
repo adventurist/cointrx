@@ -26,7 +26,8 @@ let config = {
         new webpack.ProvidePlugin({
             "React": "react",
         }),
-    ]
+    ],
+    devtool: "source-map"
 };
 
 module.exports = config;
