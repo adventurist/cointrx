@@ -15,12 +15,19 @@ import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import TrendingUp from 'material-ui/svg-icons/action/trending-up';
 import CompareArrows from 'material-ui/svg-icons/action/compare-arrows';
 import AutoRenew from 'material-ui/svg-icons/action/autorenew'
+import PowerSettingsNew from 'material-ui/svg-icons/action/power-settings-new'
 import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
 import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
+import { request, handleResponse } from '../utils/'
 // import trx from '../redux'
 
 // const trxInstance = trx()
+
+const urls = {
+    botStart: 'http://localhost:6969/bot/start',
+    botTrcPrices: 'http://localhost:6969/bot/trc/prices/all'
+}
 
 const styles = {
     console: {
@@ -88,7 +95,8 @@ export class TrxLayout extends React.Component {
             selectedBot: -1,
             botMenuItems: buildBotMenuItems(this.state.botNum),
             consoleText: '',
-            market: undefined
+            market: undefined,
+            timePeriod: '60'
         };
     }
 
@@ -151,6 +159,31 @@ export class TrxLayout extends React.Component {
         this.setState({consoleText: value})
     }
 
+    startBots = async () => {
+        const data = await request({
+            url: urls.botStart,
+            method: 'GET',
+            params: {number: this.state.botNum}
+        })
+
+        const response = handleResponse(data)
+        console.log(response)
+    }
+
+    loadMarketData = async (event, index, value) => {
+        const selectedBot = this.state.selectedBot
+        console.log(event)
+        const data = await request({
+            url: urls.botTrcPrices,
+            headers: {'Content-Type': 'application/json'},
+            params: {bot: selectedBot, time: this.state.timePeriod}
+        })
+
+        const response = handleResponse(data)
+        console.log(response)
+    }
+
+
     render() {
         return (
             <div id="main-wrap">
@@ -202,6 +235,15 @@ export class TrxLayout extends React.Component {
                                     />
                                 </RadioButtonGroup>
                             </div>
+                            <div id="start-button">
+                                <FlatButton
+                                    label="Start Bots"
+                                    labelPosition="before"
+                                    onClick={this.startBots}
+                                    primary={false}
+                                    icon={<PowerSettingsNew/>}
+                                />
+                            </div>
                         </Card>
                     </Panel>
                     <Panel id="analysis-panel" className="trx-panel" style={styles.trxPanel}>
@@ -216,6 +258,7 @@ export class TrxLayout extends React.Component {
                             <FlatButton
                                 label="Load Data"
                                 labelPosition="before"
+                                onClick={this.loadMarketData}
                                 primary={false}
                                 icon={<AutoRenew />}
                             />
@@ -247,7 +290,6 @@ export class TrxLayout extends React.Component {
             key: value
         })
     }
-
 }
 
 render(
