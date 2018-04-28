@@ -1010,8 +1010,36 @@ class BotGuiHandler(RequestHandler):
             self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
             self.render("templates/bot.html", title="TRX BOT GUI", bot_gui_urls=bot_gui_urls, bot_gui_data=bot_gui_data)
         else:
-            self.set_secure_cookie('redirect_target', '/user')
+            self.set_secure_cookie('redirect_target', self.request.path)
             self.redirect('/login')
+
+
+class BotStartHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        number = self.get_argument('number')
+        response = await http_client.get('http://localhost:9977/start?number=' + str(number))
+        if response is not None and hasattr(response, 'body'):
+            response_data = str(response.body, 'utf-8')
+            self.set_status(200)
+            self.write(response_data)
+        else:
+            self.set_status(500)
+            self.write(json.dumps({'response': 500, 'text': 'Error starting bots'}))
+
+
+class BotTrcPriceRetrieveHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        time_length = self.get_argument('time')
+        response = await http_client.get('http://localhost:9977/bots/trc/prices?time=' + str(time_length))
+        response_data = str(response.body, 'utf-8')
+        self.set_status(200)
+        self.write(response_data)
 
 
 class TRXApplication(Application):
@@ -1058,6 +1086,8 @@ class TRXApplication(Application):
             # Bot Utilities
             (r"/admin/bot", BotGuiHandler),
             (r"/analysis/analysis[0-9].html", StaticFileHandler),
+            (r"/bot/start", BotStartHandler),
+            (r"/bot/trc/prices/all", BotTrcPriceRetrieveHandler),
 
             # REST API
 
