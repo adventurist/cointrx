@@ -40,8 +40,21 @@ class StartHandler(RequestHandler):
         pass
 
     def get(self, *args, **kwargs):
-        application.set_bots(make_bots())
-        application.logger.info('Bots received')
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        num_requested = self.get_argument('number')
+
+        create_bot_result = application.set_bots(make_bots(num_requested))
+        if not has_error(create_bot_result):
+            application.logger.info('Bots received')
+            self.set_status(201, reason='Bot creation')
+            self.write(json.dumps({'response': 201, 'resource': 'bot', 'num': num_requested,
+                                   'response_text': 'Created %s bots successfully' % str(num_requested)}))
+        else:
+            application.logger.info('Unable to create bots')
+            # self.set_status(500, reason='Bot creation failure')
+            self.write(json.dumps({'response': 500, 'resource': 'bot', 'num': num_requested, 'error': True, 'response_text': 'Error when attempting to create bots.\nReason given: %s' % create_bot_result['error']}))
 
 
 class BotAllHandler(RequestHandler):
@@ -59,11 +72,26 @@ class BotLoginHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        if len(application.bots) > 0:
+        login_num_requested = self.get_argument('number')
+        bot_num = len(application.bots)
+        error = False
+        logins = 0
+        if bot_num > 0:
             for bot in application.bots:
                 login_attempt = await bot.login()
                 if login_attempt:
-                    print('Good stuff')
+                    logins += 1
+                else:
+                    error = True
+            if not logins > 0:
+                response_code = 200 if not error else 207
+            else:
+                response_code = 500
+
+            self.set_status(response_code, reason='%s %s logged in' % str(logins) % 'bots' if (login_num_requested != 1) else 'bot')
+            self.write(json.dumps({'response': response_code, 'resource': 'bot', 'action': 'login', 'num': logins,
+                                   'response_text': '%s of %s requested logged in successfully' % str(
+                                       logins) % 'bots' if login_num_requested != 1 else 'bot'}))
 
 
 class BotDumpHandler(RequestHandler):
@@ -84,7 +112,13 @@ class BotTrcPriceHandler(RequestHandler):
         if len(application.bots) > 0:
             for bot in application.bots:
                 price_history = await bot.retrieve_price_history()
-                await bot.digest_price_history(price_history.body)
+                digest_price_result = await bot.digest_price_history(price_history.body)
+                if not has_error(digest_price_result):
+                    self.set_status(200)
+                    self.write(json.dumps(
+                        {self.write(json.dumps({'response': 200, 'resource': 'bot', 'action': 'login', 'num': bot_num,
+                                                'response_text': '%s %s logged in successfully' % str(
+                                                    bot_num) % 'bots' if bot_num != 1 else 'bot'}))}))
 
 
 class BotTrcAnalysisHandler(RequestHandler):
@@ -114,7 +148,8 @@ class BotTrcAnalysisHandler(RequestHandler):
             p1.xaxis.axis_label = 'Date'
             p1.yaxis.axis_label = 'Price'
 
-            line = p1.line(x='date', y='price', source=source, color='#33ff00', legend='BTC', line_cap='round', line_width=4)
+            line = p1.line(x='date', y='price', source=source, color='#33ff00', legend='BTC', line_cap='round',
+                           line_width=2)
 
             p1.add_tools(HoverTool(
                 renderers=[line],
@@ -131,15 +166,20 @@ class BotTrcAnalysisHandler(RequestHandler):
 
             p1.circle(datetime(peak_dates), peak_prices, color='#ff00eb', legend='Peaks', line_width=6)
             p1.circle(datetime(base_dates), base_prices, color='#ff6a00', legend='Bases', line_width=6)
-            p1.square(datetime([price_data[3][0]]), [price_data[3][1]], color='#2700ff', legend="First Low", line_width=6)
-            p1.triangle(datetime([price_data[4][0]]), [price_data[4][1]], color='#f00000', legend="First High", line_width=6)
-            p1.square(datetime([price_data[5][0]]), [price_data[5][1]], color='#2700ff', legend="Last Low", line_width=6)
-            p1.triangle(datetime([price_data[6][0]]), [price_data[6][1]], color='#f00000', legend="Last High", line_width=6)
+            p1.square(datetime([price_data[3][0]]), [price_data[3][1]], color='#2700ff', legend="First Low",
+                      line_width=6)
+            p1.triangle(datetime([price_data[4][0]]), [price_data[4][1]], color='#f00000', legend="First High",
+                        line_width=6)
+            p1.square(datetime([price_data[5][0]]), [price_data[5][1]], color='#2700ff', legend="Last Low",
+                      line_width=6)
+            p1.triangle(datetime([price_data[6][0]]), [price_data[6][1]], color='#f00000', legend="Last High",
+                        line_width=6)
 
             p1.legend.location = "bottom_right"
-            output_file("analysis/analysis" + str(bot.number) + ".html", title="analysis" + str(bot.number) + ".py BTC Price Analysis", mode="inline")
+            output_file("analysis/analysis" + str(bot.number) + ".html",
+                        title="analysis" + str(bot.number) + ".py BTC Price Analysis", mode="inline")
 
-            show(gridplot([[p1]], plot_width=1600, plot_height=960)) # open browser
+            show(gridplot([[p1]], plot_width=1600, plot_height=960))  # open browser
 
 
 def datetime(x):
@@ -173,10 +213,13 @@ class BotApplication(Application):
                 self.bots.append(bot)
         elif isinstance(bots, Bot):
             self.bots.append(bots)
+        elif has_error(bots):
+            return bots
+        else:
+            return {'error': 'Unknown error occurred while calling set_bots'}
 
 
 def setup_logger(name, level, json_logging=False):
-
     logger = logging.getLogger(name)
     logger.setLevel(level)
     log_handler = logging.FileHandler('bot.log')
@@ -207,31 +250,39 @@ def bot_config():
     return config
 
 
-def make_bots():
+def make_bots(num):
+    # TODO determine the best way of limiting the number to that which was requested
     config = bot_config()
     bots = []
     users = user_data()
-    try:
-        for i in range(len(users)):
-            config.number = i + 1
-            new_bot = Bot(config, setup_logger('Bot ' + str(i + 1), logging.DEBUG, json_logging=True))
-            new_bot.set_credentials(users[i])
-            new_bot.connect()
-            bots.append(new_bot)
+    if len(users) >= int(num):
+        try:
+            for i in range(len(users)):
+                config.number = i + 1
+                new_bot = Bot(config, setup_logger('Bot ' + str(i + 1), logging.DEBUG, json_logging=True))
+                new_bot.set_credentials(users[i])
+                new_bot.connect()
+                bots.append(new_bot)
 
-    except WebSocketError as e:
-        handle_error(e, 'WebSocketErr')
-    except StreamClosedError as e:
-        handle_error(e, 'StreamClosed')
-    except Exception as e:
-        handle_error(e, 'General')
+        except WebSocketError as e:
+            handle_error(e, 'WebSocketErr')
+        except StreamClosedError as e:
+            handle_error(e, 'StreamClosed')
+        except Exception as e:
+            handle_error(e, 'General')
 
-    return bots
+        return bots
+    else:
+        return {'error': 'Requested number of bots exceeds available accounts'}
 
 
 def handle_error(err, name):
     print(err)
     application.logger.debug(name + ' error: ', str(err))
+
+
+def has_error(d):
+    return True if isinstance(d, dict) and 'error' in d else False
 
 
 if __name__ == "__main__":
