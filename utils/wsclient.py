@@ -90,6 +90,9 @@ class Bot(object):
             history_data = json.loads(str(data, 'utf-8'))
             if history_data is not None:
                 self.trc_struct.entries = history_data
+                return True
+            else:
+                return {'error': 'Unable to digest price history'}
 
     def is_first_low(self, r, idx):
         """ Check to see if row occurs within first historical period """
@@ -224,13 +227,20 @@ class Bot(object):
             if 'token' in login_response and 'trx_cookie' in login_response:
                 session_data = {'token': login_response['token'], 'trx_cookie': login_response['trx_cookie']}
                 self.session = session_data
-
+                self.logger.info('Bot ' + str(self.number) + ' successfully logged into TRX')
             else:
                 self.logger.info('Unable to login')
                 self.logger.debug('Session data was ' + str(login_response))
-                return
+                self.session = False
+                self.logger.info('Bot ' + str(self.number) + ' unable to login')
 
-            self.logger.info('Bot ' + str(self.number) + ' successfully logged into TRX')
+            return self.is_logged_in()
+
+    def is_logged_in(self):
+        return self.has_session()
+
+    def has_session(self):
+        return True if (self.session is not None) and (self.session is not False) and (isinstance(self.session, dict) and ('token' in self.session)) else False
 
 
 def receive_message(msg):
