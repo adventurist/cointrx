@@ -1001,6 +1001,7 @@ class TRCPriceUpdateHandler(RequestHandler):
 class BotGuiHandler(RequestHandler):
     def data_received(self, chunk):
         pass
+
     async def get(self, *args, **kwargs):
         cookie = self.get_secure_cookie("trx_cookie")
         if check_attribute(application.session, 'user'):
@@ -1019,8 +1020,9 @@ class BotStartHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
+        cookie = self.get_secure_cookie('trx_cookie')
         number = self.get_argument('number')
-        response = await http_client.get('http://localhost:9977/start?number=' + str(number))
+        response = await http_client.get('http://localhost:9977/start?number=' + str(number) + '&trx_cookie=' + str(cookie))
         if response is not None and hasattr(response, 'body'):
             response_data = str(response.body, 'utf-8')
             self.set_status(200)
@@ -1035,11 +1037,27 @@ class BotTrcPriceRetrieveHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
+        cookie = self.get_secure_cookie('trx_cookie')
         time_length = self.get_argument('time')
-        response = await http_client.get('http://localhost:9977/bots/trc/prices?time=' + str(time_length))
+        bot_id = self.get_argument('bot')
+        response = await http_client.get(
+            'http://localhost:9977/bots/trc/prices?bot=' + str(bot_id) + '&time=' + str(
+                time_length) + '&trx_cookie=' + cookie)
         response_data = str(response.body, 'utf-8')
         self.set_status(200)
         self.write(response_data)
+
+
+class BotWsTestHandler(WebSocketHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def on_message(self, message):
+        print(message)
+        self.write_message('Back at you, punk')
+
+    def open(self):
+        self.write_message('Connection opened')
 
 
 class TRXApplication(Application):
@@ -1088,6 +1106,7 @@ class TRXApplication(Application):
             (r"/analysis/analysis[0-9].html", StaticFileHandler),
             (r"/bot/start", BotStartHandler),
             (r"/bot/trc/prices/all", BotTrcPriceRetrieveHandler),
+            (r"/bot/ws-test", BotWsTestHandler),
 
             # REST API
 
