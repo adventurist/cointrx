@@ -39,22 +39,32 @@ class StartHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def get(self, *args, **kwargs):
-        self.set_header("Access-Control-Allow-Origin", "*")
-        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
-        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    async def get(self, *args, **kwargs):
+        trx_cookie = self.get_argument('trx_cookie')
+        self.set_secure_cookie('trx_cookie', trx_cookie)
+
         num_requested = self.get_argument('number')
 
-        create_bot_result = application.set_bots(make_bots(num_requested))
+        create_bot_result = application.set_bots(await make_bots(num_requested))
         if not has_error(create_bot_result):
             application.logger.info('Bots received')
+
+            if len(application.bots) > 0:
+                for bot in application.bots:
+                    application.logger.debug(bot.identify())
+                    # bot_conn = await bot.connect()
+                    await bot.write_message()
+                    await bot.relay_message('Jigga jigga WHAT?!?!?!')
+
             self.set_status(201, reason='Bot creation')
             self.write(json.dumps({'response': 201, 'resource': 'bot', 'num': num_requested,
                                    'response_text': 'Created %s bots successfully' % str(num_requested)}))
         else:
             application.logger.info('Unable to create bots')
             # self.set_status(500, reason='Bot creation failure')
-            self.write(json.dumps({'response': 500, 'resource': 'bot', 'num': num_requested, 'error': True, 'response_text': 'Error when attempting to create bots.\nReason given: %s' % create_bot_result['error']}))
+            self.write(json.dumps({'response': 500, 'resource': 'bot', 'num': num_requested, 'error': True,
+                                   'response_text': 'Error when attempting to create bots.\nReason given: %s' %
+                                                    create_bot_result['error']}))
 
 
 class BotAllHandler(RequestHandler):
@@ -65,6 +75,9 @@ class BotAllHandler(RequestHandler):
         if len(application.bots) > 0:
             for bot in application.bots:
                 application.logger.debug(bot.identify())
+                bot.connect()
+                bot.write_message()
+                bot.relay_message('Jigga jigga WHAT?!?!?!')
 
 
 class BotLoginHandler(RequestHandler):
@@ -88,7 +101,8 @@ class BotLoginHandler(RequestHandler):
             else:
                 response_code = 500
 
-            self.set_status(response_code, reason='%s %s logged in' % str(logins) % 'bots' if (login_num_requested != 1) else 'bot')
+            self.set_status(response_code,
+                            reason='%s %s logged in' % str(logins) % 'bots' if (login_num_requested != 1) else 'bot')
             self.write(json.dumps({'response': response_code, 'resource': 'bot', 'action': 'login', 'num': logins,
                                    'response_text': '%s of %s requested logged in successfully' % str(
                                        logins) % 'bots' if login_num_requested != 1 else 'bot'}))
@@ -109,16 +123,23 @@ class BotTrcPriceHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        if len(application.bots) > 0:
-            for bot in application.bots:
-                price_history = await bot.retrieve_price_history()
-                digest_price_result = await bot.digest_price_history(price_history.body)
-                if not has_error(digest_price_result):
-                    self.set_status(200)
-                    self.write(json.dumps(
-                        {self.write(json.dumps({'response': 200, 'resource': 'bot', 'action': 'login', 'num': bot_num,
-                                                'response_text': '%s %s logged in successfully' % str(
-                                                    bot_num) % 'bots' if bot_num != 1 else 'bot'}))}))
+        trx_cookie = self.get_argument('trx_cookie')
+        self.initialize()
+        bot_id = self.get_argument('bot')
+        if len(application.bots) > 0 and application.bots[int(bot_id)] is not None:
+            bot = application.bots[int(bot_id)]
+            price_history = await bot.retrieve_price_history()
+            digest_price_result = await bot.digest_price_history(price_history.body)
+            if not has_error(digest_price_result):
+                self.set_status(200)
+                self.write(json.dumps({'response': 200, 'resource': 'bot', 'action': 'login', 'num': 1,
+                                       'response_text': 'Successfully loaded market data into bot %s' % bot_id}))
+        else:
+            self.set_status(500)
+            self.write(json.dumps({
+                'response': 500, 'resource': 'bot', 'action': 'load data', 'num': 1,
+                'response_text': 'Bot number does not match an available bot'
+            }))
 
 
 class BotTrcAnalysisHandler(RequestHandler):
@@ -199,7 +220,8 @@ class BotApplication(Application):
         ]
         settings = {
             "debug": True,
-            "log_path": os.path.join(os.path.dirname(__file__), "log")
+            "log_path": os.path.join(os.path.dirname(__file__), "log"),
+            "cookie_secret": "984378towhdufs8047ht"
         }
         self.bots = []
 
@@ -250,7 +272,7 @@ def bot_config():
     return config
 
 
-def make_bots(num):
+async def make_bots(num):
     # TODO determine the best way of limiting the number to that which was requested
     config = bot_config()
     bots = []
@@ -261,7 +283,7 @@ def make_bots(num):
                 config.number = i + 1
                 new_bot = Bot(config, setup_logger('Bot ' + str(i + 1), logging.DEBUG, json_logging=True))
                 new_bot.set_credentials(users[i])
-                new_bot.connect()
+                await new_bot.connect()
                 bots.append(new_bot)
 
         except WebSocketError as e:
