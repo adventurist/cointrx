@@ -14,41 +14,46 @@ class Client(object):
         self.timeout = timeout
         self.ioloop = IOLoop.instance()
         self.ws = None
+        self.bot = None
         PeriodicCallback(self.keep_alive, timeout).start()
 
     @staticmethod
     def receive_message(self, msg):
         print('Message received:' + msg)
 
-    @gen.coroutine
-    def connect(self, url):
+    async def connect(self, url):
         print("trying to connect")
-        try:
-            self.ws = yield websocket_connect(url, on_message_callback=receive_message)
-        except WebSocketError as e:
-            print(str(e))
-            print("connection error")
+        if self.ws is None:
+            try:
+                self.ws = await websocket_connect(url, on_message_callback=receive_message)
+                if self.ws is not None:
+                    # await self.run()
+                    return self.ws
+            except WebSocketError as e:
+                print(str(e))
+                print("connection error")
         else:
             print("connected")
-            self.run()
+            await self.run()
 
-    def write_message(self, msg):
+        return self.ws
+
+    async def write_message(self, msg):
         if self.ws is None:
-            yield self.connect()
-        self.ws.write_message(msg)
+            await self.connect('http://localhost:9977/')
+        await self.ws.write_message(msg)
 
-    @gen.coroutine
-    def run(self):
+    async def run(self):
         while True:
-            msg = yield self.ws.read_message()
+            msg = await self.ws.read_message()
             if msg is None:
                 print("connection closed")
                 self.ws = None
                 break
 
-    def keep_alive(self):
+    async def keep_alive(self):
         if self.ws is None:
-            self.connect()
+            await self.connect('http://localhost:9977/')
         else:
             self.ws.write_message("Keep alive with id: " + str(self.id))
 
@@ -71,11 +76,14 @@ class Bot(object):
     def dump_self(self):
         self.logger.debug(str(self.__dict__))
 
-    def write_message(self):
-        self.client.write_message('Sending message from: ' + str(self.id))
+    async def write_message(self):
+        await self.client.write_message('Sending message from: ' + str(self.id))
 
-    def connect(self):
-        yield self.client.connect(url='ws://localhost:9977/')
+    async def relay_message(self, msg):
+        await self.client.write_message(str(self.id) + ': ' + msg)
+
+    async def connect(self):
+        await self.client.connect(url='ws://localhost:9977/')
 
     def identify(self):
         return "Bot Number " + str(self.number) + " and my ID is " + str(self.id)
@@ -98,7 +106,7 @@ class Bot(object):
         """ Check to see if row occurs within first historical period """
         if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
                                                                 as_unixtime(self.trc_struct.entries[len(
-                                                                        self.trc_struct.entries) - 1]['date']))[0]):
+                                                                    self.trc_struct.entries) - 1]['date']))[0]):
             # Only replace with more recent if value is more than 10% lower
             if more_than_3_percent_lower(r['high'], self.trc_struct.f_low['value'], self.trc_struct.max_offset):
                 self.trc_struct.f_low['value'] = Decimal(r['high'])
@@ -108,26 +116,30 @@ class Bot(object):
     def is_first_high(self, r, idx):
         if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
                                                                 as_unixtime(self.trc_struct.entries[len(
-                                                                        self.trc_struct.entries) - 1]['date']))[0]):
+                                                                    self.trc_struct.entries) - 1]['date']))[0]):
             # Only avoid replacing with more recent if previous value is more than 10% higher
             if (is_higher(r['high'], self.trc_struct.f_low['value'])) and (
-                is_higher(r['high'], self.trc_struct.f_high['value']) or is_within_3_percent_under(r['high'],
-                                                                                                   self.trc_struct.f_high[
-                                                                                                       'value'],
-                                                                                                   self.trc_struct.max_offset)):
+                        is_higher(r['high'], self.trc_struct.f_high['value']) or is_within_3_percent_under(r['high'],
+                                                                                                           self.trc_struct.f_high[
+                                                                                                               'value'],
+                                                                                                           self.trc_struct.max_offset)):
                 self.trc_struct.f_high['value'] = Decimal(r['high'])
                 self.trc_struct.f_high['idx'] = idx
                 return True
 
     def is_last_low(self, r, idx):
-        if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[1]):
+        if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
+                                                               as_unixtime(self.trc_struct.entries[len(
+                                                                       self.trc_struct.entries) - 1]['date']))[1]):
             if not (more_than_3_percent_higher(r['high'], self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
-                    self.trc_struct.l_low['value'] = Decimal(r['high'])
-                    self.trc_struct.l_low['idx'] = idx
-                    return True
+                self.trc_struct.l_low['value'] = Decimal(r['high'])
+                self.trc_struct.l_low['idx'] = idx
+                return True
 
     def is_last_high(self, r, idx):
-        if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[1]):
+        if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
+                                                               as_unixtime(self.trc_struct.entries[len(
+                                                                       self.trc_struct.entries) - 1]['date']))[1]):
             if not (more_than_3_percent_lower(r['high'], self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
                 self.trc_struct.l_high['value'] = Decimal(r['high'])
                 self.trc_struct.l_high['idx'] = idx
@@ -181,7 +193,7 @@ class Bot(object):
                         [x for x in self.trc_struct.peak if x['idx'] == i]) == 0:
                     self.trc_struct.peak.append({'value': row['high'], 'idx': i, 'date': row['date']})
 
-                elif close_to_min(row, self.trc_struct.min, self.trc_struct.max_offset)and len(
+                elif close_to_min(row, self.trc_struct.min, self.trc_struct.max_offset) and len(
                         [x for x in self.trc_struct.base if x['idx'] == i]) == 0:
                     self.trc_struct.base.append({'value': row['high'], 'idx': i, 'date': row['date']})
 
@@ -240,7 +252,8 @@ class Bot(object):
         return self.has_session()
 
     def has_session(self):
-        return True if (self.session is not None) and (self.session is not False) and (isinstance(self.session, dict) and ('token' in self.session)) else False
+        return True if (self.session is not None) and (self.session is not False) and (
+        isinstance(self.session, dict) and ('token' in self.session)) else False
 
 
 def receive_message(msg):
