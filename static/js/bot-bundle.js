@@ -17120,7 +17120,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var urls = {
     botStart: 'http://localhost:6969/bot/start',
-    botTrcPrices: 'http://localhost:6969/bot/trc/prices/all'
+    botTrcPrices: 'http://localhost:6969/bot/trc/prices/all',
+    wsStart: 'ws://localhost:6969/bot/ws-test'
 };
 
 var styles = {
@@ -17236,7 +17237,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
         };
 
         _this.startBots = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-            var data, response;
+            var data, response, ws;
             return _regenerator2.default.wrap(function _callee$(_context) {
                 while (1) {
                     switch (_context.prev = _context.next) {
@@ -17245,16 +17246,25 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                             return (0, _utils.request)({
                                 url: urls.botStart,
                                 method: 'GET',
-                                params: { number: _this.state.botNum }
+                                params: { number: _this.state.botNum },
+                                credentials: 'include'
                             });
 
                         case 2:
                             data = _context.sent;
                             response = (0, _utils.handleResponse)(data);
 
+                            if (!response.error) {
+                                _this.consoleOut(_this.state.botNum + ' bots created');
+                            }
                             console.log(response);
 
-                        case 5:
+                            ws = (0, _utils.requestWs)({
+                                url: urls.wsStart,
+                                params: { data: 'test' }
+                            });
+
+                        case 7:
                         case 'end':
                             return _context.stop();
                     }
@@ -17276,7 +17286,8 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 return (0, _utils.request)({
                                     url: urls.botTrcPrices,
                                     headers: { 'Content-Type': 'application/json' },
-                                    params: { bot: selectedBot, time: _this.state.timePeriod }
+                                    params: { bot: selectedBot, time: _this.state.timePeriod },
+                                    credentials: 'include'
                                 });
 
                             case 4:
@@ -17284,8 +17295,11 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 response = (0, _utils.handleResponse)(data);
 
                                 console.log(response);
+                                if (!response.error) {
+                                    _this.consoleOut(selectedBot + ' has loaded market data');
+                                }
 
-                            case 7:
+                            case 8:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -65595,13 +65609,13 @@ var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
 var request = exports.request = function () {
     var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(options) {
-        var _options, url, method, params, body, headers, queryString, requestHeaders, requestOptions, keys, _keys, response, error, responseData;
+        var _options, url, method, params, body, headers, credentials, queryString, requestHeaders, requestOptions, keys, _keys, response, error, responseData;
 
         return _regenerator2.default.wrap(function _callee$(_context) {
             while (1) {
                 switch (_context.prev = _context.next) {
                     case 0:
-                        _options = (0, _extends3.default)({}, options), url = _options.url, method = _options.method, params = _options.params, body = _options.body, headers = _options.headers;
+                        _options = (0, _extends3.default)({}, options), url = _options.url, method = _options.method, params = _options.params, body = _options.body, headers = _options.headers, credentials = _options.credentials;
                         queryString = void 0;
                         requestHeaders = void 0;
                         requestOptions = void 0;
@@ -65628,7 +65642,8 @@ var request = exports.request = function () {
                         requestOptions = {
                             method: method !== void 0 ? method : 'GET',
                             body: body !== void 0 ? body : '',
-                            headers: requestHeaders
+                            headers: requestHeaders,
+                            credentials: credentials !== void 0 ? credentials : 'omit'
                         };
 
                         if (requestOptions.method === 'GET') {
@@ -65671,6 +65686,7 @@ var request = exports.request = function () {
 }();
 
 exports.handleResponse = handleResponse;
+exports.requestWs = requestWs;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -65686,6 +65702,45 @@ function handleResponse(response) {
         error: error,
         code: 'code' in response ? response.body : false
     };
+}
+
+function requestWs(options) {
+    var _options2 = (0, _extends3.default)({}, options),
+        url = _options2.url,
+        params = _options2.params;
+
+    var urlString = params ? url + paramsToQuery(params) : url;
+
+    var ws = new WebSocket(urlString);
+
+    ws.onopen = function (event) {
+        console.log(event);
+        ws.send('HELLO FROM THE FRONT END, BITCHES!!');
+    };
+
+    ws.onmessage = function (event) {
+        console.log(event);
+        if ('data' in event) {
+            console.log(event.data);
+        }
+        if ('type' in event) {
+            console.log('WS Data Event Type: ' + event.type);
+        }
+    };
+
+    return ws;
+}
+
+function paramsToQuery(params) {
+    if (params) {
+        var keys = (0, _keys3.default)((0, _extends3.default)({}, params));
+        if (keys.length > 0) {
+            return '?' + keys.map(function (key) {
+                return key + '=' + params[key];
+            }).join('&');
+        }
+    }
+    return false;
 }
 
 /***/ })

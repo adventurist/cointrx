@@ -30,14 +30,17 @@
 }
 
 #number-container {
-    width: 50%;
+    width: 46%;
     display: inline-block;
     vertical-align: top;
     padding-top: 2px;
+    margin-right: 1em;
     padding-left: 12px;
 }
 
 #market-select {
-    width: 50%;
+    width: 46%;
+    margin-left: 1em;
+    text-align: right;
     display: inline-block;
 }
