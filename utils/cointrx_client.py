@@ -1,4 +1,5 @@
 from tornado import httpclient as tornado_client
+from tornado.httpclient import HTTPRequest
 from utils.loop_handler import IOHandler
 import aiohttp
 from types import SimpleNamespace
@@ -22,14 +23,17 @@ class Client:
 
     async def connect(self, url, body=None, headers=None):
         try:
-            response = await http_client.fetch(url, method='POST', body=body, headers=headers)
+            request = HTTPRequest(url=url, body=body, method='POST', headers=headers)
+            # response = await http_client.fetch(url=url, method='POST', body=body, headers=headers)
+            response = await http_client.fetch(request)
             return response
         except tornado_client.HTTPError as e:
             print(e.message)
 
     async def get(self, url):
         try:
-            response = await http_client.fetch(url)
+            request = HTTPRequest(url=url, method='GET')
+            response = await http_client.fetch(request)
             return response
         except tornado_client.HTTPError as e:
             print(e.message)
