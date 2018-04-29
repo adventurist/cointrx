@@ -19,14 +19,15 @@ import PowerSettingsNew from 'material-ui/svg-icons/action/power-settings-new'
 import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
 import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
-import { request, handleResponse } from '../utils/'
+import { request, handleResponse, requestWs } from '../utils/'
 // import trx from '../redux'
 
 // const trxInstance = trx()
 
 const urls = {
     botStart: 'http://localhost:6969/bot/start',
-    botTrcPrices: 'http://localhost:6969/bot/trc/prices/all'
+    botTrcPrices: 'http://localhost:6969/bot/trc/prices/all',
+    wsStart: 'ws://localhost:6969/bot/ws-test'
 }
 
 const styles = {
@@ -163,11 +164,20 @@ export class TrxLayout extends React.Component {
         const data = await request({
             url: urls.botStart,
             method: 'GET',
-            params: {number: this.state.botNum}
+            params: {number: this.state.botNum},
+            credentials: 'include'
         })
 
         const response = handleResponse(data)
+        if (!response.error) {
+            this.consoleOut(`${this.state.botNum} bots created`)
+        }
         console.log(response)
+
+        const ws = requestWs({
+            url: urls.wsStart,
+            params: {data: 'test'}
+        })
     }
 
     loadMarketData = async (event, index, value) => {
@@ -176,11 +186,15 @@ export class TrxLayout extends React.Component {
         const data = await request({
             url: urls.botTrcPrices,
             headers: {'Content-Type': 'application/json'},
-            params: {bot: selectedBot, time: this.state.timePeriod}
+            params: {bot: selectedBot, time: this.state.timePeriod},
+            credentials: 'include'
         })
 
         const response = handleResponse(data)
         console.log(response)
+        if (!response.error) {
+            this.consoleOut(`${selectedBot} has loaded market data`)
+        }
     }
 
 
