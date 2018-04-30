@@ -1,3 +1,8 @@
+const SOCKET_CONNECTING = 0;
+const SOCKET_OPEN = 1;
+const SOCKET_CLOSING = 2;
+const SOCKET_CLOSED = 3;
+
 export async function request(options) {
     const {
         url,
@@ -83,22 +88,48 @@ export function requestWs(options) {
 
     const ws = new WebSocket(urlString)
 
+    Object.defineProperty(ws, 'timer', {writable: true, value: undefined})
+
     ws.onopen = (event) => {
         console.log(event)
         ws.send('HELLO FROM THE FRONT END, BITCHES!!')
     }
 
-    ws.onmessage = (event) => {
-        console.log(event)
-        if ('data' in event) {
-            console.log(event.data)
+    ws.onmessage = (message) => {
+        console.log(message)
+        if ('data' in message && isJson(message.data)) {
+            const data = JSON.parse(message.data)
+            if ('keepAlive' in data) {
+                pong(ws)
+            } else {
+                ping(ws)
+            }
         }
-        if ('type' in event) {
-            console.log(`WS Data Event Type: ${event.type}`)
+        if ('data' in message) {
+            console.log(message.data)
+        }
+        if ('type' in message) {
+            console.log(`WS Data Event Type: ${message.type}`)
         }
     }
 
     return ws
+}
+
+function ping(ws) {
+    if (ws.readyState === SOCKET_OPEN) {
+        ws.send('__ping__');
+    } else {
+        console.log('Server - connection needs to be closed for client: ' + ws);
+    }
+}
+
+function pong(ws) {
+    console.log('Server - ' + ws + ' is still active');
+    clearTimeout(ws.timer);
+    ws.timer = setTimeout(function () {
+        ping(ws);
+    }, 20000)
 }
 
 function paramsToQuery (params) {
@@ -109,4 +140,14 @@ function paramsToQuery (params) {
         }
     }
     return false
+}
+
+export function isJson(str) {
+    try {
+        JSON.parse(str);
+    }
+    catch (e) {
+        return false;
+    }
+    return true;
 }
