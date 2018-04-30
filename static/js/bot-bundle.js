@@ -17171,6 +17171,8 @@ var styles = {
     }
 };
 
+var botConnections = [];
+
 var buildBotMenuItems = function buildBotMenuItems(length) {
     var items = [];
     items.push(React.createElement(_MenuItem2.default, { value: 'All', key: -1, primaryText: 'All' }));
@@ -17237,7 +17239,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
         };
 
         _this.startBots = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-            var data, response, ws;
+            var data, response;
             return _regenerator2.default.wrap(function _callee$(_context) {
                 while (1) {
                     switch (_context.prev = _context.next) {
@@ -17258,11 +17260,21 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 _this.consoleOut(_this.state.botNum + ' bots created');
                             }
                             console.log(response);
+                            if ('body' in response && 'data' in response.body) {
+                                if (Array.isArray(data.body.data)) {
+                                    data.body.data.map(function (bot) {
+                                        console.log(bot.message);
+                                        var ws = (0, _utils.requestWs)({
+                                            url: urls.wsStart,
+                                            params: { data: 'test' }
+                                        });
 
-                            ws = (0, _utils.requestWs)({
-                                url: urls.wsStart,
-                                params: { data: 'test' }
-                            });
+                                        if (ws) {
+                                            botConnections.push({ id: bot.id, ws: ws, number: bot.number });
+                                        }
+                                    });
+                                }
+                            }
 
                         case 7:
                         case 'end':
@@ -65687,8 +65699,14 @@ var request = exports.request = function () {
 
 exports.handleResponse = handleResponse;
 exports.requestWs = requestWs;
+exports.isJson = isJson;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var SOCKET_CONNECTING = 0;
+var SOCKET_OPEN = 1;
+var SOCKET_CLOSING = 2;
+var SOCKET_CLOSED = 3;
 
 function handleResponse(response) {
     var data = typeof response === 'string' ? JSON.parse(response) : response;
@@ -65713,22 +65731,48 @@ function requestWs(options) {
 
     var ws = new WebSocket(urlString);
 
+    Object.defineProperty(ws, 'timer', { writable: true, value: undefined });
+
     ws.onopen = function (event) {
         console.log(event);
         ws.send('HELLO FROM THE FRONT END, BITCHES!!');
     };
 
-    ws.onmessage = function (event) {
-        console.log(event);
-        if ('data' in event) {
-            console.log(event.data);
+    ws.onmessage = function (message) {
+        console.log(message);
+        if ('data' in message && isJson(message.data)) {
+            var data = JSON.parse(message.data);
+            if ('keepAlive' in data) {
+                pong(ws);
+            } else {
+                ping(ws);
+            }
         }
-        if ('type' in event) {
-            console.log('WS Data Event Type: ' + event.type);
+        if ('data' in message) {
+            console.log(message.data);
+        }
+        if ('type' in message) {
+            console.log('WS Data Event Type: ' + message.type);
         }
     };
 
     return ws;
+}
+
+function ping(ws) {
+    if (ws.readyState === SOCKET_OPEN) {
+        ws.send('__ping__');
+    } else {
+        console.log('Server - connection needs to be closed for client: ' + ws);
+    }
+}
+
+function pong(ws) {
+    console.log('Server - ' + ws + ' is still active');
+    clearTimeout(ws.timer);
+    ws.timer = setTimeout(function () {
+        ping(ws);
+    }, 20000);
 }
 
 function paramsToQuery(params) {
@@ -65741,6 +65785,15 @@ function paramsToQuery(params) {
         }
     }
     return false;
+}
+
+function isJson(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
 }
 
 /***/ })
