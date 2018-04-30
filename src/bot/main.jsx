@@ -19,7 +19,7 @@ import PowerSettingsNew from 'material-ui/svg-icons/action/power-settings-new'
 import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
 import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
-import { request, handleResponse, requestWs } from '../utils/'
+import { request, handleResponse, requestWs, isJson } from '../utils/'
 // import trx from '../redux'
 
 // const trxInstance = trx()
@@ -76,6 +76,8 @@ const styles = {
         width: '2em'
     }
 }
+
+const botConnections = []
 
 const buildBotMenuItems = (length) => {
     const items = [];
@@ -173,11 +175,22 @@ export class TrxLayout extends React.Component {
             this.consoleOut(`${this.state.botNum} bots created`)
         }
         console.log(response)
+        if ('body' in response && 'data' in response.body) {
+            if (Array.isArray(data.body.data)) {
+                data.body.data.map(bot => {
+                    console.log(bot.message)
+                    const ws = requestWs({
+                        url: urls.wsStart,
+                        params: {data: 'test'}
+                    })
 
-        const ws = requestWs({
-            url: urls.wsStart,
-            params: {data: 'test'}
-        })
+                    if (ws) {
+                        botConnections.push({id: bot.id, ws: ws, number: bot.number})
+                    }
+                })
+            }
+
+        }
     }
 
     loadMarketData = async (event, index, value) => {
