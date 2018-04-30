@@ -44,6 +44,7 @@ class StartHandler(RequestHandler):
         self.set_secure_cookie('trx_cookie', trx_cookie)
 
         num_requested = self.get_argument('number')
+        identities = []
 
         create_bot_result = application.set_bots(await make_bots(num_requested))
         if not has_error(create_bot_result):
@@ -52,13 +53,15 @@ class StartHandler(RequestHandler):
             if len(application.bots) > 0:
                 for bot in application.bots:
                     application.logger.debug(bot.identify())
+                    identities.append({'message': bot.identify(), 'id': str(bot.id), 'number': bot.number})
                     # bot_conn = await bot.connect()
                     await bot.write_message()
                     await bot.relay_message('Jigga jigga WHAT?!?!?!')
 
             self.set_status(201, reason='Bot creation')
             self.write(json.dumps({'response': 201, 'resource': 'bot', 'num': num_requested,
-                                   'response_text': 'Created %s bots successfully' % str(num_requested)}))
+                                   'response_text': 'Created %s bots successfully' % str(num_requested),
+                                   'data': identities}))
         else:
             application.logger.info('Unable to create bots')
             # self.set_status(500, reason='Bot creation failure')
