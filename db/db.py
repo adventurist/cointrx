@@ -1015,15 +1015,15 @@ async def update_user(uid: str, data: dict):
             return False
 
 
-async def regtest_graph_data():
-    minmax_dataset = await btc_hour_minmax_price()
+async def regtest_graph_data(time):
+    minmax_dataset = await btc_hour_minmax_price(time)
     hourly_minmax = []
     for row in minmax_dataset:
         hourly_minmax.append({'date': row[0].strftime("%Y-%m-%d %H:%M:%S"), 'low': str(row[1]), 'high': str(row[2])})
     return json.dumps(hourly_minmax)
 
 
-async def btc_hour_minmax_price():
+async def btc_hour_minmax_price(time='60'):
     return engine.execute("SELECT date_trunc('minute', to_timestamp(modified)) - "
                    "(EXTRACT('minute' FROM to_timestamp(modified))::integer %% 30) * interval '1 minute' as date, min(last), max(last) "
                    "FROM cx_price_revision "
