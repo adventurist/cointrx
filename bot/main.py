@@ -128,10 +128,11 @@ class BotTrcPriceHandler(RequestHandler):
     async def get(self, *args, **kwargs):
         trx_cookie = self.get_argument('trx_cookie')
         self.initialize()
-        bot_id = self.get_argument('bot')
-        if len(application.bots) > 0 and application.bots[int(bot_id)] is not None:
-            bot = application.bots[int(bot_id)]
-            price_history = await bot.retrieve_price_history()
+        bot_id = self.get_argument('bot_id')
+        time = self.get_argument('time')
+        if len(application.bots) > 0 and application.retrieve_bot_by_id(bot_id) is not None:
+            bot = application.retrieve_bot_by_id(bot_id)
+            price_history = await bot.retrieve_price_history(time)
             digest_price_result = await bot.digest_price_history(price_history.body)
             if not has_error(digest_price_result):
                 self.set_status(200)
@@ -150,8 +151,10 @@ class BotTrcAnalysisHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        if len(application.bots) > 0:
-            bot = application.bots[0]
+        bot_id = self.get_argument('bot_id')
+
+        if len(application.bots) > 0 and application.retrieve_bot_by_id(bot_id) is not None:
+            bot = application.retrieve_bot_by_id(bot_id)
             application.logger.info(
                 'Bot {0} (id {1} performing technical analysis of market data'.format(str(bot.number), str(bot.id)))
             bot.analyze_price_history()
@@ -242,6 +245,12 @@ class BotApplication(Application):
             return bots
         else:
             return {'error': 'Unknown error occurred while calling set_bots'}
+
+    def retrieve_bot_by_id(self, bot_id):
+        if isinstance(self.bots, list) and len(self.bots) > 0:
+            search = list(filter(lambda x: str(x.id) == bot_id, self.bots))
+            if search is not None and len(search) > 0:
+                return search[0]
 
 
 def setup_logger(name, level, json_logging=False):
