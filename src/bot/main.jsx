@@ -27,6 +27,7 @@ import { request, handleResponse, requestWs, isJson } from '../utils/'
 const urls = {
     botStart: 'http://localhost:6969/bot/start',
     botTrcPrices: 'http://localhost:6969/bot/trc/prices/all',
+    botTrcAnalyze: 'http://localhost:6969/bot/trc/prices/analyze',
     wsStart: 'ws://localhost:6969/bot/ws-test'
 }
 
@@ -145,11 +146,13 @@ export class TrxLayout extends React.Component {
     };
 
     consoleOut (incomingText) {
+        const time = Date.now().toString().slice(0, -3)
+
         const textArr = this.state.consoleText.split('\n')
         if (textArr.length > 11) {
             textArr.splice(0, 1)
         }
-        this.setState({consoleText: `${textArr.join('\n')}\n${incomingText}`})
+        this.setState({consoleText: `${textArr.join('\n')}\n${time} - ${incomingText}`})
     }
 
     botNumberChange = (event, value) => {
@@ -157,6 +160,13 @@ export class TrxLayout extends React.Component {
         this.setState({botNum: value, botMenuItems: newItems})
         this.consoleOut(`Number of bots to be built: ${value}`)
     }
+
+    onBotsCreate = (num) => {
+        const newItems = buildBotMenuItems(num)
+        this.setState({botMenuItems: newItems})
+        this.consoleOut(`${num} bots currently connected`)
+    }
+
 
     handleConsoleChange = (event, index, value) => {
         this.setState({consoleText: value})
@@ -176,6 +186,7 @@ export class TrxLayout extends React.Component {
         }
         console.log(response)
         if ('body' in response && 'data' in response.body) {
+            let previousBotNumber = botConnections.length
             if (Array.isArray(data.body.data)) {
                 data.body.data.map(bot => {
                     console.log(bot.message)
@@ -188,18 +199,26 @@ export class TrxLayout extends React.Component {
                         botConnections.push({id: bot.id, ws: ws, number: bot.number})
                     }
                 })
+                let currentBotNumber = botConnections.length
+                let numDiff = currentBotNumber - previousBotNumber
+                let createResult = Math.abs(numDiff) === data.body.data.length
+
+                if (!createResult) {
+                    console.log('Problem creating the requested number of bots')
+                }
+                this.onBotsCreate(currentBotNumber)
             }
 
         }
     }
 
     loadMarketData = async (event, index, value) => {
-        const selectedBot = this.state.selectedBot
+        const selectedBot = botConnections[this.state.selectedBot]
         console.log(event)
         const data = await request({
             url: urls.botTrcPrices,
             headers: {'Content-Type': 'application/json'},
-            params: {bot: selectedBot, time: this.state.timePeriod},
+            params: {bot_id: selectedBot.id, time: this.state.timePeriod},
             credentials: 'include'
         })
 
@@ -210,6 +229,20 @@ export class TrxLayout extends React.Component {
         }
     }
 
+    analyzeMarketData = async (value) => {
+        const selectedBot = botConnections[this.state.selectedBot]
+
+        const data = {
+            url: urls.botTrcAnalyze,
+            data: {
+                bot_id: selectedBot.id, time: this.state.timePeriod
+            },
+            type: 'request'
+        }
+
+        selectedBot.ws.send(JSON.stringify(data))
+        this.consoleOut(`Bot ${selectedBot.number} (${selectedBot.id}) has analyzed market data`)
+    }
 
     render() {
         return (
@@ -292,6 +325,7 @@ export class TrxLayout extends React.Component {
                             <RaisedButton
                                 label="Analyze"
                                 labelPosition="before"
+                                onClick={this.analyzeMarketData}
                                 primary={false}
                                 icon={<PlayCircle />}
                             />
