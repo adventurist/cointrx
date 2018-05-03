@@ -1006,8 +1006,9 @@ class BotGuiHandler(RequestHandler):
     async def get(self, *args, **kwargs):
         cookie = self.get_secure_cookie("trx_cookie")
         if check_attribute(application.session, 'user'):
+
             bot_gui_data = {}
-            bot_gui_urls = {}
+            bot_gui_urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
 
             self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
             self.render("templates/bot.html", title="TRX BOT GUI", bot_gui_urls=bot_gui_urls, bot_gui_data=bot_gui_data)
