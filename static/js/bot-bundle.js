@@ -17122,12 +17122,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // const trxInstance = trx()
 
-var urls = {
-    botStart: 'http://localhost:6969/bot/start',
-    botTrcPrices: 'http://localhost:6969/bot/trc/prices/all',
-    botTrcAnalyze: 'http://localhost:6969/bot/trc/prices/analyze',
-    wsStart: 'ws://localhost:6969/bot/ws-test'
-};
+// const urls = {
+//     botStart: 'http://localhost:6969/bot/start',
+//     botTrcPrices: 'http://localhost:6969/bot/trc/prices/all',
+//     botTrcAnalyze: 'http://localhost:6969/bot/trc/prices/analyze',
+//     wsStart: 'ws://localhost:6969/bot/ws-test'
+// }
+var urls = JSON.parse(botUrls.replace(/'/g, '"'));
 
 var styles = {
     console: {
@@ -17257,7 +17258,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                         case 0:
                             _context.next = 2;
                             return (0, _utils.request)({
-                                url: urls.botStart,
+                                url: urls.start,
                                 method: 'GET',
                                 params: { number: _this.state.botNum },
                                 credentials: 'include'
@@ -17318,7 +17319,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 console.log(event);
                                 _context2.next = 4;
                                 return (0, _utils.request)({
-                                    url: urls.botTrcPrices,
+                                    url: urls.trc.prices,
                                     headers: { 'Content-Type': 'application/json' },
                                     params: { bot_id: selectedBot.id, time: _this.state.timePeriod },
                                     credentials: 'include'
@@ -17355,7 +17356,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                             case 0:
                                 selectedBot = botConnections[_this.state.selectedBot];
                                 data = {
-                                    url: urls.botTrcAnalyze,
+                                    url: urls.trc.analyze,
                                     data: {
                                         bot_id: selectedBot.id, time: _this.state.timePeriod
                                     },
