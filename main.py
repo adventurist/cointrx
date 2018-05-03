@@ -1023,7 +1023,8 @@ class BotStartHandler(RequestHandler):
     async def get(self, *args, **kwargs):
         cookie = self.get_secure_cookie('trx_cookie')
         number = self.get_argument('number')
-        response = await http_client.get('http://localhost:9977/start?number=' + str(number) + '&trx_cookie=' + str(cookie))
+        urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
+        response = await http_client.get(urls['start'] + '?number=' + str(number) + '&trx_cookie=' + str(cookie))
         if response is not None and hasattr(response, 'body'):
             response_data = str(response.body, 'utf-8')
             self.set_status(200)
@@ -1041,8 +1042,9 @@ class BotTrcPriceRetrieveHandler(RequestHandler):
         cookie = self.get_secure_cookie('trx_cookie')
         time_length = self.get_argument('time')
         bot_id = self.get_argument('bot_id')
+        urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
         response = await http_client.get(
-            'http://localhost:9977/bots/trc/prices?bot_id=' + str(bot_id) + '&time=' + str(
+            urls['trc']['prices'] + '?bot_id=' + str(bot_id) + '&time=' + str(
                 time_length) + '&trx_cookie=' + str(cookie))
         response_data = str(response.body, 'utf-8')
         self.set_status(200)
@@ -1068,8 +1070,9 @@ class BotWsTestHandler(WebSocketHandler):
 
 
 async def handle_ws_request(type, data):
+    urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
     async def send_message(url, data):
-        request_result = await http_client.get('http://localhost:9977/bots/trc/analyze?bot_id=%s' % data['bot_id'])
+        request_result = await http_client.get(urls['trc']['analyze'] + '?bot_id=%s' % data['bot_id'])
         return request_result
 
     switch = {
@@ -1174,6 +1177,7 @@ class TRXApplication(Application):
 
             # Static
             (r"/static/(.*)", StaticFileHandler, {"path": "/static"}),
+            (r"/analysis/(.*)", StaticFileHandler, {"path": "/analysis"}),
             (r"/sites/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "sites")}),
             (r"/themes/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "themes")})
         ]
