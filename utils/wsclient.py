@@ -88,8 +88,8 @@ class Bot(object):
     def identify(self):
         return "Bot Number " + str(self.number) + " and my ID is " + str(self.id)
 
-    async def retrieve_price_history(self):
-        price_url = 'http://localhost:6969/api/prices/regtest/btc/cad/minmax/json'
+    async def retrieve_price_history(self, time):
+        price_url = 'http://localhost:6969/api/prices/regtest/btc/cad/minmax/json?time=%s' % time
         price_result = await self.http_client.get(url=price_url)
         return price_result
 
