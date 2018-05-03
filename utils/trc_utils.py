@@ -1,6 +1,7 @@
 from decimal import Decimal
 from random import uniform
-from utils.btcd_utils import  get_env_variables
+import json
+from utils.btcd_utils import get_env_variables
 from subprocess import run, PIPE
 
 TWO_PLACES = Decimal(10) ** -2
@@ -20,3 +21,11 @@ def expose_analysis_files():
         return move_result.stdout
     else:
         return None
+
+
+def valid_json(data):
+    try:
+        parsed = json.loads(data)
+        return True
+    except:
+        return False
