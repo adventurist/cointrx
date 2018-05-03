@@ -918,7 +918,8 @@ class BtcMinMaxHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        minmax_data = await db.regtest_graph_data()
+        time = self.get_argument('time')
+        minmax_data = await db.regtest_graph_data(time)
         self.write(minmax_data)
 
 
@@ -1039,9 +1040,9 @@ class BotTrcPriceRetrieveHandler(RequestHandler):
     async def get(self, *args, **kwargs):
         cookie = self.get_secure_cookie('trx_cookie')
         time_length = self.get_argument('time')
-        bot_id = self.get_argument('bot')
+        bot_id = self.get_argument('bot_id')
         response = await http_client.get(
-            'http://localhost:9977/bots/trc/prices?bot=' + str(bot_id) + '&time=' + str(
+            'http://localhost:9977/bots/trc/prices?bot_id=' + str(bot_id) + '&time=' + str(
                 time_length) + '&trx_cookie=' + str(cookie))
         response_data = str(response.body, 'utf-8')
         self.set_status(200)
@@ -1054,11 +1055,29 @@ class BotWsTestHandler(WebSocketHandler):
 
     async def on_message(self, message):
         print('Message received: %s' % str(message))
+        if trc_utils.valid_json(message):
+            parsed = json.loads(message)
+            result = await handle_ws_request(parsed['type'], parsed['data'])
+            print(str(result))
+
         return_message = {'keepAlive': 1, 'message': 'Back at you, punk'}
         self.write_message(json.dumps(return_message))
 
     def open(self):
         self.write_message('Connection opened')
+
+
+async def handle_ws_request(type, data):
+    async def send_message(url, data):
+        request_result = await http_client.get('http://localhost:9977/bots/trc/analyze?bot_id=%s' % data['bot_id'])
+        return request_result
+
+    switch = {
+        'request': send_message
+    }
+    func = switch.get(type, lambda: 'Invalid request type')
+    result = await func(type, data)
+    return result
 
 
 class TRXApplication(Application):
