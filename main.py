@@ -1057,11 +1057,13 @@ class BotWsTestHandler(WebSocketHandler):
         pass
 
     async def on_message(self, message):
-        print('Message received: %s' % str(message))
+        logger.debug('Message received: %s' % str(message))
         if trc_utils.valid_json(message):
             parsed = json.loads(message)
             result = await handle_ws_request(parsed['type'], parsed['data'])
-            print(str(result))
+            logger.debug('WS Request: %s' % str(result))
+            # TODO Handle this internally and send a TRX response
+            self.write_message(str(result.body, 'utf-8'))
 
         return_message = {'keepAlive': 1, 'message': 'Back at you, punk'}
         self.write_message(json.dumps(return_message))
@@ -1071,7 +1073,6 @@ class BotWsTestHandler(WebSocketHandler):
 
 
 async def handle_ws_request(type, data):
-    urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
     async def send_message(url, data):
         request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
         return request_result

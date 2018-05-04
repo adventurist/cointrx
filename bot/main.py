@@ -5,7 +5,7 @@ from utils.wsclient import Bot
 from pythonjsonlogger import jsonlogger
 from types import SimpleNamespace
 
-from lightning import Lightning
+from utils.trc_utils import expose_analysis_files
 
 import tornado.ioloop
 import logging
@@ -13,7 +13,7 @@ import os
 import json
 
 from bokeh.layouts import gridplot
-from bokeh.plotting import figure, show, output_file, ColumnDataSource
+from bokeh.plotting import figure, show, output_file, ColumnDataSource, save
 from bokeh.models import HoverTool
 
 import numpy as np
@@ -203,10 +203,14 @@ class BotTrcAnalysisHandler(RequestHandler):
                         line_width=6)
 
             p1.legend.location = "bottom_right"
-            output_file("analysis/analysis" + str(bot.number) + ".html",
+            filename = "analysis" + str(bot.number) + ".html"
+            output_file('analysis/%s' % filename,
                         title="analysis" + str(bot.number) + ".py BTC Price Analysis", mode="inline")
-
-            show(gridplot([[p1]], plot_width=1600, plot_height=960))  # open browser
+            save(p1)
+            file_mv_result = expose_analysis_files()
+            application.logger.debug('File move result: %s' % file_mv_result)
+            # show(gridplot([[p1]], plot_width=1600, plot_height=960))  # open browser
+            self.write(json.dumps({'response': 201, 'filename': filename, 'bot_id': bot_id}))
 
 
 def datetime(x):
