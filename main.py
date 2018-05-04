@@ -1025,7 +1025,7 @@ class BotStartHandler(RequestHandler):
         cookie = self.get_secure_cookie('trx_cookie')
         number = self.get_argument('number')
         urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
-        response = await http_client.get(urls['start'] + '?number=' + str(number) + '&trx_cookie=' + str(cookie))
+        response = await http_client.get('http://localhost:9977/start' + '?number=' + str(number) + '&trx_cookie=' + str(cookie))
         if response is not None and hasattr(response, 'body'):
             response_data = str(response.body, 'utf-8')
             self.set_status(200)
@@ -1045,7 +1045,7 @@ class BotTrcPriceRetrieveHandler(RequestHandler):
         bot_id = self.get_argument('bot_id')
         urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
         response = await http_client.get(
-            urls['trc']['prices'] + '?bot_id=' + str(bot_id) + '&time=' + str(
+            'http://localhost:9977/bots/trc/prices' + '?bot_id=' + str(bot_id) + '&time=' + str(
                 time_length) + '&trx_cookie=' + str(cookie))
         response_data = str(response.body, 'utf-8')
         self.set_status(200)
@@ -1073,7 +1073,7 @@ class BotWsTestHandler(WebSocketHandler):
 async def handle_ws_request(type, data):
     urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
     async def send_message(url, data):
-        request_result = await http_client.get(urls['trc']['analyze'] + '?bot_id=%s' % data['bot_id'])
+        request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
         return request_result
 
     switch = {

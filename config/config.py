@@ -36,7 +36,7 @@ def trx_urls(trx_env):
         'key_gen_url': 'https://app.cointrx.com/keys/btc/regtest/generate',
         'bot': {
             'start': 'https://app.cointrx.com/bot/start',
-            'wsStart': 'https://app.cointrx.com/bot/ws-test',
+            'wsStart': 'wss://app.cointrx.com/bot/ws-test',
             'trc': {
                 'prices': 'https://app.cointrx.com/bot/trc/prices/all',
                 'analyze': 'https://bot.cointrx.com/bots/trc/analyze'
@@ -51,10 +51,10 @@ def trx_urls(trx_env):
         'wif_to_private_url': 'http://localhost:3000/key/from-wif',
         'key_gen_url': 'http://localhost:6969/keys/btc/regtest/generate',
         'bot': {
-            'start': 'http://localhost:9977/start',
-            'wsS    tart': 'https://localhost:6969/bot/ws-test',
+            'start': 'http://localhost:6969/bot/start',
+            'wsStart': 'ws://localhost:6969/bot/ws-test',
             'trc': {
-                'prices': 'http://localhost:9977/bots/trc/prices',
+                'prices': 'http://localhost:6969/bot/trc/prices/all',
                 'analyze': 'http://localhost:9977/bots/trc/analyze'
             }
         }
