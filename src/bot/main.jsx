@@ -24,12 +24,13 @@ import { request, handleResponse, requestWs, isJson } from '../utils/'
 
 // const trxInstance = trx()
 
-const urls = {
-    botStart: 'http://localhost:6969/bot/start',
-    botTrcPrices: 'http://localhost:6969/bot/trc/prices/all',
-    botTrcAnalyze: 'http://localhost:6969/bot/trc/prices/analyze',
-    wsStart: 'ws://localhost:6969/bot/ws-test'
-}
+// const urls = {
+//     botStart: 'http://localhost:6969/bot/start',
+//     botTrcPrices: 'http://localhost:6969/bot/trc/prices/all',
+//     botTrcAnalyze: 'http://localhost:6969/bot/trc/prices/analyze',
+//     wsStart: 'ws://localhost:6969/bot/ws-test'
+// }
+const urls = JSON.parse(botUrls.replace(/'/g, '"'))
 
 const styles = {
     console: {
@@ -174,7 +175,7 @@ export class TrxLayout extends React.Component {
 
     startBots = async () => {
         const data = await request({
-            url: urls.botStart,
+            url: urls.start,
             method: 'GET',
             params: {number: this.state.botNum},
             credentials: 'include'
@@ -216,7 +217,7 @@ export class TrxLayout extends React.Component {
         const selectedBot = botConnections[this.state.selectedBot]
         console.log(event)
         const data = await request({
-            url: urls.botTrcPrices,
+            url: urls.trc.prices,
             headers: {'Content-Type': 'application/json'},
             params: {bot_id: selectedBot.id, time: this.state.timePeriod},
             credentials: 'include'
@@ -233,7 +234,7 @@ export class TrxLayout extends React.Component {
         const selectedBot = botConnections[this.state.selectedBot]
 
         const data = {
-            url: urls.botTrcAnalyze,
+            url: urls.trc.analyze,
             data: {
                 bot_id: selectedBot.id, time: this.state.timePeriod
             },
