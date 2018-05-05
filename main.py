@@ -21,7 +21,7 @@ from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.options import define
 from tornado.websocket import WebSocketHandler
-from tornado.web import Application, RequestHandler, StaticFileHandler, HTTPError
+from tornado.web import Application, RequestHandler, StaticFileHandler, HTTPError, asynchronous
 
 from config import config as TRXConfig
 from db import db
@@ -1051,6 +1051,12 @@ class BotTrcPriceRetrieveHandler(RequestHandler):
 class BotWsTestHandler(WebSocketHandler):
     def data_received(self, chunk):
         pass
+
+    @asynchronous
+    def get(self, *args, **kwargs):
+        logger.debug('WS Request received')
+        logger.debug('Request Headers: %s' % str(self.request.headers))
+        return super().get(self)
 
     async def on_message(self, message):
         logger.debug('Message received: %s' % str(message))
