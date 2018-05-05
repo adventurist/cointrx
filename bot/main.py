@@ -131,6 +131,7 @@ class BotTrcPriceHandler(RequestHandler):
         bot_id = self.get_argument('bot_id')
         time = self.get_argument('time')
         if len(application.bots) > 0 and application.retrieve_bot_by_id(bot_id) is not None:
+            application.logger.info('Retrieving prices for %s' % bot_id)
             bot = application.retrieve_bot_by_id(bot_id)
             price_history = await bot.retrieve_price_history(time)
             digest_price_result = await bot.digest_price_history(price_history.body)

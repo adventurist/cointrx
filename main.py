@@ -1065,6 +1065,7 @@ class BotWsTestHandler(WebSocketHandler):
         self.write_message(json.dumps(return_message))
 
     def open(self):
+        logger.debug('Connection opened: ' + str(self))
         self.write_message('Connection opened')
 
 
