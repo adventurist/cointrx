@@ -1058,7 +1058,7 @@ class BotWsTestHandler(WebSocketHandler):
     def get(self, *args, **kwargs):
         logger.debug('WS Request received')
         logger.debug('Request Headers: %s' % str(self.request.headers))
-        self.add_header('Uprade', 'Websocket')
+        self.add_header('Upgrade', 'Websocket')
         return super().get(self)
 
     async def on_message(self, message):
