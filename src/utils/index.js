@@ -13,6 +13,14 @@ export async function request(options) {
         credentials
     } = {...options}
 
+    delete options.body
+    delete options.credentials
+    delete options.method
+    delete options.url
+    delete options.headers
+    delete options.params
+
+
     let queryString
     let requestHeaders
     let requestOptions
@@ -35,7 +43,9 @@ export async function request(options) {
         method: method !== void 0 ? method : 'GET',
         body: body !== void 0 ? body : '',
         headers: requestHeaders,
-        credentials: credentials !== void 0 ? credentials : 'omit'
+        credentials: credentials !== void 0 ? credentials : 'omit',
+        // Pass all remaining options
+        ... options
     }
 
     if (requestOptions.method === 'GET') {
@@ -52,17 +62,6 @@ export async function request(options) {
             error: error !== undefined ? error : false,
         }
     }
-    // return fetch('http://localhost:6969/bot/start' + queryString, requestOptions)
-    //     .then(response => {
-    //         let error = response.error
-    //         return response.json()
-    //             .then(responseBody => {
-    //                 return {
-    //                     body: responseBody,
-    //                     error: error !== undefined ? error : false,
-    //                 }
-    //             })
-    //     })
 }
 
 export function handleResponse(response) {

@@ -193,7 +193,8 @@ export class TrxLayout extends React.Component {
                     console.log(bot.message)
                     const ws = requestWs({
                         url: urls.wsStart,
-                        params: {data: 'test'}
+                        params: {data: 'test'},
+                        timeout: 0
                     })
 
                     if (ws) {

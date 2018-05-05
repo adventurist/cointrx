@@ -17280,7 +17280,8 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                         console.log(bot.message);
                                         var ws = (0, _utils.requestWs)({
                                             url: urls.wsStart,
-                                            params: { data: 'test' }
+                                            params: { data: 'test' },
+                                            timeout: 0
                                         });
 
                                         if (ws) {
@@ -65704,6 +65705,15 @@ var request = exports.request = function () {
                 switch (_context.prev = _context.next) {
                     case 0:
                         _options = (0, _extends3.default)({}, options), url = _options.url, method = _options.method, params = _options.params, body = _options.body, headers = _options.headers, credentials = _options.credentials;
+
+
+                        delete options.body;
+                        delete options.credentials;
+                        delete options.method;
+                        delete options.url;
+                        delete options.headers;
+                        delete options.params;
+
                         queryString = void 0;
                         requestHeaders = void 0;
                         requestOptions = void 0;
@@ -65727,40 +65737,40 @@ var request = exports.request = function () {
                             }
                         }
 
-                        requestOptions = {
+                        requestOptions = (0, _extends3.default)({
                             method: method !== void 0 ? method : 'GET',
                             body: body !== void 0 ? body : '',
                             headers: requestHeaders,
                             credentials: credentials !== void 0 ? credentials : 'omit'
-                        };
+                        }, options);
 
                         if (requestOptions.method === 'GET') {
                             delete requestOptions.body;
                         }
 
-                        _context.next = 10;
+                        _context.next = 16;
                         return fetch('' + url + (queryString ? queryString : ''), requestOptions);
 
-                    case 10:
+                    case 16:
                         response = _context.sent;
 
                         if (!response) {
-                            _context.next = 17;
+                            _context.next = 23;
                             break;
                         }
 
                         error = response.error;
-                        _context.next = 15;
+                        _context.next = 21;
                         return response.json();
 
-                    case 15:
+                    case 21:
                         responseData = _context.sent;
                         return _context.abrupt('return', {
                             body: responseData,
                             error: error !== undefined ? error : false
                         });
 
-                    case 17:
+                    case 23:
                     case 'end':
                         return _context.stop();
                 }
