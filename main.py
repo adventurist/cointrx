@@ -324,6 +324,8 @@ class ETHPriceUpdateHandler(RequestHandler):
         """
 
         eth_data = await eth_utils.update_eth_prices()
+        if eth_data is not None:
+            self.write(json.dumps({'response': 201, 'data': 'placeholder CHANGE THIS'}))
 
 
 class LatestPriceHandler(RequestHandler):
@@ -1056,6 +1058,7 @@ class BotWsTestHandler(WebSocketHandler):
     def get(self, *args, **kwargs):
         logger.debug('WS Request received')
         logger.debug('Request Headers: %s' % str(self.request.headers))
+        self.add_header('Uprade', 'Websocket')
         return super().get(self)
 
     async def on_message(self, message):
