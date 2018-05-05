@@ -259,19 +259,15 @@ class LoginHandler(RequestHandler):
                         self.write(user_verified.name)
 
     def get(self, *args, **kwargs):
-        print('get getting get')
         cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
         current_header = self.request.headers.get("Content-Type")
         print(cookie_secret)
         print(self._headers)
         print(self.get_status())
-        # name = self.get_argument('name')
-        # print(name)
         print(current_header)
 
         if self.request.headers.get("Content-Type") == 'text/html':
             name = self.get_argument('name')
-            print('text/html, yo')
             print(name)
 
         message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut",
