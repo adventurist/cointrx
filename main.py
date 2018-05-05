@@ -1055,6 +1055,7 @@ class BotWsTestHandler(WebSocketHandler):
     async def on_message(self, message):
         logger.debug('Message received: %s' % str(message))
         if trc_utils.valid_json(message):
+            logger.debug('Valid JSON detected - Processing request')
             parsed = json.loads(message)
             result = await handle_ws_request(parsed['type'], parsed['data'])
             logger.debug('WS Request: %s' % str(result))
