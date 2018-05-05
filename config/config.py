@@ -36,7 +36,7 @@ def trx_urls(trx_env):
         'key_gen_url': 'https://app.cointrx.com/keys/btc/regtest/generate',
         'bot': {
             'start': 'https://app.cointrx.com/bot/start',
-            'wsStart': 'wss://bot.cointrx.com:9978/bot/ws-test',
+            'wsStart': 'wss://app.cointrx.com/bot/ws-test',
             'trc': {
                 'prices': 'https://app.cointrx.com/bot/trc/prices/all',
                 'analyze': 'https://bot.cointrx.com/bots/trc/analyze'
