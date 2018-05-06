@@ -572,7 +572,7 @@ async def parse_price_data(data):
 
 
 async def parse_eth_price_data(data, currency='cad'):
-    result = session.query(ETHPrice).filter(ETHPrice.currency == currency).one_or_none()
+    result = session.query(ETHPrice).filter(ETHPrice.currency == currency).one()
     cur_time = datetime.datetime.now()
     if result is None:
         result = ETHPrice(currency=currency, last=data[0], modified=cur_time)
