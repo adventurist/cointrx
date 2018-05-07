@@ -53,7 +53,8 @@ def trx_urls(trx_env):
         'key_gen_url': 'http://localhost:6969/keys/btc/regtest/generate',
         'bot': {
             'start': 'http://localhost:6969/bot/start',
-            'wsStart': 'ws://localhost:6969/bot/ws-test',
+            'wsStart': 'http://localhost:9977/ws/start',
+            # 'wsStart': 'ws://localhost:6969/bot/ws-test',
             'trc': {
                 'prices': 'http://localhost:6969/bot/trc/prices/all',
                 'analyze': 'http://localhost:9977/bots/trc/analyze'
