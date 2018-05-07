@@ -246,34 +246,25 @@ class LoginHandler(RequestHandler):
                         self.clear_cookie('redirect_target')
                         return self.redirect(redirect_target)
                     self.write(user_verified.name)
-                    #drupal_login = await drupal_utils.attempt_login(
-                    #    escape.json_encode({'name': name, 'pass': password}))
-                    #if drupal_login is not None:
-                    #    drupal_user_data = escape.json_decode(escape.to_basestring(drupal_login.body))
-                    #    csrf = user_verified.generate_auth_token(expiration=1200)
-                    #    application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
-                    #                               csrf=csrf, dcsrf=drupal_user_data['csrf_token'])
-                    #    self.set_secure_cookie("dcsrf", application.session.drupal_token())
-                    #   self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
-                    #else:
+
 
 def get(self, *args, **kwargs):
-        cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
-        current_header = self.request.headers.get("Content-Type")
-        print(cookie_secret)
-        print(self._headers)
-        print(self.get_status())
-        print(current_header)
+    cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
+    current_header = self.request.headers.get("Content-Type")
+    print(cookie_secret)
+    print(self._headers)
+    print(self.get_status())
+    print(current_header)
 
-        if self.request.headers.get("Content-Type") == 'text/html':
-            name = self.get_argument('name')
-            print(name)
+    if self.request.headers.get("Content-Type") == 'text/html':
+        name = self.get_argument('name')
+        print(name)
 
-        message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut",
-                                 "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time",
-                                 "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife",
-                                 "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
-        self.render("templates/login.html", title="Jiggas Login Handler", message=message)
+    message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut",
+                             "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time",
+                             "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife",
+                             "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
+    self.render("templates/login.html", title="Jiggas Login Handler", message=message)
 
 
 class SendMailHandler(RequestHandler):
@@ -1022,7 +1013,8 @@ class BotStartHandler(RequestHandler):
         cookie = self.get_secure_cookie('trx_cookie')
         number = self.get_argument('number')
         urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
-        response = await http_client.get('http://localhost:9977/start' + '?number=' + str(number) + '&trx_cookie=' + str(cookie))
+        response = await http_client.get(
+            'http://localhost:9977/start' + '?number=' + str(number) + '&trx_cookie=' + str(cookie))
         if response is not None and hasattr(response, 'body'):
             response_data = str(response.body, 'utf-8')
             self.set_status(200)
