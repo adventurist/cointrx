@@ -236,16 +236,6 @@ class LoginHandler(RequestHandler):
             if name is not None and password is not None and len(name) > 0:
                 user_verified = db.check_auth_by_name(name, password)
                 if user_verified is not None and user_verified is not -1:
-                    #drupal_login = await drupal_utils.attempt_login(
-                    #    escape.json_encode({'name': name, 'pass': password}))
-                    #if drupal_login is not None:
-                    #    drupal_user_data = escape.json_decode(escape.to_basestring(drupal_login.body))
-                    #    csrf = user_verified.generate_auth_token(expiration=1200)
-                    #    application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
-                    #                               csrf=csrf, dcsrf=drupal_user_data['csrf_token'])
-                    #    self.set_secure_cookie("dcsrf", application.session.drupal_token())
-                    #   self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
-                    #else:
                     csrf = user_verified.generate_auth_token(expiration=1200)
                     application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
                                                csrf=csrf)
@@ -256,7 +246,16 @@ class LoginHandler(RequestHandler):
                         self.clear_cookie('redirect_target')
                         return self.redirect(redirect_target)
                     self.write(user_verified.name)
-
+                    #drupal_login = await drupal_utils.attempt_login(
+                    #    escape.json_encode({'name': name, 'pass': password}))
+                    #if drupal_login is not None:
+                    #    drupal_user_data = escape.json_decode(escape.to_basestring(drupal_login.body))
+                    #    csrf = user_verified.generate_auth_token(expiration=1200)
+                    #    application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
+                    #                               csrf=csrf, dcsrf=drupal_user_data['csrf_token'])
+                    #    self.set_secure_cookie("dcsrf", application.session.drupal_token())
+                    #   self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                    #else:
 
 def get(self, *args, **kwargs):
         cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
@@ -1250,10 +1249,7 @@ if __name__ == "__main__":
 
     warnings.simplefilter('always')
     application = TRXApplication()
-    http_server = httpserver.HTTPServer(application, ssl_options={
-        "certfile": "/etc/letsencrypt/live/app.cointrx.com/cert.pem",
-        "keyfile":  "/etc/letsencrypt/live/app.cointrx.com/key.pem",
-    })
+    http_server = httpserver.HTTPServer(application)
     http_server.listen(6969)
     # application.listen(6969)
 
