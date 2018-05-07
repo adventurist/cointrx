@@ -4,20 +4,22 @@ from tornado.log import enable_pretty_logging
 from utils.wsclient import Bot
 from pythonjsonlogger import jsonlogger
 from types import SimpleNamespace
+from utils.cointrx_client import Client
 
-from utils.trc_utils import expose_analysis_files
+from utils.trc_utils import *
 
 import tornado.ioloop
 import logging
 import os
 import json
 
-from bokeh.layouts import gridplot
-from bokeh.plotting import figure, show, output_file, ColumnDataSource, save
+
+from bokeh.plotting import figure, output_file, ColumnDataSource, save
 from bokeh.models import HoverTool
 
 import numpy as np
 
+http_client = Client()
 enable_pretty_logging()
 socket_handlers = []
 
@@ -64,7 +66,6 @@ class StartHandler(RequestHandler):
                                    'data': identities}))
         else:
             application.logger.info('Unable to create bots')
-            # self.set_status(500, reason='Bot creation failure')
             self.write(json.dumps({'response': 500, 'resource': 'bot', 'num': num_requested, 'error': True,
                                    'response_text': 'Error when attempting to create bots.\nReason given: %s' %
                                                     create_bot_result['error']}))
@@ -218,6 +219,41 @@ def datetime(x):
     return np.array(x, dtype=np.datetime64)
 
 
+class BotWsStartHandler(WebSocketHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def on_message(self, message):
+        application.logger.debug('Message received: %s' % str(message))
+        if valid_json(message):
+            application.logger.debug('Valid JSON detected - Processing request')
+            parsed = json.loads(message)
+            result = await handle_ws_request(parsed['type'], parsed['data'])
+            application.logger.debug('WS Request: %s' % str(result))
+            # TODO Handle this internally and send a TRX response
+            self.write_message(str(result.body, 'utf-8'))
+
+        return_message = {'keepAlive': 1, 'message': 'Back at you, punk'}
+        self.write_message(json.dumps(return_message))
+
+    def open(self):
+        application.logger.debug('Connection opened: ' + str(self))
+        self.write_message('Connection opened')
+
+
+async def handle_ws_request(type, data):
+    async def send_message(url, data):
+        request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
+        return request_result
+
+    switch = {
+        'request': send_message
+    }
+    func = switch.get(type, lambda: 'Invalid request type')
+    result = await func(type, data)
+    return result
+
+
 class BotApplication(Application):
     def __init__(self):
         handlers = [
@@ -226,6 +262,7 @@ class BotApplication(Application):
             (r"/bots/all", BotAllHandler),
             (r"/bots/dump", BotDumpHandler),
             (r"/bots/login", BotLoginHandler),
+            (r"/ws/start", BotWsStartHandler),
             (r"/bots/trc/prices", BotTrcPriceHandler),
             (r"/bots/trc/analyze", BotTrcAnalysisHandler)
         ]
