@@ -248,23 +248,23 @@ class LoginHandler(RequestHandler):
                     self.write(user_verified.name)
 
 
-def get(self, *args, **kwargs):
-    cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
-    current_header = self.request.headers.get("Content-Type")
-    print(cookie_secret)
-    print(self._headers)
-    print(self.get_status())
-    print(current_header)
+    def get(self, *args, **kwargs):
+        cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
+        current_header = self.request.headers.get("Content-Type")
+        print(cookie_secret)
+        print(self._headers)
+        print(self.get_status())
+        print(current_header)
 
-    if self.request.headers.get("Content-Type") == 'text/html':
-        name = self.get_argument('name')
-        print(name)
+        if self.request.headers.get("Content-Type") == 'text/html':
+            name = self.get_argument('name')
+            print(name)
 
-    message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut",
-                             "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time",
-                             "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife",
-                             "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
-    self.render("templates/login.html", title="Jiggas Login Handler", message=message)
+        message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut",
+                                 "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time",
+                                 "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife",
+                                 "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
+        self.render("templates/login.html", title="Jiggas Login Handler", message=message)
 
 
 class SendMailHandler(RequestHandler):
