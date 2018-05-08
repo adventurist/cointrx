@@ -1,4 +1,5 @@
 import re
+from bokeh.layouts import gridplot
 
 from tornado.websocket import WebSocketHandler, WebSocketError, StreamClosedError
 from tornado.web import Application, RequestHandler
@@ -210,10 +211,10 @@ class BotTrcAnalysisHandler(RequestHandler):
             filename = "analysis" + str(bot.number) + ".html"
             output_file('analysis/%s' % filename,
                         title="analysis" + str(bot.number) + ".py BTC Price Analysis", mode="inline")
-            save(p1)
+            save(gridplot([[p1]], plot_width=1600, plot_height=960))
             file_mv_result = expose_analysis_files()
             application.logger.debug('File move result: %s' % file_mv_result)
-            # show(gridplot([[p1]], plot_width=1600, plot_height=960))  # open browser
+
             self.write(json.dumps({'response': 201, 'filename': filename, 'bot_id': bot_id}))
 
 
