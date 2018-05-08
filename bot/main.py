@@ -1,3 +1,5 @@
+import re
+
 from tornado.websocket import WebSocketHandler, WebSocketError, StreamClosedError
 from tornado.web import Application, RequestHandler
 from tornado.log import enable_pretty_logging
@@ -222,6 +224,9 @@ def datetime(x):
 class BotWsStartHandler(WebSocketHandler):
     def data_received(self, chunk):
         pass
+
+    def check_origin(self, origin):
+        return bool(re.match(r'^.*?\.cointrx\.com', origin))
 
     async def on_message(self, message):
         application.logger.debug('Message received: %s' % str(message))
