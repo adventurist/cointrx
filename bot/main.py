@@ -238,7 +238,7 @@ class BotWsStartHandler(WebSocketHandler):
             # TODO Handle this internally and send a TRX response
             self.write_message(str(result.body, 'utf-8'))
 
-        return_message = {'keepAlive': 1, 'message': 'Back at you, punk'}
+        return_message = {'keepAlive': 1, 'message': 'Back at you, punk', 'botConnections': len(application.bots)}
         self.write_message(json.dumps(return_message))
 
     def open(self):
