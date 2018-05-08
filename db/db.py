@@ -586,7 +586,7 @@ async def parse_eth_price_data(data, currency='cad'):
         print(e)
         return False
 
-    result2 = session.query(ETHPriceRevision).filter(ETHPriceRevision.currency == currency).group_by(ETHPriceRevision.id).order_by(desc(func.max(ETHPriceRevision.rid))).one()
+    result2 = session.query(ETHPriceRevision).filter(ETHPriceRevision.currency == currency).group_by(ETHPriceRevision.id).order_by(desc(func.max(ETHPriceRevision.rid))).first()
     rid = find_rid(result2)
     rid = rid + 1 if rid is not None else 1
 
