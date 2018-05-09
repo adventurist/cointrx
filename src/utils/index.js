@@ -1,8 +1,17 @@
+/**
+ *
+ * @type {number}
+ */
 const SOCKET_CONNECTING = 0;
 const SOCKET_OPEN = 1;
 const SOCKET_CLOSING = 2;
 const SOCKET_CLOSED = 3;
 
+/**
+ *
+ * @param options
+ * @returns {Promise.<{body: *, error: boolean}>}
+ */
 export async function request(options) {
     const {
         url,
@@ -64,6 +73,11 @@ export async function request(options) {
     }
 }
 
+/**
+ *
+ * @param response
+ * @returns {{body: boolean, error: boolean, code: boolean}}
+ */
 export function handleResponse(response) {
     const data = typeof response === 'string' ? JSON.parse(response) : response
     let error = false
@@ -78,7 +92,13 @@ export function handleResponse(response) {
     }
 }
 
-export function requestWs(options) {
+/**
+ *
+ * @param options
+ * @param msgHandler
+ * @returns {WebSocket}
+ */
+export function requestWs(options, msgHandler = undefined) {
     const {
         url, params
     } = {...options}
@@ -94,27 +114,34 @@ export function requestWs(options) {
         ws.send('HELLO FROM THE FRONT END, BITCHES!!')
     }
 
+    /**
+     *
+     * @param message
+     */
     ws.onmessage = (message) => {
         console.log(message)
         if ('data' in message && isJson(message.data)) {
             const data = JSON.parse(message.data)
             if ('keepAlive' in data) {
                 pong(ws)
+                delete data.keepAlive
             } else {
                 ping(ws)
             }
+            if (msgHandler !== void 0) {
+                data.type = 'type' in message ? message.type : 'Websocket Message'
+                msgHandler(data)
+            }
         }
-        if ('data' in message) {
-            console.log(message.data)
-        }
-        if ('type' in message) {
-            console.log(`WS Data Event Type: ${message.type}`)
-        }
-    }
 
+    }
     return ws
 }
 
+/**
+ *
+ * @param ws
+ */
 function ping(ws) {
     if (ws.readyState === SOCKET_OPEN) {
         ws.send('__ping__');
@@ -123,6 +150,10 @@ function ping(ws) {
     }
 }
 
+/**
+ *
+ * @param ws
+ */
 function pong(ws) {
     console.log('Server - ' + ws + ' is still active');
     clearTimeout(ws.timer);
@@ -131,6 +162,11 @@ function pong(ws) {
     }, 20000)
 }
 
+/**
+ *
+ * @param params
+ * @returns {*}
+ */
 function paramsToQuery (params) {
     if (params) {
         let keys = Object.keys({...params})
@@ -141,6 +177,11 @@ function paramsToQuery (params) {
     return false
 }
 
+/**
+ *
+ * @param str
+ * @returns {boolean}
+ */
 export function isJson(str) {
     try {
         JSON.parse(str);
