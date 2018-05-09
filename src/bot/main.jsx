@@ -90,6 +90,15 @@ const buildBotMenuItems = (length) => {
     return items
 }
 
+const buildFileMenuItems = (files) => {
+    const items = []
+    for ( let i = 0; i < files.length; i++) {
+        items.push(<MenuItem value={i} key={i} primaryText={`File ${i + 1}`}>{files[i].url}</MenuItem>);
+
+    }
+    return items
+}
+
 export class TrxLayout extends React.Component {
 
     constructor(props) {
@@ -97,11 +106,14 @@ export class TrxLayout extends React.Component {
         this.state = {
             open: false,
             botNum: 1,
+            files: [],
             selectedBot: -1,
             botMenuItems: buildBotMenuItems(this.state.botNum),
+            fileMenuItems: buildFileMenuItems(3),
             consoleText: '',
             market: undefined,
-            timePeriod: '60'
+            timePeriod: '60',
+            selectedFile: -1
         };
     }
 
@@ -112,8 +124,9 @@ export class TrxLayout extends React.Component {
     };
 
     componentDidMount() {
-        let menuItems = buildBotMenuItems(this.state.botNum)
-        this.setState({botMenuItems: menuItems})
+        let botMenuItems = buildBotMenuItems(this.state.botNum)
+        let fileMenuItems = buildFileMenuItems(0)
+        this.setState({botMenuItems: botMenuItems, fileMenuItems: fileMenuItems})
     }
 
     handleClick = () => {
@@ -195,7 +208,7 @@ export class TrxLayout extends React.Component {
                         url: urls.wsStart,
                         params: {data: 'test'},
                         timeout: 0
-                    })
+                    }, this.msgHandler)
 
                     if (ws) {
                         botConnections.push({id: bot.id, ws: ws, number: bot.number})
@@ -244,97 +257,139 @@ export class TrxLayout extends React.Component {
 
         selectedBot.ws.send(JSON.stringify(data))
         this.consoleOut(`Bot ${selectedBot.number} (${selectedBot.id}) has analyzed market data`)
+        if (true) {
+
+        }
+    }
+
+    /**
+     *
+     * @param message
+     */
+    msgHandler = ({...message}) => {
+        if ('type' in message) {
+            console.log(`WS Data Event Type`, message.type)
+        }
+        if ('filename' in message) {
+            this.updateFileList(message.filename)
+            console.log('Updating file list')
+            delete message.filename
+        }
+        console.log(`Remaining data to be handled`, message)
+    }
+
+    updateFileList (filename) {
+        const file = {
+            url: `/static/analysis/${filename}`,
+            filename: filename
+        }
+        this.state.files.push(file)
+        const fileMenuItems = buildFileMenuItems(this.state.files)
+        this.setState({fileMenuItems: fileMenuItems})
+    }
+
+    handleFileSelect = (event, index, value) => {
+        const file = this.state.files[value]
+        console.log('File Selection:', file)
+        this.setState({selectedFile: file})
+        this.consoleOut(`Opening ${file.filename}`)
+        window.open(`${window.location.origin + file.url}`, '_blank')
     }
 
     render() {
         return (
-            <div id="main-wrap">
-            <TrxNav id="trx-nav" />
-                <Layout id="main-layout" style={styles.mainLayout}>
-                    <Panel id="console" className="console" style={styles.console}>
-                        <TextField
-                            multiLine={true}
-                            rows={12}
-                            rowsMax={12}
-                            hintText='Console'
-                            value={this.state.consoleText}
-                            onChange={this.handleConsoleChange}
+<div id="main-wrap">
+<TrxNav id="trx-nav" />
+    <Layout id="main-layout" style={styles.mainLayout}>
+        <Panel id="console" className="console" style={styles.console}>
+            <TextField
+                multiLine={true}
+                rows={12}
+                rowsMax={12}
+                hintText='Console'
+                value={this.state.consoleText}
+                onChange={this.handleConsoleChange}
+            />
+        </Panel>
+        <Panel id="bot-panel" className="trx-panel" style={styles.trxPanel}>
+            <Card>
+                <CardTitle title="Bot Setup" />
+                <CardText>
+                    Configure and create bots
+                </CardText>
+                <div id="number-container">
+                    <CardActions className="number-control"  style={styles.numberControl}>
+                        <NumericInput min={0} max={100} value={this.state.botNum} onChange={this.botNumberChange} />
+                    </CardActions>
+                </div>
+                <div id="market-select">
+                    <RadioButtonGroup name="market-select" defaultSelected="trx" onChange={this.handleMarketSelect}>
+                        <RadioButton
+                            value="TRX"
+                            label="TRX"
+                            checkedIcon={<TrendingUp style={{color: '#F44336'}} />}
+                            uncheckedIcon={<TrendingUp style={{color: '#777777'}}/>}
+                            style={styles.radioButton}
                         />
-                    </Panel>
-                    <Panel id="bot-panel" className="trx-panel" style={styles.trxPanel}>
-                        <Card>
-                            <CardTitle title="Bot Setup" />
-                            <CardText>
-                                Configure and create bots
-                            </CardText>
-                            <div id="number-container">
-                                <CardActions className="number-control"  style={styles.numberControl}>
-                                    <NumericInput min={0} max={100} value={this.state.botNum} onChange={this.botNumberChange} />
-                                </CardActions>
-                            </div>
-                            <div id="market-select">
-                                <RadioButtonGroup name="market-select" defaultSelected="trx" onChange={this.handleMarketSelect}>
-                                    <RadioButton
-                                        value="TRX"
-                                        label="TRX"
-                                        checkedIcon={<TrendingUp style={{color: '#F44336'}} />}
-                                        uncheckedIcon={<TrendingUp style={{color: '#777777'}}/>}
-                                        style={styles.radioButton}
-                                    />
-                                    <RadioButton
-                                        value="TRC"
-                                        label="TRC"
-                                        checkedIcon={<TrendingUp style={{color: '#F44336'}} />}
-                                        uncheckedIcon={<TrendingUp style={{color: '#777777'}}/>}
-                                        style={styles.radioButton}
-                                    />
-                                    <RadioButton
-                                        value="Exchange"
-                                        label="Exchange TRX/TRC"
-                                        checkedIcon={<CompareArrows style={{color: '#F44336'}} />}
-                                        uncheckedIcon={<CompareArrows style={{color: '#777777'}}/>}
-                                        style={styles.radioButton}
-                                    />
-                                </RadioButtonGroup>
-                            </div>
-                            <div id="start-button">
-                                <FlatButton
-                                    label="Start Bots"
-                                    labelPosition="before"
-                                    onClick={this.startBots}
-                                    primary={false}
-                                    icon={<PowerSettingsNew/>}
-                                />
-                            </div>
-                        </Card>
-                    </Panel>
-                    <Panel id="analysis-panel" className="trx-panel" style={styles.trxPanel}>
-                        <Card>
-                            <CardTitle title="Analysis" />
-                            <CardText>
-                                Examine and trade
-                            </CardText>
-                            <DropDownMenu id="bot-select" style={styles.botSelect} maxHeight={300} value={this.state.selectedBot} onChange={this.handleBotSelect}>
-                                {this.state.botMenuItems}
-                            </DropDownMenu>
-                            <FlatButton
-                                label="Load Data"
-                                labelPosition="before"
-                                onClick={this.loadMarketData}
-                                primary={false}
-                                icon={<AutoRenew />}
-                            />
-                            <RaisedButton
-                                label="Analyze"
-                                labelPosition="before"
-                                onClick={this.analyzeMarketData}
-                                primary={false}
-                                icon={<PlayCircle />}
-                            />
-                        </Card>
-                    </Panel>
-                </Layout>
-            </div>
+                        <RadioButton
+                            value="TRC"
+                            label="TRC"
+                            checkedIcon={<TrendingUp style={{color: '#F44336'}} />}
+                            uncheckedIcon={<TrendingUp style={{color: '#777777'}}/>}
+                            style={styles.radioButton}
+                        />
+                        <RadioButton
+                            value="Exchange"
+                            label="Exchange TRX/TRC"
+                            checkedIcon={<CompareArrows style={{color: '#F44336'}} />}
+                            uncheckedIcon={<CompareArrows style={{color: '#777777'}}/>}
+                            style={styles.radioButton}
+                        />
+                    </RadioButtonGroup>
+                </div>
+                <div id="start-button">
+                    <FlatButton
+                        label="Start Bots"
+                        labelPosition="before"
+                        onClick={this.startBots}
+                        primary={false}
+                        icon={<PowerSettingsNew/>}
+                    />
+                </div>
+            </Card>
+        </Panel>
+        <Panel id="analysis-panel" className="trx-panel" style={styles.trxPanel}>
+            <Card>
+                <CardTitle title="Analysis" />
+                <CardText>
+                    Examine and trade
+                </CardText>
+                <DropDownMenu id="bot-select" style={styles.botSelect} maxHeight={300} value={this.state.selectedBot} onChange={this.handleBotSelect}>
+                    {this.state.botMenuItems}
+                </DropDownMenu>
+                <FlatButton
+                    label="Load Data"
+                    labelPosition="before"
+                    onClick={this.loadMarketData}
+                    primary={false}
+                    icon={<AutoRenew />}
+                />
+                <RaisedButton
+                    label="Analyze"
+                    labelPosition="before"
+                    onClick={this.analyzeMarketData}
+                    primary={false}
+                    icon={<PlayCircle />}
+                />
+                <div id="visualizations"><h3>Visualizations</h3>
+                <DropDownMenu id="file-select" style={styles.botSelect} maxHeight={300} value={this.state.selectedFile} onChange={this.handleFileSelect}>
+                    {this.state.fileMenuItems}
+                </DropDownMenu>
+                </div>
+            </Card>
+        </Panel>
+    </Layout>
+</div>
         )
     }
 
