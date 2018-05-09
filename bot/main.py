@@ -215,7 +215,7 @@ class BotTrcAnalysisHandler(RequestHandler):
             file_mv_result = expose_analysis_files()
             application.logger.debug('File move result: %s' % file_mv_result)
 
-            self.write(json.dumps({'response': 201, 'filename': filename, 'bot_id': bot_id}))
+            self.write(json.dumps({'response': 201, 'filename': '%s' % filename, 'bot_id': bot_id}))
 
 
 def datetime(x):
