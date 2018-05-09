@@ -17008,6 +17008,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TrxLayout = undefined;
 
+var _objectWithoutProperties2 = __webpack_require__(12);
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
 var _stringify = __webpack_require__(273);
 
 var _stringify2 = _interopRequireDefault(_stringify);
@@ -17188,6 +17192,18 @@ var buildBotMenuItems = function buildBotMenuItems(length) {
     return items;
 };
 
+var buildFileMenuItems = function buildFileMenuItems(files) {
+    var items = [];
+    for (var i = 0; i < files.length; i++) {
+        items.push(React.createElement(
+            _MenuItem2.default,
+            { value: i, key: i, primaryText: 'File ' + (i + 1) },
+            files[i].url
+        ));
+    }
+    return items;
+};
+
 var TrxLayout = exports.TrxLayout = function (_React$Component) {
     (0, _inherits3.default)(TrxLayout, _React$Component);
 
@@ -17282,7 +17298,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                             url: urls.wsStart,
                                             params: { data: 'test' },
                                             timeout: 0
-                                        });
+                                        }, _this.msgHandler);
 
                                         if (ws) {
                                             botConnections.push({ id: bot.id, ws: ws, number: bot.number });
@@ -17367,8 +17383,9 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
 
                                 selectedBot.ws.send((0, _stringify2.default)(data));
                                 _this.consoleOut('Bot ' + selectedBot.number + ' (' + selectedBot.id + ') has analyzed market data');
+                                if (true) {}
 
-                            case 4:
+                            case 5:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -17380,6 +17397,28 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                 return _ref3.apply(this, arguments);
             };
         }();
+
+        _this.msgHandler = function (_ref4) {
+            var message = (0, _objectWithoutProperties3.default)(_ref4, []);
+
+            if ('type' in message) {
+                console.log('WS Data Event Type', message.type);
+            }
+            if ('filename' in message) {
+                _this.updateFileList(message.filename);
+                console.log('Updating file list');
+                delete message.filename;
+            }
+            console.log('Remaining data to be handled', message);
+        };
+
+        _this.handleFileSelect = function (event, index, value) {
+            var file = _this.state.files[value];
+            console.log('File Selection:', file);
+            _this.setState({ selectedFile: file });
+            _this.consoleOut('Opening ' + file.filename);
+            window.open('' + (window.location.origin + file.url), '_blank');
+        };
 
         _this.handleBotSelect = function (event, index, value) {
             _this.setState({ selectedBot: value });
@@ -17400,11 +17439,14 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
         _this.state = {
             open: false,
             botNum: 1,
+            files: [],
             selectedBot: -1,
             botMenuItems: buildBotMenuItems(_this.state.botNum),
+            fileMenuItems: buildFileMenuItems(3),
             consoleText: '',
             market: undefined,
-            timePeriod: '60'
+            timePeriod: '60',
+            selectedFile: -1
         };
         return _this;
     }
@@ -17412,8 +17454,9 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
     (0, _createClass3.default)(TrxLayout, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var menuItems = buildBotMenuItems(this.state.botNum);
-            this.setState({ botMenuItems: menuItems });
+            var botMenuItems = buildBotMenuItems(this.state.botNum);
+            var fileMenuItems = buildFileMenuItems(0);
+            this.setState({ botMenuItems: botMenuItems, fileMenuItems: fileMenuItems });
         }
     }, {
         key: 'consoleOut',
@@ -17425,6 +17468,23 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                 textArr.splice(0, 1);
             }
             this.setState({ consoleText: textArr.join('\n') + '\n' + time + ' - ' + incomingText });
+        }
+
+        /**
+         *
+         * @param message
+         */
+
+    }, {
+        key: 'updateFileList',
+        value: function updateFileList(filename) {
+            var file = {
+                url: '/static/analysis/' + filename,
+                filename: filename
+            };
+            this.state.files.push(file);
+            var fileMenuItems = buildFileMenuItems(this.state.files);
+            this.setState({ fileMenuItems: fileMenuItems });
         }
     }, {
         key: 'render',
@@ -17541,7 +17601,21 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 onClick: this.analyzeMarketData,
                                 primary: false,
                                 icon: React.createElement(_playCircleFilled2.default, null)
-                            })
+                            }),
+                            React.createElement(
+                                'div',
+                                { id: 'visualizations' },
+                                React.createElement(
+                                    'h3',
+                                    null,
+                                    'Visualizations'
+                                ),
+                                React.createElement(
+                                    _DropDownMenu2.default,
+                                    { id: 'file-select', style: styles.botSelect, maxHeight: 300, value: this.state.selectedFile, onChange: this.handleFileSelect },
+                                    this.state.fileMenuItems
+                                )
+                            )
                         )
                     )
                 )
@@ -65696,6 +65770,11 @@ var _asyncToGenerator2 = __webpack_require__(156);
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
+/**
+ *
+ * @param options
+ * @returns {Promise.<{body: *, error: boolean}>}
+ */
 var request = exports.request = function () {
     var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(options) {
         var _options, url, method, params, body, headers, credentials, queryString, requestHeaders, requestOptions, keys, _keys, response, error, responseData;
@@ -65783,18 +65862,27 @@ var request = exports.request = function () {
     };
 }();
 
+/**
+ *
+ * @param response
+ * @returns {{body: boolean, error: boolean, code: boolean}}
+ */
+
+
 exports.handleResponse = handleResponse;
 exports.requestWs = requestWs;
 exports.isJson = isJson;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ *
+ * @type {number}
+ */
 var SOCKET_CONNECTING = 0;
 var SOCKET_OPEN = 1;
 var SOCKET_CLOSING = 2;
-var SOCKET_CLOSED = 3;
-
-function handleResponse(response) {
+var SOCKET_CLOSED = 3;function handleResponse(response) {
     var data = typeof response === 'string' ? JSON.parse(response) : response;
     var error = false;
     if ('error' in data) {
@@ -65808,7 +65896,15 @@ function handleResponse(response) {
     };
 }
 
+/**
+ *
+ * @param options
+ * @param msgHandler
+ * @returns {WebSocket}
+ */
 function requestWs(options) {
+    var msgHandler = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+
     var _options2 = (0, _extends3.default)({}, options),
         url = _options2.url,
         params = _options2.params;
@@ -65824,27 +65920,33 @@ function requestWs(options) {
         ws.send('HELLO FROM THE FRONT END, BITCHES!!');
     };
 
+    /**
+     *
+     * @param message
+     */
     ws.onmessage = function (message) {
         console.log(message);
         if ('data' in message && isJson(message.data)) {
             var data = JSON.parse(message.data);
             if ('keepAlive' in data) {
                 pong(ws);
+                delete data.keepAlive;
             } else {
                 ping(ws);
             }
-        }
-        if ('data' in message) {
-            console.log(message.data);
-        }
-        if ('type' in message) {
-            console.log('WS Data Event Type: ' + message.type);
+            if (msgHandler !== void 0) {
+                data.type = 'type' in message ? message.type : 'Websocket Message';
+                msgHandler(data);
+            }
         }
     };
-
     return ws;
 }
 
+/**
+ *
+ * @param ws
+ */
 function ping(ws) {
     if (ws.readyState === SOCKET_OPEN) {
         ws.send('__ping__');
@@ -65853,6 +65955,10 @@ function ping(ws) {
     }
 }
 
+/**
+ *
+ * @param ws
+ */
 function pong(ws) {
     console.log('Server - ' + ws + ' is still active');
     clearTimeout(ws.timer);
@@ -65861,6 +65967,11 @@ function pong(ws) {
     }, 20000);
 }
 
+/**
+ *
+ * @param params
+ * @returns {*}
+ */
 function paramsToQuery(params) {
     if (params) {
         var keys = (0, _keys3.default)((0, _extends3.default)({}, params));
@@ -65873,6 +65984,11 @@ function paramsToQuery(params) {
     return false;
 }
 
+/**
+ *
+ * @param str
+ * @returns {boolean}
+ */
 function isJson(str) {
     try {
         JSON.parse(str);
