@@ -59,7 +59,7 @@ const UserCard = () => (
             overlay={<CardTitle title="This ugly bitch" subtitle="So ugly"/>}
         >
             <img
-                src="https://cointrx.com/sites/default/files/2017-09/X58Q4cA.jpg" alt="User photo"
+                src="/static/images/default/avatar.jpg" alt="User photo"
                 className="user-photo"
             />
         </CardMedia>

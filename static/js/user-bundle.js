@@ -42077,7 +42077,7 @@ var UserCard = function UserCard() {
                 overlay: React.createElement(_Card.CardTitle, { title: 'This ugly bitch', subtitle: 'So ugly' })
             },
             React.createElement('img', {
-                src: 'https://cointrx.com/sites/default/files/2017-09/X58Q4cA.jpg', alt: 'User photo',
+                src: '/static/images/default/avatar.jpg', alt: 'User photo',
                 className: 'user-photo'
             })
         )
@@ -96944,6 +96944,14 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var trxLogo = function trxLogo() {
+    return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement('img', { id: 'trx-logo-img', height: '64px', src: '/static/images/logo.png' })
+    );
+};
+
 var TrxNav = exports.TrxNav = function (_React$Component) {
     (0, _inherits3.default)(TrxNav, _React$Component);
 
@@ -97018,14 +97026,16 @@ var TrxNav = exports.TrxNav = function (_React$Component) {
                     _react2.default.createElement(
                         _app_bar.AppBar,
                         { className: 'TrxAppBar',
-                            title: 'Coin TRX',
+                            id: 'trx-app-bar',
+                            title: trxLogo(),
                             styleName: 'theme.AppBar',
                             theme: theme,
+                            style: { backgroundColor: '#333333' },
                             leftIcon: 'menu',
                             onLeftIconClick: this.toggleDrawerActive },
                         _react2.default.createElement(
                             _navigation2.default,
-                            { className: 'trx-appbar-nav', type: 'horizontal' },
+                            { className: 'trx-appbar-nav', type: 'horizontal', style: { backgroundColor: '#333333' } },
                             _react2.default.createElement(
                                 'div',
                                 { className: 'app-bar-icons' },
