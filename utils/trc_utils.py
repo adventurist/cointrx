@@ -16,7 +16,7 @@ def expose_analysis_files():
     interface = 'mv'
     param1 = '/var/www/cointrx/bot/*.html' if env == 'SNOWFLAKE' else '/var/www/coinx/bot/*.html'
     param2 = '/var/www/cointrx/analysis/' if env == 'SNOWFLAKE' else '/var/www/coinx/analysis/'
-    move_result = run([interface, param1, param2], stdout=PIPE)
+    move_result = run([interface, param1, param2], stdout=PIPE, shell=True)
     if move_result is not None and hasattr(move_result, 'stdout'):
         return move_result.stdout
     else:
