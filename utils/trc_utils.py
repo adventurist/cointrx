@@ -13,7 +13,7 @@ def create_mock_price(price_min, price_max):
 
 def expose_analysis_files():
     env = get_env_variables()['TRX_ENV']
-    command = 'mv /var/www/cointrx/bot/analysis/*.html /var/www/cointrx/analysis/' if env == 'SNOWFLAKE' else 'mv /var/www/coinx/bot/*.html /var/www/coinx/analysis/'
+    command = 'mv /var/www/cointrx/bot/analysis/*.html /var/www/cointrx/static/analysis/' if env == 'SNOWFLAKE' else 'mv /var/www/coinx/bot/*.html /var/www/coinx/static/analysis/'
     move_result = call(command, shell=True, stdout=PIPE)
     if move_result is not None and hasattr(move_result, 'stdout'):
         return move_result.stdout
