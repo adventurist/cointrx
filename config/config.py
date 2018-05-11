@@ -40,7 +40,8 @@ def trx_urls(trx_env):
             'trc': {
                 'prices': 'https://app.cointrx.com/bot/trc/prices/all',
                 'analyze': 'https://bot.cointrx.com/bots/trc/analyze'
-            }
+            },
+            'fetch': 'http://bot.cointrx.com/bots/fetch'
         }
     } if trx_env == 'SNOWFLAKE' else {
         'base_url': 'http://localhost',
@@ -52,11 +53,12 @@ def trx_urls(trx_env):
         'key_gen_url': 'http://localhost:6969/keys/btc/regtest/generate',
         'bot': {
             'start': 'http://localhost:6969/bot/start',
-            'wsStart': 'http://localhost:9977/ws/start',
+            'wsStart': 'ws://localhost:6969/bot/ws-test',
             'trc': {
                 'prices': 'http://localhost:6969/bot/trc/prices/all',
                 'analyze': 'http://localhost:9977/bots/trc/analyze'
-            }
+            },
+            'fetch': 'http://localhost:9977/bots/fetch'
         }
     }
 
