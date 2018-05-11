@@ -19,7 +19,7 @@ import PowerSettingsNew from 'material-ui/svg-icons/action/power-settings-new'
 import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
 import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
-import { request, handleResponse, requestWs, isJson } from '../utils/'
+import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
 // import trx from '../redux'
 
 // const trxInstance = trx()
@@ -81,6 +81,8 @@ const styles = {
 
 const botConnections = []
 
+const container = {}
+
 const buildBotMenuItems = (length) => {
     const items = [];
     items.push(<MenuItem value={'All'} key={-1} primaryText={`All`} />);
@@ -114,7 +116,7 @@ export class TrxLayout extends React.Component {
             market: undefined,
             timePeriod: '60',
             selectedFile: -1
-        };
+        }
     }
 
     state = {
@@ -123,10 +125,11 @@ export class TrxLayout extends React.Component {
         sidebarPinned: false
     };
 
-    componentDidMount() {
+    async componentDidMount() {
         let botMenuItems = buildBotMenuItems(this.state.botNum)
         let fileMenuItems = buildFileMenuItems(0)
         this.setState({botMenuItems: botMenuItems, fileMenuItems: fileMenuItems})
+        await this.init()
     }
 
     handleClick = () => {
@@ -184,6 +187,46 @@ export class TrxLayout extends React.Component {
 
     handleConsoleChange = (event, index, value) => {
         this.setState({consoleText: value})
+    }
+
+    init = async () => {
+        container.conn = await requestWs({
+            url: urls.wsStart,
+            params: {
+                data: JSON.stringify({timestamp: Date.now()})
+            },
+            timeout: 0
+        }, this.msgHandler)
+        if (container.conn) {
+            container.conn.onopen = () => {
+                console.log('Primary channel open')
+                console.log('Fetching bots')
+                const response = this.sendWsRequest('fetchBots')
+                if (response) {
+                    console.log('Bots ready')
+                    container.bots = botConnections
+                }
+            }
+        }
+        window.trx = container
+    }
+
+    sendWsRequest = async (request) => {
+        switch (request) {
+            case 'fetchBots':
+                if (container && 'conn' in container && container.conn) {
+                    const availableBots = await this.fetchAvailableBots(container.conn)
+                    return availableBots
+                }
+        }
+    }
+
+    /**
+     * @param {WebSocket} conn
+     * @returns {Promise.<void>}
+     */
+    fetchAvailableBots = async (conn) => {
+        conn.send('bots:all')
     }
 
     startBots = async () => {
@@ -270,10 +313,30 @@ export class TrxLayout extends React.Component {
         if ('type' in message) {
             console.log(`WS Data Event Type`, message.type)
         }
-        if ('filename' in message) {
-            this.updateFileList(message.filename)
-            console.log('Updating file list')
-            delete message.filename
+        if ('action' in message) {
+            const action = message.action
+            switch (action) {
+                case 'updatebots':
+                    const bots = message.payload
+                    if (typeof bots === Array && bots.length > 0) {
+                        bots.map( bot => botConnections.push({id: bot.id, ws: ws, number: bot.number}) )
+                        console.log('Bot connections updated')
+                    }
+                    console.log('No bots available')
+                    break
+                case 'addfile':
+                    const data = message.payload
+                    if ('filename' in data) {
+                        this.updateFileList(data.filename)
+                        console.log('Updating file list')
+                        delete data.filename
+                    }
+                    break
+            }
+        }
+        if ('error' in message) {
+            const error = message.error
+            console.log(error)
         }
         console.log(`Remaining data to be handled`, message)
     }
