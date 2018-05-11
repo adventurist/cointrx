@@ -2,10 +2,10 @@
  *
  * @type {number}
  */
-const SOCKET_CONNECTING = 0;
-const SOCKET_OPEN = 1;
-const SOCKET_CLOSING = 2;
-const SOCKET_CLOSED = 3;
+export const SOCKET_CONNECTING = 0;
+export const SOCKET_OPEN = 1;
+export const SOCKET_CLOSING = 2;
+export const SOCKET_CLOSED = 3;
 
 /**
  *
@@ -110,13 +110,13 @@ export function requestWs(options, msgHandler = undefined) {
     Object.defineProperty(ws, 'timer', {writable: true, value: undefined})
 
     ws.onopen = (event) => {
-        console.log(event)
-        ws.send('HELLO FROM THE FRONT END, BITCHES!!')
+        ws.send('Socket Connection Initialized')
     }
 
     /**
      *
-     * @param message
+     * @param {Object} message Message sent from TRX Services
+     * @param {string} [message.data] Additional data in the message
      */
     ws.onmessage = (message) => {
         console.log(message)
@@ -127,6 +127,12 @@ export function requestWs(options, msgHandler = undefined) {
                 delete data.keepAlive
             } else {
                 ping(ws)
+            }
+            if ('action' in message) {
+                data.action = message.action
+                if ('payload' in message) {
+                    data.payload = message.payload
+                }
             }
             if (msgHandler !== void 0) {
                 data.type = 'type' in message ? message.type : 'Websocket Message'
@@ -155,7 +161,7 @@ function ping(ws) {
  * @param ws
  */
 function pong(ws) {
-    console.log('Server - ' + ws + ' is still active');
+    console.log('Server active', ws);
     clearTimeout(ws.timer);
     ws.timer = setTimeout(function () {
         ping(ws);
@@ -176,6 +182,12 @@ function paramsToQuery (params) {
     }
     return false
 }
+
+// async function wsReady(ws) => {
+//     setTimeout( () => {
+//         // if (ws.)
+//     })
+// }
 
 /**
  *
