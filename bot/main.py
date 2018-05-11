@@ -237,7 +237,7 @@ class BotWsStartHandler(WebSocketHandler):
             result = await handle_ws_request(parsed['type'], parsed['data'])
             application.logger.debug('WS Request: %s' % str(result))
             # TODO Handle this internally and send a TRX response
-            self.write_message(str(result.body, 'utf-8'))
+            self.write_message(str(result, 'utf-8'))
 
         return_message = {'keepAlive': 1, 'message': 'Back at you, punk', 'botConnections': len(application.bots)}
         self.write_message(json.dumps(return_message))
@@ -250,14 +250,26 @@ class BotWsStartHandler(WebSocketHandler):
 async def handle_ws_request(type, data):
     async def send_message(url, data):
         request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
-        return request_result
+        if hasattr(request_result, 'body'):
+            return {'action': 'addfile', 'payload': request_result.body}
+    async def fetch_bots():
+        return {'action': 'updatebots', 'payload': application.fetch_bots()}
 
     switch = {
-        'request': send_message
+        'request': send_message,
+        'bots:all': fetch_bots
     }
     func = switch.get(type, lambda: 'Invalid request type')
     result = await func(type, data)
     return result
+
+
+class BotFetchHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        self.write(json.dumps(application.fetch_bots()))
 
 
 class BotApplication(Application):
@@ -268,6 +280,7 @@ class BotApplication(Application):
             (r"/bots/all", BotAllHandler),
             (r"/bots/dump", BotDumpHandler),
             (r"/bots/login", BotLoginHandler),
+            (r"/bots/fetch", BotFetchHandler),
             (r"/ws/start", BotWsStartHandler),
             (r"/bots/trc/prices", BotTrcPriceHandler),
             (r"/bots/trc/analyze", BotTrcAnalysisHandler)
@@ -299,6 +312,10 @@ class BotApplication(Application):
             search = list(filter(lambda x: str(x.id) == bot_id, self.bots))
             if search is not None and len(search) > 0:
                 return search[0]
+
+    def fetch_bots(self):
+        if isinstance(self.bots, list) and len(self.bots) > 0:
+            return self.bots
 
 
 def setup_logger(name, level, json_logging=False):
