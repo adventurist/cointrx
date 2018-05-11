@@ -236,8 +236,9 @@ class BotWsStartHandler(WebSocketHandler):
             parsed = json.loads(message)
             result = await handle_ws_request(parsed['type'], parsed['data'])
             application.logger.debug('WS Request: %s' % str(result))
+            response = json.dumps(result) if isinstance(result, dict) else str(result, 'utf-8')
             # TODO Handle this internally and send a TRX response
-            self.write_message(str(result, 'utf-8'))
+            self.write_message(response)
 
         return_message = {'keepAlive': 1, 'message': 'Back at you, punk', 'botConnections': len(application.bots)}
         self.write_message(json.dumps(return_message))
@@ -251,9 +252,11 @@ async def handle_ws_request(type, data):
     async def send_message(url, data):
         request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
         if hasattr(request_result, 'body'):
-            return {'action': 'addfile', 'payload': request_result.body}
+            return {'action': 'addfile', 'payload': json.loads(str(request_result.body, 'utf-8'))}
     async def fetch_bots():
-        return {'action': 'updatebots', 'payload': application.fetch_bots()}
+        request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
+        if hasattr(request_result, 'body'):
+            return {'action': 'updatebots', 'payload': json.loads(str(request_result.body, 'utf-8'))}
 
     switch = {
         'request': send_message,

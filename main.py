@@ -1056,7 +1056,6 @@ class BotWsTestHandler(WebSocketHandler):
             parsed = json.loads(message)
             result = await handle_ws_request(parsed['type'], parsed['data'])
             logger.debug('WS Request: %s' % str(result))
-            is_dict = isinstance(result, dict)
             response = json.dumps(result) if isinstance(result, dict) else str(result, 'utf-8')
             # TODO Handle this internally and send a TRX response
             self.write_message(response)
