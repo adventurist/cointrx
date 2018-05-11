@@ -10,6 +10,7 @@ import json
 import os
 import random
 import warnings
+import re
 
 from graphql.error import GraphQLError
 from graphql.error import format_error as format_graphql_error
@@ -1045,12 +1046,8 @@ class BotWsTestHandler(WebSocketHandler):
     def data_received(self, chunk):
         pass
 
-    # @asynchronous
-    # def get(self, *args, **kwargs):
-    #     logger.debug('WS Request received')
-    #     logger.debug('Request Headers: %s' % str(self.request.headers))
-    #     self.add_header('Upgrade', 'Websocket')
-    #     return super().get(self)
+    # def check_origin(self, origin):
+    #     return bool(re.match(r'^.*?\.cointrx\.com', origin))
 
     async def on_message(self, message):
         logger.debug('Message received: %s' % str(message))
@@ -1059,10 +1056,12 @@ class BotWsTestHandler(WebSocketHandler):
             parsed = json.loads(message)
             result = await handle_ws_request(parsed['type'], parsed['data'])
             logger.debug('WS Request: %s' % str(result))
+            is_dict = isinstance(result, dict)
+            response = json.dumps(result) if isinstance(result, dict) else str(result, 'utf-8')
             # TODO Handle this internally and send a TRX response
-            self.write_message(str(result.body, 'utf-8'))
+            self.write_message(response)
 
-        return_message = {'keepAlive': 1, 'message': 'Back at you, punk'}
+        return_message = {'keepAlive': 1, 'message': 'Back at you, punk', 'botConnections': len(application.bots)}
         self.write_message(json.dumps(return_message))
 
     def open(self):
@@ -1073,10 +1072,16 @@ class BotWsTestHandler(WebSocketHandler):
 async def handle_ws_request(type, data):
     async def send_message(url, data):
         request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
-        return request_result
+        if hasattr(request_result, 'body'):
+            return {'action': 'addfile', 'payload': json.loads(str(request_result.body, 'utf-8'))}
+    async def fetch_bots():
+        request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
+        if hasattr(request_result, 'body'):
+            return {'action': 'updatebots', 'payload': json.loads(str(request_result.body, 'utf-8'))}
 
     switch = {
-        'request': send_message
+        'request': send_message,
+        'bots:all': fetch_bots
     }
     func = switch.get(type, lambda: 'Invalid request type')
     result = await func(type, data)
