@@ -226,7 +226,7 @@ export class TrxLayout extends React.Component {
      * @returns {Promise.<void>}
      */
     fetchAvailableBots = async (conn) => {
-        conn.send('bots:all')
+        conn.send(JSON.stringify({type: 'bots:all', data: 'init'}))
     }
 
     startBots = async () => {
@@ -318,8 +318,9 @@ export class TrxLayout extends React.Component {
             switch (action) {
                 case 'updatebots':
                     const bots = message.payload
-                    if (typeof bots === Array && bots.length > 0) {
-                        bots.map( bot => botConnections.push({id: bot.id, ws: ws, number: bot.number}) )
+                    if (Array.isArray(bots) && bots.length > 0) {
+                        bots.map( bot => botConnections.push({id: bot.id, ws: 'none', number: bot.number}) )
+                        this.botNumberChange(undefined, botConnections.length)
                         console.log('Bot connections updated')
                     }
                     console.log('No bots available')
