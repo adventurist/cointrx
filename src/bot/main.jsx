@@ -20,6 +20,7 @@ import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
 import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
 import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
+import log from 'loglevel'
 // import trx from '../redux'
 
 // const trxInstance = trx()
@@ -173,7 +174,8 @@ export class TrxLayout extends React.Component {
     }
 
     botNumberChange = (event, value) => {
-        const newItems = buildBotMenuItems(value)
+        // TODO this can't be right
+        const newItems = buildBotMenuItems(container.bots.length + value)
         this.setState({botNum: value, botMenuItems: newItems})
         this.consoleOut(`Number of bots to be built: ${value}`)
     }
@@ -198,13 +200,13 @@ export class TrxLayout extends React.Component {
             timeout: 0
         }, this.msgHandler)
         if (container.conn) {
-            container.conn.onopen = () => {
-                console.log('Primary channel open')
-                console.log('Fetching bots')
-                const response = this.sendWsRequest('fetchBots')
+            container.conn.onopen = async () => {
+                log.info('Primary channel open')
+                log.info('Fetching bots')
+                const response = await this.sendWsRequest('fetchBots')
                 if (response) {
-                    console.log('Bots ready')
                     container.bots = botConnections
+                    this.botNumberChange(undefined, container.bots.length)
                 }
             }
         }
@@ -215,8 +217,13 @@ export class TrxLayout extends React.Component {
         switch (request) {
             case 'fetchBots':
                 if (container && 'conn' in container && container.conn) {
-                    const availableBots = await this.fetchAvailableBots(container.conn)
-                    return availableBots
+                    try {
+                        await this.fetchAvailableBots(container.conn)
+                        return true
+                    } catch (err) {
+                        log.error(err)
+                        return false
+                    }
                 }
         }
     }
@@ -241,12 +248,12 @@ export class TrxLayout extends React.Component {
         if (!response.error) {
             this.consoleOut(`${this.state.botNum} bots created`)
         }
-        console.log(response)
+        log.info(response)
         if ('body' in response && 'data' in response.body) {
             let previousBotNumber = botConnections.length
             if (Array.isArray(data.body.data)) {
                 data.body.data.map(bot => {
-                    console.log(bot.message)
+                    log.info(bot.message)
                     const ws = requestWs({
                         url: urls.wsStart,
                         params: {data: 'test'},
@@ -262,7 +269,7 @@ export class TrxLayout extends React.Component {
                 let createResult = Math.abs(numDiff) === data.body.data.length
 
                 if (!createResult) {
-                    console.log('Problem creating the requested number of bots')
+                    log.info('Problem creating the requested number of bots')
                 }
                 this.onBotsCreate(currentBotNumber)
             }
@@ -272,7 +279,7 @@ export class TrxLayout extends React.Component {
 
     loadMarketData = async (event, index, value) => {
         const selectedBot = botConnections[this.state.selectedBot]
-        console.log(event)
+        log.info(event)
         const data = await request({
             url: urls.trc.prices,
             headers: {'Content-Type': 'application/json'},
@@ -281,7 +288,7 @@ export class TrxLayout extends React.Component {
         })
 
         const response = handleResponse(data)
-        console.log(response)
+        log.info(response)
         if (!response.error) {
             this.consoleOut(`${selectedBot} has loaded market data`)
         }
@@ -311,7 +318,7 @@ export class TrxLayout extends React.Component {
      */
     msgHandler = ({...message}) => {
         if ('type' in message) {
-            console.log(`WS Data Event Type`, message.type)
+            log.info(`WS Data Event Type`, message.type)
         }
         if ('action' in message) {
             const action = message.action
@@ -320,16 +327,16 @@ export class TrxLayout extends React.Component {
                     const bots = message.payload
                     if (Array.isArray(bots) && bots.length > 0) {
                         bots.map( bot => botConnections.push({id: bot.id, ws: 'none', number: bot.number}) )
-                        this.botNumberChange(undefined, botConnections.length)
-                        console.log('Bot connections updated')
+                        this.onBotsCreate(botConnections.length)
+                        log.info('Bot connections updated')
                     }
-                    console.log('No bots available')
+                    log.info('No bots available')
                     break
                 case 'addfile':
                     const data = message.payload
                     if ('filename' in data) {
                         this.updateFileList(data.filename)
-                        console.log('Updating file list')
+                        log.info('Updating file list')
                         delete data.filename
                     }
                     break
@@ -337,9 +344,9 @@ export class TrxLayout extends React.Component {
         }
         if ('error' in message) {
             const error = message.error
-            console.log(error)
+            log.info(error)
         }
-        console.log(`Remaining data to be handled`, message)
+        log.info(`Remaining data to be handled`, message)
     }
 
     updateFileList (filename) {
@@ -354,7 +361,7 @@ export class TrxLayout extends React.Component {
 
     handleFileSelect = (event, index, value) => {
         const file = this.state.files[value]
-        console.log('File Selection:', file)
+        log.info('File Selection:', file)
         this.setState({selectedFile: file})
         this.consoleOut(`Opening ${file.filename}`)
         window.open(`${window.location.origin + file.url}`, '_blank')
