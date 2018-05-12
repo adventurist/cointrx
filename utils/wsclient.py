@@ -57,6 +57,10 @@ class Client(object):
         else:
             self.ws.write_message("Keep alive with id: " + str(self.id))
 
+    def close_connection(self):
+        if self.ws is not None:
+            self.ws.close()
+
 
 class Bot(object):
     def __init__(self, config, logger):
@@ -84,6 +88,9 @@ class Bot(object):
 
     async def connect(self):
         await self.client.connect(url='ws://localhost:9977/')
+
+    def close_connection(self):
+        self.client.close_connection()
 
     def identify(self):
         return "Bot Number " + str(self.number) + " and my ID is " + str(self.id)
