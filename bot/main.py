@@ -269,7 +269,7 @@ async def handle_ws_request(type, data):
         """
         Retrieve info on all active bots
         """
-        request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
+        request_result = await http_client.get('http://localhost:9977/bots/fetch')
         if hasattr(request_result, 'body'):
             return {'action': 'updatebots', 'payload': json.loads(str(request_result.body, 'utf-8'))}
     async def close_bot_connections(type, data):
