@@ -272,7 +272,8 @@ class BotFetchHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        self.write(json.dumps(application.fetch_bots()))
+        bots = [{'message': x.identify(), 'id': str(x.id), 'number': x.number} for x in application.bots]
+        self.write(json.dumps(bots))
 
 
 class BotApplication(Application):
