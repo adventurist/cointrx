@@ -2,7 +2,7 @@ import re
 from bokeh.layouts import gridplot
 
 from tornado.websocket import WebSocketHandler, WebSocketError, StreamClosedError
-from tornado.web import Application, RequestHandler
+from tornado.web import Application, RequestHandler, HTTPError
 from tornado.log import enable_pretty_logging
 from utils.wsclient import Bot
 from pythonjsonlogger import jsonlogger
@@ -10,6 +10,7 @@ from types import SimpleNamespace
 from utils.cointrx_client import Client
 
 from utils.trc_utils import *
+from utils.btcd_utils import get_env_variables
 
 import tornado.ioloop
 import logging
@@ -227,7 +228,9 @@ class BotWsStartHandler(WebSocketHandler):
         pass
 
     def check_origin(self, origin):
-        return bool(re.match(r'^.*?\.cointrx\.com', origin))
+        vars = get_env_variables()
+        env = vars['TRX_ENV']
+        return bool(re.match(r'^.*?\.cointrx\.com', origin)) if application.settings['env'] == 'SNOWFLAKE' else True
 
     async def on_message(self, message):
         application.logger.debug('Message received: %s' % str(message))
@@ -249,18 +252,53 @@ class BotWsStartHandler(WebSocketHandler):
 
 
 async def handle_ws_request(type, data):
-    async def send_message(url, data):
+    """
+    Utility to handle requests sent through the websocket stream
+    :param type:
+    :param data:
+    :return dict:
+    """
+    async def analyze_market(url, data):
+        """
+        Request that bot with ID perform a technical analysis
+        """
         request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
         if hasattr(request_result, 'body'):
             return {'action': 'addfile', 'payload': json.loads(str(request_result.body, 'utf-8'))}
-    async def fetch_bots():
+    async def fetch_bots(type, data):
+        """
+        Retrieve info on all active bots
+        """
         request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
         if hasattr(request_result, 'body'):
             return {'action': 'updatebots', 'payload': json.loads(str(request_result.body, 'utf-8'))}
-
+    async def close_bot_connections(type, data):
+        """
+        Close all bot connections
+        """
+        try:
+            application.close_bot_connections()
+            return {'action': 'noaction', 'payload': {'request': 'close bot connections', 'result': 1}}
+        except HTTPError as e:
+            e.log_message = 'Unable to close bot connections'
+            e.status_code = 500
+            return {'action': 'noaction', 'payload': {'request': 'close bot connections', 'result': 0, 'error': e}}
+    async def close_bot_connection(type, data):
+        """
+        Close connection for bot with ID
+        """
+        if 'id' in data:
+            try:
+                application.close_bot_connection(data['id'])
+            except HTTPError as e:
+                e.log_message = 'Unable to close bot connection for bot with id %s' % data['id']
+                e.status_code = 500
+                return {'action': 'noaction', 'payload': {'request': 'close bot connections', 'result': 0, 'error': e}}
     switch = {
-        'request': send_message,
-        'bots:all': fetch_bots
+        'request': analyze_market,
+        'bots:all': fetch_bots,
+        'bots:close': close_bot_connections,
+        'bot:close': close_bot_connection
     }
     func = switch.get(type, lambda: 'Invalid request type')
     result = await func(type, data)
@@ -292,7 +330,8 @@ class BotApplication(Application):
         settings = {
             "debug": True,
             "log_path": os.path.join(os.path.dirname(__file__), "log"),
-            "cookie_secret": "984378towhdufs8047ht"
+            "cookie_secret": "984378towhdufs8047ht",
+            "env": get_env_variables()['TRX_ENV']
         }
         self.bots = []
 
@@ -320,6 +359,20 @@ class BotApplication(Application):
     def fetch_bots(self):
         if isinstance(self.bots, list) and len(self.bots) > 0:
             return self.bots
+
+    def close_bot_connections(self):
+        if active_bots(self.bots):
+            map(lambda x: x.close_connection, self.bots)
+
+    def close_bot_connection(self, bot_id):
+        if active_bots(self.bots):
+            bot = self.retrieve_bot_by_id(bot_id)
+            if bot is not None:
+                bot.close_connection()
+
+
+def active_bots(bots: list):
+    return isinstance(bots, list) and len(bots) > 0
 
 
 def setup_logger(name, level, json_logging=False):
