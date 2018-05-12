@@ -1060,7 +1060,7 @@ class BotWsTestHandler(WebSocketHandler):
             # TODO Handle this internally and send a TRX response
             self.write_message(response)
 
-        return_message = {'keepAlive': 1, 'message': 'Back at you, punk', 'botConnections': len(application.bots)}
+        return_message = {'keepAlive': 1, 'message': 'Back at you, punk'}
         self.write_message(json.dumps(return_message))
 
     def open(self):
@@ -1069,12 +1069,12 @@ class BotWsTestHandler(WebSocketHandler):
 
 
 async def handle_ws_request(type, data):
-    async def send_message(url, data):
+    async def send_message(type, data):
         request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
         if hasattr(request_result, 'body'):
             return {'action': 'addfile', 'payload': json.loads(str(request_result.body, 'utf-8'))}
-    async def fetch_bots():
-        request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
+    async def fetch_bots(type, data):
+        request_result = await http_client.get('http://localhost:9977/bots/fetch')
         if hasattr(request_result, 'body'):
             return {'action': 'updatebots', 'payload': json.loads(str(request_result.body, 'utf-8'))}
 
