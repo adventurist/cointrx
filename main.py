@@ -1069,17 +1069,30 @@ class BotWsTestHandler(WebSocketHandler):
 
 
 async def handle_ws_request(type, data):
-    async def send_message(type, data):
+    """
+    Utility to handle requests sent through the websocket stream
+    :param type:
+    :param data:
+    :return dict:
+    """
+    async def analyze_market(url, data):
+        """
+        Request that bot with ID perform a technical analysis
+        """
         request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
         if hasattr(request_result, 'body'):
             return {'action': 'addfile', 'payload': json.loads(str(request_result.body, 'utf-8'))}
     async def fetch_bots(type, data):
+        """
+        Retrieve info on all active bots
+        """
         request_result = await http_client.get('http://localhost:9977/bots/fetch')
         if hasattr(request_result, 'body'):
             return {'action': 'updatebots', 'payload': json.loads(str(request_result.body, 'utf-8'))}
 
+
     switch = {
-        'request': send_message,
+        'request': analyze_market,
         'bots:all': fetch_bots
     }
     func = switch.get(type, lambda: 'Invalid request type')
