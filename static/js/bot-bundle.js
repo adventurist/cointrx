@@ -17118,6 +17118,10 @@ var _RaisedButton2 = _interopRequireDefault(_RaisedButton);
 
 var _utils = __webpack_require__(618);
 
+var _loglevel = __webpack_require__(619);
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -17253,7 +17257,8 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
         };
 
         _this.botNumberChange = function (event, value) {
-            var newItems = buildBotMenuItems(value);
+            // TODO this can't be right
+            var newItems = buildBotMenuItems(container.bots.length + value);
             _this.setState({ botNum: value, botMenuItems: newItems });
             _this.consoleOut('Number of bots to be built: ' + value);
         };
@@ -17268,12 +17273,12 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
             _this.setState({ consoleText: value });
         };
 
-        _this.init = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-            return _regenerator2.default.wrap(function _callee$(_context) {
+        _this.init = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
+            return _regenerator2.default.wrap(function _callee2$(_context2) {
                 while (1) {
-                    switch (_context.prev = _context.next) {
+                    switch (_context2.prev = _context2.next) {
                         case 0:
-                            _context.next = 2;
+                            _context2.next = 2;
                             return (0, _utils.requestWs)({
                                 url: urls.wsStart,
                                 params: {
@@ -17283,94 +17288,117 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                             }, _this.msgHandler);
 
                         case 2:
-                            container.conn = _context.sent;
+                            container.conn = _context2.sent;
 
                             if (container.conn) {
-                                container.conn.onopen = function () {
-                                    console.log('Primary channel open');
-                                    console.log('Fetching bots');
-                                    var response = _this.sendWsRequest('fetchBots');
-                                    if (response) {
-                                        console.log('Bots ready');
-                                        container.bots = botConnections;
-                                    }
-                                };
+                                container.conn.onopen = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+                                    var response;
+                                    return _regenerator2.default.wrap(function _callee$(_context) {
+                                        while (1) {
+                                            switch (_context.prev = _context.next) {
+                                                case 0:
+                                                    _loglevel2.default.info('Primary channel open');
+                                                    _loglevel2.default.info('Fetching bots');
+                                                    _context.next = 4;
+                                                    return _this.sendWsRequest('fetchBots');
+
+                                                case 4:
+                                                    response = _context.sent;
+
+                                                    if (response) {
+                                                        container.bots = botConnections;
+                                                        _this.botNumberChange(undefined, container.bots.length);
+                                                    }
+
+                                                case 6:
+                                                case 'end':
+                                                    return _context.stop();
+                                            }
+                                        }
+                                    }, _callee, _this2);
+                                }));
                             }
                             window.trx = container;
 
                         case 5:
                         case 'end':
-                            return _context.stop();
+                            return _context2.stop();
                     }
                 }
-            }, _callee, _this2);
+            }, _callee2, _this2);
         }));
 
         _this.sendWsRequest = function () {
-            var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(request) {
-                var availableBots;
-                return _regenerator2.default.wrap(function _callee2$(_context2) {
+            var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(request) {
+                return _regenerator2.default.wrap(function _callee3$(_context3) {
                     while (1) {
-                        switch (_context2.prev = _context2.next) {
+                        switch (_context3.prev = _context3.next) {
                             case 0:
-                                _context2.t0 = request;
-                                _context2.next = _context2.t0 === 'fetchBots' ? 3 : 8;
+                                _context3.t0 = request;
+                                _context3.next = _context3.t0 === 'fetchBots' ? 3 : 14;
                                 break;
 
                             case 3:
                                 if (!(container && 'conn' in container && container.conn)) {
-                                    _context2.next = 8;
+                                    _context3.next = 14;
                                     break;
                                 }
 
-                                _context2.next = 6;
+                                _context3.prev = 4;
+                                _context3.next = 7;
                                 return _this.fetchAvailableBots(container.conn);
 
-                            case 6:
-                                availableBots = _context2.sent;
-                                return _context2.abrupt('return', availableBots);
+                            case 7:
+                                return _context3.abrupt('return', true);
 
-                            case 8:
+                            case 10:
+                                _context3.prev = 10;
+                                _context3.t1 = _context3['catch'](4);
+
+                                _loglevel2.default.error(_context3.t1);
+                                return _context3.abrupt('return', false);
+
+                            case 14:
                             case 'end':
-                                return _context2.stop();
+                                return _context3.stop();
                         }
                     }
-                }, _callee2, _this2);
+                }, _callee3, _this2, [[4, 10]]);
             }));
 
             return function (_x) {
-                return _ref2.apply(this, arguments);
+                return _ref3.apply(this, arguments);
             };
         }();
 
         _this.fetchAvailableBots = function () {
-            var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(conn) {
-                return _regenerator2.default.wrap(function _callee3$(_context3) {
+            var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(conn) {
+                return _regenerator2.default.wrap(function _callee4$(_context4) {
                     while (1) {
-                        switch (_context3.prev = _context3.next) {
+                        switch (_context4.prev = _context4.next) {
                             case 0:
                                 conn.send((0, _stringify2.default)({ type: 'bots:all', data: 'init' }));
 
                             case 1:
                             case 'end':
-                                return _context3.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee3, _this2);
+                }, _callee4, _this2);
             }));
 
             return function (_x2) {
-                return _ref3.apply(this, arguments);
+                return _ref4.apply(this, arguments);
             };
         }();
 
-        _this.startBots = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4() {
+        _this.startBots = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5() {
             var data, response, previousBotNumber, currentBotNumber, numDiff, createResult;
-            return _regenerator2.default.wrap(function _callee4$(_context4) {
+            return _regenerator2.default.wrap(function _callee5$(_context5) {
                 while (1) {
-                    switch (_context4.prev = _context4.next) {
+                    switch (_context5.prev = _context5.next) {
                         case 0:
-                            _context4.next = 2;
+                            _context5.next = 2;
                             return (0, _utils.request)({
                                 url: urls.start,
                                 method: 'GET',
@@ -17379,19 +17407,19 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                             });
 
                         case 2:
-                            data = _context4.sent;
+                            data = _context5.sent;
                             response = (0, _utils.handleResponse)(data);
 
                             if (!response.error) {
                                 _this.consoleOut(_this.state.botNum + ' bots created');
                             }
-                            console.log(response);
+                            _loglevel2.default.info(response);
                             if ('body' in response && 'data' in response.body) {
                                 previousBotNumber = botConnections.length;
 
                                 if (Array.isArray(data.body.data)) {
                                     data.body.data.map(function (bot) {
-                                        console.log(bot.message);
+                                        _loglevel2.default.info(bot.message);
                                         var ws = (0, _utils.requestWs)({
                                             url: urls.wsStart,
                                             params: { data: 'test' },
@@ -17408,7 +17436,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
 
 
                                     if (!createResult) {
-                                        console.log('Problem creating the requested number of bots');
+                                        _loglevel2.default.info('Problem creating the requested number of bots');
                                     }
                                     _this.onBotsCreate(currentBotNumber);
                                 }
@@ -17416,23 +17444,23 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
 
                         case 7:
                         case 'end':
-                            return _context4.stop();
+                            return _context5.stop();
                     }
                 }
-            }, _callee4, _this2);
+            }, _callee5, _this2);
         }));
 
         _this.loadMarketData = function () {
-            var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(event, index, value) {
+            var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(event, index, value) {
                 var selectedBot, data, response;
-                return _regenerator2.default.wrap(function _callee5$(_context5) {
+                return _regenerator2.default.wrap(function _callee6$(_context6) {
                     while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context6.prev = _context6.next) {
                             case 0:
                                 selectedBot = botConnections[_this.state.selectedBot];
 
-                                console.log(event);
-                                _context5.next = 4;
+                                _loglevel2.default.info(event);
+                                _context6.next = 4;
                                 return (0, _utils.request)({
                                     url: urls.trc.prices,
                                     headers: { 'Content-Type': 'application/json' },
@@ -17441,33 +17469,33 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 });
 
                             case 4:
-                                data = _context5.sent;
+                                data = _context6.sent;
                                 response = (0, _utils.handleResponse)(data);
 
-                                console.log(response);
+                                _loglevel2.default.info(response);
                                 if (!response.error) {
                                     _this.consoleOut(selectedBot + ' has loaded market data');
                                 }
 
                             case 8:
                             case 'end':
-                                return _context5.stop();
+                                return _context6.stop();
                         }
                     }
-                }, _callee5, _this2);
+                }, _callee6, _this2);
             }));
 
             return function (_x3, _x4, _x5) {
-                return _ref5.apply(this, arguments);
+                return _ref6.apply(this, arguments);
             };
         }();
 
         _this.analyzeMarketData = function () {
-            var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(value) {
+            var _ref7 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(value) {
                 var selectedBot, data;
-                return _regenerator2.default.wrap(function _callee6$(_context6) {
+                return _regenerator2.default.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
                                 selectedBot = botConnections[_this.state.selectedBot];
                                 data = {
@@ -17485,22 +17513,22 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
 
                             case 5:
                             case 'end':
-                                return _context6.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee6, _this2);
+                }, _callee7, _this2);
             }));
 
             return function (_x6) {
-                return _ref6.apply(this, arguments);
+                return _ref7.apply(this, arguments);
             };
         }();
 
-        _this.msgHandler = function (_ref7) {
-            var message = (0, _objectWithoutProperties3.default)(_ref7, []);
+        _this.msgHandler = function (_ref8) {
+            var message = (0, _objectWithoutProperties3.default)(_ref8, []);
 
             if ('type' in message) {
-                console.log('WS Data Event Type', message.type);
+                _loglevel2.default.info('WS Data Event Type', message.type);
             }
             if ('action' in message) {
                 var action = message.action;
@@ -17511,16 +17539,16 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                             bots.map(function (bot) {
                                 return botConnections.push({ id: bot.id, ws: 'none', number: bot.number });
                             });
-                            _this.botNumberChange(undefined, botConnections.length);
-                            console.log('Bot connections updated');
+                            _this.onBotsCreate(botConnections.length);
+                            _loglevel2.default.info('Bot connections updated');
                         }
-                        console.log('No bots available');
+                        _loglevel2.default.info('No bots available');
                         break;
                     case 'addfile':
                         var data = message.payload;
                         if ('filename' in data) {
                             _this.updateFileList(data.filename);
-                            console.log('Updating file list');
+                            _loglevel2.default.info('Updating file list');
                             delete data.filename;
                         }
                         break;
@@ -17528,14 +17556,14 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
             }
             if ('error' in message) {
                 var error = message.error;
-                console.log(error);
+                _loglevel2.default.info(error);
             }
-            console.log('Remaining data to be handled', message);
+            _loglevel2.default.info('Remaining data to be handled', message);
         };
 
         _this.handleFileSelect = function (event, index, value) {
             var file = _this.state.files[value];
-            console.log('File Selection:', file);
+            _loglevel2.default.info('File Selection:', file);
             _this.setState({ selectedFile: file });
             _this.consoleOut('Opening ' + file.filename);
             window.open('' + (window.location.origin + file.url), '_blank');
@@ -17575,29 +17603,29 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
     (0, _createClass3.default)(TrxLayout, [{
         key: 'componentDidMount',
         value: function () {
-            var _ref8 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7() {
+            var _ref9 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8() {
                 var botMenuItems, fileMenuItems;
-                return _regenerator2.default.wrap(function _callee7$(_context7) {
+                return _regenerator2.default.wrap(function _callee8$(_context8) {
                     while (1) {
-                        switch (_context7.prev = _context7.next) {
+                        switch (_context8.prev = _context8.next) {
                             case 0:
                                 botMenuItems = buildBotMenuItems(this.state.botNum);
                                 fileMenuItems = buildFileMenuItems(0);
 
                                 this.setState({ botMenuItems: botMenuItems, fileMenuItems: fileMenuItems });
-                                _context7.next = 5;
+                                _context8.next = 5;
                                 return this.init();
 
                             case 5:
                             case 'end':
-                                return _context7.stop();
+                                return _context8.stop();
                         }
                     }
-                }, _callee7, this);
+                }, _callee8, this);
             }));
 
             function componentDidMount() {
-                return _ref8.apply(this, arguments);
+                return _ref9.apply(this, arguments);
             }
 
             return componentDidMount;
@@ -66159,6 +66187,266 @@ function isJson(str) {
     }
     return true;
 }
+
+/***/ }),
+/* 619 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
+* loglevel - https://github.com/pimterry/loglevel
+*
+* Copyright (c) 2013 Tim Perry
+* Licensed under the MIT license.
+*/
+(function (root, definition) {
+    "use strict";
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_FACTORY__ = (definition),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
+				__WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    } else if (typeof module === 'object' && module.exports) {
+        module.exports = definition();
+    } else {
+        root.log = definition();
+    }
+}(this, function () {
+    "use strict";
+
+    // Slightly dubious tricks to cut down minimized file size
+    var noop = function() {};
+    var undefinedType = "undefined";
+
+    var logMethods = [
+        "trace",
+        "debug",
+        "info",
+        "warn",
+        "error"
+    ];
+
+    // Cross-browser bind equivalent that works at least back to IE6
+    function bindMethod(obj, methodName) {
+        var method = obj[methodName];
+        if (typeof method.bind === 'function') {
+            return method.bind(obj);
+        } else {
+            try {
+                return Function.prototype.bind.call(method, obj);
+            } catch (e) {
+                // Missing bind shim or IE8 + Modernizr, fallback to wrapping
+                return function() {
+                    return Function.prototype.apply.apply(method, [obj, arguments]);
+                };
+            }
+        }
+    }
+
+    // Build the best logging method possible for this env
+    // Wherever possible we want to bind, not wrap, to preserve stack traces
+    function realMethod(methodName) {
+        if (methodName === 'debug') {
+            methodName = 'log';
+        }
+
+        if (typeof console === undefinedType) {
+            return false; // No method possible, for now - fixed later by enableLoggingWhenConsoleArrives
+        } else if (console[methodName] !== undefined) {
+            return bindMethod(console, methodName);
+        } else if (console.log !== undefined) {
+            return bindMethod(console, 'log');
+        } else {
+            return noop;
+        }
+    }
+
+    // These private functions always need `this` to be set properly
+
+    function replaceLoggingMethods(level, loggerName) {
+        /*jshint validthis:true */
+        for (var i = 0; i < logMethods.length; i++) {
+            var methodName = logMethods[i];
+            this[methodName] = (i < level) ?
+                noop :
+                this.methodFactory(methodName, level, loggerName);
+        }
+
+        // Define log.log as an alias for log.debug
+        this.log = this.debug;
+    }
+
+    // In old IE versions, the console isn't present until you first open it.
+    // We build realMethod() replacements here that regenerate logging methods
+    function enableLoggingWhenConsoleArrives(methodName, level, loggerName) {
+        return function () {
+            if (typeof console !== undefinedType) {
+                replaceLoggingMethods.call(this, level, loggerName);
+                this[methodName].apply(this, arguments);
+            }
+        };
+    }
+
+    // By default, we use closely bound real methods wherever possible, and
+    // otherwise we wait for a console to appear, and then try again.
+    function defaultMethodFactory(methodName, level, loggerName) {
+        /*jshint validthis:true */
+        return realMethod(methodName) ||
+               enableLoggingWhenConsoleArrives.apply(this, arguments);
+    }
+
+    function Logger(name, defaultLevel, factory) {
+      var self = this;
+      var currentLevel;
+      var storageKey = "loglevel";
+      if (name) {
+        storageKey += ":" + name;
+      }
+
+      function persistLevelIfPossible(levelNum) {
+          var levelName = (logMethods[levelNum] || 'silent').toUpperCase();
+
+          if (typeof window === undefinedType) return;
+
+          // Use localStorage if available
+          try {
+              window.localStorage[storageKey] = levelName;
+              return;
+          } catch (ignore) {}
+
+          // Use session cookie as fallback
+          try {
+              window.document.cookie =
+                encodeURIComponent(storageKey) + "=" + levelName + ";";
+          } catch (ignore) {}
+      }
+
+      function getPersistedLevel() {
+          var storedLevel;
+
+          if (typeof window === undefinedType) return;
+
+          try {
+              storedLevel = window.localStorage[storageKey];
+          } catch (ignore) {}
+
+          // Fallback to cookies if local storage gives us nothing
+          if (typeof storedLevel === undefinedType) {
+              try {
+                  var cookie = window.document.cookie;
+                  var location = cookie.indexOf(
+                      encodeURIComponent(storageKey) + "=");
+                  if (location !== -1) {
+                      storedLevel = /^([^;]+)/.exec(cookie.slice(location))[1];
+                  }
+              } catch (ignore) {}
+          }
+
+          // If the stored level is not valid, treat it as if nothing was stored.
+          if (self.levels[storedLevel] === undefined) {
+              storedLevel = undefined;
+          }
+
+          return storedLevel;
+      }
+
+      /*
+       *
+       * Public logger API - see https://github.com/pimterry/loglevel for details
+       *
+       */
+
+      self.name = name;
+
+      self.levels = { "TRACE": 0, "DEBUG": 1, "INFO": 2, "WARN": 3,
+          "ERROR": 4, "SILENT": 5};
+
+      self.methodFactory = factory || defaultMethodFactory;
+
+      self.getLevel = function () {
+          return currentLevel;
+      };
+
+      self.setLevel = function (level, persist) {
+          if (typeof level === "string" && self.levels[level.toUpperCase()] !== undefined) {
+              level = self.levels[level.toUpperCase()];
+          }
+          if (typeof level === "number" && level >= 0 && level <= self.levels.SILENT) {
+              currentLevel = level;
+              if (persist !== false) {  // defaults to true
+                  persistLevelIfPossible(level);
+              }
+              replaceLoggingMethods.call(self, level, name);
+              if (typeof console === undefinedType && level < self.levels.SILENT) {
+                  return "No console available for logging";
+              }
+          } else {
+              throw "log.setLevel() called with invalid level: " + level;
+          }
+      };
+
+      self.setDefaultLevel = function (level) {
+          if (!getPersistedLevel()) {
+              self.setLevel(level, false);
+          }
+      };
+
+      self.enableAll = function(persist) {
+          self.setLevel(self.levels.TRACE, persist);
+      };
+
+      self.disableAll = function(persist) {
+          self.setLevel(self.levels.SILENT, persist);
+      };
+
+      // Initialize with the right level
+      var initialLevel = getPersistedLevel();
+      if (initialLevel == null) {
+          initialLevel = defaultLevel == null ? "WARN" : defaultLevel;
+      }
+      self.setLevel(initialLevel, false);
+    }
+
+    /*
+     *
+     * Top-level API
+     *
+     */
+
+    var defaultLogger = new Logger();
+
+    var _loggersByName = {};
+    defaultLogger.getLogger = function getLogger(name) {
+        if (typeof name !== "string" || name === "") {
+          throw new TypeError("You must supply a name when creating a logger.");
+        }
+
+        var logger = _loggersByName[name];
+        if (!logger) {
+          logger = _loggersByName[name] = new Logger(
+            name, defaultLogger.getLevel(), defaultLogger.methodFactory);
+        }
+        return logger;
+    };
+
+    // Grab the current global log variable in case of overwrite
+    var _log = (typeof window !== undefinedType) ? window.log : undefined;
+    defaultLogger.noConflict = function() {
+        if (typeof window !== undefinedType &&
+               window.log === defaultLogger) {
+            window.log = _log;
+        }
+
+        return defaultLogger;
+    };
+
+    defaultLogger.getLoggers = function getLoggers() {
+        return _loggersByName;
+    };
+
+    return defaultLogger;
+}));
+
 
 /***/ })
 /******/ ]);
