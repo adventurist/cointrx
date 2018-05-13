@@ -17044,6 +17044,8 @@ var _inherits2 = __webpack_require__(10);
 
 var _inherits3 = _interopRequireDefault(_inherits2);
 
+exports.requestWsForBot = requestWsForBot;
+
 var _react = __webpack_require__(0);
 
 var React = _interopRequireWildcard(_react);
@@ -17420,12 +17422,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 if (Array.isArray(data.body.data)) {
                                     data.body.data.map(function (bot) {
                                         _loglevel2.default.info(bot.message);
-                                        var ws = (0, _utils.requestWs)({
-                                            url: urls.wsStart,
-                                            params: { data: 'test' },
-                                            timeout: 0
-                                        }, _this.msgHandler);
-
+                                        var ws = requestWsForBot(_this.msgHandler);
                                         if (ws) {
                                             botConnections.push({ id: bot.id, ws: ws, number: bot.number });
                                         }
@@ -17507,11 +17504,16 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 };
 
 
-                                selectedBot.ws.send((0, _stringify2.default)(data));
-                                _this.consoleOut('Bot ' + selectedBot.number + ' (' + selectedBot.id + ') has analyzed market data');
-                                if (true) {}
+                                if (!'ws' in selectedBot) {
+                                    selectedBot.ws = requestWsForBot(_this.msgHandler);
+                                    selectedBot.ws.onopen(selectedBot.ws.send((0, _stringify2.default)(data)));
+                                } else {
+                                    selectedBot.ws.send((0, _stringify2.default)(data));
+                                }
 
-                            case 5:
+                                _this.consoleOut('Bot ' + selectedBot.number + ' (' + selectedBot.id + ') has analyzed market data');
+
+                            case 4:
                             case 'end':
                                 return _context7.stop();
                         }
@@ -17537,7 +17539,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                         var bots = message.payload;
                         if (Array.isArray(bots) && bots.length > 0) {
                             bots.map(function (bot) {
-                                return botConnections.push({ id: bot.id, ws: 'none', number: bot.number });
+                                return botConnections.push({ id: bot.id, ws: requestWsForBot(_this.msgHandler), number: bot.number });
                             });
                             _this.onBotsCreate(botConnections.length);
                             _loglevel2.default.info('Bot connections updated');
@@ -17816,6 +17818,16 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
         )
     )
 ), document.getElementById('root'));
+
+function requestWsForBot(handler) {
+    var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'test';
+
+    return (0, _utils.requestWs)({
+        url: urls.wsStart,
+        params: { data: data },
+        timeout: 0
+    }, handler);
+}
 
 /***/ }),
 /* 273 */
