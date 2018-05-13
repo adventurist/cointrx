@@ -16,9 +16,11 @@ import TrendingUp from 'material-ui/svg-icons/action/trending-up';
 import CompareArrows from 'material-ui/svg-icons/action/compare-arrows';
 import AutoRenew from 'material-ui/svg-icons/action/autorenew'
 import PowerSettingsNew from 'material-ui/svg-icons/action/power-settings-new'
+import CallEnd from 'material-ui/svg-icons/communication/call-end'
 import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
 import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
+import Chip from 'material-ui/Chip';
 import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
 import log from 'loglevel'
 // import trx from '../redux'
@@ -112,11 +114,12 @@ export class TrxLayout extends React.Component {
             files: [],
             selectedBot: -1,
             botMenuItems: buildBotMenuItems(this.state.botNum),
-            fileMenuItems: buildFileMenuItems(3),
+            fileMenuItems: buildFileMenuItems(0),
             consoleText: '',
             market: undefined,
             timePeriod: '60',
-            selectedFile: -1
+            selectedFile: -1,
+            dataReady: false
         }
     }
 
@@ -129,7 +132,7 @@ export class TrxLayout extends React.Component {
     async componentDidMount() {
         let botMenuItems = buildBotMenuItems(this.state.botNum)
         let fileMenuItems = buildFileMenuItems(0)
-        this.setState({botMenuItems: botMenuItems, fileMenuItems: fileMenuItems})
+        this.setState({botMenuItems: botMenuItems, fileMenuItems: fileMenuItems, selectedBot: -1})
         await this.init()
     }
 
@@ -256,7 +259,7 @@ export class TrxLayout extends React.Component {
                     log.info(bot.message)
                     const ws = requestWsForBot(this.msgHandler)
                     if (ws) {
-                        botConnections.push({id: bot.id, ws: ws, number: bot.number})
+                        botConnections.push({id: bot.id, ws: ws, number: bot.number, dataReady: false})
                     }
                 })
                 let currentBotNumber = botConnections.length
@@ -285,6 +288,8 @@ export class TrxLayout extends React.Component {
         const response = handleResponse(data)
         log.info(response)
         if (!response.error) {
+            botConnections[this.state.selectedBot].dataReady = true
+            this.setState({dataReady: true})
             this.consoleOut(`${selectedBot} has loaded market data`)
         }
     }
@@ -324,7 +329,7 @@ export class TrxLayout extends React.Component {
                 case 'updatebots':
                     const bots = message.payload
                     if (Array.isArray(bots) && bots.length > 0) {
-                        bots.map( bot => botConnections.push({id: bot.id, ws: requestWsForBot(this.msgHandler), number: bot.number}) )
+                        bots.map( bot => botConnections.push({id: bot.id, ws: requestWsForBot(this.msgHandler), number: bot.number, dataReady: false}) )
                         this.onBotsCreate(botConnections.length)
                         log.info('Bot connections updated')
                     }
@@ -355,12 +360,15 @@ export class TrxLayout extends React.Component {
         this.state.files.push(file)
         const fileMenuItems = buildFileMenuItems(this.state.files)
         this.setState({fileMenuItems: fileMenuItems})
+        if (this.state.selectedFile === -1) {
+            this.setState({selectedFile: 0})
+        }
     }
 
     handleFileSelect = (event, index, value) => {
         const file = this.state.files[value]
         log.info('File Selection:', file)
-        this.setState({selectedFile: file})
+        this.setState({selectedFile: value})
         this.consoleOut(`Opening ${file.filename}`)
         window.open(`${window.location.origin + file.url}`, '_blank')
     }
@@ -456,6 +464,32 @@ export class TrxLayout extends React.Component {
                 </DropDownMenu>
                 </div>
             </Card>
+            <Card>
+                <CardTitle title="Bot Detail" subtitle={botConnections[this.state.selectedBot] !== void 0 && 'id' in botConnections[this.state.selectedBot] ?
+                    botConnections[this.state.selectedBot].id : 'None selected'}/>
+                <CardText>
+                    Bot Controls
+                </CardText>
+                <Chip
+                    id="data-ready"
+                    class={this.state.dataReady ? "data-ready-show" : "data-ready-hidden"}
+                    backgroundColor={blue300}
+                    style={styles.chip}
+                >
+                    <Avatar size={32} color={orange500} backgroundColor="#4fb6e1" >
+                        Data ready
+                    </Avatar>
+
+                </Chip>
+                <FlatButton
+                    label="Close"
+                    labelPosition="before"
+                    onClick={this.closeBotConnection}
+                    primary={false}
+                    icon={<CallEnd/>}
+                />
+
+            </Card>
         </Panel>
     </Layout>
 </div>
@@ -464,6 +498,7 @@ export class TrxLayout extends React.Component {
 
     handleBotSelect = (event, index, value) => {
         this.setState({selectedBot: value})
+        this.setState({dataReady: botConnections[this.state.selectedBot].dataReady})
         this.consoleOut(`Bot ${value + 1} selected`)
     }
 
