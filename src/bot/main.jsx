@@ -254,12 +254,7 @@ export class TrxLayout extends React.Component {
             if (Array.isArray(data.body.data)) {
                 data.body.data.map(bot => {
                     log.info(bot.message)
-                    const ws = requestWs({
-                        url: urls.wsStart,
-                        params: {data: 'test'},
-                        timeout: 0
-                    }, this.msgHandler)
-
+                    const ws = requestWsForBot(this.msgHandler)
                     if (ws) {
                         botConnections.push({id: bot.id, ws: ws, number: bot.number})
                     }
@@ -305,11 +300,14 @@ export class TrxLayout extends React.Component {
             type: 'request'
         }
 
-        selectedBot.ws.send(JSON.stringify(data))
-        this.consoleOut(`Bot ${selectedBot.number} (${selectedBot.id}) has analyzed market data`)
-        if (true) {
-
+        if (!'ws' in selectedBot) {
+            selectedBot.ws = requestWsForBot(this.msgHandler)
+            selectedBot.ws.onopen(selectedBot.ws.send(JSON.stringify(data)))
+        } else {
+            selectedBot.ws.send(JSON.stringify(data))
         }
+
+        this.consoleOut(`Bot ${selectedBot.number} (${selectedBot.id}) has analyzed market data`)
     }
 
     /**
@@ -326,7 +324,7 @@ export class TrxLayout extends React.Component {
                 case 'updatebots':
                     const bots = message.payload
                     if (Array.isArray(bots) && bots.length > 0) {
-                        bots.map( bot => botConnections.push({id: bot.id, ws: 'none', number: bot.number}) )
+                        bots.map( bot => botConnections.push({id: bot.id, ws: requestWsForBot(this.msgHandler), number: bot.number}) )
                         this.onBotsCreate(botConnections.length)
                         log.info('Bot connections updated')
                     }
@@ -490,3 +488,11 @@ render(
     </MuiThemeProvider>
     , document.getElementById('root')
 )
+
+export function requestWsForBot (handler, data = 'test') {
+    return requestWs({
+        url: urls.wsStart,
+        params: {data: data},
+        timeout: 0
+    }, handler)
+}
