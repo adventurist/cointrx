@@ -44,3 +44,15 @@
     text-align: right;
     display: inline-block;
 }
+
+#data-ready > span > div {
+    font-size: 12px!important;
+}
+
+.data-ready-hidden {
+    display: none!important;
+}
+
+.data-ready-show {
+    display: flex!important;
+}
