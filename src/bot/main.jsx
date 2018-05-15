@@ -1,26 +1,28 @@
 import * as React from 'react'
 import { render }from 'react-dom'
-import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import { TrxNav } from '../TrxAppBar.jsx'
 import { Layout, Panel } from 'react-toolbox'
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
-import TextField from 'material-ui/TextField';
-import {orange500} from 'material-ui/styles/colors';
-import NumericInput from 'react-numeric-input';
-import DropDownMenu from 'material-ui/DropDownMenu';
-import MenuItem from 'material-ui/MenuItem';
-import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
-import TrendingUp from 'material-ui/svg-icons/action/trending-up';
-import CompareArrows from 'material-ui/svg-icons/action/compare-arrows';
+import {Card, CardActions, CardTitle, CardText} from 'material-ui/Card'
+import TextField from 'material-ui/TextField'
+import {orange500, red500} from 'material-ui/styles/colors'
+import NumericInput from 'react-numeric-input'
+import DropDownMenu from 'material-ui/DropDownMenu'
+import MenuItem from 'material-ui/MenuItem'
+import Avatar from 'material-ui/Avatar'
+import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton'
+import TrendingUp from 'material-ui/svg-icons/action/trending-up'
+import CompareArrows from 'material-ui/svg-icons/action/compare-arrows'
 import AutoRenew from 'material-ui/svg-icons/action/autorenew'
 import PowerSettingsNew from 'material-ui/svg-icons/action/power-settings-new'
 import CallEnd from 'material-ui/svg-icons/communication/call-end'
 import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
 import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
-import Chip from 'material-ui/Chip';
+import Chip from 'material-ui/Chip'
+import DoneIcon from 'material-ui/svg-icons/action/done'
 import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
 import log from 'loglevel'
 // import trx from '../redux'
@@ -36,6 +38,15 @@ import log from 'loglevel'
 const urls = JSON.parse(botUrls.replace(/'/g, '"'))
 
 const styles = {
+    chip: {
+        float: 'right',
+        marginRight: '1em',
+        transform: 'translateY(-2.5em)',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        width: '4%',
+        height: '13px'
+    },
     console: {
         position: 'static',
         width: '100%',
@@ -88,7 +99,7 @@ const container = {}
 
 const buildBotMenuItems = (length) => {
     const items = [];
-    items.push(<MenuItem value={'All'} key={-1} primaryText={`All`} />);
+    items.push(<MenuItem value={-1} key={-1} primaryText={`All`} />);
     for (let i = 0; i < length; i++ ) {
         items.push(<MenuItem value={i} key={i} primaryText={`Bot ${i + 1}`} />);
     }
@@ -113,7 +124,7 @@ export class TrxLayout extends React.Component {
             botNum: 1,
             files: [],
             selectedBot: -1,
-            botMenuItems: buildBotMenuItems(this.state.botNum),
+            botMenuItems: buildBotMenuItems(0),
             fileMenuItems: buildFileMenuItems(0),
             consoleText: '',
             market: undefined,
@@ -130,7 +141,7 @@ export class TrxLayout extends React.Component {
     };
 
     async componentDidMount() {
-        let botMenuItems = buildBotMenuItems(this.state.botNum)
+        let botMenuItems = buildBotMenuItems(0)
         let fileMenuItems = buildFileMenuItems(0)
         this.setState({botMenuItems: botMenuItems, fileMenuItems: fileMenuItems, selectedBot: -1})
         await this.init()
@@ -178,8 +189,7 @@ export class TrxLayout extends React.Component {
 
     botNumberChange = (event, value) => {
         // TODO this can't be right
-        const newItems = buildBotMenuItems(container.bots.length + value)
-        this.setState({botNum: value, botMenuItems: newItems})
+        this.setState({botNum: value})
         this.consoleOut(`Number of bots to be built: ${value}`)
     }
 
@@ -209,7 +219,7 @@ export class TrxLayout extends React.Component {
                 const response = await this.sendWsRequest('fetchBots')
                 if (response) {
                     container.bots = botConnections
-                    this.botNumberChange(undefined, container.bots.length)
+                    this.onBotsCreate(container.bots.length)
                 }
             }
         }
@@ -288,6 +298,7 @@ export class TrxLayout extends React.Component {
         const response = handleResponse(data)
         log.info(response)
         if (!response.error) {
+            const bot = botConnections[this.state.selectedBot]
             botConnections[this.state.selectedBot].dataReady = true
             this.setState({dataReady: true})
             this.consoleOut(`${selectedBot} has loaded market data`)
@@ -473,21 +484,19 @@ export class TrxLayout extends React.Component {
                 <Chip
                     id="data-ready"
                     class={this.state.dataReady ? "data-ready-show" : "data-ready-hidden"}
-                    backgroundColor={blue300}
+                    backgroundColor={red500}
                     style={styles.chip}
-                >
-                    <Avatar size={32} color={orange500} backgroundColor="#4fb6e1" >
+                    deleteIconStyle={{ width: 5, height: 5, fontSize: 5 }}>
+                    <Avatar size={2} color={red500} backgroundColor={red500} style={{fontSize: '12px', fontWeight: 700}}>
                         Data ready
                     </Avatar>
-
                 </Chip>
                 <FlatButton
                     label="Close"
                     labelPosition="before"
                     onClick={this.closeBotConnection}
                     primary={false}
-                    icon={<CallEnd/>}
-                />
+                    icon={<CallEnd/>} />
 
             </Card>
         </Panel>
@@ -497,8 +506,9 @@ export class TrxLayout extends React.Component {
     }
 
     handleBotSelect = (event, index, value) => {
+        const dataReady = value !== -1 ? botConnections[value].dataReady : allDataReady()
         this.setState({selectedBot: value})
-        this.setState({dataReady: botConnections[this.state.selectedBot].dataReady})
+        this.setState({dataReady: dataReady})
         this.consoleOut(`Bot ${value + 1} selected`)
     }
 
@@ -530,4 +540,8 @@ export function requestWsForBot (handler, data = 'test') {
         params: {data: data},
         timeout: 0
     }, handler)
+}
+
+function allDataReady() {
+    return botConnections.filter(bot => bot.dataReady).length === botConnections.length
 }
