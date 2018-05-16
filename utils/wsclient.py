@@ -203,7 +203,8 @@ class Bot(object):
                 elif close_to_min(row, self.trc_struct.min, self.trc_struct.max_offset) and len(
                         [x for x in self.trc_struct.base if x['idx'] == i]) == 0:
                     self.trc_struct.base.append({'value': row['high'], 'idx': i, 'date': row['date']})
-
+                # TODO - These are not accurate -> last max was likely limited by potential period. Need to re-evaluate the design of the algorithm
+                # TODO - to consolidate the balance of time period vs value significance
                 if self.is_first_low(row, i):
                     continue
                 if self.is_first_high(row, i):
