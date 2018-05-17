@@ -19,6 +19,7 @@ import AutoRenew from 'material-ui/svg-icons/action/autorenew'
 import PowerSettingsNew from 'material-ui/svg-icons/action/power-settings-new'
 import CallEnd from 'material-ui/svg-icons/communication/call-end'
 import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
+import Sync from 'material-ui/svg-icons/notification/sync'
 import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
 import Chip from 'material-ui/Chip'
@@ -29,12 +30,6 @@ import log from 'loglevel'
 
 // const trxInstance = trx()
 
-// const urls = {
-//     botStart: 'http://localhost:6969/bot/start',
-//     botTrcPrices: 'http://localhost:6969/bot/trc/prices/all',
-//     botTrcAnalyze: 'http://localhost:6969/bot/trc/prices/analyze',
-//     wsStart: 'ws://localhost:6969/bot/ws-test'
-// }
 const urls = JSON.parse(botUrls.replace(/'/g, '"'))
 
 const styles = {
@@ -99,18 +94,19 @@ const container = {}
 
 const buildBotMenuItems = (length) => {
     const items = [];
-    items.push(<MenuItem value={-1} key={-1} primaryText={`All`} />);
+    items.push(<MenuItem value={undefined} key={undefined} primaryText={`Select bot`} />)
     for (let i = 0; i < length; i++ ) {
-        items.push(<MenuItem value={i} key={i} primaryText={`Bot ${i + 1}`} />);
+        items.push(<MenuItem value={i} key={i} primaryText={`Bot ${i + 1}`} />)
     }
+    items.push(<MenuItem value={-1} key={-1} primaryText={`All`} />)
     return items
 }
 
 const buildFileMenuItems = (files) => {
     const items = []
+    items.push(<MenuItem value={undefined} key={undefined} primaryText={`Select file`} />)
     for ( let i = 0; i < files.length; i++) {
-        items.push(<MenuItem value={i} key={i} primaryText={`File ${i + 1}`}>{files[i].url}</MenuItem>);
-
+        items.push(<MenuItem value={i} key={i} primaryText={`File ${i + 1}`}>{files[i].url}</MenuItem>)
     }
     return items
 }
@@ -123,13 +119,13 @@ export class TrxLayout extends React.Component {
             open: false,
             botNum: 1,
             files: [],
-            selectedBot: -1,
+            selectedBot: undefined,
             botMenuItems: buildBotMenuItems(0),
             fileMenuItems: buildFileMenuItems(0),
             consoleText: '',
             market: undefined,
             timePeriod: '60',
-            selectedFile: -1,
+            selectedFile: undefined,
             dataReady: false
         }
     }
@@ -143,7 +139,7 @@ export class TrxLayout extends React.Component {
     async componentDidMount() {
         let botMenuItems = buildBotMenuItems(0)
         let fileMenuItems = buildFileMenuItems(0)
-        this.setState({botMenuItems: botMenuItems, fileMenuItems: fileMenuItems, selectedBot: -1})
+        this.setState({botMenuItems: botMenuItems, fileMenuItems: fileMenuItems})
         await this.init()
     }
 
@@ -371,17 +367,19 @@ export class TrxLayout extends React.Component {
         this.state.files.push(file)
         const fileMenuItems = buildFileMenuItems(this.state.files)
         this.setState({fileMenuItems: fileMenuItems})
-        if (this.state.selectedFile === -1) {
+        if (this.state.selectedFile) {
             this.setState({selectedFile: 0})
         }
     }
 
     handleFileSelect = (event, index, value) => {
-        const file = this.state.files[value]
-        log.info('File Selection:', file)
-        this.setState({selectedFile: value})
-        this.consoleOut(`Opening ${file.filename}`)
-        window.open(`${window.location.origin + file.url}`, '_blank')
+        if (value) {
+            const file = this.state.files[value]
+            log.info('File Selection:', file)
+            this.setState({selectedFile: value})
+            this.consoleOut(`Opening ${file.filename}`)
+            window.open(`${window.location.origin + file.url}`, '_blank')
+        }
     }
 
     render() {
@@ -469,7 +467,7 @@ export class TrxLayout extends React.Component {
                     primary={false}
                     icon={<PlayCircle />}
                 />
-                <div id="visualizations"><h3>Visualizations</h3>
+                <div id="visualizations" style={{padding: '16px'}}><h3>Visualizations</h3>
                 <DropDownMenu id="file-select" style={styles.botSelect} maxHeight={300} value={this.state.selectedFile} onChange={this.handleFileSelect}>
                     {this.state.fileMenuItems}
                 </DropDownMenu>
@@ -496,8 +494,20 @@ export class TrxLayout extends React.Component {
                     labelPosition="before"
                     onClick={this.closeBotConnection}
                     primary={false}
-                    icon={<CallEnd/>} />
-
+                    icon={<CallEnd />} />
+                <FlatButton
+                    label="Reconnect"
+                    labelPosition="before"
+                    onClick={this.reconnectBot}
+                    primary={false}
+                    icon={<Sync />} />
+                <RaisedButton
+                    label="Trade"
+                    labelPosition="before"
+                    onClick={this.performTrade}
+                    primary={false}
+                    checkedIcon={<TrendingUp style={{color: '#F44336'}} />}
+                />
             </Card>
         </Panel>
     </Layout>

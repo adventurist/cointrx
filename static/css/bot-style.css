@@ -21,8 +21,23 @@
     font-family: Roboto, "Open Sans", sans-serif !important;
 }
 
+#bot-select, #file-select {
+    width: 100%!important;
+    padding: 16px!important;
+    position: static;
+    margin-bottom: 10%;
+}
+
+#bot-select div, #file-select div {
+    overflow: visible!important;
+}
+
 #console, #bot-panel, #analysis-panel {
     padding: 8px;
+}
+
+#console div {
+    overflow: visible!important;
 }
 
 #TrxAppBar, #main-wrap header {
