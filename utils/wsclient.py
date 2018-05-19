@@ -197,6 +197,7 @@ class Bot(object):
 
             for i, row in enumerate(self.trc_struct.entries):
                 # Add to Peak and Base if value is similar, proximate and has not yet been added
+                self.logger.debug('Iterating over %s' % row['date'])
                 if close_to_max(row, self.trc_struct.max, self.trc_struct.max_offset) and len(
                         [x for x in self.trc_struct.peak if x['idx'] == i]) == 0:
                     self.trc_struct.peak.append({'value': row['high'], 'idx': i, 'date': row['date']})
