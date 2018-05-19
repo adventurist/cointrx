@@ -53,13 +53,14 @@ class Client(object):
 
     async def keep_alive(self):
         if self.ws is None:
-            await self.connect('http://localhost:9977/')
-        else:
             self.ws.write_message("Keep alive with id: " + str(self.id))
+        #     await self.connect('http://localhost:9977/')
+        # else:
 
     def close_connection(self):
         if self.ws is not None:
             self.ws.close()
+
 
 
 class Bot(object):
@@ -115,7 +116,7 @@ class Bot(object):
                                                                 as_unixtime(self.trc_struct.entries[len(
                                                                     self.trc_struct.entries) - 1]['date']))[0]):
             # Only replace with more recent if value is more than 10% lower
-            if more_than_3_percent_lower(r['high'], self.trc_struct.f_low['value'], self.trc_struct.max_offset):
+            if more_than_5_percent_lower(r['high'], self.trc_struct.f_low['value'], self.trc_struct.max_offset):
                 self.trc_struct.f_low['value'] = Decimal(r['high'])
                 self.trc_struct.f_low['idx'] = idx
                 return True
@@ -126,7 +127,7 @@ class Bot(object):
                                                                     self.trc_struct.entries) - 1]['date']))[0]):
             # Only avoid replacing with more recent if previous value is more than 10% higher
             if (is_higher(r['high'], self.trc_struct.f_low['value'])) and (
-                        is_higher(r['high'], self.trc_struct.f_high['value']) or is_within_3_percent_under(r['high'],
+                        is_higher(r['high'], self.trc_struct.f_high['value']) or is_within_5_percent_under(r['high'],
                                                                                                            self.trc_struct.f_high[
                                                                                                                'value'],
                                                                                                            self.trc_struct.max_offset)):
@@ -138,7 +139,7 @@ class Bot(object):
         if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
                                                                as_unixtime(self.trc_struct.entries[len(
                                                                        self.trc_struct.entries) - 1]['date']))[1]):
-            if not (more_than_3_percent_higher(r['high'], self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
+            if not (more_than_5_percent_higher(r['high'], self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
                 self.trc_struct.l_low['value'] = Decimal(r['high'])
                 self.trc_struct.l_low['idx'] = idx
                 return True
@@ -147,7 +148,7 @@ class Bot(object):
         if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
                                                                as_unixtime(self.trc_struct.entries[len(
                                                                        self.trc_struct.entries) - 1]['date']))[1]):
-            if not (more_than_3_percent_lower(r['high'], self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
+            if not (more_than_5_percent_lower(r['high'], self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
                 self.trc_struct.l_high['value'] = Decimal(r['high'])
                 self.trc_struct.l_high['idx'] = idx
                 return True
@@ -319,23 +320,23 @@ def is_higher(a, b):
     return Decimal(a) > Decimal(b)
 
 
-def is_within_3_percent_over(a, b, max_offset):
-    margin_of_offset = max_offset * Decimal(0.03)
+def is_within_5_percent_over(a, b, max_offset):
+    margin_of_offset = max_offset * Decimal(0.05)
     return Decimal(b) < Decimal(a) < Decimal(b) * (Decimal(1) + margin_of_offset)
 
 
-def is_within_3_percent_under(a, b, max_offset):
-    margin_of_offset = max_offset * Decimal(0.03)
+def is_within_5_percent_under(a, b, max_offset):
+    margin_of_offset = max_offset * Decimal(0.05)
     return Decimal(b) > Decimal(a) > Decimal(b) * (Decimal(1) - margin_of_offset)
 
 
-def more_than_3_percent_higher(a, b, max_offset):
-    margin_of_offset = max_offset * Decimal(0.03)
+def more_than_5_percent_higher(a, b, max_offset):
+    margin_of_offset = max_offset * Decimal(0.05)
     return Decimal(a) > Decimal(b) and Decimal(a) > Decimal(b) * (Decimal(1) + margin_of_offset)
 
 
-def more_than_3_percent_lower(a, b, max_offset):
-    margin_of_offset = max_offset * Decimal(0.03)
+def more_than_5_percent_lower(a, b, max_offset):
+    margin_of_offset = max_offset * Decimal(0.05)
     return Decimal(a) < Decimal(b) and Decimal(a) < Decimal(b) * (Decimal(1) - margin_of_offset)
 
 
