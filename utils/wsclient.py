@@ -201,7 +201,7 @@ class Bot(object):
                 if close_to_max(row, self.trc_struct.max, self.trc_struct.max_offset) and len(
                         [x for x in self.trc_struct.peak if x['idx'] == i]) == 0:
                     self.trc_struct.peak.append({'value': row['high'], 'idx': i, 'date': row['date']})
-                    self.logger.debug('Added to peak', row['high'], row['date'])
+                    self.logger.debug('Added to peak', str(row['high']), str(row['date']))
 
                 elif close_to_min(row, self.trc_struct.min, self.trc_struct.max_offset) and len(
                         [x for x in self.trc_struct.base if x['idx'] == i]) == 0:
