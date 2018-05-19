@@ -17,7 +17,6 @@ import logging
 import os
 import json
 
-
 from bokeh.plotting import figure, output_file, ColumnDataSource, save
 from bokeh.models import HoverTool
 
@@ -243,7 +242,7 @@ class BotWsStartHandler(WebSocketHandler):
             # TODO Handle this internally and send a TRX response
             self.write_message(response)
 
-        return_message = {'keepAlive': 1, 'message': 'Back at you, punk', 'botConnections': len(application.bots)}
+        return_message = {'keepAlive': 1, 'message': 'Back at you, punk', 'botConnections': len(self.application.bots)}
         self.write_message(json.dumps(return_message))
 
     def open(self):
@@ -258,6 +257,7 @@ async def handle_ws_request(type, data):
     :param data:
     :return dict:
     """
+
     async def analyze_market(url, data):
         """
         Request that bot with ID perform a technical analysis
@@ -265,6 +265,7 @@ async def handle_ws_request(type, data):
         request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
         if hasattr(request_result, 'body'):
             return {'action': 'addfile', 'payload': json.loads(str(request_result.body, 'utf-8'))}
+
     async def fetch_bots(type, data):
         """
         Retrieve info on all active bots
@@ -272,17 +273,19 @@ async def handle_ws_request(type, data):
         request_result = await http_client.get('http://localhost:9977/bots/fetch')
         if hasattr(request_result, 'body'):
             return {'action': 'updatebots', 'payload': json.loads(str(request_result.body, 'utf-8'))}
+
     async def close_bot_connections(type, data):
         """
         Close all bot connections
         """
         try:
             application.close_bot_connections()
-            return {'action': 'noaction', 'payload': {'request': 'close bot connections', 'result': 1}}
+            return {'action': 'killbots', 'payload': {'request': 'close bot connections', 'result': 1}}
         except HTTPError as e:
             e.log_message = 'Unable to close bot connections'
             e.status_code = 500
             return {'action': 'noaction', 'payload': {'request': 'close bot connections', 'result': 0, 'error': e}}
+
     async def close_bot_connection(type, data):
         """
         Close connection for bot with ID
@@ -294,6 +297,7 @@ async def handle_ws_request(type, data):
                 e.log_message = 'Unable to close bot connection for bot with id %s' % data['id']
                 e.status_code = 500
                 return {'action': 'noaction', 'payload': {'request': 'close bot connections', 'result': 0, 'error': e}}
+
     switch = {
         'request': analyze_market,
         'bots:all': fetch_bots,
@@ -363,12 +367,15 @@ class BotApplication(Application):
     def close_bot_connections(self):
         if active_bots(self.bots):
             map(lambda x: x.close_connection, self.bots)
+            del self.bots
+            self.bots = []
 
     def close_bot_connection(self, bot_id):
         if active_bots(self.bots):
             bot = self.retrieve_bot_by_id(bot_id)
             if bot is not None:
                 bot.close_connection()
+                del bot
 
 
 def active_bots(bots: list):
