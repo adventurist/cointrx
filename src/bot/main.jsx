@@ -20,6 +20,7 @@ import PowerSettingsNew from 'material-ui/svg-icons/action/power-settings-new'
 import CallEnd from 'material-ui/svg-icons/communication/call-end'
 import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
 import Sync from 'material-ui/svg-icons/notification/sync'
+import BotsOff from 'material-ui/svg-icons/file/cloud-off'
 import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
 import Chip from 'material-ui/Chip'
@@ -111,6 +112,35 @@ const buildFileMenuItems = (files) => {
     return items
 }
 
+export class BotButtons extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+
+        }
+    }
+
+    render () {
+        return (
+            <div id="start-button">
+                <FlatButton
+                    label="Start Bots"
+                    labelPosition="before"
+                    onClick={this.props.start}
+                    primary={false}
+                    icon={<PowerSettingsNew/>}
+                />
+                <FlatButton
+                    label="Kill Bots"
+                    labelPosition="before"
+                    onClick={this.props.kill}
+                    primary={false}
+                    icon={<BotsOff />}
+                />
+            </div>
+        )
+    }
+}
 export class TrxLayout extends React.Component {
 
     constructor(props) {
@@ -201,15 +231,15 @@ export class TrxLayout extends React.Component {
     }
 
     init = async () => {
-        container.conn = await requestWs({
+        container.ws = await requestWs({
             url: urls.wsStart,
             params: {
                 data: JSON.stringify({timestamp: Date.now()})
             },
             timeout: 0
         }, this.msgHandler)
-        if (container.conn) {
-            container.conn.onopen = async () => {
+        if (container.ws) {
+            container.ws.onopen = async () => {
                 log.info('Primary channel open')
                 log.info('Fetching bots')
                 const response = await this.sendWsRequest('fetchBots')
@@ -225,9 +255,9 @@ export class TrxLayout extends React.Component {
     sendWsRequest = async (request) => {
         switch (request) {
             case 'fetchBots':
-                if (container && 'conn' in container && container.conn) {
+                if (container && 'ws' in container && container.ws) {
                     try {
-                        await this.fetchAvailableBots(container.conn)
+                        await this.fetchAvailableBots(container.ws)
                         return true
                     } catch (err) {
                         log.error(err)
@@ -281,6 +311,16 @@ export class TrxLayout extends React.Component {
         }
     }
 
+    async killBots () {
+        const data = {
+            data: [],
+            type: 'bots:close'
+        }
+        if (sendMessage(container, data)) {
+            log.info('Close bot connections requested')
+        }
+    }
+
     loadMarketData = async (event, index, value) => {
         const selectedBot = botConnections[this.state.selectedBot]
         log.info(event)
@@ -301,7 +341,7 @@ export class TrxLayout extends React.Component {
         }
     }
 
-    analyzeMarketData = async (value) => {
+    analyzeMarketData = async () => {
         const selectedBot = botConnections[this.state.selectedBot]
 
         const data = {
@@ -312,14 +352,9 @@ export class TrxLayout extends React.Component {
             type: 'request'
         }
 
-        if (!'ws' in selectedBot) {
-            selectedBot.ws = requestWsForBot(this.msgHandler)
-            selectedBot.ws.onopen(selectedBot.ws.send(JSON.stringify(data)))
-        } else {
-            selectedBot.ws.send(JSON.stringify(data))
+        if (sendMessage(selectedBot, data)) {
+            this.consoleOut(`Bot ${selectedBot.number} (${selectedBot.id}) has analyzed market data`)
         }
-
-        this.consoleOut(`Bot ${selectedBot.number} (${selectedBot.id}) has analyzed market data`)
     }
 
     /**
@@ -332,15 +367,32 @@ export class TrxLayout extends React.Component {
         }
         if ('action' in message) {
             const action = message.action
+            log.info('ACTION', action)
             switch (action) {
                 case 'updatebots':
                     const bots = message.payload
-                    if (Array.isArray(bots) && bots.length > 0) {
-                        bots.map( bot => botConnections.push({id: bot.id, ws: requestWsForBot(this.msgHandler), number: bot.number, dataReady: false}) )
-                        this.onBotsCreate(botConnections.length)
-                        log.info('Bot connections updated')
+
+                    if (Array.isArray(bots)) {
+                        if (bots.length > 0) {
+                            bots.map(bot => botConnections.push({
+                                id: bot.id,
+                                ws: requestWsForBot(this.msgHandler),
+                                number: bot.number,
+                                dataReady: false
+                            }))
+                            this.onBotsCreate(botConnections.length)
+                            log.info('Bot connections updated')
+                        } else {
+                            log.info('No bots available')
+                            botConnections.map(bot => bot.ws.close())
+                            botConnections.splice(0, botConnections.length)
+                        }
+
                     }
-                    log.info('No bots available')
+                    break
+                case 'killbots':
+                    botConnections.map(bot => bot.ws.close())
+                    botConnections.splice(0, botConnections.length)
                     break
                 case 'addfile':
                     const data = message.payload
@@ -373,7 +425,8 @@ export class TrxLayout extends React.Component {
     }
 
     handleFileSelect = (event, index, value) => {
-        if (value) {
+        console.log('File selection', event, index, value)
+        if (value !== void 0) {
             const file = this.state.files[value]
             log.info('File Selection:', file)
             this.setState({selectedFile: value})
@@ -433,15 +486,7 @@ export class TrxLayout extends React.Component {
                         />
                     </RadioButtonGroup>
                 </div>
-                <div id="start-button">
-                    <FlatButton
-                        label="Start Bots"
-                        labelPosition="before"
-                        onClick={this.startBots}
-                        primary={false}
-                        icon={<PowerSettingsNew/>}
-                    />
-                </div>
+                <BotButtons start={this.startBots} kill={this.killBots} />
             </Card>
         </Panel>
         <Panel id="analysis-panel" className="trx-panel" style={styles.trxPanel}>
@@ -550,6 +595,21 @@ export function requestWsForBot (handler, data = 'test') {
         params: {data: data},
         timeout: 0
     }, handler)
+}
+
+function sendMessage(bot, data) {
+    try {
+        if (!'ws' in bot) {
+            bot.ws = requestWsForBot(this.msgHandler)
+            bot.ws.onopen(bot.ws.send(JSON.stringify(data)))
+        } else {
+            bot.ws.send(JSON.stringify(data))
+        }
+        return true
+    } catch (err) {
+        log.debug(err)
+        return false
+    }
 }
 
 function allDataReady() {
