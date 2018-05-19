@@ -17006,7 +17006,7 @@ exports.default = RadioButton;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.TrxLayout = undefined;
+exports.TrxLayout = exports.BotButtons = undefined;
 
 var _objectWithoutProperties2 = __webpack_require__(12);
 
@@ -17122,25 +17122,29 @@ var _sync = __webpack_require__(616);
 
 var _sync2 = _interopRequireDefault(_sync);
 
-var _FlatButton = __webpack_require__(617);
+var _cloudOff = __webpack_require__(617);
+
+var _cloudOff2 = _interopRequireDefault(_cloudOff);
+
+var _FlatButton = __webpack_require__(618);
 
 var _FlatButton2 = _interopRequireDefault(_FlatButton);
 
-var _RaisedButton = __webpack_require__(619);
+var _RaisedButton = __webpack_require__(620);
 
 var _RaisedButton2 = _interopRequireDefault(_RaisedButton);
 
-var _Chip = __webpack_require__(620);
+var _Chip = __webpack_require__(621);
 
 var _Chip2 = _interopRequireDefault(_Chip);
 
-var _done = __webpack_require__(623);
+var _done = __webpack_require__(624);
 
 var _done2 = _interopRequireDefault(_done);
 
-var _utils = __webpack_require__(624);
+var _utils = __webpack_require__(625);
 
-var _loglevel = __webpack_require__(625);
+var _loglevel = __webpack_require__(626);
 
 var _loglevel2 = _interopRequireDefault(_loglevel);
 
@@ -17237,69 +17241,107 @@ var buildFileMenuItems = function buildFileMenuItems(files) {
     return items;
 };
 
-var TrxLayout = exports.TrxLayout = function (_React$Component) {
-    (0, _inherits3.default)(TrxLayout, _React$Component);
+var BotButtons = exports.BotButtons = function (_React$Component) {
+    (0, _inherits3.default)(BotButtons, _React$Component);
+
+    function BotButtons(props) {
+        (0, _classCallCheck3.default)(this, BotButtons);
+
+        var _this = (0, _possibleConstructorReturn3.default)(this, (BotButtons.__proto__ || (0, _getPrototypeOf2.default)(BotButtons)).call(this, props));
+
+        _this.state = {};
+        return _this;
+    }
+
+    (0, _createClass3.default)(BotButtons, [{
+        key: 'render',
+        value: function render() {
+            return React.createElement(
+                'div',
+                { id: 'start-button' },
+                React.createElement(_FlatButton2.default, {
+                    label: 'Start Bots',
+                    labelPosition: 'before',
+                    onClick: this.props.start,
+                    primary: false,
+                    icon: React.createElement(_powerSettingsNew2.default, null)
+                }),
+                React.createElement(_FlatButton2.default, {
+                    label: 'Kill Bots',
+                    labelPosition: 'before',
+                    onClick: this.props.kill,
+                    primary: false,
+                    icon: React.createElement(_cloudOff2.default, null)
+                })
+            );
+        }
+    }]);
+    return BotButtons;
+}(React.Component);
+
+var TrxLayout = exports.TrxLayout = function (_React$Component2) {
+    (0, _inherits3.default)(TrxLayout, _React$Component2);
 
     function TrxLayout(props) {
-        var _this2 = this;
+        var _this3 = this;
 
         (0, _classCallCheck3.default)(this, TrxLayout);
 
-        var _this = (0, _possibleConstructorReturn3.default)(this, (TrxLayout.__proto__ || (0, _getPrototypeOf2.default)(TrxLayout)).call(this, props));
+        var _this2 = (0, _possibleConstructorReturn3.default)(this, (TrxLayout.__proto__ || (0, _getPrototypeOf2.default)(TrxLayout)).call(this, props));
 
-        _this.state = {
+        _this2.state = {
             drawerActive: false,
             drawerPinned: false,
             sidebarPinned: false
         };
 
-        _this.handleClick = function () {
-            _this.setState({
+        _this2.handleClick = function () {
+            _this2.setState({
                 open: true
             });
         };
 
-        _this.handleRequestClose = function () {
-            _this.setState({
+        _this2.handleRequestClose = function () {
+            _this2.setState({
                 open: false
             });
         };
 
-        _this.toggleDrawerActive = function () {
-            _this.setState({
-                drawerActive: !_this.state.drawerActive
+        _this2.toggleDrawerActive = function () {
+            _this2.setState({
+                drawerActive: !_this2.state.drawerActive
             });
         };
 
-        _this.toggleDrawerPinned = function () {
-            _this.setState({
-                drawerPinned: !_this.state.drawerPinned
+        _this2.toggleDrawerPinned = function () {
+            _this2.setState({
+                drawerPinned: !_this2.state.drawerPinned
             });
         };
 
-        _this.toggleSidebar = function () {
-            _this.setState({
-                sidebarPinned: !_this.state.sidebarPinned
+        _this2.toggleSidebar = function () {
+            _this2.setState({
+                sidebarPinned: !_this2.state.sidebarPinned
             });
         };
 
-        _this.botNumberChange = function (event, value) {
+        _this2.botNumberChange = function (event, value) {
             // TODO this can't be right
-            _this.setState({ botNum: value });
-            _this.consoleOut('Number of bots to be built: ' + value);
+            _this2.setState({ botNum: value });
+            _this2.consoleOut('Number of bots to be built: ' + value);
         };
 
-        _this.onBotsCreate = function (num) {
+        _this2.onBotsCreate = function (num) {
             var newItems = buildBotMenuItems(num);
-            _this.setState({ botMenuItems: newItems });
-            _this.consoleOut(num + ' bots currently connected');
+            _this2.setState({ botMenuItems: newItems });
+            _this2.consoleOut(num + ' bots currently connected');
         };
 
-        _this.handleConsoleChange = function (event, index, value) {
-            _this.setState({ consoleText: value });
+        _this2.handleConsoleChange = function (event, index, value) {
+            _this2.setState({ consoleText: value });
         };
 
-        _this.init = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
+        _this2.init = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
             return _regenerator2.default.wrap(function _callee2$(_context2) {
                 while (1) {
                     switch (_context2.prev = _context2.next) {
@@ -17311,13 +17353,13 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                     data: (0, _stringify2.default)({ timestamp: Date.now() })
                                 },
                                 timeout: 0
-                            }, _this.msgHandler);
+                            }, _this2.msgHandler);
 
                         case 2:
-                            container.conn = _context2.sent;
+                            container.ws = _context2.sent;
 
-                            if (container.conn) {
-                                container.conn.onopen = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+                            if (container.ws) {
+                                container.ws.onopen = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
                                     var response;
                                     return _regenerator2.default.wrap(function _callee$(_context) {
                                         while (1) {
@@ -17326,14 +17368,14 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                                     _loglevel2.default.info('Primary channel open');
                                                     _loglevel2.default.info('Fetching bots');
                                                     _context.next = 4;
-                                                    return _this.sendWsRequest('fetchBots');
+                                                    return _this2.sendWsRequest('fetchBots');
 
                                                 case 4:
                                                     response = _context.sent;
 
                                                     if (response) {
                                                         container.bots = botConnections;
-                                                        _this.onBotsCreate(container.bots.length);
+                                                        _this2.onBotsCreate(container.bots.length);
                                                     }
 
                                                 case 6:
@@ -17341,7 +17383,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                                     return _context.stop();
                                             }
                                         }
-                                    }, _callee, _this2);
+                                    }, _callee, _this3);
                                 }));
                             }
                             window.trx = container;
@@ -17351,10 +17393,10 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                             return _context2.stop();
                     }
                 }
-            }, _callee2, _this2);
+            }, _callee2, _this3);
         }));
 
-        _this.sendWsRequest = function () {
+        _this2.sendWsRequest = function () {
             var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(request) {
                 return _regenerator2.default.wrap(function _callee3$(_context3) {
                     while (1) {
@@ -17365,14 +17407,14 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 break;
 
                             case 3:
-                                if (!(container && 'conn' in container && container.conn)) {
+                                if (!(container && 'ws' in container && container.ws)) {
                                     _context3.next = 14;
                                     break;
                                 }
 
                                 _context3.prev = 4;
                                 _context3.next = 7;
-                                return _this.fetchAvailableBots(container.conn);
+                                return _this2.fetchAvailableBots(container.ws);
 
                             case 7:
                                 return _context3.abrupt('return', true);
@@ -17389,7 +17431,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 return _context3.stop();
                         }
                     }
-                }, _callee3, _this2, [[4, 10]]);
+                }, _callee3, _this3, [[4, 10]]);
             }));
 
             return function (_x) {
@@ -17397,7 +17439,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
             };
         }();
 
-        _this.fetchAvailableBots = function () {
+        _this2.fetchAvailableBots = function () {
             var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(conn) {
                 return _regenerator2.default.wrap(function _callee4$(_context4) {
                     while (1) {
@@ -17410,7 +17452,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 return _context4.stop();
                         }
                     }
-                }, _callee4, _this2);
+                }, _callee4, _this3);
             }));
 
             return function (_x2) {
@@ -17418,7 +17460,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
             };
         }();
 
-        _this.startBots = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5() {
+        _this2.startBots = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5() {
             var data, response, previousBotNumber, currentBotNumber, numDiff, createResult;
             return _regenerator2.default.wrap(function _callee5$(_context5) {
                 while (1) {
@@ -17428,7 +17470,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                             return (0, _utils.request)({
                                 url: urls.start,
                                 method: 'GET',
-                                params: { number: _this.state.botNum },
+                                params: { number: _this2.state.botNum },
                                 credentials: 'include'
                             });
 
@@ -17437,7 +17479,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                             response = (0, _utils.handleResponse)(data);
 
                             if (!response.error) {
-                                _this.consoleOut(_this.state.botNum + ' bots created');
+                                _this2.consoleOut(_this2.state.botNum + ' bots created');
                             }
                             _loglevel2.default.info(response);
                             if ('body' in response && 'data' in response.body) {
@@ -17446,7 +17488,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 if (Array.isArray(data.body.data)) {
                                     data.body.data.map(function (bot) {
                                         _loglevel2.default.info(bot.message);
-                                        var ws = requestWsForBot(_this.msgHandler);
+                                        var ws = requestWsForBot(_this2.msgHandler);
                                         if (ws) {
                                             botConnections.push({ id: bot.id, ws: ws, number: bot.number, dataReady: false });
                                         }
@@ -17459,7 +17501,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                     if (!createResult) {
                                         _loglevel2.default.info('Problem creating the requested number of bots');
                                     }
-                                    _this.onBotsCreate(currentBotNumber);
+                                    _this2.onBotsCreate(currentBotNumber);
                                 }
                             }
 
@@ -17468,24 +17510,24 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                             return _context5.stop();
                     }
                 }
-            }, _callee5, _this2);
+            }, _callee5, _this3);
         }));
 
-        _this.loadMarketData = function () {
+        _this2.loadMarketData = function () {
             var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(event, index, value) {
                 var selectedBot, data, response, bot;
                 return _regenerator2.default.wrap(function _callee6$(_context6) {
                     while (1) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
-                                selectedBot = botConnections[_this.state.selectedBot];
+                                selectedBot = botConnections[_this2.state.selectedBot];
 
                                 _loglevel2.default.info(event);
                                 _context6.next = 4;
                                 return (0, _utils.request)({
                                     url: urls.trc.prices,
                                     headers: { 'Content-Type': 'application/json' },
-                                    params: { bot_id: selectedBot.id, time: _this.state.timePeriod },
+                                    params: { bot_id: selectedBot.id, time: _this2.state.timePeriod },
                                     credentials: 'include'
                                 });
 
@@ -17495,11 +17537,11 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
 
                                 _loglevel2.default.info(response);
                                 if (!response.error) {
-                                    bot = botConnections[_this.state.selectedBot];
+                                    bot = botConnections[_this2.state.selectedBot];
 
-                                    botConnections[_this.state.selectedBot].dataReady = true;
-                                    _this.setState({ dataReady: true });
-                                    _this.consoleOut(selectedBot + ' has loaded market data');
+                                    botConnections[_this2.state.selectedBot].dataReady = true;
+                                    _this2.setState({ dataReady: true });
+                                    _this2.consoleOut(selectedBot + ' has loaded market data');
                                 }
 
                             case 8:
@@ -17507,7 +17549,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                 return _context6.stop();
                         }
                     }
-                }, _callee6, _this2);
+                }, _callee6, _this3);
             }));
 
             return function (_x3, _x4, _x5) {
@@ -17515,46 +17557,35 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
             };
         }();
 
-        _this.analyzeMarketData = function () {
-            var _ref7 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(value) {
-                var selectedBot, data;
-                return _regenerator2.default.wrap(function _callee7$(_context7) {
-                    while (1) {
-                        switch (_context7.prev = _context7.next) {
-                            case 0:
-                                selectedBot = botConnections[_this.state.selectedBot];
-                                data = {
-                                    url: urls.trc.analyze,
-                                    data: {
-                                        bot_id: selectedBot.id, time: _this.state.timePeriod
-                                    },
-                                    type: 'request'
-                                };
+        _this2.analyzeMarketData = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7() {
+            var selectedBot, data;
+            return _regenerator2.default.wrap(function _callee7$(_context7) {
+                while (1) {
+                    switch (_context7.prev = _context7.next) {
+                        case 0:
+                            selectedBot = botConnections[_this2.state.selectedBot];
+                            data = {
+                                url: urls.trc.analyze,
+                                data: {
+                                    bot_id: selectedBot.id, time: _this2.state.timePeriod
+                                },
+                                type: 'request'
+                            };
 
 
-                                if (!'ws' in selectedBot) {
-                                    selectedBot.ws = requestWsForBot(_this.msgHandler);
-                                    selectedBot.ws.onopen(selectedBot.ws.send((0, _stringify2.default)(data)));
-                                } else {
-                                    selectedBot.ws.send((0, _stringify2.default)(data));
-                                }
+                            if (sendMessage(selectedBot, data)) {
+                                _this2.consoleOut('Bot ' + selectedBot.number + ' (' + selectedBot.id + ') has analyzed market data');
+                            }
 
-                                _this.consoleOut('Bot ' + selectedBot.number + ' (' + selectedBot.id + ') has analyzed market data');
-
-                            case 4:
-                            case 'end':
-                                return _context7.stop();
-                        }
+                        case 3:
+                        case 'end':
+                            return _context7.stop();
                     }
-                }, _callee7, _this2);
-            }));
+                }
+            }, _callee7, _this3);
+        }));
 
-            return function (_x6) {
-                return _ref7.apply(this, arguments);
-            };
-        }();
-
-        _this.msgHandler = function (_ref8) {
+        _this2.msgHandler = function (_ref8) {
             var message = (0, _objectWithoutProperties3.default)(_ref8, []);
 
             if ('type' in message) {
@@ -17562,22 +17593,42 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
             }
             if ('action' in message) {
                 var action = message.action;
+                _loglevel2.default.info('ACTION', action);
                 switch (action) {
                     case 'updatebots':
                         var bots = message.payload;
-                        if (Array.isArray(bots) && bots.length > 0) {
-                            bots.map(function (bot) {
-                                return botConnections.push({ id: bot.id, ws: requestWsForBot(_this.msgHandler), number: bot.number, dataReady: false });
-                            });
-                            _this.onBotsCreate(botConnections.length);
-                            _loglevel2.default.info('Bot connections updated');
+
+                        if (Array.isArray(bots)) {
+                            if (bots.length > 0) {
+                                bots.map(function (bot) {
+                                    return botConnections.push({
+                                        id: bot.id,
+                                        ws: requestWsForBot(_this2.msgHandler),
+                                        number: bot.number,
+                                        dataReady: false
+                                    });
+                                });
+                                _this2.onBotsCreate(botConnections.length);
+                                _loglevel2.default.info('Bot connections updated');
+                            } else {
+                                _loglevel2.default.info('No bots available');
+                                botConnections.map(function (bot) {
+                                    return bot.ws.close();
+                                });
+                                botConnections.splice(0, botConnections.length);
+                            }
                         }
-                        _loglevel2.default.info('No bots available');
+                        break;
+                    case 'killbots':
+                        botConnections.map(function (bot) {
+                            return bot.ws.close();
+                        });
+                        botConnections.splice(0, botConnections.length);
                         break;
                     case 'addfile':
                         var data = message.payload;
                         if ('filename' in data) {
-                            _this.updateFileList(data.filename);
+                            _this2.updateFileList(data.filename);
                             _loglevel2.default.info('Updating file list');
                             delete data.filename;
                         }
@@ -17591,35 +17642,36 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
             _loglevel2.default.info('Remaining data to be handled', message);
         };
 
-        _this.handleFileSelect = function (event, index, value) {
-            if (value) {
-                var file = _this.state.files[value];
+        _this2.handleFileSelect = function (event, index, value) {
+            console.log('File selection', event, index, value);
+            if (value !== void 0) {
+                var file = _this2.state.files[value];
                 _loglevel2.default.info('File Selection:', file);
-                _this.setState({ selectedFile: value });
-                _this.consoleOut('Opening ' + file.filename);
+                _this2.setState({ selectedFile: value });
+                _this2.consoleOut('Opening ' + file.filename);
                 window.open('' + (window.location.origin + file.url), '_blank');
             }
         };
 
-        _this.handleBotSelect = function (event, index, value) {
+        _this2.handleBotSelect = function (event, index, value) {
             var dataReady = value !== -1 ? botConnections[value].dataReady : allDataReady();
-            _this.setState({ selectedBot: value });
-            _this.setState({ dataReady: dataReady });
-            _this.consoleOut('Bot ' + (value + 1) + ' selected');
+            _this2.setState({ selectedBot: value });
+            _this2.setState({ dataReady: dataReady });
+            _this2.consoleOut('Bot ' + (value + 1) + ' selected');
         };
 
-        _this.handleMarketSelect = function (event, value) {
-            _this.setState({ market: value });
-            _this.consoleOut('Market set to ' + value);
+        _this2.handleMarketSelect = function (event, value) {
+            _this2.setState({ market: value });
+            _this2.consoleOut('Market set to ' + value);
         };
 
-        _this.updateState = function (key, value) {
-            _this.setState({
+        _this2.updateState = function (key, value) {
+            _this2.setState({
                 key: value
             });
         };
 
-        _this.state = {
+        _this2.state = {
             open: false,
             botNum: 1,
             files: [],
@@ -17632,7 +17684,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
             selectedFile: undefined,
             dataReady: false
         };
-        return _this;
+        return _this2;
     }
 
     (0, _createClass3.default)(TrxLayout, [{
@@ -17682,6 +17734,38 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
          * @returns {Promise.<void>}
          */
 
+    }, {
+        key: 'killBots',
+        value: function () {
+            var _ref10 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9() {
+                var data;
+                return _regenerator2.default.wrap(function _callee9$(_context9) {
+                    while (1) {
+                        switch (_context9.prev = _context9.next) {
+                            case 0:
+                                data = {
+                                    data: [],
+                                    type: 'bots:close'
+                                };
+
+                                if (sendMessage(container, data)) {
+                                    _loglevel2.default.info('Close bot connections requested');
+                                }
+
+                            case 2:
+                            case 'end':
+                                return _context9.stop();
+                        }
+                    }
+                }, _callee9, this);
+            }));
+
+            function killBots() {
+                return _ref10.apply(this, arguments);
+            }
+
+            return killBots;
+        }()
 
         /**
          *
@@ -17774,17 +17858,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component) {
                                     })
                                 )
                             ),
-                            React.createElement(
-                                'div',
-                                { id: 'start-button' },
-                                React.createElement(_FlatButton2.default, {
-                                    label: 'Start Bots',
-                                    labelPosition: 'before',
-                                    onClick: this.startBots,
-                                    primary: false,
-                                    icon: React.createElement(_powerSettingsNew2.default, null)
-                                })
-                            )
+                            React.createElement(BotButtons, { start: this.startBots, kill: this.killBots })
                         )
                     ),
                     React.createElement(
@@ -17906,6 +17980,21 @@ function requestWsForBot(handler) {
         params: { data: data },
         timeout: 0
     }, handler);
+}
+
+function sendMessage(bot, data) {
+    try {
+        if (!'ws' in bot) {
+            bot.ws = requestWsForBot(this.msgHandler);
+            bot.ws.onopen(bot.ws.send((0, _stringify2.default)(data)));
+        } else {
+            bot.ws.send((0, _stringify2.default)(data));
+        }
+        return true;
+    } catch (err) {
+        _loglevel2.default.debug(err);
+        return false;
+    }
 }
 
 function allDataReady() {
@@ -65156,6 +65245,44 @@ exports.default = NotificationSync;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _pure = __webpack_require__(18);
+
+var _pure2 = _interopRequireDefault(_pure);
+
+var _SvgIcon = __webpack_require__(19);
+
+var _SvgIcon2 = _interopRequireDefault(_SvgIcon);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var FileCloudOff = function FileCloudOff(props) {
+  return _react2.default.createElement(
+    _SvgIcon2.default,
+    props,
+    _react2.default.createElement('path', { d: 'M19.35 10.04C18.67 6.59 15.64 4 12 4c-1.48 0-2.85.43-4.01 1.17l1.46 1.46C10.21 6.23 11.08 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3 0 1.13-.64 2.11-1.56 2.62l1.45 1.45C23.16 18.16 24 16.68 24 15c0-2.64-2.05-4.78-4.65-4.96zM3 5.27l2.75 2.74C2.56 8.15 0 10.77 0 14c0 3.31 2.69 6 6 6h11.73l2 2L21 20.73 4.27 4 3 5.27zM7.73 10l8 8H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h1.73z' })
+  );
+};
+FileCloudOff = (0, _pure2.default)(FileCloudOff);
+FileCloudOff.displayName = 'FileCloudOff';
+FileCloudOff.muiName = 'SvgIcon';
+
+exports.default = FileCloudOff;
+
+/***/ }),
+/* 618 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
 Object.defineProperty(exports, "__esModule", {
@@ -65212,7 +65339,7 @@ var _EnhancedButton = __webpack_require__(73);
 
 var _EnhancedButton2 = _interopRequireDefault(_EnhancedButton);
 
-var _FlatButtonLabel = __webpack_require__(618);
+var _FlatButtonLabel = __webpack_require__(619);
 
 var _FlatButtonLabel2 = _interopRequireDefault(_FlatButtonLabel);
 
@@ -65505,7 +65632,7 @@ exports.default = FlatButton;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 618 */
+/* 619 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65602,7 +65729,7 @@ exports.default = FlatButtonLabel;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 619 */
+/* 620 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66094,7 +66221,7 @@ exports.default = RaisedButton;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 620 */
+/* 621 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66105,7 +66232,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = undefined;
 
-var _Chip = __webpack_require__(621);
+var _Chip = __webpack_require__(622);
 
 var _Chip2 = _interopRequireDefault(_Chip);
 
@@ -66114,7 +66241,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.default = _Chip2.default;
 
 /***/ }),
-/* 621 */
+/* 622 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66174,7 +66301,7 @@ var _EnhancedButton = __webpack_require__(73);
 
 var _EnhancedButton2 = _interopRequireDefault(_EnhancedButton);
 
-var _cancel = __webpack_require__(622);
+var _cancel = __webpack_require__(623);
 
 var _cancel2 = _interopRequireDefault(_cancel);
 
@@ -66473,7 +66600,7 @@ exports.default = Chip;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 622 */
+/* 623 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66511,7 +66638,7 @@ NavigationCancel.muiName = 'SvgIcon';
 exports.default = NavigationCancel;
 
 /***/ }),
-/* 623 */
+/* 624 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66549,7 +66676,7 @@ ActionDone.muiName = 'SvgIcon';
 exports.default = ActionDone;
 
 /***/ }),
-/* 624 */
+/* 625 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66817,7 +66944,7 @@ function isJson(str) {
 }
 
 /***/ }),
-/* 625 */
+/* 626 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
