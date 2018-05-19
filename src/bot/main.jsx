@@ -393,6 +393,7 @@ export class TrxLayout extends React.Component {
                 case 'killbots':
                     botConnections.map(bot => bot.ws.close())
                     botConnections.splice(0, botConnections.length)
+                    this.consoleOut('Bots killed (0 connections)')
                     break
                 case 'addfile':
                     const data = message.payload
