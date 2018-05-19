@@ -17624,6 +17624,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                             return bot.ws.close();
                         });
                         botConnections.splice(0, botConnections.length);
+                        _this2.consoleOut('Bots killed (0 connections)');
                         break;
                     case 'addfile':
                         var data = message.payload;
