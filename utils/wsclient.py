@@ -200,10 +200,12 @@ class Bot(object):
                 if close_to_max(row, self.trc_struct.max, self.trc_struct.max_offset) and len(
                         [x for x in self.trc_struct.peak if x['idx'] == i]) == 0:
                     self.trc_struct.peak.append({'value': row['high'], 'idx': i, 'date': row['date']})
+                    self.logger.debug('Added to peak', row['high'], row['date'])
 
                 elif close_to_min(row, self.trc_struct.min, self.trc_struct.max_offset) and len(
                         [x for x in self.trc_struct.base if x['idx'] == i]) == 0:
                     self.trc_struct.base.append({'value': row['high'], 'idx': i, 'date': row['date']})
+                    self.logger.debug('Added to base', row['high'], row['date'])
                 # TODO - These are not accurate -> last max was likely limited by potential period. Need to re-evaluate the design of the algorithm
                 # TODO - to consolidate the balance of time period vs value significance
                 if self.is_first_low(row, i):
@@ -382,3 +384,19 @@ class TxStruct(object):
 
     def serialize_entries(self):
         return self.entries
+
+
+class PatternFinder(object):
+
+    def __init__(self, struct):
+        self.patterns = []
+        self.value_structure = struct
+
+    def cup_and_hande(self):
+        first_peak = None
+        max_bottom = None
+        second_peak = None
+        #  handle_start = None - handle_start is likely just second_peak
+        handle_bottom = None
+        last_point = None
+        v_struct = self.value_structure
