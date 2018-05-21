@@ -21,6 +21,7 @@ import CallEnd from 'material-ui/svg-icons/communication/call-end'
 import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
 import Sync from 'material-ui/svg-icons/notification/sync'
 import BotsOff from 'material-ui/svg-icons/file/cloud-off'
+import Patterns from 'material-ui/svg-icons/image/blur-linear'
 import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
 import Chip from 'material-ui/Chip'
@@ -357,6 +358,23 @@ export class TrxLayout extends React.Component {
         }
     }
 
+    findPatterns = async () => {
+        const selectedBot = botConnections[this.state.selectedBot]
+
+        const data = {
+            data: {
+                bot_id: selectedBot.id,
+            },
+            type: 'patterns:search'
+        }
+
+        if (sendMessage(container, data)) {
+            const msg = `Bot ${selectedBot.number} (${selectedBot.id}) is conducting a pattern search`
+            this.consoleOut(msg)
+            log.info(msg)
+        }
+    }
+
     /**
      *
      * @param message
@@ -367,10 +385,11 @@ export class TrxLayout extends React.Component {
         }
         if ('action' in message) {
             const action = message.action
+            const data = message.payload
             log.info('ACTION', action)
             switch (action) {
                 case 'updatebots':
-                    const bots = message.payload
+                    const bots = data
 
                     if (Array.isArray(bots)) {
                         if (bots.length > 0) {
@@ -396,12 +415,14 @@ export class TrxLayout extends React.Component {
                     this.consoleOut('Bots killed (0 connections)')
                     break
                 case 'addfile':
-                    const data = message.payload
                     if ('filename' in data) {
                         this.updateFileList(data.filename)
                         log.info('Updating file list')
                         delete data.filename
                     }
+                    break
+                case 'pattern:results:update':
+                    log.info('Search results', data)
                     break
             }
         }
@@ -547,6 +568,12 @@ export class TrxLayout extends React.Component {
                     onClick={this.reconnectBot}
                     primary={false}
                     icon={<Sync />} />
+                <RaisedButton
+                    label="Find Patterns"
+                    labelPosition="before"
+                    onClick={this.findPatterns}
+                    primary={false}
+                    checkedIcon={<Patterns style={{color: '#F44336'}} />} />
                 <RaisedButton
                     label="Trade"
                     labelPosition="before"

@@ -54,13 +54,12 @@ class Client(object):
     async def keep_alive(self):
         if self.ws is None:
             self.ws.write_message("Keep alive with id: " + str(self.id))
-        #     await self.connect('http://localhost:9977/')
-        # else:
+            #     await self.connect('http://localhost:9977/')
+            # else:
 
     def close_connection(self):
         if self.ws is not None:
             self.ws.close()
-
 
 
 class Bot(object):
@@ -74,6 +73,18 @@ class Bot(object):
         self.session = None
         self.trc_price_history = None
         self.trc_struct = TxStruct()
+
+    async def find_all_patterns(self) -> dict:
+        # TODO choose one return type
+        """
+        :return:list of patterns or pattern search results
+        """
+        patterns = {}
+        finder = PatternFinder(self.trc_struct)
+        # Search for cup and handle
+        patterns['cup_and_handle'] = finder.cup_and_handle()
+
+        return patterns
 
     def set_credentials(self, credentials):
         self.credentials = credentials
@@ -138,7 +149,7 @@ class Bot(object):
     def is_last_low(self, r, idx):
         if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
                                                                as_unixtime(self.trc_struct.entries[len(
-                                                                       self.trc_struct.entries) - 1]['date']))[1]):
+                                                                   self.trc_struct.entries) - 1]['date']))[1]):
             if not (more_than_5_percent_higher(r['high'], self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
                 self.trc_struct.l_low['value'] = Decimal(r['high'])
                 self.trc_struct.l_low['idx'] = idx
@@ -147,7 +158,7 @@ class Bot(object):
     def is_last_high(self, r, idx):
         if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
                                                                as_unixtime(self.trc_struct.entries[len(
-                                                                       self.trc_struct.entries) - 1]['date']))[1]):
+                                                                   self.trc_struct.entries) - 1]['date']))[1]):
             if not (more_than_5_percent_lower(r['high'], self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
                 self.trc_struct.l_high['value'] = Decimal(r['high'])
                 self.trc_struct.l_high['idx'] = idx
@@ -198,6 +209,9 @@ class Bot(object):
             for i, row in enumerate(self.trc_struct.entries):
                 # Add to Peak and Base if value is similar, proximate and has not yet been added
                 self.logger.debug('Iterating over %s' % row['date'])
+                if '11557.93' in str(row['high']):
+                    stop_here = 'stophere'
+
                 if close_to_max(row, self.trc_struct.max, self.trc_struct.max_offset) and len(
                         [x for x in self.trc_struct.peak if x['idx'] == i]) == 0:
                     self.trc_struct.peak.append({'value': row['high'], 'idx': i, 'date': row['date']})
@@ -211,12 +225,22 @@ class Bot(object):
                 # TODO - to consolidate the balance of time period vs value significance
                 if self.is_first_low(row, i):
                     continue
+                # TODO - Find out why is_first_high isn't among peaks
                 if self.is_first_high(row, i):
                     continue
                 if self.is_last_low(row, i):
                     continue
                 if self.is_last_high(row, i):
                     continue
+
+            for peak in self.trc_struct.peak:
+                self.trc_struct.peak_map[peak['idx']] = peak['value']
+
+            for base in self.trc_struct.base:
+                self.trc_struct.base_map[base['idx']] = base['value']
+
+            for entry in self.trc_struct.entries:
+                self.trc_struct.map[entry['idx']] = entry['high']
 
             self.logger.info('Finished sorting Trc Structure\n')
             self.logger.debug(str(self.trc_struct))
@@ -265,7 +289,7 @@ class Bot(object):
 
     def has_session(self):
         return True if (self.session is not None) and (self.session is not False) and (
-        isinstance(self.session, dict) and ('token' in self.session)) else False
+            isinstance(self.session, dict) and ('token' in self.session)) else False
 
 
 def receive_message(msg):
@@ -346,14 +370,14 @@ def more_than_5_percent_lower(a, b, max_offset):
 def close_to_max(row, max, max_offset):
     # Determination of proximity to max/min is based on calculating 2.5 % of the maximum variation of value within a
     # period
-    margin_of_offset = max_offset * Decimal(0.025)
+    margin_of_offset = max_offset * Decimal(0.35)
     return Decimal(row['high']) > Decimal(max['high']) * (Decimal(1) - margin_of_offset)
 
 
 def close_to_min(row, min, max_offset):
     # Determination of proximity to max/min is based on calculating 2.5 % of the maximum variation of value within a
     # period
-    margin_of_offset = max_offset * Decimal(0.025)
+    margin_of_offset = max_offset * Decimal(0.35)
     return Decimal(row['high']) < Decimal(min['high']) * (Decimal(1) + margin_of_offset)
 
 
@@ -369,6 +393,9 @@ class TxStruct(object):
         self.max = None
         self.min = None
         self.entries = []
+        self.peak_map = {}
+        self.base_map = {}
+        self.map = {}
 
     def serialize(self):
         return {
@@ -388,16 +415,80 @@ class TxStruct(object):
 
 
 class PatternFinder(object):
-
     def __init__(self, struct):
         self.patterns = []
         self.value_structure = struct
 
-    def cup_and_hande(self):
-        first_peak = None
-        max_bottom = None
-        second_peak = None
-        #  handle_start = None - handle_start is likely just second_peak
-        handle_bottom = None
-        last_point = None
+    def cup_and_handle(self):
+        findings = {
+            'first_peak': None, 'second_peak': None, 'cup_bottom': None, 'handle_bottom': None, 'cup': None,
+            'handle': None, 'handle_breakout': None,
+            'downward_trend': [], 'handle_downward_trend': []
+        }
+
         v_struct = self.value_structure
+        peaks = v_struct.peak
+        bases = v_struct.base
+        peaks_map = v_struct.peak_map
+        bases_map = v_struct.base_map
+
+        for i, peak in enumerate(peaks):
+            # check for gaps between peaks5
+            if i < len(peaks) - 1 and peaks[i + 1]['idx'] != peak['idx'] + 1:
+                # Find any bases which occur between this gap
+                for j, base in enumerate(bases):
+                    if peak['idx'] < base['idx'] < peaks[i + 1]['idx']:
+                        findings['downward_trend'].append(base)
+                        # delete the base so we don't have to iterate it ever again
+                        del (bases_map[base['idx']])
+                # TODO find out how many bases are the minimum required to assert that we've found a cup
+                if len(findings['downward_trend']) > 0:
+                    findings['first_peak'] = peak['idx']
+                    findings['second_peak'] = peaks[i + 1]
+                    findings['cup_bottom'] = sorted(findings['downward_trend'], key=lambda x: Decimal(x['value']))[::-1][0]
+                    findings['cup'] = True
+                    # Delete the peaks of the cup from the initial peaks list
+                    del peaks_map[peaks[i]['idx']]
+                    del peaks_map[peaks[i + 1]['idx']]
+                    # Stop iterating
+                    break
+            # Delete the peak we've just iterated, since there is only ever a potential requirement to iterate over later peaks
+            del peaks_map[peaks[i]['idx']]
+        # Continue analyzing if we found a cup
+        if findings['cup']:
+            peak_keys = peaks_map.keys()
+            for i, peak in enumerate(peaks_map):
+                if gap_exists(peak, peaks_map):
+                    # for j, base in enumerate(bases_map):
+                        # if between_peaks(peak)
+
+            # for i, peak in enumerate(peaks):
+            #     if gap_exists(peak, peaks, i):
+                    for j, base in enumerate(bases):
+                        if between_peaks(peak['idx'], peaks[i + 1]['idx'], base['idx']):
+                            findings['handle_downward_trend'].append(base)
+                            # delete the base so we don't have to iterate it ever again
+                            del (bases[j])
+                    if len(findings['handle_downward_trend']) > 0:
+                        findings['handle_breakout'] = peaks[i + i]
+                        findings['handle_bottom'] = sorted(findings['handle_downward_trend'], key=lambda x: Decimal(x['value']))[::-1][
+                            0]
+                        findings['handle'] = True
+
+        return {
+            'cup': findings['cup'],
+            'handle': findings['handle'],
+            'first_peak': findings['first_peak'],
+            'cup_bottom': findings['cup_bottom'],
+            'second_peak': findings['second_peak'],
+            'handle_bottom': findings['handle_bottom'],
+            'handle_breakout': findings['handle_breakout']
+        }
+
+
+def gap_exists(item, a_list, i):
+    return True if a_list[i]['idx'] is not item['idx'] + 1 else False
+
+
+def between_peaks(peak1, peak2, base):
+    return True if peak1 < base < peak2 else False

@@ -298,11 +298,24 @@ async def handle_ws_request(type, data):
                 e.status_code = 500
                 return {'action': 'noaction', 'payload': {'request': 'close bot connections', 'result': 0, 'error': e}}
 
+    async def find_market_patterns(type, data):
+        if 'bot_id' in data:
+            try:
+                bot = application.retrieve_bot_by_id(data['bot_id'])
+                patterns = await bot.find_all_patterns()
+                return {'action': 'pattern:results:update', 'payload': {'patterns': patterns, 'result': 1}}
+            except HTTPError as e:
+                e.log_message = 'Unable to close bot connection for bot with id %s' % data['id']
+                e.status_code = 500
+                return {'action': 'noaction', 'payload': {'request': 'close bot connections', 'result': 0, 'error': e}}
+
+
     switch = {
         'request': analyze_market,
         'bots:all': fetch_bots,
         'bots:close': close_bot_connections,
-        'bot:close': close_bot_connection
+        'bot:close': close_bot_connection,
+        'patterns:search': find_market_patterns,
     }
     func = switch.get(type, lambda: 'Invalid request type')
     result = await func(type, data)
