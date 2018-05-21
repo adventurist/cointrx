@@ -17126,25 +17126,29 @@ var _cloudOff = __webpack_require__(617);
 
 var _cloudOff2 = _interopRequireDefault(_cloudOff);
 
-var _FlatButton = __webpack_require__(618);
+var _blurLinear = __webpack_require__(618);
+
+var _blurLinear2 = _interopRequireDefault(_blurLinear);
+
+var _FlatButton = __webpack_require__(619);
 
 var _FlatButton2 = _interopRequireDefault(_FlatButton);
 
-var _RaisedButton = __webpack_require__(620);
+var _RaisedButton = __webpack_require__(621);
 
 var _RaisedButton2 = _interopRequireDefault(_RaisedButton);
 
-var _Chip = __webpack_require__(621);
+var _Chip = __webpack_require__(622);
 
 var _Chip2 = _interopRequireDefault(_Chip);
 
-var _done = __webpack_require__(624);
+var _done = __webpack_require__(625);
 
 var _done2 = _interopRequireDefault(_done);
 
-var _utils = __webpack_require__(625);
+var _utils = __webpack_require__(626);
 
-var _loglevel = __webpack_require__(626);
+var _loglevel = __webpack_require__(627);
 
 var _loglevel2 = _interopRequireDefault(_loglevel);
 
@@ -17584,19 +17588,49 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                 }
             }, _callee7, _this3);
         }));
+        _this2.findPatterns = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8() {
+            var selectedBot, data, msg;
+            return _regenerator2.default.wrap(function _callee8$(_context8) {
+                while (1) {
+                    switch (_context8.prev = _context8.next) {
+                        case 0:
+                            selectedBot = botConnections[_this2.state.selectedBot];
+                            data = {
+                                data: {
+                                    bot_id: selectedBot.id
+                                },
+                                type: 'patterns:search'
+                            };
 
-        _this2.msgHandler = function (_ref8) {
-            var message = (0, _objectWithoutProperties3.default)(_ref8, []);
+
+                            if (sendMessage(container, data)) {
+                                msg = 'Bot ' + selectedBot.number + ' (' + selectedBot.id + ') is conducting a pattern search';
+
+                                _this2.consoleOut(msg);
+                                _loglevel2.default.info(msg);
+                            }
+
+                        case 3:
+                        case 'end':
+                            return _context8.stop();
+                    }
+                }
+            }, _callee8, _this3);
+        }));
+
+        _this2.msgHandler = function (_ref9) {
+            var message = (0, _objectWithoutProperties3.default)(_ref9, []);
 
             if ('type' in message) {
                 _loglevel2.default.info('WS Data Event Type', message.type);
             }
             if ('action' in message) {
                 var action = message.action;
+                var data = message.payload;
                 _loglevel2.default.info('ACTION', action);
                 switch (action) {
                     case 'updatebots':
-                        var bots = message.payload;
+                        var bots = data;
 
                         if (Array.isArray(bots)) {
                             if (bots.length > 0) {
@@ -17627,12 +17661,14 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                         _this2.consoleOut('Bots killed (0 connections)');
                         break;
                     case 'addfile':
-                        var data = message.payload;
                         if ('filename' in data) {
                             _this2.updateFileList(data.filename);
                             _loglevel2.default.info('Updating file list');
                             delete data.filename;
                         }
+                        break;
+                    case 'pattern:results:update':
+                        _loglevel2.default.info('Search results', data);
                         break;
                 }
             }
@@ -17691,29 +17727,29 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
     (0, _createClass3.default)(TrxLayout, [{
         key: 'componentDidMount',
         value: function () {
-            var _ref9 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8() {
+            var _ref10 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9() {
                 var botMenuItems, fileMenuItems;
-                return _regenerator2.default.wrap(function _callee8$(_context8) {
+                return _regenerator2.default.wrap(function _callee9$(_context9) {
                     while (1) {
-                        switch (_context8.prev = _context8.next) {
+                        switch (_context9.prev = _context9.next) {
                             case 0:
                                 botMenuItems = buildBotMenuItems(0);
                                 fileMenuItems = buildFileMenuItems(0);
 
                                 this.setState({ botMenuItems: botMenuItems, fileMenuItems: fileMenuItems });
-                                _context8.next = 5;
+                                _context9.next = 5;
                                 return this.init();
 
                             case 5:
                             case 'end':
-                                return _context8.stop();
+                                return _context9.stop();
                         }
                     }
-                }, _callee8, this);
+                }, _callee9, this);
             }));
 
             function componentDidMount() {
-                return _ref9.apply(this, arguments);
+                return _ref10.apply(this, arguments);
             }
 
             return componentDidMount;
@@ -17738,11 +17774,11 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
     }, {
         key: 'killBots',
         value: function () {
-            var _ref10 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9() {
+            var _ref11 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee10() {
                 var data;
-                return _regenerator2.default.wrap(function _callee9$(_context9) {
+                return _regenerator2.default.wrap(function _callee10$(_context10) {
                     while (1) {
-                        switch (_context9.prev = _context9.next) {
+                        switch (_context10.prev = _context10.next) {
                             case 0:
                                 data = {
                                     data: [],
@@ -17755,14 +17791,14 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
 
                             case 2:
                             case 'end':
-                                return _context9.stop();
+                                return _context10.stop();
                         }
                     }
-                }, _callee9, this);
+                }, _callee10, this);
             }));
 
             function killBots() {
-                return _ref10.apply(this, arguments);
+                return _ref11.apply(this, arguments);
             }
 
             return killBots;
@@ -17943,6 +17979,12 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                                 onClick: this.reconnectBot,
                                 primary: false,
                                 icon: React.createElement(_sync2.default, null) }),
+                            React.createElement(_RaisedButton2.default, {
+                                label: 'Find Patterns',
+                                labelPosition: 'before',
+                                onClick: this.findPatterns,
+                                primary: false,
+                                checkedIcon: React.createElement(_blurLinear2.default, { style: { color: '#F44336' } }) }),
                             React.createElement(_RaisedButton2.default, {
                                 label: 'Trade',
                                 labelPosition: 'before',
@@ -65284,6 +65326,44 @@ exports.default = FileCloudOff;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _pure = __webpack_require__(18);
+
+var _pure2 = _interopRequireDefault(_pure);
+
+var _SvgIcon = __webpack_require__(19);
+
+var _SvgIcon2 = _interopRequireDefault(_SvgIcon);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var ImageBlurLinear = function ImageBlurLinear(props) {
+  return _react2.default.createElement(
+    _SvgIcon2.default,
+    props,
+    _react2.default.createElement('path', { d: 'M5 17.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM9 13c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zm0-4c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zM3 21h18v-2H3v2zM5 9.5c.83 0 1.5-.67 1.5-1.5S5.83 6.5 5 6.5 3.5 7.17 3.5 8 4.17 9.5 5 9.5zm0 4c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM9 17c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zm8-.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5-.5.22-.5.5.22.5.5.5zM3 3v2h18V3H3zm14 5.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5-.5.22-.5.5.22.5.5.5zm0 4c.28 0 .5-.22.5-.5s-.22-.5-.5-.5-.5.22-.5.5.22.5.5.5zM13 9c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zm0 4c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zm0 4c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1z' })
+  );
+};
+ImageBlurLinear = (0, _pure2.default)(ImageBlurLinear);
+ImageBlurLinear.displayName = 'ImageBlurLinear';
+ImageBlurLinear.muiName = 'SvgIcon';
+
+exports.default = ImageBlurLinear;
+
+/***/ }),
+/* 619 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
 Object.defineProperty(exports, "__esModule", {
@@ -65340,7 +65420,7 @@ var _EnhancedButton = __webpack_require__(73);
 
 var _EnhancedButton2 = _interopRequireDefault(_EnhancedButton);
 
-var _FlatButtonLabel = __webpack_require__(619);
+var _FlatButtonLabel = __webpack_require__(620);
 
 var _FlatButtonLabel2 = _interopRequireDefault(_FlatButtonLabel);
 
@@ -65633,7 +65713,7 @@ exports.default = FlatButton;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 619 */
+/* 620 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65730,7 +65810,7 @@ exports.default = FlatButtonLabel;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 620 */
+/* 621 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66222,7 +66302,7 @@ exports.default = RaisedButton;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 621 */
+/* 622 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66233,7 +66313,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = undefined;
 
-var _Chip = __webpack_require__(622);
+var _Chip = __webpack_require__(623);
 
 var _Chip2 = _interopRequireDefault(_Chip);
 
@@ -66242,7 +66322,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.default = _Chip2.default;
 
 /***/ }),
-/* 622 */
+/* 623 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66302,7 +66382,7 @@ var _EnhancedButton = __webpack_require__(73);
 
 var _EnhancedButton2 = _interopRequireDefault(_EnhancedButton);
 
-var _cancel = __webpack_require__(623);
+var _cancel = __webpack_require__(624);
 
 var _cancel2 = _interopRequireDefault(_cancel);
 
@@ -66601,7 +66681,7 @@ exports.default = Chip;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 623 */
+/* 624 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66639,7 +66719,7 @@ NavigationCancel.muiName = 'SvgIcon';
 exports.default = NavigationCancel;
 
 /***/ }),
-/* 624 */
+/* 625 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66677,7 +66757,7 @@ ActionDone.muiName = 'SvgIcon';
 exports.default = ActionDone;
 
 /***/ }),
-/* 625 */
+/* 626 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -66945,7 +67025,7 @@ function isJson(str) {
 }
 
 /***/ }),
-/* 626 */
+/* 627 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
