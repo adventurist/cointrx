@@ -64,15 +64,15 @@ class Client(object):
 
 class Bot(object):
     def __init__(self, config, logger):
-        self.id = uuid4()
-        self.client = Client(id=self.id, timeout=config.timeout)
-        self.http_client = http_client()
+        self.id = uuid4()  # Unique identifier
+        self.client = Client(id=self.id, timeout=config.timeout)  # WebSocket client
+        self.http_client = http_client()  # HTTP Client
         self.logger = logger
         self.number = config.number
-        self.credentials = None
+        self.credentials = None  # User credentials for authentication
         self.session = None
         self.trc_price_history = None
-        self.trc_struct = TxStruct()
+        self.trc_struct = TxStruct()  # Struct object is our market valuation history dataset
 
     async def find_all_patterns(self) -> dict:
         # TODO choose one return type
@@ -120,6 +120,69 @@ class Bot(object):
                 return True
             else:
                 return {'error': 'Unable to digest price history'}
+
+    def analyze_price_history(self):
+        # Make sure entries are populated
+        if self.entries_ready():
+            # Clear analysis data, except for original price history entries
+            self.reset_analysis_data()
+            # Make a copy of the data to work with, instead of modifying and corrupting the data
+            entries = self.trc_struct.entries.copy()
+            # Sort entries to determine Max, Min and Range between
+            sort_by_price = sorted(entries, key=lambda x: Decimal(x['high']))
+            self.trc_struct.min = sort_by_price[0]
+            self.trc_struct.max = sort_by_price[len(sort_by_price) - 1]
+            self.trc_struct.max_offset = Decimal(1) - Decimal(self.trc_struct.min['high']) / Decimal(
+                self.trc_struct.max['high'])
+
+            # Set initial values to first/last low/high
+            self.trc_struct.f_high['value'] = self.trc_struct.f_low['value'] = self.trc_struct.l_high['value'] = \
+                self.trc_struct.l_low['value'] = Decimal(entries[0]['high'])
+
+            for i, row in enumerate(entries):
+                # Add to Peak and Base if value is similar, proximate and has not yet been added
+                self.logger.debug('Iterating over %s' % row['date'])
+                if '10219.08' in str(row['high']):
+                    stop_here = 'stophere'
+                # If point is close to max, add to peaks
+                if close_to_max(row, self.trc_struct.max, self.trc_struct.max_offset) and self.peak_not_added(i):
+                    self.add_entry_to_peak(row, i)
+                    self.logger.debug('Added to peak', str(row['high']), str(row['date']))
+                # If point is close to min, add to bases
+                elif close_to_min(row, self.trc_struct.min, self.trc_struct.max_offset) and self.base_not_added(i):
+                    self.add_entry_to_base(row, i)
+                    self.logger.debug('Added to base', row['high'], row['date'])
+                # Check to see if the data point is the first low/high or last low/high in the dataset
+                # Add entries to base/peak if they haven't been already
+                if self.is_first_low(row, i):
+                    if self.base_not_added(i):
+                        self.add_entry_to_base(row, i)
+                    continue
+                # TODO - Find out why is_first_high isn't among peaks
+                if self.is_first_high(row, i):
+                    if self.peak_not_added(i):
+                        self.add_entry_to_peak(row, i)
+                    continue
+                if self.is_last_low(row, i):
+                    if self.base_not_added(i):
+                        self.add_entry_to_base(row, i)
+                    continue
+                if self.is_last_high(row, i):
+                    if self.peak_not_added(i):
+                        self.add_entry_to_peak(row, i)
+                    continue
+            # Create our maps for easy future analysis
+            for peak in self.trc_struct.peak:
+                self.trc_struct.peak_map[peak['idx']] = peak['value']
+
+            for base in self.trc_struct.base:
+                self.trc_struct.base_map[base['idx']] = base['value']
+
+            for i, entry in enumerate(entries):
+                self.trc_struct.map[i] = entry['high']
+
+            self.logger.info('Finished sorting Trc Structure\n')
+            self.logger.debug(str(self.trc_struct))
 
     def is_first_low(self, r, idx):
         """ Check to see if row occurs within first historical period """
@@ -192,59 +255,6 @@ class Bot(object):
         else:
             return 2, self.trc_struct.l_high['value'] / row_value
 
-    def analyze_price_history(self):
-        # Make sure entries are populated
-        if self.trc_struct and hasattr(self.trc_struct, 'entries') and len(self.trc_struct.entries) > 0:
-            # Sort entries to determine Max, Min and Range between
-            sort_by_price = sorted(self.trc_struct.entries, key=lambda x: Decimal(x['high']))
-            self.trc_struct.min = sort_by_price[0]
-            self.trc_struct.max = sort_by_price[len(sort_by_price) - 1]
-            self.trc_struct.max_offset = Decimal(1) - Decimal(self.trc_struct.min['high']) / Decimal(
-                self.trc_struct.max['high'])
-
-            # Set initial values to first/last low/high
-            self.trc_struct.f_high['value'] = self.trc_struct.f_low['value'] = self.trc_struct.l_high['value'] = \
-                self.trc_struct.l_low['value'] = Decimal(self.trc_struct.entries[0]['high'])
-
-            for i, row in enumerate(self.trc_struct.entries):
-                # Add to Peak and Base if value is similar, proximate and has not yet been added
-                self.logger.debug('Iterating over %s' % row['date'])
-                if '11557.93' in str(row['high']):
-                    stop_here = 'stophere'
-
-                if close_to_max(row, self.trc_struct.max, self.trc_struct.max_offset) and len(
-                        [x for x in self.trc_struct.peak if x['idx'] == i]) == 0:
-                    self.trc_struct.peak.append({'value': row['high'], 'idx': i, 'date': row['date']})
-                    self.logger.debug('Added to peak', str(row['high']), str(row['date']))
-
-                elif close_to_min(row, self.trc_struct.min, self.trc_struct.max_offset) and len(
-                        [x for x in self.trc_struct.base if x['idx'] == i]) == 0:
-                    self.trc_struct.base.append({'value': row['high'], 'idx': i, 'date': row['date']})
-                    self.logger.debug('Added to base', row['high'], row['date'])
-                # TODO - These are not accurate -> last max was likely limited by potential period. Need to re-evaluate the design of the algorithm
-                # TODO - to consolidate the balance of time period vs value significance
-                if self.is_first_low(row, i):
-                    continue
-                # TODO - Find out why is_first_high isn't among peaks
-                if self.is_first_high(row, i):
-                    continue
-                if self.is_last_low(row, i):
-                    continue
-                if self.is_last_high(row, i):
-                    continue
-
-            for peak in self.trc_struct.peak:
-                self.trc_struct.peak_map[peak['idx']] = peak['value']
-
-            for base in self.trc_struct.base:
-                self.trc_struct.base_map[base['idx']] = base['value']
-
-            for entry in self.trc_struct.entries:
-                self.trc_struct.map[entry['idx']] = entry['high']
-
-            self.logger.info('Finished sorting Trc Structure\n')
-            self.logger.debug(str(self.trc_struct))
-
     async def post_data_as_json(self):
         entries = [(x['high'], x['date']) for x in self.trc_struct.entries]
         peaks = [(x['value'], x['date']) for x in self.trc_struct.peak]
@@ -259,6 +269,31 @@ class Bot(object):
     def update_max_offset(self, offset):
         if self.trc_struct.max_offset < offset:
             self.trc_struct.max_offset = offset
+
+    def add_entry_to_peak(self, entry, idx):
+        self.trc_struct.peak.append({'value': entry['high'], 'idx': idx, 'date': entry['date']})
+
+    def add_entry_to_base(self, entry, idx):
+        self.trc_struct.base.append({'value': entry['high'], 'idx': idx, 'date': entry['date']})
+
+    def peak_not_added(self, i):
+        return len([x for x in self.trc_struct.peak if x['idx'] == i]) == 0
+
+    def base_not_added(self, i):
+        return len([x for x in self.trc_struct.base if x['idx'] == i]) == 0
+
+    def entries_ready(self):
+        return self.trc_struct and hasattr(self.trc_struct, 'entries') and len(self.trc_struct.entries) > 0
+
+    def reset_analysis_data(self):
+        self.trc_struct.peak = []
+        self.trc_struct.base = []
+        self.trc_struct.map = {}
+        self.trc_struct.peak_map = {}
+        self.trc_struct.base_map = {}
+        self.trc_struct.min = None
+        self.trc_struct.max = None
+        self.trc_struct.max_offset = Decimal(0)
 
     async def login(self):
         print('login')
@@ -423,7 +458,7 @@ class PatternFinder(object):
         findings = {
             'first_peak': None, 'second_peak': None, 'cup_bottom': None, 'handle_bottom': None, 'cup': None,
             'handle': None, 'handle_breakout': None,
-            'downward_trend': [], 'handle_downward_trend': []
+            'downward_trend': [], 'handle_downward_trend': [], 'end_of_downward_trend': None, 'handle_upward_trend': []
         }
 
         v_struct = self.value_structure
@@ -431,6 +466,7 @@ class PatternFinder(object):
         bases = v_struct.base
         peaks_map = v_struct.peak_map
         bases_map = v_struct.base_map
+        trc_map = v_struct.map
 
         for i, peak in enumerate(peaks):
             # check for gaps between peaks5
@@ -445,35 +481,70 @@ class PatternFinder(object):
                 if len(findings['downward_trend']) > 0:
                     findings['first_peak'] = peak['idx']
                     findings['second_peak'] = peaks[i + 1]
-                    findings['cup_bottom'] = sorted(findings['downward_trend'], key=lambda x: Decimal(x['value']))[::-1][0]
+                    findings['cup_bottom'] = sorted(findings['downward_trend'], key=lambda x: Decimal(x['value']))[0]
                     findings['cup'] = True
                     # Delete the peaks of the cup from the initial peaks list
                     del peaks_map[peaks[i]['idx']]
                     del peaks_map[peaks[i + 1]['idx']]
                     # Stop iterating
                     break
-            # Delete the peak we've just iterated, since there is only ever a potential requirement to iterate over later peaks
+            # Delete peak just iterated, since there is only ever a potential requirement to iterate over later peaks
             del peaks_map[peaks[i]['idx']]
         # Continue analyzing if we found a cup
         if findings['cup']:
-            peak_keys = peaks_map.keys()
-            for i, peak in enumerate(peaks_map):
-                if gap_exists(peak, peaks_map):
-                    # for j, base in enumerate(bases_map):
-                        # if between_peaks(peak)
+            remaining_entries = {k: v for (k, v) in trc_map.items() if k > int(findings['downward_trend'][-1]['idx'])}
+            up_trend = 0
+            remaining_keys = list(remaining_entries.keys())
+            bottom_peak_ratio = ratio_a_over_b(findings['cup_bottom']['value'], trc_map[findings['first_peak']])
+            # Check and see if the first element of the remaining_entries is part of an upward_trend
+            # num = v_struct['entries'][remaining_entries[remaining_keys[0]]]['high']
 
-            # for i, peak in enumerate(peaks):
-            #     if gap_exists(peak, peaks, i):
-                    for j, base in enumerate(bases):
-                        if between_peaks(peak['idx'], peaks[i + 1]['idx'], base['idx']):
-                            findings['handle_downward_trend'].append(base)
-                            # delete the base so we don't have to iterate it ever again
-                            del (bases[j])
-                    if len(findings['handle_downward_trend']) > 0:
-                        findings['handle_breakout'] = peaks[i + i]
-                        findings['handle_bottom'] = sorted(findings['handle_downward_trend'], key=lambda x: Decimal(x['value']))[::-1][
-                            0]
-                        findings['handle'] = True
+            if str_num_a_above_b(remaining_entries[remaining_keys[0]],
+                                 findings['downward_trend'][len(findings['downward_trend']) - 1]['value']):
+                # add to our findings and attempt to continue analyzing a potential upward trend
+                findings['handle_upward_trend'].append(
+                    {'idx': remaining_keys[0], 'value': remaining_entries[remaining_keys[0]]})
+                up_trend += 1
+                for i, idx in enumerate(remaining_keys):
+                    # Skip the first value, since we've already recorded it
+                    if i == 0:
+                        continue
+                    value_peak_ratio = ratio_a_over_b(remaining_entries[idx], trc_map[findings['first_peak']])
+                    # Check each entry against the previous entry, to ensure it is an upward trend
+                    if non_regressive_trend(bottom_peak_ratio, value_peak_ratio, remaining_entries[idx],
+                                            remaining_entries[remaining_keys[i - 1]]):
+                        findings['handle_upward_trend'].append(
+                            {'idx': idx, 'value': remaining_entries[remaining_keys[i - 1]]})
+                        up_trend += 1
+                    # Break once the upward trend is complete
+                    else:
+                        # Mark this peak
+                        break
+
+            if up_trend > 1:
+                stop_here = 'stophere'
+                # Second last implementation
+                # for k, v in remaining_entries.items():
+                #     if k in remaining_entries and k - 1 in remaining_entries and v > remaining_entries[k - 1]:
+                #         print('jigga')
+                #
+                # findings['end_of_downward_trend'] = v_struct.entries[int(findings['downward_trend'][-1]['idx']):]
+                #
+                # # Oldest implementation
+                # for i, idx in enumerate(remaining_keys):
+                #     if gap_exists(idx, remaining_entries[i + 1]):
+                #
+                #         for j, base in enumerate(bases):
+                #             if between_peaks(peak['idx'], peaks[i + 1]['idx'], base['idx']):
+                #                 findings['handle_downward_trend'].append(base)
+                #                 # delete the base so we don't have to iterate it ever again
+                #                 del (bases[j])
+                #         if len(findings['handle_downward_trend']) > 0:
+                #             findings['handle_breakout'] = peaks[i + i]
+                #             findings['handle_bottom'] = \
+                #             sorted(findings['handle_downward_trend'], key=lambda x: Decimal(x['value']))[
+                #                 0]
+                #             findings['handle'] = True
 
         return {
             'cup': findings['cup'],
@@ -486,9 +557,29 @@ class PatternFinder(object):
         }
 
 
-def gap_exists(item, a_list, i):
-    return True if a_list[i]['idx'] is not item['idx'] + 1 else False
+# def gap_exists(item, a_list, i):
+#     return True if a_list[i]['idx'] is not item['idx'] + 1 else False
+
+
+def gap_exists(idx1, idx2):
+    return int(idx2) == int(idx1) + 1
 
 
 def between_peaks(peak1, peak2, base):
-    return True if peak1 < base < peak2 else False
+    return peak1 < base < peak2
+
+
+def str_num_a_above_b(a, b):
+    return Decimal(a) > Decimal(b)
+
+
+def ratio_a_over_b(a, b):
+    return Decimal(a) / Decimal(b)
+
+
+def non_regressive_trend(bottom_ratio, current_ratio, current_value, previous_value):
+    a = Decimal(current_value) if current_value > previous_value else Decimal(previous_value)
+    b = Decimal(previous_value) if a == current_value else Decimal(current_value)
+    ratio_comparison = (1 - Decimal(current_ratio)) > (1 - Decimal(bottom_ratio)) / 2
+    value_comparison = Decimal(b / a) > Decimal(0.95)
+    return ratio_comparison and value_comparison
