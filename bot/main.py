@@ -427,13 +427,13 @@ def bot_config():
 
 
 async def make_bots(num):
-    # TODO determine the best way of limiting the number to that which was requested
+    num = int(num)
     config = bot_config()
     bots = []
     users = user_data()
-    if len(users) >= int(num):
+    if len(users) >= num:
         try:
-            for i in range(len(users)):
+            for i in range(num):
                 config.number = i + 1
                 new_bot = Bot(config, setup_logger('Bot ' + str(i + 1), logging.DEBUG, json_logging=True))
                 new_bot.set_credentials(users[i])
