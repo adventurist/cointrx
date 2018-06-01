@@ -1025,10 +1025,10 @@ async def regtest_graph_data(time):
 
 async def btc_hour_minmax_price(time='60'):
     return engine.execute("SELECT date_trunc('minute', to_timestamp(modified)) - "
-                   "(EXTRACT('minute' FROM to_timestamp(modified))::integer %% 30) * interval '1 minute' as date, min(last), max(last) "
+                   "(EXTRACT('minute' FROM to_timestamp(modified))::integer %% 60) * interval '15 minutes' as date, min(last), max(last) "
                    "FROM cx_price_revision "
                    "WHERE currency='CAD' "
-                    "AND to_timestamp(modified) < CURRENT_TIMESTAMP AND to_timestamp(modified) > (CURRENT_TIMESTAMP - INTERVAL '60 days')"
+                    "AND to_timestamp(modified) < CURRENT_TIMESTAMP AND to_timestamp(modified) > (CURRENT_TIMESTAMP - INTERVAL '40 days')"
                    "GROUP BY 1 ORDER BY date;")
 
 
