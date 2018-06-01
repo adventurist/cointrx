@@ -1,11 +1,12 @@
 from tornado.ioloop import IOLoop, PeriodicCallback
-from tornado import gen
 from tornado.websocket import websocket_connect, WebSocketError
+from utils.cointrx_client import Client as HttpClient
 from uuid import uuid4
-from utils.cointrx_client import Client as http_client
 from datetime import datetime
 from decimal import Decimal
+from copy import deepcopy
 import json
+
 
 
 class Client(object):
@@ -66,7 +67,7 @@ class Bot(object):
     def __init__(self, config, logger):
         self.id = uuid4()  # Unique identifier
         self.client = Client(id=self.id, timeout=config.timeout)  # WebSocket client
-        self.http_client = http_client()  # HTTP Client
+        self.http_client = HttpClient()  # HTTP Client
         self.logger = logger
         self.number = config.number
         self.credentials = None  # User credentials for authentication
@@ -127,7 +128,7 @@ class Bot(object):
             # Clear analysis data, except for original price history entries
             self.reset_analysis_data()
             # Make a copy of the data to work with, instead of modifying and corrupting the data
-            entries = self.trc_struct.entries.copy()
+            entries = deepcopy(self.trc_struct.entries)
             # Sort entries to determine Max, Min and Range between
             sort_by_price = sorted(entries, key=lambda x: Decimal(x['high']))
             self.trc_struct.min = sort_by_price[0]
@@ -147,11 +148,9 @@ class Bot(object):
                 # If point is close to max, add to peaks
                 if close_to_max(row, self.trc_struct.max, self.trc_struct.max_offset) and self.peak_not_added(i):
                     self.add_entry_to_peak(row, i)
-                    self.logger.debug('Added to peak', str(row['high']), str(row['date']))
                 # If point is close to min, add to bases
                 elif close_to_min(row, self.trc_struct.min, self.trc_struct.max_offset) and self.base_not_added(i):
                     self.add_entry_to_base(row, i)
-                    self.logger.debug('Added to base', row['high'], row['date'])
                 # Check to see if the data point is the first low/high or last low/high in the dataset
                 # Add entries to base/peak if they haven't been already
                 if self.is_first_low(row, i):
@@ -182,7 +181,6 @@ class Bot(object):
                 self.trc_struct.map[i] = entry['high']
 
             self.logger.info('Finished sorting Trc Structure\n')
-            self.logger.debug(str(self.trc_struct))
 
     def is_first_low(self, r, idx):
         """ Check to see if row occurs within first historical period """
@@ -479,7 +477,7 @@ class PatternFinder(object):
                         del (bases_map[base['idx']])
                 # TODO find out how many bases are the minimum required to assert that we've found a cup
                 if len(findings['downward_trend']) > 0:
-                    findings['first_peak'] = peak['idx']
+                    findings['first_peak'] = peaks[i]
                     findings['second_peak'] = peaks[i + 1]
                     findings['cup_bottom'] = sorted(findings['downward_trend'], key=lambda x: Decimal(x['value']))[0]
                     findings['cup'] = True
@@ -495,7 +493,7 @@ class PatternFinder(object):
             remaining_entries = {k: v for (k, v) in trc_map.items() if k > int(findings['downward_trend'][-1]['idx'])}
             up_trend = 0
             remaining_keys = list(remaining_entries.keys())
-            bottom_peak_ratio = ratio_a_over_b(findings['cup_bottom']['value'], trc_map[findings['first_peak']])
+            bottom_peak_ratio = ratio_a_over_b(findings['cup_bottom']['value'], trc_map[findings['first_peak']['idx']])
             # Check and see if the first element of the remaining_entries is part of an upward_trend
             # num = v_struct['entries'][remaining_entries[remaining_keys[0]]]['high']
 
@@ -509,7 +507,9 @@ class PatternFinder(object):
                     # Skip the first value, since we've already recorded it
                     if i == 0:
                         continue
-                    value_peak_ratio = ratio_a_over_b(remaining_entries[idx], trc_map[findings['first_peak']])
+                    if remaining_entries[idx] == '10530.52':
+                        stop_here = 'stophere'
+                    value_peak_ratio = ratio_a_over_b(remaining_entries[idx], trc_map[findings['first_peak']['idx']])
                     # Check each entry against the previous entry, to ensure it is an upward trend
                     if non_regressive_trend(bottom_peak_ratio, value_peak_ratio, remaining_entries[idx],
                                             remaining_entries[remaining_keys[i - 1]]):
@@ -523,6 +523,7 @@ class PatternFinder(object):
 
             if up_trend > 1:
                 stop_here = 'stophere'
+                findings['handle'] = True
                 # Second last implementation
                 # for k, v in remaining_entries.items():
                 #     if k in remaining_entries and k - 1 in remaining_entries and v > remaining_entries[k - 1]:
@@ -579,7 +580,10 @@ def ratio_a_over_b(a, b):
 
 def non_regressive_trend(bottom_ratio, current_ratio, current_value, previous_value):
     a = Decimal(current_value) if current_value > previous_value else Decimal(previous_value)
-    b = Decimal(previous_value) if a == current_value else Decimal(current_value)
-    ratio_comparison = (1 - Decimal(current_ratio)) > (1 - Decimal(bottom_ratio)) / 2
-    value_comparison = Decimal(b / a) > Decimal(0.95)
+    b = Decimal(previous_value) if a == Decimal(current_value) else Decimal(current_value)
+    prev_diff = (1 - Decimal(bottom_ratio)) / 2
+    curr_diff = 1 - Decimal(current_ratio)
+    val_diff = Decimal(b / a)
+    ratio_comparison = abs(1 - Decimal(current_ratio)) < (1 - Decimal(bottom_ratio)) / Decimal(2)
+    value_comparison = Decimal(b / a) > Decimal(0.98)
     return ratio_comparison and value_comparison
