@@ -4,8 +4,8 @@ from bokeh.layouts import gridplot
 from tornado.websocket import WebSocketHandler, WebSocketError, StreamClosedError
 from tornado.web import Application, RequestHandler, HTTPError
 from tornado.log import enable_pretty_logging
-from utils.wsclient import Bot
-from pythonjsonlogger import jsonlogger
+from utils.wsclient import Bot, as_unixtime
+import pandas as pd
 from types import SimpleNamespace
 from utils.cointrx_client import Client
 
@@ -16,9 +16,12 @@ import tornado.ioloop
 import logging
 import os
 import json
+import math
 
 from bokeh.plotting import figure, output_file, ColumnDataSource, save
-from bokeh.models import HoverTool
+from bokeh.models import HoverTool, Plot, DataRange1d, LinearAxis, Grid
+from bokeh.models.glyphs import Bezier
+from bokeh.io import curdoc
 
 import numpy as np
 
@@ -165,55 +168,8 @@ class BotTrcAnalysisHandler(RequestHandler):
             bot.analyze_price_history()
             price_data = await bot.post_data_as_json()
 
-            entry_dates = [x[1] for x in price_data[0]]
-            peak_dates = [x[1] for x in price_data[1]]
-            base_dates = [x[1] for x in price_data[2]]
-
-            entry_prices = [x[0] for x in price_data[0]]
-            peak_prices = [x[0] for x in price_data[1]]
-            base_prices = [x[0] for x in price_data[2]]
-
-            source = ColumnDataSource({'date': datetime(entry_dates), 'price': entry_prices})
-
-            p1 = figure(x_axis_type="datetime", title="BTC Market Analysis")
-            p1.grid.grid_line_alpha = 0.3
-            p1.xaxis.axis_label = 'Date'
-            p1.yaxis.axis_label = 'Price'
-
-            line = p1.line(x='date', y='price', source=source, color='#33ff00', legend='BTC', line_cap='round',
-                           line_width=2)
-
-            p1.add_tools(HoverTool(
-                renderers=[line],
-                tooltips=("""
-                    <div style="padding: 12px; background: #5d5d5d;">
-                        <span style="color: #3fe108; font-size: 20px;">Price: $@price CAD</span><br />
-                        <span style="color: #3fe108; font-size: 16px;">(Date: @date{%D - %H:%m})</span>
-                    </div>
-                """),
-                formatters={
-                    'date': 'datetime'
-                }
-            ))
-
-            p1.circle(datetime(peak_dates), peak_prices, color='#ff00eb', legend='Peaks', line_width=6)
-            p1.circle(datetime(base_dates), base_prices, color='#ff6a00', legend='Bases', line_width=6)
-            p1.square(datetime([price_data[3][0]]), [price_data[3][1]], color='#2700ff', legend="First Low",
-                      line_width=6)
-            p1.triangle(datetime([price_data[4][0]]), [price_data[4][1]], color='#f00000', legend="First High",
-                        line_width=6)
-            p1.square(datetime([price_data[5][0]]), [price_data[5][1]], color='#2700ff', legend="Last Low",
-                      line_width=6)
-            p1.triangle(datetime([price_data[6][0]]), [price_data[6][1]], color='#f00000', legend="Last High",
-                        line_width=6)
-
-            p1.legend.location = "bottom_right"
-            filename = "analysis" + str(bot.number) + ".html"
-            output_file('analysis/%s' % filename,
-                        title="analysis" + str(bot.number) + ".py BTC Price Analysis", mode="inline")
-            save(gridplot([[p1]], plot_width=1600, plot_height=960))
-            file_mv_result = expose_analysis_files()
-            application.logger.debug('File move result: %s' % file_mv_result)
+            filename = build_graph(price_data, bot.number)
+            # filename = build_bezier()
 
             self.write(json.dumps({'response': 201, 'filename': '%s' % filename, 'bot_id': bot_id}))
 
@@ -303,12 +259,18 @@ async def handle_ws_request(type, data):
             try:
                 bot = application.retrieve_bot_by_id(data['bot_id'])
                 patterns = await bot.find_all_patterns()
-                return {'action': 'pattern:results:update', 'payload': {'patterns': patterns, 'result': 1}}
+                findings = patterns['cup_and_handle']
+                price_history = await bot.retrieve_price_history(60)
+                # bot.digest_price_history(price_history)
+                bot.analyze_price_history()
+                price_data = await bot.post_data_as_json()
+                filename = build_graph(price_data, bot.number, findings)
+                return {'action': 'pattern:results:update',
+                        'payload': {'patterns': patterns, 'filename': filename, 'result': 1}}
             except HTTPError as e:
                 e.log_message = 'Unable to close bot connection for bot with id %s' % data['id']
                 e.status_code = 500
                 return {'action': 'noaction', 'payload': {'request': 'close bot connections', 'result': 0, 'error': e}}
-
 
     switch = {
         'request': analyze_market,
@@ -331,6 +293,14 @@ class BotFetchHandler(RequestHandler):
         self.write(json.dumps(bots))
 
 
+class BotTrcPatternAnalysisHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def post(self, *args, **kwargs):
+        data = json.loads(self.request.body)
+
+
 class BotApplication(Application):
     def __init__(self):
         handlers = [
@@ -342,7 +312,8 @@ class BotApplication(Application):
             (r"/bots/fetch", BotFetchHandler),
             (r"/ws/start", BotWsStartHandler),
             (r"/bots/trc/prices", BotTrcPriceHandler),
-            (r"/bots/trc/analyze", BotTrcAnalysisHandler)
+            (r"/bots/trc/analyze", BotTrcAnalysisHandler),
+            (r"/bots/trc/analyze/pattern", BotTrcPatternAnalysisHandler)
         ]
         settings = {
             "debug": True,
@@ -450,6 +421,178 @@ async def make_bots(num):
         return bots
     else:
         return {'error': 'Requested number of bots exceeds available accounts'}
+
+
+def build_bezier():
+    x0 = math.floor(float(as_unixtime('2018-04-18 17:30:00')))
+    xm = math.floor(float(as_unixtime('2018-04-18 18:00:00')))
+    xm1 = math.floor(float(as_unixtime('2018-04-18 18:30:00')))
+    x1 = math.floor(float(as_unixtime('2018-04-18 19:00:00')))
+    N = 1
+    x = np.linspace(x0, x1, N)
+    y = x ** 2
+
+    # bezier_source = ColumnDataSource({
+    #             # 'x0': [pd.Timestamp('2018-04-18 17:30:00')],
+    #             'x0': x,
+    #             'xm': [xm],
+    #             'x1': [x1],
+    #             'y0': ['10351.10'],
+    #             'ym': ['10333.33'],
+    #             'y1': ['10403.79']
+    # })
+    bezier_source = ColumnDataSource({
+        'x': [x0],
+        # 'y':y,
+        'y': 10351.10,
+        'xp02': x1,
+        'xp01': xm,
+        'xm01': xm1,
+        # 'yp01':y+0.2,
+        'yp01': 10333.33,
+        'ym01': 10403.79,
+        # 'ym01':y-0.2
+    })
+    xdr = DataRange1d()
+    ydr = DataRange1d()
+
+    plot = Plot(
+        title=None, x_range=xdr, y_range=ydr, plot_width=300, plot_height=300,
+        h_symmetry=False, v_symmetry=False, min_border=0, toolbar_location=None)
+
+    glyph = Bezier(x0="x", y0="y", x1="xp02", y1="y", cx0="xp01", cy0="yp01", cx1="xm01", cy1="ym01",
+                   line_color="#d95f02", line_width=2)
+    plot.add_glyph(bezier_source, glyph)
+
+    xaxis = LinearAxis()
+    plot.add_layout(xaxis, 'below')
+
+    yaxis = LinearAxis()
+    plot.add_layout(yaxis, 'left')
+
+    plot.add_layout(Grid(dimension=0, ticker=xaxis.ticker))
+    plot.add_layout(Grid(dimension=1, ticker=yaxis.ticker))
+
+    # curdoc().add_root(plot)
+
+    # glyph = Bezier(x0="x0", y0="y0", x1="x1", y1="y1", cx0="xm", cy0="ym", line_color="#d95f02", line_width=2)
+    # glyph2 = Bezier(x0="x", y0="y", x1="xp02", y1="y", cx0="xp01", cy0="yp01", cx1="xm01", cy1="ym01", line_color="#d95f02", line_width=2)
+    # p1 = figure(title="BTC Market Analysis", )
+    # p1.x_range.end = 6
+    # p1.grid.grid_line_alpha = 0.3
+    # # p1.background_fill_color = '#333333'
+    # p1.xaxis.axis_label = 'Date'
+    # p1.yaxis.axis_label = 'Price'
+    #
+    # p1.add_glyph(bezier_source, glyph2)
+    #
+    # p1.legend.location = "bottom_right"
+    filename = "analysis69.html"
+    output_file('analysis/%s' % filename,
+                title="analysis69.py BTC Price Analysis", mode="inline")
+
+    save(gridplot([[plot]], plot_width=1600, plot_height=960))
+
+    file_mv_result = expose_analysis_files()
+    application.logger.debug('File move result: %s' % file_mv_result)
+
+    return filename
+
+
+def build_graph(price_data, bot_number, pattern=None):
+    entry_dates = [x[1] for x in price_data[0]]
+    peak_dates = [x[1] for x in price_data[1]]
+    base_dates = [x[1] for x in price_data[2]]
+
+    entry_prices = [x[0] for x in price_data[0]]
+    peak_prices = [x[0] for x in price_data[1]]
+    base_prices = [x[0] for x in price_data[2]]
+
+    cup_line = None
+
+    source = ColumnDataSource({'date': [pd.Timestamp(x) for x in entry_dates], 'price': entry_prices})
+
+    p1 = figure(x_axis_type="datetime", title="BTC Market Analysis")
+
+    p1.background_fill_color = "#333333"
+    p1.grid.grid_line_alpha = 0.3
+    p1.xaxis.axis_label = 'Date'
+    p1.yaxis.axis_label = 'Price'
+
+    line = p1.line(x='date', y='price', source=source, color='#33ff00', legend='BTC', line_cap='round',
+                   line_width=2)
+
+    if pattern is not None:
+        x0, xm, x1, y0, ym, y1 = extract_bezier_points(pattern)
+        cup_source = ColumnDataSource({
+            'date': datetime([x0, xm, x1]),
+            'price': [y0, ym, y1],
+        })
+        cup_line = p1.line(x='date', y='price', source=cup_source, color='#4e0080', legend='cup', line_cap='round',
+                           line_width=2)
+
+    if cup_line is None and line is not None:
+        p1.add_tools(HoverTool(
+            renderers=[line],
+            tooltips=("""
+                        <div style="padding: 12px; background: #5d5d5d;">
+                            <span style="color: #3fe108; font-size: 20px;">Price: $@price CAD</span><br />
+                            <span style="color: #3fe108; font-size: 16px;">(Date: @date{%D - %H:%m})</span>
+                        </div>
+                    """),
+            formatters={
+                'date': 'datetime'
+            }
+        ))
+
+    p1.circle(datetime(peak_dates), peak_prices, color='#ff00eb', legend='Peaks', line_width=6)
+    p1.circle(datetime(base_dates), base_prices, color='#ff6a00', legend='Bases', line_width=6)
+    p1.square(datetime([price_data[3][0]]), [price_data[3][1]], color='#2700ff', legend="First Low",
+              line_width=6)
+    p1.triangle(datetime([price_data[4][0]]), [price_data[4][1]], color='#f00000', legend="First High",
+                line_width=6)
+    p1.square(datetime([price_data[5][0]]), [price_data[5][1]], color='#2700ff', legend="Last Low",
+              line_width=6)
+    p1.triangle(datetime([price_data[6][0]]), [price_data[6][1]], color='#f00000', legend="Last High",
+                line_width=6)
+
+    p1.legend.location = "bottom_right"
+    filename = "analysis" + str(bot_number) + ".html"
+    output_file('analysis/%s' % filename,
+                title="analysis" + str(bot_number) + ".py BTC Price Analysis", mode="inline")
+    if cup_line is not None:
+        save(gridplot([[p1]], plot_width=1600, plot_height=960))
+    else:
+        save(gridplot([[p1]], plot_width=1600, plot_height=960))
+
+    file_mv_result = expose_analysis_files()
+    application.logger.debug('File move result: %s' % file_mv_result)
+
+    return filename
+
+
+def extract_bezier_points(data):
+    date_start = data['first_peak']['date']
+    date_end = data['second_peak']['date']
+    # date_start = pd.Timestamp(data['first_peak']['date'])
+    # date_end = pd.Timestamp(data['second_peak']['date'])
+    # date_start = as_unixtime(data['first_peak']['date'])
+    # date_end = as_unixtime(data['second_peak']['date'])
+    # x0 = np.linspace(date_start, date_end, 1)
+    # x0 = np.linspace(date_start.value, date_end.value, 1)
+    x0 = date_start
+    # x0 = datetime(data['first_peak']['date'])
+    xm = data['cup_bottom']['date']
+    x1 = data['second_peak']['date']
+    # xm = pd.Timestamp(data['cup_bottom']['date'])
+    # x1 = pd.Timestamp(data['second_peak']['date'])
+    # xm = as_unixtime(data['cup_bottom']['date'])
+    # x1 = as_unixtime(data['second_peak']['date'])
+    y0 = data['first_peak']['value']
+    ym = data['cup_bottom']['value']
+    y1 = data['second_peak']['value']
+
+    return x0, xm, x1, y0, ym, y1
 
 
 def handle_error(err, name):
