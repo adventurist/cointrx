@@ -17142,23 +17142,15 @@ var _Chip = __webpack_require__(622);
 
 var _Chip2 = _interopRequireDefault(_Chip);
 
-var _done = __webpack_require__(625);
+var _utils = __webpack_require__(625);
 
-var _done2 = _interopRequireDefault(_done);
-
-var _utils = __webpack_require__(626);
-
-var _loglevel = __webpack_require__(627);
+var _loglevel = __webpack_require__(626);
 
 var _loglevel2 = _interopRequireDefault(_loglevel);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// import trx from '../redux'
-
-// const trxInstance = trx()
 
 var urls = JSON.parse(botUrls.replace(/'/g, '"'));
 
@@ -66726,44 +66718,6 @@ exports.default = NavigationCancel;
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _pure = __webpack_require__(18);
-
-var _pure2 = _interopRequireDefault(_pure);
-
-var _SvgIcon = __webpack_require__(19);
-
-var _SvgIcon2 = _interopRequireDefault(_SvgIcon);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var ActionDone = function ActionDone(props) {
-  return _react2.default.createElement(
-    _SvgIcon2.default,
-    props,
-    _react2.default.createElement('path', { d: 'M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z' })
-  );
-};
-ActionDone = (0, _pure2.default)(ActionDone);
-ActionDone.displayName = 'ActionDone';
-ActionDone.muiName = 'SvgIcon';
-
-exports.default = ActionDone;
-
-/***/ }),
-/* 626 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.request = exports.SOCKET_CLOSED = exports.SOCKET_CLOSING = exports.SOCKET_OPEN = exports.SOCKET_CONNECTING = undefined;
@@ -67025,7 +66979,7 @@ function isJson(str) {
 }
 
 /***/ }),
-/* 627 */
+/* 626 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
