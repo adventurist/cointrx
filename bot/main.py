@@ -523,6 +523,7 @@ def build_graph(price_data, bot_number, pattern=None):
                    line_width=2)
 
     if pattern is not None:
+        log.debug('Pattern is here', pattern)
         x0, xm, x1, y0, ym, y1 = extract_bezier_points(pattern)
         cup_source = ColumnDataSource({
             'date': datetime([x0, xm, x1]),
