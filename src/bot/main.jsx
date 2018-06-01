@@ -25,12 +25,8 @@ import Patterns from 'material-ui/svg-icons/image/blur-linear'
 import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
 import Chip from 'material-ui/Chip'
-import DoneIcon from 'material-ui/svg-icons/action/done'
 import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
 import log from 'loglevel'
-// import trx from '../redux'
-
-// const trxInstance = trx()
 
 const urls = JSON.parse(botUrls.replace(/'/g, '"'))
 
@@ -548,7 +544,7 @@ export class TrxLayout extends React.Component {
                 </CardText>
                 <Chip
                     id="data-ready"
-                    class={this.state.dataReady ? "data-ready-show" : "data-ready-hidden"}
+                    className={this.state.dataReady ? "data-ready-show" : "data-ready-hidden"}
                     backgroundColor={red500}
                     style={styles.chip}
                     deleteIconStyle={{ width: 5, height: 5, fontSize: 5 }}>
