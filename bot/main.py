@@ -423,82 +423,6 @@ async def make_bots(num):
         return {'error': 'Requested number of bots exceeds available accounts'}
 
 
-def build_bezier():
-    x0 = math.floor(float(as_unixtime('2018-04-18 17:30:00')))
-    xm = math.floor(float(as_unixtime('2018-04-18 18:00:00')))
-    xm1 = math.floor(float(as_unixtime('2018-04-18 18:30:00')))
-    x1 = math.floor(float(as_unixtime('2018-04-18 19:00:00')))
-    N = 1
-    x = np.linspace(x0, x1, N)
-    y = x ** 2
-
-    # bezier_source = ColumnDataSource({
-    #             # 'x0': [pd.Timestamp('2018-04-18 17:30:00')],
-    #             'x0': x,
-    #             'xm': [xm],
-    #             'x1': [x1],
-    #             'y0': ['10351.10'],
-    #             'ym': ['10333.33'],
-    #             'y1': ['10403.79']
-    # })
-    bezier_source = ColumnDataSource({
-        'x': [x0],
-        # 'y':y,
-        'y': 10351.10,
-        'xp02': x1,
-        'xp01': xm,
-        'xm01': xm1,
-        # 'yp01':y+0.2,
-        'yp01': 10333.33,
-        'ym01': 10403.79,
-        # 'ym01':y-0.2
-    })
-    xdr = DataRange1d()
-    ydr = DataRange1d()
-
-    plot = Plot(
-        title=None, x_range=xdr, y_range=ydr, plot_width=300, plot_height=300,
-        h_symmetry=False, v_symmetry=False, min_border=0, toolbar_location=None)
-
-    glyph = Bezier(x0="x", y0="y", x1="xp02", y1="y", cx0="xp01", cy0="yp01", cx1="xm01", cy1="ym01",
-                   line_color="#d95f02", line_width=2)
-    plot.add_glyph(bezier_source, glyph)
-
-    xaxis = LinearAxis()
-    plot.add_layout(xaxis, 'below')
-
-    yaxis = LinearAxis()
-    plot.add_layout(yaxis, 'left')
-
-    plot.add_layout(Grid(dimension=0, ticker=xaxis.ticker))
-    plot.add_layout(Grid(dimension=1, ticker=yaxis.ticker))
-
-    # curdoc().add_root(plot)
-
-    # glyph = Bezier(x0="x0", y0="y0", x1="x1", y1="y1", cx0="xm", cy0="ym", line_color="#d95f02", line_width=2)
-    # glyph2 = Bezier(x0="x", y0="y", x1="xp02", y1="y", cx0="xp01", cy0="yp01", cx1="xm01", cy1="ym01", line_color="#d95f02", line_width=2)
-    # p1 = figure(title="BTC Market Analysis", )
-    # p1.x_range.end = 6
-    # p1.grid.grid_line_alpha = 0.3
-    # # p1.background_fill_color = '#333333'
-    # p1.xaxis.axis_label = 'Date'
-    # p1.yaxis.axis_label = 'Price'
-    #
-    # p1.add_glyph(bezier_source, glyph2)
-    #
-    # p1.legend.location = "bottom_right"
-    filename = "analysis69.html"
-    output_file('analysis/%s' % filename,
-                title="analysis69.py BTC Price Analysis", mode="inline")
-
-    save(gridplot([[plot]], plot_width=1600, plot_height=960))
-
-    file_mv_result = expose_analysis_files()
-    application.logger.debug('File move result: %s' % file_mv_result)
-
-    return filename
-
-
 def build_graph(price_data, bot_number, pattern=None):
     entry_dates = [x[1] for x in price_data[0]]
     peak_dates = [x[1] for x in price_data[1]]
@@ -529,8 +453,8 @@ def build_graph(price_data, bot_number, pattern=None):
             'date': datetime([x0, xm, x1]),
             'price': [y0, ym, y1],
         })
-        cup_line = p1.line(x='date', y='price', source=cup_source, color='#4e0080', legend='cup', line_cap='round',
-                           line_width=2)
+        cup_line = p1.line(x='date', y='price', source=cup_source, color='#f4e4ff', legend='cup', line_cap='round',
+                           line_width=4)
 
     if cup_line is None and line is not None:
         p1.add_tools(HoverTool(
