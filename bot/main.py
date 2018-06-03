@@ -433,6 +433,7 @@ def build_graph(price_data, bot_number, pattern=None):
     base_prices = [x[0] for x in price_data[2]]
 
     cup_line = None
+    lines_to_render = []
 
     source = ColumnDataSource({'date': [pd.Timestamp(x) for x in entry_dates], 'price': entry_prices})
 
@@ -445,6 +446,7 @@ def build_graph(price_data, bot_number, pattern=None):
 
     line = p1.line(x='date', y='price', source=source, color='#33ff00', legend='BTC', line_cap='round',
                    line_width=2)
+    lines_to_render.append(line)
 
     if pattern is not None:
         log.debug('Pattern is here', pattern)
@@ -455,20 +457,20 @@ def build_graph(price_data, bot_number, pattern=None):
         })
         cup_line = p1.line(x='date', y='price', source=cup_source, color='#f4e4ff', legend='cup', line_cap='round',
                            line_width=4)
+        lines_to_render.append(cup_line)
 
-    if cup_line is None and line is not None:
-        p1.add_tools(HoverTool(
-            renderers=[line],
-            tooltips=("""
-                        <div style="padding: 12px; background: #5d5d5d;">
-                            <span style="color: #3fe108; font-size: 20px;">Price: $@price CAD</span><br />
-                            <span style="color: #3fe108; font-size: 16px;">(Date: @date{%D - %H:%m})</span>
-                        </div>
-                    """),
-            formatters={
-                'date': 'datetime'
-            }
-        ))
+    p1.add_tools(HoverTool(
+        renderers=lines_to_render,
+        tooltips=("""
+                    <div style="padding: 12px; background: #5d5d5d;">
+                        <span style="color: #3fe108; font-size: 20px;">Price: $@price CAD</span><br />
+                        <span style="color: #3fe108; font-size: 16px;">(Date: @date{%D - %H:%m})</span>
+                    </div>
+                """),
+        formatters={
+            'date': 'datetime'
+        }
+    ))
 
     p1.circle(datetime(peak_dates), peak_prices, color='#ff00eb', legend='Peaks', line_width=6)
     p1.circle(datetime(base_dates), base_prices, color='#ff6a00', legend='Bases', line_width=6)
