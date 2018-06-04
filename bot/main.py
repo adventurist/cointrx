@@ -423,7 +423,7 @@ async def make_bots(num):
         return {'error': 'Requested number of bots exceeds available accounts'}
 
 
-def build_graph(price_data, bot_number, pattern=None):
+def build_graph(price_data, bot_number, patterns=None):
     entry_dates = [x[1] for x in price_data[0]]
     peak_dates = [x[1] for x in price_data[1]]
     base_dates = [x[1] for x in price_data[2]]
@@ -448,16 +448,17 @@ def build_graph(price_data, bot_number, pattern=None):
                    line_width=2)
     lines_to_render.append(line)
 
-    if pattern is not None:
-        log.debug('Pattern is here', pattern)
-        x0, xm, x1, y0, ym, y1 = extract_bezier_points(pattern)
-        cup_source = ColumnDataSource({
-            'date': datetime([x0, xm, x1]),
-            'price': [y0, ym, y1],
-        })
-        cup_line = p1.line(x='date', y='price', source=cup_source, color='#f4e4ff', legend='cup', line_cap='round',
-                           line_width=4)
-        lines_to_render.append(cup_line)
+    if patterns is not None:
+        for i, pattern in enumerate(patterns):
+            log.debug('Pattern is here', patterns)
+            x0, xm, x1, y0, ym, y1 = extract_bezier_points(pattern)
+            cup_source = ColumnDataSource({
+                'date': datetime([x0, xm, x1]),
+                'price': [y0, ym, y1],
+            })
+            cup_line = p1.line(x='date', y='price', source=cup_source, color='#b241ff', legend='cup%s' % str(i), line_cap='round',
+                               line_width=4)
+            lines_to_render.append(cup_line)
 
     p1.add_tools(HoverTool(
         renderers=lines_to_render,
@@ -499,22 +500,9 @@ def build_graph(price_data, bot_number, pattern=None):
 
 
 def extract_bezier_points(data):
-    date_start = data['first_peak']['date']
-    date_end = data['second_peak']['date']
-    # date_start = pd.Timestamp(data['first_peak']['date'])
-    # date_end = pd.Timestamp(data['second_peak']['date'])
-    # date_start = as_unixtime(data['first_peak']['date'])
-    # date_end = as_unixtime(data['second_peak']['date'])
-    # x0 = np.linspace(date_start, date_end, 1)
-    # x0 = np.linspace(date_start.value, date_end.value, 1)
-    x0 = date_start
-    # x0 = datetime(data['first_peak']['date'])
+    x0 = data['first_peak']['date']
     xm = data['cup_bottom']['date']
     x1 = data['second_peak']['date']
-    # xm = pd.Timestamp(data['cup_bottom']['date'])
-    # x1 = pd.Timestamp(data['second_peak']['date'])
-    # xm = as_unixtime(data['cup_bottom']['date'])
-    # x1 = as_unixtime(data['second_peak']['date'])
     y0 = data['first_peak']['value']
     ym = data['cup_bottom']['value']
     y1 = data['second_peak']['value']

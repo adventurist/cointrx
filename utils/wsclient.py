@@ -8,7 +8,6 @@ from copy import deepcopy
 import json
 
 
-
 class Client(object):
     def __init__(self, id, timeout=20000):
         self.id = id
@@ -453,11 +452,6 @@ class PatternFinder(object):
         self.value_structure = struct
 
     def cup_and_handle(self):
-        findings = {
-            'first_peak': None, 'second_peak': None, 'cup_bottom': None, 'handle_bottom': None, 'cup': None,
-            'handle': None, 'handle_breakout': None,
-            'downward_trend': [], 'handle_downward_trend': [], 'end_of_downward_trend': None, 'handle_upward_trend': []
-        }
 
         v_struct = self.value_structure
         peaks = v_struct.peak
@@ -466,100 +460,98 @@ class PatternFinder(object):
         bases_map = v_struct.base_map
         trc_map = v_struct.map
 
+        findings = []
+        analysis_complete = False
+        counter = -1
+        # while not analysis_complete and len(peaks) > 1:
+
         for i, peak in enumerate(peaks):
+            # Create fresh dictionary to store the results of each investigation. The dataset will be investigated for boundaries and evidence of a specific behaviour between those boundaries.
+            cup_result = {
+                'first_peak': None, 'second_peak': None, 'cup_bottom': None, 'handle_bottom': None, 'cup': None,
+                'handle': None, 'handle_breakout': None,
+                'downward_trend': [], 'handle_downward_trend': [], 'end_of_downward_trend': None,
+                'handle_upward_trend': []
+            }
             # check for gaps between peaks5
             if i < len(peaks) - 1 and peaks[i + 1]['idx'] != peak['idx'] + 1:
                 # Find any bases which occur between this gap
                 for j, base in enumerate(bases):
                     if peak['idx'] < base['idx'] < peaks[i + 1]['idx']:
-                        findings['downward_trend'].append(base)
-                        # delete the base so we don't have to iterate it ever again
-                        del (bases_map[base['idx']])
+                        cup_result['downward_trend'].append(base)
                 # TODO find out how many bases are the minimum required to assert that we've found a cup
-                if len(findings['downward_trend']) > 0:
-                    findings['first_peak'] = peaks[i]
-                    findings['second_peak'] = peaks[i + 1]
-                    findings['cup_bottom'] = sorted(findings['downward_trend'], key=lambda x: Decimal(x['value']))[0]
-                    findings['cup'] = True
-                    # Delete the peaks of the cup from the initial peaks list
-                    del peaks_map[peaks[i]['idx']]
-                    del peaks_map[peaks[i + 1]['idx']]
-                    # Stop iterating
-                    break
-            # Delete peak just iterated, since there is only ever a potential requirement to iterate over later peaks
-            del peaks_map[peaks[i]['idx']]
-        # Continue analyzing if we found a cup
-        if findings['cup']:
-            remaining_entries = {k: v for (k, v) in trc_map.items() if k > int(findings['downward_trend'][-1]['idx'])}
-            up_trend = 0
-            remaining_keys = list(remaining_entries.keys())
-            bottom_peak_ratio = ratio_a_over_b(findings['cup_bottom']['value'], trc_map[findings['first_peak']['idx']])
-            # Check and see if the first element of the remaining_entries is part of an upward_trend
-            # num = v_struct['entries'][remaining_entries[remaining_keys[0]]]['high']
+                if len(cup_result['downward_trend']) > 0:
+                    # If a downward trend was observed, save the boundaries and the lowest point within them, to mark the basic expression of the cup
+                    cup_result['first_peak'] = peaks[i]
+                    cup_result['second_peak'] = peaks[i + 1]
+                    cup_result['cup_bottom'] = sorted(cup_result['downward_trend'], key=lambda x: Decimal(x['value']))[
+                        0]
+                    cup_result['cup'] = True
+                    # Add our finding to the array
+                    findings.append(cup_result)
 
-            if str_num_a_above_b(remaining_entries[remaining_keys[0]],
-                                 findings['downward_trend'][len(findings['downward_trend']) - 1]['value']):
-                # add to our findings and attempt to continue analyzing a potential upward trend
-                findings['handle_upward_trend'].append(
-                    {'idx': remaining_keys[0], 'value': remaining_entries[remaining_keys[0]]})
-                up_trend += 1
-                for i, idx in enumerate(remaining_keys):
-                    # Skip the first value, since we've already recorded it
-                    if i == 0:
-                        continue
-                    if remaining_entries[idx] == '10530.52':
-                        stop_here = 'stophere'
-                    value_peak_ratio = ratio_a_over_b(remaining_entries[idx], trc_map[findings['first_peak']['idx']])
-                    # Check each entry against the previous entry, to ensure it is an upward trend
-                    if non_regressive_trend(bottom_peak_ratio, value_peak_ratio, remaining_entries[idx],
-                                            remaining_entries[remaining_keys[i - 1]]):
-                        findings['handle_upward_trend'].append(
-                            {'idx': idx, 'value': remaining_entries[remaining_keys[i - 1]]})
-                        up_trend += 1
-                    # Break once the upward trend is complete
-                    else:
-                        # Mark this peak
-                        break
+                del cup_result
+            # For any finding, we must search for its corresponding handle
+        if len(findings) > 0 and len([x for x in findings if x['cup']]) > 0:
+            for pattern_index, cup_result in enumerate(findings):
+                remaining_entries = {k: v for (k, v) in trc_map.items() if
+                                     k > int(cup_result['downward_trend'][-1]['idx'])}
+                up_trend = 0
+                remaining_keys = list(remaining_entries.keys())
+                bottom_peak_ratio = ratio_a_over_b(cup_result['cup_bottom']['value'],
+                                                   trc_map[cup_result['first_peak']['idx']])
+                # Check and see if the first element of the remaining_entries is part of an upward_trend
+                # num = v_struct['entries'][remaining_entries[remaining_keys[0]]]['high']
 
-            if up_trend > 1:
-                stop_here = 'stophere'
-                findings['handle'] = True
-                # Second last implementation
-                # for k, v in remaining_entries.items():
-                #     if k in remaining_entries and k - 1 in remaining_entries and v > remaining_entries[k - 1]:
-                #         print('jigga')
-                #
-                # findings['end_of_downward_trend'] = v_struct.entries[int(findings['downward_trend'][-1]['idx']):]
-                #
-                # # Oldest implementation
-                # for i, idx in enumerate(remaining_keys):
-                #     if gap_exists(idx, remaining_entries[i + 1]):
-                #
-                #         for j, base in enumerate(bases):
-                #             if between_peaks(peak['idx'], peaks[i + 1]['idx'], base['idx']):
-                #                 findings['handle_downward_trend'].append(base)
-                #                 # delete the base so we don't have to iterate it ever again
-                #                 del (bases[j])
-                #         if len(findings['handle_downward_trend']) > 0:
-                #             findings['handle_breakout'] = peaks[i + i]
-                #             findings['handle_bottom'] = \
-                #             sorted(findings['handle_downward_trend'], key=lambda x: Decimal(x['value']))[
-                #                 0]
-                #             findings['handle'] = True
+                if str_num_a_above_b(remaining_entries[remaining_keys[0]],
+                                     cup_result['downward_trend'][len(cup_result['downward_trend']) - 1]['value']):
+                    # add to our cup_result and attempt to continue analyzing a potential upward trend
+                    cup_result['handle_upward_trend'].append(
+                        {'idx': remaining_keys[0], 'value': remaining_entries[remaining_keys[0]]})
+                    up_trend += 1
+                    for i, idx in enumerate(remaining_keys):
+                        # Skip the first value, since we've already recorded it
+                        if i == 0:
+                            continue
+                        value_peak_ratio = ratio_a_over_b(remaining_entries[idx],
+                                                          trc_map[cup_result['first_peak']['idx']])
+                        # Check each entry against the previous entry, to ensure it is an upward trend
+                        if non_regressive_trend(bottom_peak_ratio, value_peak_ratio, remaining_entries[idx],
+                                                remaining_entries[remaining_keys[i - 1]]):
+                            cup_result['handle_upward_trend'].append(
+                                {'idx': idx, 'value': remaining_entries[remaining_keys[i - 1]]})
+                            up_trend += 1
+                        # Break once the upward trend is complete
+                        else:
+                            # Mark this peak
+                            break
 
-        return {
-            'cup': findings['cup'],
-            'handle': findings['handle'],
-            'first_peak': findings['first_peak'],
-            'cup_bottom': findings['cup_bottom'],
-            'second_peak': findings['second_peak'],
-            'handle_bottom': findings['handle_bottom'],
-            'handle_breakout': findings['handle_breakout']
-        }
+                if up_trend > 1:
+                    cup_result['handle'] = True
+                    # Second last implementation
+                    # for k, v in remaining_entries.items():
+                    #     if k in remaining_entries and k - 1 in remaining_entries and v > remaining_entries[k - 1]:
+                    #         print('jigga')
+                    #
+                    # findings['end_of_downward_trend'] = v_struct.entries[int(findings['downward_trend'][-1]['idx']):]
+                    #
+                    # # Oldest implementation
+                    # for i, idx in enumerate(remaining_keys):
+                    #     if gap_exists(idx, remaining_entries[i + 1]):
+                    #
+                    #         for j, base in enumerate(bases):
+                    #             if between_peaks(peak['idx'], peaks[i + 1]['idx'], base['idx']):
+                    #                 findings['handle_downward_trend'].append(base)
+                    #                 # delete the base so we don't have to iterate it ever again
+                    #                 del (bases[j])
+                    #         if len(findings['handle_downward_trend']) > 0:
+                    #             findings['handle_breakout'] = peaks[i + i]
+                    #             findings['handle_bottom'] = \
+                    #             sorted(findings['handle_downward_trend'], key=lambda x: Decimal(x['value']))[
+                    #                 0]
+                    #             findings['handle'] = True
 
-
-# def gap_exists(item, a_list, i):
-#     return True if a_list[i]['idx'] is not item['idx'] + 1 else False
+        return findings
 
 
 def gap_exists(idx1, idx2):
