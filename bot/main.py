@@ -1,3 +1,4 @@
+
 import re
 from bokeh.layouts import gridplot
 
@@ -20,8 +21,8 @@ import math
 
 from bokeh.plotting import figure, output_file, ColumnDataSource, save
 from bokeh.models import HoverTool, Plot, DataRange1d, LinearAxis, Grid
-from bokeh.models.glyphs import Bezier
-from bokeh.io import curdoc
+from scipy import interpolate as intrpl
+
 
 import numpy as np
 
@@ -450,14 +451,24 @@ def build_graph(price_data, bot_number, patterns=None):
 
     if patterns is not None:
         for i, pattern in enumerate(patterns):
-            log.debug('Pattern is here', patterns)
             x0, xm, x1, y0, ym, y1 = extract_bezier_points(pattern)
+            x = datetime([x0, xm, x1])
+            y = [y0, ym, y1]
+
+            # t, c, k = intrpl.splrep(x, y, k=2, s=0)
+            # spline = intrpl.BSpline(t, c, k, extrapolate=False)
+
+            # smooth_source = ColumnDataSource({
+            #     'date': x,
+            #     # 'price': spline(y)
+            #     'price': y
+            # })
+            # smooth_source = cubic_column_datasource(x, y)
             cup_source = ColumnDataSource({
-                'date': datetime([x0, xm, x1]),
-                'price': [y0, ym, y1],
+                'date': x,
+                'price': y
             })
-            cup_line = p1.line(x='date', y='price', source=cup_source, color='#b241ff', legend='cup%s' % str(i), line_cap='round',
-                               line_width=4)
+            cup_line = p1.line(x='date', y='price', source=cup_source, color="#b241ff", legend="cup%s" % str(i), line_cap='round', line_width=4)
             lines_to_render.append(cup_line)
 
     p1.add_tools(HoverTool(
@@ -510,13 +521,33 @@ def extract_bezier_points(data):
     return x0, xm, x1, y0, ym, y1
 
 
+def smooth(y, box_pts):
+    y = [float(x) for x in y]
+    box = np.ones(box_pts)/box_pts
+    y_smooth = np.convolve(y, box, mode='same')
+    return y_smooth
+
+
 def handle_error(err, name):
     print(err)
     application.logger.debug(name + ' error: ', str(err))
 
 
 def has_error(d):
-    return True if isinstance(d, dict) and 'error' in d else False
+    return isinstance(d, dict) and 'error' in d
+
+
+def smooth_column_datasource(x, y):
+    return ColumnDataSource({
+        'date': x,
+        'price': y
+    })
+
+
+def cubic_column_datasource(x, y):
+    from scipy.interpolate import CubicSpline
+    spl = CubicSpline(x, y)
+    return ColumnDataSource({'date': x.astype('datetime64'), 'price': spl(y)})
 
 
 if __name__ == "__main__":
