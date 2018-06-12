@@ -1,18 +1,19 @@
+/* React */
 import * as React from 'react'
 import { render }from 'react-dom'
+
+/**
+* Material Libraries
+*
+* Theme and Layout
+*/
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
-import { TrxNav } from '../TrxAppBar.jsx'
 import { Layout, Panel } from 'react-toolbox'
-import {Card, CardActions, CardTitle, CardText} from 'material-ui/Card'
-import TextField from 'material-ui/TextField'
-import {orange500, red500} from 'material-ui/styles/colors'
-import NumericInput from 'react-numeric-input'
-import DropDownMenu from 'material-ui/DropDownMenu'
-import MenuItem from 'material-ui/MenuItem'
-import Avatar from 'material-ui/Avatar'
-import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton'
+import { TrxNav } from '../TrxAppBar.jsx'
+
+/* Colour and Icon */
 import TrendingUp from 'material-ui/svg-icons/action/trending-up'
 import CompareArrows from 'material-ui/svg-icons/action/compare-arrows'
 import AutoRenew from 'material-ui/svg-icons/action/autorenew'
@@ -22,9 +23,25 @@ import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
 import Sync from 'material-ui/svg-icons/notification/sync'
 import BotsOff from 'material-ui/svg-icons/file/cloud-off'
 import Patterns from 'material-ui/svg-icons/image/blur-linear'
+import { orange500, red500 } from 'material-ui/styles/colors'
+
+/* Menu */
+import DropDownMenu from 'material-ui/DropDownMenu'
+import MenuItem from 'material-ui/MenuItem'
+
+/* Inputs */
+import TextField from 'material-ui/TextField'
+import NumericInput from 'react-numeric-input'
+
+/* Buttons, Avatars */
+import { Card, CardActions, CardTitle, CardText } from 'material-ui/Card'
+import Avatar from 'material-ui/Avatar'
+import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton'
 import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
 import Chip from 'material-ui/Chip'
+
+/* utils */
 import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
 import log from 'loglevel'
 
@@ -265,6 +282,10 @@ export class TrxLayout extends React.Component {
     }
 
     /**
+     * @WSREQUEST
+     * Helper function for the internal bot API
+     * Service will return ID and status of bots currently in the pool
+     * 
      * @param {WebSocket} conn
      * @returns {Promise.<void>}
      */
@@ -272,7 +293,18 @@ export class TrxLayout extends React.Component {
         conn.send(JSON.stringify({type: 'bots:all', data: 'init'}))
     }
 
+    /**
+     * @to-be-deprecated
+     *
+     * Request and reserve bots
+     * Implementation to request instantiation a quantity of bots equal to
+     * the value set by the user. Each bot will have a WS channel opened to maintain
+     * a message stream via PING/PONG 
+     * 
+     * Currently a POST request, but can be re-written as a request for the WS Channel
+     */
     startBots = async () => {
+        // Fetch from the server
         const data = await request({
             url: urls.start,
             method: 'GET',
@@ -290,8 +322,10 @@ export class TrxLayout extends React.Component {
             if (Array.isArray(data.body.data)) {
                 data.body.data.map(bot => {
                     log.info(bot.message)
+                    // Open a message stream for each bot
                     const ws = requestWsForBot(this.msgHandler)
                     if (ws) {
+                        // Place in the container where they will await instruction
                         botConnections.push({id: bot.id, ws: ws, number: bot.number, dataReady: false})
                     }
                 })
@@ -302,12 +336,18 @@ export class TrxLayout extends React.Component {
                 if (!createResult) {
                     log.info('Problem creating the requested number of bots')
                 }
+                // Update state
                 this.onBotsCreate(currentBotNumber)
             }
 
         }
     }
 
+    /**
+     * @WSREQUEST
+     * 
+     * Requests that bots are terminated on the server
+     */
     async killBots () {
         const data = {
             data: [],
@@ -318,6 +358,12 @@ export class TrxLayout extends React.Component {
         }
     }
 
+    /**
+     * @to-be-deprecated
+     * 
+     * Requests the selected bot to load fresh data into data structure and perform
+     * prepare for analysis
+     */
     loadMarketData = async (event, index, value) => {
         const selectedBot = botConnections[this.state.selectedBot]
         log.info(event)
@@ -331,6 +377,7 @@ export class TrxLayout extends React.Component {
         const response = handleResponse(data)
         log.info(response)
         if (!response.error) {
+            // State needs to reflect that this bot is ready to analyze
             const bot = botConnections[this.state.selectedBot]
             botConnections[this.state.selectedBot].dataReady = true
             this.setState({dataReady: true})
@@ -338,6 +385,14 @@ export class TrxLayout extends React.Component {
         }
     }
 
+    /**
+     * @WSREQUEST
+     * 
+     * Requests that the selected bot perform general analysis on the data it has loaded
+     * Naming convention of `type` = 'request' is misleading. 'request' should be changed
+     * to 'bot:analyze'
+     */
+    // TODO rename 'request' to 'bot:analyze'
     analyzeMarketData = async () => {
         const selectedBot = botConnections[this.state.selectedBot]
 
@@ -354,13 +409,17 @@ export class TrxLayout extends React.Component {
         }
     }
 
+    /**
+     * @WSREQUEST
+     * 
+     * Requests that the selected bot search for any possible market patterns 
+     * in the data it has previously loaded and analyzed
+     */
     findPatterns = async () => {
         const selectedBot = botConnections[this.state.selectedBot]
 
         const data = {
-            data: {
-                bot_id: selectedBot.id,
-            },
+            data: { bot_id: selectedBot.id },
             type: 'patterns:search'
         }
 
@@ -372,6 +431,9 @@ export class TrxLayout extends React.Component {
     }
 
     /**
+     * Message handler provided to our web socket object. Parses incoming messages
+     * from a bot's socket stream for requested actions and reported errors from 
+     * the server
      *
      * @param message
      */
@@ -429,6 +491,11 @@ export class TrxLayout extends React.Component {
         log.info(`Remaining data to be handled`, message)
     }
 
+    /**
+     * Helper function to update the list of files in the GUI
+     * 
+     * @param {String} filename 
+     */
     updateFileList (filename) {
         const file = {
             url: `/static/analysis/${filename}`,
@@ -442,6 +509,9 @@ export class TrxLayout extends React.Component {
         }
     }
 
+    /**
+     * Helper function to open the file selected by the user, and update the state
+     */
     handleFileSelect = (event, index, value) => {
         console.log('File selection', event, index, value)
         if (value !== void 0) {
@@ -453,6 +523,9 @@ export class TrxLayout extends React.Component {
         }
     }
 
+    /**
+     * Render the component
+     */
     render() {
         return (
 <div id="main-wrap">
@@ -584,6 +657,13 @@ export class TrxLayout extends React.Component {
         )
     }
 
+    /**
+     * Helper function to update state after user selects a bot
+     * 
+     * @param {Object} event triggering the selection
+     * @param {Number} index of the menu position representing the selected bot
+     * @param {Number} The position value of the selected bot, relevant to the container
+     */
     handleBotSelect = (event, index, value) => {
         const dataReady = value !== -1 ? botConnections[value].dataReady : allDataReady()
         this.setState({selectedBot: value})
@@ -591,11 +671,22 @@ export class TrxLayout extends React.Component {
         this.consoleOut(`Bot ${value + 1} selected`)
     }
 
+    /**
+     * Helper function to handle user's selection of a market
+     * Implementation will be more relevant after TRC & TRX blockchains are available
+     * 
+     * @param {Object} event triggering the selection
+     * @param {Object} value the value of the selected market
+     * 
+     */
     handleMarketSelect = (event, value) => {
         this.setState({market: value})
         this.consoleOut(`Market set to ${value}`)
     }
 
+    /**
+     * General purpose function which can be called to update state
+     */
     updateState = (key, value) => {
         this.setState({
             key: value
