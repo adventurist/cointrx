@@ -44,9 +44,10 @@ import Chip from 'material-ui/Chip'
 /* utils */
 import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
 import log from 'loglevel'
-
+// The urls provided by the back end
 const urls = JSON.parse(botUrls.replace(/'/g, '"'))
 
+// All stylesheet values
 const styles = {
     chip: {
         float: 'right',
@@ -102,11 +103,15 @@ const styles = {
         width: '2em'
     }
 }
-
-const botConnections = []
-
+// The container to be attached to the window
 const container = {}
-
+// The sub-container for the bots
+const botConnections = []
+/**
+ * Helper method for building the Bot Menu
+ * 
+ * @param {Number} length 
+ */
 const buildBotMenuItems = (length) => {
     const items = [];
     items.push(<MenuItem value={undefined} key={undefined} primaryText={`Select bot`} />)
@@ -117,6 +122,10 @@ const buildBotMenuItems = (length) => {
     return items
 }
 
+/**
+ * Helper method for building the File Menu
+ * @param {Array} files 
+ */
 const buildFileMenuItems = (files) => {
     const items = []
     items.push(<MenuItem value={undefined} key={undefined} primaryText={`Select file`} />)
@@ -158,6 +167,10 @@ export class BotButtons extends React.Component {
 
 export class TrxLayout extends React.Component {
 
+    /**
+     * @constructor
+     * @param {*} props 
+     */
     constructor(props) {
         super(props);
         this.state = {
@@ -234,12 +247,24 @@ export class TrxLayout extends React.Component {
         this.setState({consoleText: `${textArr.join('\n')}\n${time} - ${incomingText}`})
     }
 
+    /**
+     * @STATE
+     * @param {Object} event triggering the selection
+     * @param {Number} value The number of bots chosen with the select list
+     */
     botNumberChange = (event, value) => {
         // TODO this can't be right
         this.setState({botNum: value})
         this.consoleOut(`Number of bots to be built: ${value}`)
     }
 
+    /**
+     * Helper function to have the GUI build items to represent
+     * the number of bots provided
+     * @STATE
+     * 
+     * @param {Number} num The number of bots to be represented in the menu
+     */
     onBotsCreate = (num) => {
         const newItems = buildBotMenuItems(num)
         this.setState({botMenuItems: newItems})
@@ -382,7 +407,7 @@ export class TrxLayout extends React.Component {
      * 
      * @param {Object} event triggering the selection
      * @param {Number} index of the menu position representing the selected bot
-     * @param {Number} The position value of the selected bot, relevant to the container
+     * @param {Number} value position value of the selected bot, relevant to the container
      */
     loadMarketData = async (event, index, value) => {
         const selectedBot = botConnections[this.state.selectedBot]
