@@ -155,6 +155,7 @@ export class BotButtons extends React.Component {
         )
     }
 }
+
 export class TrxLayout extends React.Component {
 
     constructor(props) {
@@ -217,6 +218,12 @@ export class TrxLayout extends React.Component {
         });
     };
 
+    /**
+     * Exposed method for printing to the console visible to the 
+     * user in their GUI
+     * 
+     * @param {String} incomingText 
+     */
     consoleOut (incomingText) {
         const time = Date.now().toString().slice(0, -3)
 
@@ -239,11 +246,17 @@ export class TrxLayout extends React.Component {
         this.consoleOut(`${num} bots currently connected`)
     }
 
-
+    /**
+     * Helper function to make printing to the console possible
+     */
     handleConsoleChange = (event, index, value) => {
         this.setState({consoleText: value})
     }
 
+    /**
+     * Initializing function which should be excuted after
+     * component has mounted
+     */
     init = async () => {
         container.ws = await requestWs({
             url: urls.wsStart,
@@ -266,6 +279,9 @@ export class TrxLayout extends React.Component {
         window.trx = container
     }
 
+    /**
+     * @param {String} event triggering the selection
+     */
     sendWsRequest = async (request) => {
         switch (request) {
             case 'fetchBots':
@@ -363,6 +379,10 @@ export class TrxLayout extends React.Component {
      * 
      * Requests the selected bot to load fresh data into data structure and perform
      * prepare for analysis
+     * 
+     * @param {Object} event triggering the selection
+     * @param {Number} index of the menu position representing the selected bot
+     * @param {Number} The position value of the selected bot, relevant to the container
      */
     loadMarketData = async (event, index, value) => {
         const selectedBot = botConnections[this.state.selectedBot]
