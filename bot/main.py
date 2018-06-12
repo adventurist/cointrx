@@ -1,35 +1,36 @@
-
-import re
-from bokeh.layouts import gridplot
-
+# Tornado
 from tornado.websocket import WebSocketHandler, WebSocketError, StreamClosedError
 from tornado.web import Application, RequestHandler, HTTPError
 from tornado.log import enable_pretty_logging
-from utils.wsclient import Bot, as_unixtime
-import pandas as pd
-from types import SimpleNamespace
-from utils.cointrx_client import Client
+import tornado.ioloop
 
+# Data Science
+from scipy import interpolate as intrpl
+import pandas as pd
+import numpy as np
+import math
+
+# Data Visualization
+from bokeh.plotting import figure, output_file, ColumnDataSource, save
+from bokeh.models import HoverTool, Plot, DataRange1d, LinearAxis, Grid
+from bokeh.layouts import gridplot
+
+# TRX Utilities
+from utils.cointrx_client import Client
+from utils.wsclient import Bot, as_unixtime
 from utils.trc_utils import *
 from utils.btcd_utils import get_env_variables
 
-import tornado.ioloop
-import logging
+# Misc
+from types import SimpleNamespace
+import re
 import os
 import json
-import math
+import logging
 
-from bokeh.plotting import figure, output_file, ColumnDataSource, save
-from bokeh.models import HoverTool, Plot, DataRange1d, LinearAxis, Grid
-from scipy import interpolate as intrpl
-
-
-import numpy as np
-
+socket_handlers = []
 http_client = Client()
 enable_pretty_logging()
-socket_handlers = []
-
 
 class MainHandler(WebSocketHandler):
     def data_received(self, chunk):
@@ -45,6 +46,13 @@ class MainHandler(WebSocketHandler):
 
 
 class StartHandler(RequestHandler):
+    """
+    Class to instantiate bots and setup an internal message stream
+
+    Arguments:
+        RequestHandler {[type]} -- [description]
+    """
+
     def data_received(self, chunk):
         pass
 
@@ -96,6 +104,7 @@ class BotLoginHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
+
         login_num_requested = self.get_argument('number')
         bot_num = len(application.bots)
         error = False
@@ -124,16 +133,31 @@ class BotDumpHandler(RequestHandler):
         pass
 
     def get(self, *args, **kwargs):
+        """
+        Requests all bots currently in the pool to dump their info
+        """
+
         if len(application.bots) > 0:
             for bot in application.bots:
                 bot.dump_self()
 
 
 class BotTrcPriceHandler(RequestHandler):
+    """
+    Class to deal with the loading of TRC Price Data
+
+    Arguments:
+        RequestHandler {[type]} -- [description]
+    """
+
     def data_received(self, chunk):
         pass
 
     async def get(self, *args, **kwargs):
+        """
+        Loads data into the specified bot for the specified period
+        """
+
         trx_cookie = self.get_argument('trx_cookie')
         self.initialize()
         bot_id = self.get_argument('bot_id')
@@ -160,6 +184,13 @@ class BotTrcAnalysisHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
+        """
+        Method to perform general technical analysis on data already loaded into the
+        bot specified
+
+        Results are rendered in a graph using the Bokeh library
+        """
+
         bot_id = self.get_argument('bot_id')
 
         if len(application.bots) > 0 and application.retrieve_bot_by_id(bot_id) is not None:
@@ -176,6 +207,15 @@ class BotTrcAnalysisHandler(RequestHandler):
 
 
 def datetime(x):
+    """[summary]
+
+    Arguments:
+        x {[list]} -- A list of datetime strings
+
+    Returns:
+        [np.array] -- Returns the dates as a numpy array of datetime64 objects
+    """
+
     return np.array(x, dtype=np.datetime64)
 
 
@@ -184,21 +224,43 @@ class BotWsStartHandler(WebSocketHandler):
         pass
 
     def check_origin(self, origin):
+        """[summary]
+
+        Arguments:
+            origin {string} -- Checks the origin value to ensure that live CORS requests
+            valid, or permits them based on local development
+
+        Returns:
+            [bool] -- returns True or False, which decides whether the request is granted
+        """
+
         vars = get_env_variables()
         env = vars['TRX_ENV']
         return bool(re.match(r'^.*?\.cointrx\.com', origin)) if application.settings['env'] == 'SNOWFLAKE' else True
 
     async def on_message(self, message):
+        """
+        Overrides the on_message method for the server-side websocket implementation
+
+        Arguments:
+            message {String} -- A JSON string containing requests to be parsed and reacted
+            to by the server. Requests are handled by the `handle_ws_request` method
+        """
+
         application.logger.debug('Message received: %s' % str(message))
+        # If valid JSON, parse and ensure `type` and `date` keys are present
         if valid_json(message):
             application.logger.debug('Valid JSON detected - Processing request')
             parsed = json.loads(message)
+            # Send request to the handler
             result = await handle_ws_request(parsed['type'], parsed['data'])
             application.logger.debug('WS Request: %s' % str(result))
             response = json.dumps(result) if isinstance(result, dict) else str(result, 'utf-8')
             # TODO Handle this internally and send a TRX response
             self.write_message(response)
-
+        # Simply messages from a bot which don't contain any JSON should be responded to by
+        # encouraging the bot to maintain a connection, and are thus responded to with
+        # a keepAlive value
         return_message = {'keepAlive': 1, 'message': 'Back at you, punk', 'botConnections': len(self.application.bots)}
         self.write_message(json.dumps(return_message))
 
@@ -210,9 +272,9 @@ class BotWsStartHandler(WebSocketHandler):
 async def handle_ws_request(type, data):
     """
     Utility to handle requests sent through the websocket stream
-    :param type:
-    :param data:
-    :return dict:
+    :param type: Determines what type of request is being made
+    :param data: Contains any data required to process the request
+    :return dict: Returned dictionaries should contain an **action** and a **payload**
     """
 
     async def analyze_market(url, data):
@@ -234,7 +296,15 @@ async def handle_ws_request(type, data):
     async def close_bot_connections(type, data):
         """
         Close all bot connections
+
+        Arguments:
+            type {String} -- Only required for consistency
+            data {String} -- Only required for consistency
+
+        Returns:
+            [dict] -- The result of the request
         """
+
         try:
             application.close_bot_connections()
             return {'action': 'killbots', 'payload': {'request': 'close bot connections', 'result': 1}}
