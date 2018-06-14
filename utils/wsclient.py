@@ -80,9 +80,9 @@ class Bot(object):
         :return:list of patterns or pattern search results
         """
         patterns = {}
-        finder = PatternFinder(self.trc_struct)
+        finder = PatternFinder(self.trc_struct, self.logger)
         # Search for cup and handle
-        patterns['cup_and_handle'] = finder.cup_and_handle()
+        patterns['cup_and_handle'] = finder.cup()
 
         return patterns
 
@@ -142,8 +142,6 @@ class Bot(object):
             for i, row in enumerate(entries):
                 # Add to Peak and Base if value is similar, proximate and has not yet been added
                 self.logger.debug('Iterating over %s' % row['date'])
-                if '10219.08' in str(row['high']):
-                    stop_here = 'stophere'
                 # If point is close to max, add to peaks
                 if close_to_max(row, self.trc_struct.max, self.trc_struct.max_offset) and self.peak_not_added(i):
                     self.add_entry_to_peak(row, i)
@@ -331,7 +329,7 @@ def receive_message(msg):
 
 def parse_message(msg):
     return_msg = {}
-    if isinstance(msg, dict) and 'result' in dict:
+    if isinstance(msg, dict) and 'result' in msg:
         return_msg['result'] = msg['result']
 
     return_msg['all'] = msg
@@ -447,9 +445,10 @@ class TxStruct(object):
 
 
 class PatternFinder(object):
-    def __init__(self, struct):
+    def __init__(self, struct, logger):
         self.patterns = []
         self.value_structure = struct
+        self.logger = logger
 
     def cup_and_handle(self):
 
@@ -550,6 +549,63 @@ class PatternFinder(object):
                     #             sorted(findings['handle_downward_trend'], key=lambda x: Decimal(x['value']))[
                     #                 0]
                     #             findings['handle'] = True
+
+        return findings
+
+    def cup(self):
+
+        v_struct = self.value_structure
+        peaks = v_struct.peak
+        bases = v_struct.base
+        peaks_map = v_struct.peak_map
+        bases_map = v_struct.base_map
+        trc_map = v_struct.map
+
+        findings = []
+        analysis_complete = False
+        counter = -1
+        # while not analysis_complete and len(peaks) > 1:
+
+        for i, peak in enumerate(peaks):
+            # Create fresh dictionary to store the results of each investigation. The dataset will be investigated for boundaries and evidence of a specific behaviour between those boundaries.
+            cup_result = {
+                'first_peak': None, 'second_peak': None, 'cup_bottom': None, 'cup': None,
+                'downward_trend': [], 'end_of_downward_trend': None
+            }
+            real_closing_peak = None
+            # check for gaps between peaks
+            if real_closing_peak is None and i < len(peaks) - 1 and peaks[i + 1]['idx'] != peak['idx'] + 1:
+                # Search cup completion prior to peaks[i + 1]
+                for k, v in trc_map.items():
+                    # TODO find a better comparison for v['value']
+                    # Ensure that the index of the iterated datapoint occurs between two peaks
+                    # AND that its value satisfies two constraints:
+                    #   1. Its value is higher than that of the first peak
+                    #   2. Its existence contributes to the continuation of an upward trend
+                    if int(k) > int(peaks[i]['idx']) and int(k) < int(peaks[i + 1]['idx']) and Decimal(v) > Decimal(peaks[i]['value']):
+                        for n in range(int(k), int(peaks[i + 1]['idx'])):
+                            if trc_map[n] < trc_map[n - 1]:
+                                real_closing_peak = trc_map[n - 1]
+                                self.logger.info('Cup closed at %s' % str(n - 1))
+                                break
+                    if real_closing_peak is not None:
+                        break
+
+                # Find any bases which occur between this gap
+                for j, base in enumerate(bases):
+                    if peak['idx'] < base['idx'] < peaks[i + 1]['idx']:
+                        cup_result['downward_trend'].append(base)
+                # TODO find out how many bases are the minimum required to assert that we've found a cup
+                if len(cup_result['downward_trend']) > 0:
+                    # If a downward trend was observed, save the boundaries and the lowest point within them, to mark the basic expression of the cup
+                    cup_result['first_peak'] = peaks[i]
+                    cup_result['second_peak'] = peaks[i + 1]
+                    cup_result['cup_bottom'] = sorted(cup_result['downward_trend'], key=lambda x: Decimal(x['value']))[
+                        0]
+                    cup_result['cup'] = True
+                    # Add our finding to the array
+                    findings.append(cup_result)
+                del cup_result
 
         return findings
 
