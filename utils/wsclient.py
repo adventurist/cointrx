@@ -75,7 +75,7 @@ class Bot(object):
         self.trc_struct = TxStruct()  # Struct object is our market valuation history dataset
 
     async def find_all_patterns(self) -> dict:
-        # TODO choose one return type
+        # TODO: choose one return type
         """
         :return:list of patterns or pattern search results
         """
@@ -154,7 +154,7 @@ class Bot(object):
                     if self.base_not_added(i):
                         self.add_entry_to_base(row, i)
                     continue
-                # TODO - Find out why is_first_high isn't among peaks
+                # TODO: - Find out why is_first_high isn't among peaks
                 if self.is_first_high(row, i):
                     if self.peak_not_added(i):
                         self.add_entry_to_peak(row, i)
@@ -181,9 +181,7 @@ class Bot(object):
 
     def is_first_low(self, r, idx):
         """ Check to see if row occurs within first historical period """
-        if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
-                                                                as_unixtime(self.trc_struct.entries[len(
-                                                                    self.trc_struct.entries) - 1]['date']))[0]):
+        if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[0]):
             # Only replace with more recent if value is more than 10% lower
             if more_than_5_percent_lower(r['high'], self.trc_struct.f_low['value'], self.trc_struct.max_offset):
                 self.trc_struct.f_low['value'] = Decimal(r['high'])
@@ -191,32 +189,22 @@ class Bot(object):
                 return True
 
     def is_first_high(self, r, idx):
-        if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
-                                                                as_unixtime(self.trc_struct.entries[len(
-                                                                    self.trc_struct.entries) - 1]['date']))[0]):
+        if is_first_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[0]):
             # Only avoid replacing with more recent if previous value is more than 10% higher
-            if (is_higher(r['high'], self.trc_struct.f_low['value'])) and (
-                        is_higher(r['high'], self.trc_struct.f_high['value']) or is_within_5_percent_under(r['high'],
-                                                                                                           self.trc_struct.f_high[
-                                                                                                               'value'],
-                                                                                                           self.trc_struct.max_offset)):
+            if (is_higher(r['high'], self.trc_struct.f_low['value'])) and (is_higher(r['high'], self.trc_struct.f_high['value']) or is_within_5_percent_under(r['high'],self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
                 self.trc_struct.f_high['value'] = Decimal(r['high'])
                 self.trc_struct.f_high['idx'] = idx
                 return True
 
     def is_last_low(self, r, idx):
-        if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
-                                                               as_unixtime(self.trc_struct.entries[len(
-                                                                   self.trc_struct.entries) - 1]['date']))[1]):
+        if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[1]):
             if not (more_than_5_percent_higher(r['high'], self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
                 self.trc_struct.l_low['value'] = Decimal(r['high'])
                 self.trc_struct.l_low['idx'] = idx
                 return True
 
     def is_last_high(self, r, idx):
-        if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']),
-                                                               as_unixtime(self.trc_struct.entries[len(
-                                                                   self.trc_struct.entries) - 1]['date']))[1]):
+        if is_last_period(as_unixtime(r['date']), date_metrics(as_unixtime(self.trc_struct.entries[0]['date']), as_unixtime(self.trc_struct.entries[len(self.trc_struct.entries) - 1]['date']))[1]):
             if not (more_than_5_percent_lower(r['high'], self.trc_struct.f_high['value'], self.trc_struct.max_offset)):
                 self.trc_struct.l_high['value'] = Decimal(r['high'])
                 self.trc_struct.l_high['idx'] = idx
@@ -478,7 +466,7 @@ class PatternFinder(object):
                 for j, base in enumerate(bases):
                     if peak['idx'] < base['idx'] < peaks[i + 1]['idx']:
                         cup_result['downward_trend'].append(base)
-                # TODO find out how many bases are the minimum required to assert that we've found a cup
+                # TODO: find out how many bases are the minimum required to assert that we've found a cup
                 if len(cup_result['downward_trend']) > 0:
                     # If a downward trend was observed, save the boundaries and the lowest point within them, to mark the basic expression of the cup
                     cup_result['first_peak'] = peaks[i]
@@ -553,7 +541,6 @@ class PatternFinder(object):
         return findings
 
     def cup(self):
-
         v_struct = self.value_structure
         peaks = v_struct.peak
         bases = v_struct.base
@@ -573,40 +560,55 @@ class PatternFinder(object):
                 'downward_trend': [], 'end_of_downward_trend': None
             }
             real_closing_peak = None
+            if peak['value'] == '9809.99':
+                stop = 'stop'
             # check for gaps between peaks
             if real_closing_peak is None and i < len(peaks) - 1 and peaks[i + 1]['idx'] != peak['idx'] + 1:
-                # Search cup completion prior to peaks[i + 1]
+                # It's possible that a cup pattern closes before the next value in our peaks list
+                # Search for cup completion prior to peaks[i + 1]
                 for k, v in trc_map.items():
-                    # TODO find a better comparison for v['value']
                     # Ensure that the index of the iterated datapoint occurs between two peaks
                     # AND that its value satisfies two constraints:
                     #   1. Its value is higher than that of the first peak
                     #   2. Its existence contributes to the continuation of an upward trend
-                    if int(k) > int(peaks[i]['idx']) and int(k) < int(peaks[i + 1]['idx']) and Decimal(v) > Decimal(peaks[i]['value']):
+                    #       - We determine this by finding the first drop in value, and then store #         the previously iterated value
+                    # Identify the cup's final upward trend:
+                    #   1. Index occurs between peaks
+                    #   2. Value is equal to or greater than first peak
+                    if int(k) > int(peaks[i]['idx']) and int(k) < int(peaks[i + 1]['idx']) and Decimal(v) >= Decimal(peaks[i]['value']):
+                        # Final upward trend identified, now we must identify the end of its rise
                         for n in range(int(k), int(peaks[i + 1]['idx'])):
                             if trc_map[n] < trc_map[n - 1]:
+                                # n's value has gone down, so store n-1's value
                                 real_closing_peak = trc_map[n - 1]
                                 self.logger.info('Cup closed at %s' % str(n - 1))
+                                # Cup is closed, stop iterating
                                 break
                     if real_closing_peak is not None:
                         break
 
-                # Find any bases which occur between this gap
                 for j, base in enumerate(bases):
+                # Find any bases which occur between this gap
+                # It is more efficient to find patterns through comparison with bases, since it shrinks the dataset being compared
                     if peak['idx'] < base['idx'] < peaks[i + 1]['idx']:
                         cup_result['downward_trend'].append(base)
-                # TODO find out how many bases are the minimum required to assert that we've found a cup
+                if len(cup_result['downward_trend']) == 0:
+                # If a pattern was not discovered through comparison to the bases of the dataset, it's possible one might still exist. In this case, we will iterate the entire dataset
+                    for k, v in trc_map.items():
+                        if int(peak['idx']) < int(k) < (peaks[i + 1]['idx']) and Decimal(v) < Decimal(peak['value']):
+                            cup_result['downward_trend'].append({'idx': k, 'value': v, 'date': v_struct.entries[k]['date']})
                 if len(cup_result['downward_trend']) > 0:
-                    # If a downward trend was observed, save the boundaries and the lowest point within them, to mark the basic expression of the cup
+                # TODO: find out how many bases are the minimum required to assert that we've found a cup. Depending on the scale of time, it is likely more than one.
+                # If a downward trend was observed, save the boundaries and the lowest point within them, to mark the basic expression of the cup
                     cup_result['first_peak'] = peaks[i]
                     cup_result['second_peak'] = peaks[i + 1]
-                    cup_result['cup_bottom'] = sorted(cup_result['downward_trend'], key=lambda x: Decimal(x['value']))[
-                        0]
+                    cup_result['cup_bottom'] = sorted(cup_result['downward_trend'], key=lambda x: Decimal(x['value']))[0]
                     cup_result['cup'] = True
-                    # Add our finding to the array
+                # Add our finding to the array
                     findings.append(cup_result)
+            # Throw away the cup result, and start fresh from the next peak in the dataset
                 del cup_result
-
+        # Return our list of cup results
         return findings
 
 
@@ -627,11 +629,22 @@ def ratio_a_over_b(a, b):
 
 
 def non_regressive_trend(bottom_ratio, current_ratio, current_value, previous_value):
+    """
+    Function to determine any reduction of value in moving between a and b (or vice versa) is significant enough to be considered `regressive`
+
+    Arguments:
+        bottom_ratio {Decimal} -- The ratio between the first peak and the bottom of the cup
+        current_ratio {Decimal} -- The ratio between the first peak and the examined datapoint
+        current_value {Decimal} -- The value of the examined datapoint
+        previous_value {Decimal} -- The value of the previously examined datapoint
+
+    Returns:
+        [Bool] -- a return of True represents a satisfaction of two requirements:
+            1. The difference between the current point and the first peak is less than half that of the bottom of the cup and the first peak
+            2. The rate of change between b and a is no more than about 2 %
+    """
     a = Decimal(current_value) if current_value > previous_value else Decimal(previous_value)
     b = Decimal(previous_value) if a == Decimal(current_value) else Decimal(current_value)
-    prev_diff = (1 - Decimal(bottom_ratio)) / 2
-    curr_diff = 1 - Decimal(current_ratio)
-    val_diff = Decimal(b / a)
     ratio_comparison = abs(1 - Decimal(current_ratio)) < (1 - Decimal(bottom_ratio)) / Decimal(2)
     value_comparison = Decimal(b / a) > Decimal(0.98)
     return ratio_comparison and value_comparison
