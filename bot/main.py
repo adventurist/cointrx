@@ -208,8 +208,8 @@ class BotTrcAnalysisHandler(RequestHandler):
 
 def datetime(x):
     """[summary]
-
     Arguments:
+
         x {[list]} -- A list of datetime strings
 
     Returns:
@@ -566,7 +566,8 @@ def build_graph(price_data, bot_number, patterns=None):
                 line_width=6)
 
     p1.legend.location = "bottom_right"
-    filename = "analysis" + str(bot_number) + ".html"
+    filetype = '%s' % 'general' if patterns is None else 'pattern'
+    filename = "analysis" + str(bot_number) + "-%s.html" % filetype
     output_file('analysis/%s' % filename,
                 title="analysis" + str(bot_number) + ".py BTC Price Analysis", mode="inline")
     if cup_line is not None:
