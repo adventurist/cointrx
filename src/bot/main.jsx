@@ -109,8 +109,8 @@ const container = {}
 const botConnections = []
 /**
  * Helper method for building the Bot Menu
- * 
- * @param {Number} length 
+ *
+ * @param {Number} length
  */
 const buildBotMenuItems = (length) => {
     const items = [];
@@ -124,7 +124,7 @@ const buildBotMenuItems = (length) => {
 
 /**
  * Helper method for building the File Menu
- * @param {Array} files 
+ * @param {Array} files
  */
 const buildFileMenuItems = (files) => {
     const items = []
@@ -169,7 +169,7 @@ export class TrxLayout extends React.Component {
 
     /**
      * @constructor
-     * @param {*} props 
+     * @param {*} props
      */
     constructor(props) {
         super(props);
@@ -232,10 +232,10 @@ export class TrxLayout extends React.Component {
     };
 
     /**
-     * Exposed method for printing to the console visible to the 
+     * Exposed method for printing to the console visible to the
      * user in their GUI
-     * 
-     * @param {String} incomingText 
+     *
+     * @param {String} incomingText
      */
     consoleOut (incomingText) {
         const time = Date.now().toString().slice(0, -3)
@@ -262,7 +262,7 @@ export class TrxLayout extends React.Component {
      * Helper function to have the GUI build items to represent
      * the number of bots provided
      * @STATE
-     * 
+     *
      * @param {Number} num The number of bots to be represented in the menu
      */
     onBotsCreate = (num) => {
@@ -326,7 +326,7 @@ export class TrxLayout extends React.Component {
      * @WSREQUEST
      * Helper function for the internal bot API
      * Service will return ID and status of bots currently in the pool
-     * 
+     *
      * @param {WebSocket} conn
      * @returns {Promise.<void>}
      */
@@ -340,8 +340,8 @@ export class TrxLayout extends React.Component {
      * Request and reserve bots
      * Implementation to request instantiation a quantity of bots equal to
      * the value set by the user. Each bot will have a WS channel opened to maintain
-     * a message stream via PING/PONG 
-     * 
+     * a message stream via PING/PONG
+     *
      * Currently a POST request, but can be re-written as a request for the WS Channel
      */
     startBots = async () => {
@@ -386,8 +386,10 @@ export class TrxLayout extends React.Component {
 
     /**
      * @WSREQUEST
-     * 
+     *
      * Requests that bots are terminated on the server
+     * Successful request results in a returned message via the websocket channel
+     * instruction the application to close all bot connections
      */
     async killBots () {
         const data = {
@@ -401,10 +403,10 @@ export class TrxLayout extends React.Component {
 
     /**
      * @to-be-deprecated
-     * 
+     *
      * Requests the selected bot to load fresh data into data structure and perform
      * prepare for analysis
-     * 
+     *
      * @param {Object} event triggering the selection
      * @param {Number} index of the menu position representing the selected bot
      * @param {Number} value position value of the selected bot, relevant to the container
@@ -432,7 +434,7 @@ export class TrxLayout extends React.Component {
 
     /**
      * @WSREQUEST
-     * 
+     *
      * Requests that the selected bot perform general analysis on the data it has loaded
      * Naming convention of `type` = 'request' is misleading. 'request' should be changed
      * to 'bot:analyze'
@@ -456,8 +458,8 @@ export class TrxLayout extends React.Component {
 
     /**
      * @WSREQUEST
-     * 
-     * Requests that the selected bot search for any possible market patterns 
+     *
+     * Requests that the selected bot search for any possible market patterns
      * in the data it has previously loaded and analyzed
      */
     findPatterns = async () => {
@@ -477,12 +479,13 @@ export class TrxLayout extends React.Component {
 
     /**
      * Message handler provided to our web socket object. Parses incoming messages
-     * from a bot's socket stream for requested actions and reported errors from 
+     * from a bot's socket stream for requested actions and reported errors from
      * the server
      *
      * @param message
      */
     msgHandler = ({...message}) => {
+        console.log('Making the msgHandler visible')
         if ('type' in message) {
             log.info(`WS Data Event Type`, message.type)
         }
@@ -513,11 +516,14 @@ export class TrxLayout extends React.Component {
                     }
                     break
                 case 'killbots':
+                // The server is sending back a successful response from the bots:close
+                // request, thus all bot connections should be closed
                     botConnections.map(bot => bot.ws.close())
                     botConnections.splice(0, botConnections.length)
                     this.consoleOut('Bots killed (0 connections)')
                     break
                 case 'addfile':
+                // A new visualization file is ready to be used. Update the UI to make it accessible
                     if ('filename' in data) {
                         this.updateFileList(data.filename)
                         log.info('Updating file list')
@@ -525,7 +531,12 @@ export class TrxLayout extends React.Component {
                     }
                     break
                 case 'pattern:results:update':
+                // Pattern search has been completed. Update the UI with the new results
                     log.info('Search results', data)
+                    if ('filename' in data) {
+                        this.updateFileList(data.filename)
+                        delete data.filename
+                    }
                     break
             }
         }
@@ -538,8 +549,8 @@ export class TrxLayout extends React.Component {
 
     /**
      * Helper function to update the list of files in the GUI
-     * 
-     * @param {String} filename 
+     *
+     * @param {String} filename
      */
     updateFileList (filename) {
         const file = {
@@ -704,7 +715,7 @@ export class TrxLayout extends React.Component {
 
     /**
      * Helper function to update state after user selects a bot
-     * 
+     *
      * @param {Object} event triggering the selection
      * @param {Number} index of the menu position representing the selected bot
      * @param {Number} The position value of the selected bot, relevant to the container
@@ -719,10 +730,10 @@ export class TrxLayout extends React.Component {
     /**
      * Helper function to handle user's selection of a market
      * Implementation will be more relevant after TRC & TRX blockchains are available
-     * 
+     *
      * @param {Object} event triggering the selection
      * @param {Object} value the value of the selected market
-     * 
+     *
      */
     handleMarketSelect = (event, value) => {
         this.setState({market: value})
