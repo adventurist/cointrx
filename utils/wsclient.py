@@ -7,6 +7,12 @@ from decimal import Decimal
 from copy import deepcopy
 import json
 
+cup_constants = {
+    'SUSPICIOUS_RESULT': -1,
+    'CONTAINED': 0,
+    'EXTEND_START': 1,
+    'EXTEND_END': 2
+}
 
 class Client(object):
     def __init__(self, id, timeout=20000):
@@ -141,7 +147,6 @@ class Bot(object):
 
             for i, row in enumerate(entries):
                 # Add to Peak and Base if value is similar, proximate and has not yet been added
-                self.logger.debug('Iterating over %s' % row['date'])
                 # If point is close to max, add to peaks
                 if close_to_max(row, self.trc_struct.max, self.trc_struct.max_offset) and self.peak_not_added(i):
                     self.add_entry_to_peak(row, i)
@@ -450,29 +455,27 @@ class PatternFinder(object):
         findings = []
         analysis_complete = False
         counter = -1
-        # while not analysis_complete and len(peaks) > 1:
 
         for i, peak in enumerate(peaks):
             # Create fresh dictionary to store the results of each investigation. The dataset will be investigated for boundaries and evidence of a specific behaviour between those boundaries.
+            # These boundaries can be derived from peaks or one peak and any point occuring before the next peak, so long as such a point is able to fit the right constraints.
             cup_result = {
                 'first_peak': None, 'second_peak': None, 'cup_bottom': None, 'handle_bottom': None, 'cup': None,
                 'handle': None, 'handle_breakout': None,
                 'downward_trend': [], 'handle_downward_trend': [], 'end_of_downward_trend': None,
                 'handle_upward_trend': []
             }
-            # check for gaps between peaks5
+            # check for gaps between peaks
             if i < len(peaks) - 1 and peaks[i + 1]['idx'] != peak['idx'] + 1:
                 # Find any bases which occur between this gap
-                for j, base in enumerate(bases):
+                for base in bases:
                     if peak['idx'] < base['idx'] < peaks[i + 1]['idx']:
                         cup_result['downward_trend'].append(base)
-                # TODO: find out how many bases are the minimum required to assert that we've found a cup
                 if len(cup_result['downward_trend']) > 0:
                     # If a downward trend was observed, save the boundaries and the lowest point within them, to mark the basic expression of the cup
                     cup_result['first_peak'] = peaks[i]
                     cup_result['second_peak'] = peaks[i + 1]
-                    cup_result['cup_bottom'] = sorted(cup_result['downward_trend'], key=lambda x: Decimal(x['value']))[
-                        0]
+                    cup_result['cup_bottom'] = sorted(cup_result['downward_trend'], key=lambda x: Decimal(x['value']))[0]
                     cup_result['cup'] = True
                     # Add our finding to the array
                     findings.append(cup_result)
@@ -524,6 +527,7 @@ class PatternFinder(object):
                     #
                     # # Oldest implementation
                     # for i, idx in enumerate(remaining_keys):
+                    # TODO: Check if gap_exists actually works !
                     #     if gap_exists(idx, remaining_entries[i + 1]):
                     #
                     #         for j, base in enumerate(bases):
@@ -551,17 +555,14 @@ class PatternFinder(object):
         findings = []
         analysis_complete = False
         counter = -1
-        # while not analysis_complete and len(peaks) > 1:
 
         for i, peak in enumerate(peaks):
             # Create fresh dictionary to store the results of each investigation. The dataset will be investigated for boundaries and evidence of a specific behaviour between those boundaries.
             cup_result = {
                 'first_peak': None, 'second_peak': None, 'cup_bottom': None, 'cup': None,
-                'downward_trend': [], 'end_of_downward_trend': None
+                'downward_trend': [], 'end_of_downward_trend': None, 'final': False
             }
             real_closing_peak = None
-            if peak['value'] == '9809.99':
-                stop = 'stop'
             # check for gaps between peaks
             if real_closing_peak is None and i < len(peaks) - 1 and peaks[i + 1]['idx'] != peak['idx'] + 1:
                 # It's possible that a cup pattern closes before the next value in our peaks list
@@ -571,7 +572,8 @@ class PatternFinder(object):
                     # AND that its value satisfies two constraints:
                     #   1. Its value is higher than that of the first peak
                     #   2. Its existence contributes to the continuation of an upward trend
-                    #       - We determine this by finding the first drop in value, and then store #         the previously iterated value
+                    #       - We determine this by finding the first drop in value, and then store
+                    #         the previously iterated value
                     # Identify the cup's final upward trend:
                     #   1. Index occurs between peaks
                     #   2. Value is equal to or greater than first peak
@@ -579,8 +581,8 @@ class PatternFinder(object):
                         # Final upward trend identified, now we must identify the end of its rise
                         for n in range(int(k), int(peaks[i + 1]['idx'])):
                             if trc_map[n] < trc_map[n - 1]:
-                                # n's value has gone down, so store n-1's value
-                                real_closing_peak = trc_map[n - 1]
+                                # n's value has gone down, so store `n - 1`'s value
+                                real_closing_peak = {'idx': n - 1, 'value': trc_map[n - 1]}
                                 self.logger.info('Cup closed at %s' % str(n - 1))
                                 # Cup is closed, stop iterating
                                 break
@@ -588,8 +590,8 @@ class PatternFinder(object):
                         break
 
                 for j, base in enumerate(bases):
-                # Find any bases which occur between this gap
-                # It is more efficient to find patterns through comparison with bases, since it shrinks the dataset being compared
+                # Find any bases which occur within the gap currently being investigated
+                # It is more efficient to find patterns through comparison with bases, since it shrinks n
                     if peak['idx'] < base['idx'] < peaks[i + 1]['idx']:
                         cup_result['downward_trend'].append(base)
                 if len(cup_result['downward_trend']) == 0:
@@ -598,21 +600,92 @@ class PatternFinder(object):
                         if int(peak['idx']) < int(k) < (peaks[i + 1]['idx']) and Decimal(v) < Decimal(peak['value']):
                             cup_result['downward_trend'].append({'idx': k, 'value': v, 'date': v_struct.entries[k]['date']})
                 if len(cup_result['downward_trend']) > 0:
-                # TODO: find out how many bases are the minimum required to assert that we've found a cup. Depending on the scale of time, it is likely more than one.
                 # If a downward trend was observed, save the boundaries and the lowest point within them, to mark the basic expression of the cup
                     cup_result['first_peak'] = peaks[i]
-                    cup_result['second_peak'] = peaks[i + 1]
+                    cup_result['second_peak'] = peaks[i + 1] if real_closing_peak is None else real_closing_peak
                     cup_result['cup_bottom'] = sorted(cup_result['downward_trend'], key=lambda x: Decimal(x['value']))[0]
                     cup_result['cup'] = True
+                    # new_cup_result = find_handle(v_struct, cup_result)
+                    # peaks = [x for x in peaks if x['idx'] not in [y['idx'] for y in new_cup_result['handle_upward_trend']]]
                 # Add our finding to the array
                     findings.append(cup_result)
             # Throw away the cup result, and start fresh from the next peak in the dataset
                 del cup_result
+                # del new_cup_result
         # Return our list of cup results
-        return findings
+        interim_findings = []
+        final_findings = []
+        cup_indexes = [(x['first_peak']['idx'], (x['second_peak']['idx'])) for x in findings]
+        used_indexes = []
+        for i in range(1, len(findings)):
+            prev = findings[i - 1]
+            curr = findings[i]
+            new_finding = None
+
+            if i == len(findings) - 1:
+            # On the final iteration, we need to find out if the currently iterated
+            # cup has yet been added to our findings
+                self.logger.info('We are at the end!')
+                if final_findings is not None and len(final_findings) > 0 and final_findings[-1]['second_peak'] == prev['second_peak'] and find_surrounding_cup(used_indexes, **{'start': curr['first_peak']['idx']}) is None:
+                    final_findings.append(curr)
+            else:
+                n = prev if not adjacent_cups(curr, prev) else combine_cups(curr, prev)
+                surrounding_result = find_surrounding_cup(cup_indexes, **{'start': n['first_peak']['idx'], 'end': n['second_peak']['idx']})
+
+                if surrounding_result is not None:
+                    if surrounding_result[1] == cup_constants['EXTEND_START']:
+                        new_finding = extend_cup(find_cup_with_indexes(surrounding_result[0][0], surrounding_result[0][1], findings), n, 'start')
+
+                    elif surrounding_result[1] == cup_constants['EXTEND_END']:
+                        new_finding = extend_cup(find_cup_with_indexes(surrounding_result[0][0], surrounding_result[0][1], findings), n, 'end')
+
+                    if len(interim_findings) > 0 and adjacent_cups(new_finding, interim_findings[:-1]):
+                        final_findings.append(combine_cups(new_finding, interim_findings[:-1]))
+                    else:
+                        final_findings.append(new_finding)
+                        if len(interim_findings) and interim_findings[:-1] is not None:
+                            interim_findings[:-1]['final'] = True
+
+        for finding in interim_findings:
+            if finding['final']:
+                final_findings.append(finding)
+            else:
+                self.logger.debug('We have an unconsolidated finding between %s and %s' % str(finding['first_peak']['idx']) % str(finding['second_peak']['idx']))
+
+        return final_findings
+
+def find_surrounding_cup(cup_indexes, **kwargs):
+    start = kwargs['start']
+    end = kwargs['end'] if 'end' in kwargs and kwargs['end'] is not None else start
+    for peaks in cup_indexes:
+        if peaks[0] <= start <= peaks[1]:
+            # Start is between peaks
+            if peaks[0] <= end <= peaks[1]:
+                # End is also between peaks
+                return (peaks, cup_constants['CONTAINED'])
+            else:
+                # Start is INSIDE but End is OUTSIDE
+                return (peaks, cup_constants['EXTEND_START'])
+        if peaks[0] <= end <= peaks[1]:
+            # End is between peaks but Start is NOT
+            return (peaks, cup_constants['EXTEND_END'])
 
 
 def gap_exists(idx1, idx2):
+    """
+    checks if idx2 is equal to idx1 + 1
+
+    TODO: Wouldn't that mean that NO gap exists?
+    VERIFY THIS
+
+    Arguments:
+        idx1 {[int]} -- Index value from financial dataset
+        idx2 {[int]} -- Index value from financial dataset
+
+    Returns:
+        [bool] --
+    """
+
     return int(idx2) == int(idx1) + 1
 
 
@@ -648,3 +721,188 @@ def non_regressive_trend(bottom_ratio, current_ratio, current_value, previous_va
     ratio_comparison = abs(1 - Decimal(current_ratio)) < (1 - Decimal(bottom_ratio)) / Decimal(2)
     value_comparison = Decimal(b / a) > Decimal(0.98)
     return ratio_comparison and value_comparison
+
+def find_handle(v_struct, cup_result):
+    peaks = v_struct.peak
+    bases = v_struct.base
+    peaks_map = v_struct.peak_map
+    bases_map = v_struct.base_map
+    trc_map = v_struct.map
+
+    cup_result = { k: v for k, v in cup_result.items() }
+    cup_result['handle_upward_trend'] = []
+
+    # Investigation for the corresponding handle of any closed cup
+    remaining_entries = { k: v for (k, v) in trc_map.items() if k > int(cup_result['downward_trend'][-1]['idx'])}
+    up_trend = 0
+    remaining_keys = list(remaining_entries.keys())
+    bottom_peak_ratio = ratio_a_over_b(cup_result['cup_bottom']['value'],
+                                        trc_map[cup_result['first_peak']['idx']])
+    # Check and see if the first element of the remaining_entries is part of an upward_trend
+    # num = v_struct['entries'][remaining_entries[remaining_keys[0]]]['high']
+
+    if str_num_a_above_b(remaining_entries[remaining_keys[0]],
+                            cup_result['downward_trend'][len(cup_result['downward_trend']) - 1]['value']):
+        # add to our cup_result and attempt to continue analyzing a potential upward trend
+        cup_result['handle_upward_trend'].append(
+            {'idx': remaining_keys[0], 'value': remaining_entries[remaining_keys[0]]})
+        up_trend += 1
+        for i, idx in enumerate(remaining_keys):
+            # Skip the first value, since we've already recorded it
+            if i == 0:
+                continue
+            value_peak_ratio = ratio_a_over_b(remaining_entries[idx],
+                                                trc_map[cup_result['first_peak']['idx']])
+            # Check each entry against the previous entry, to ensure it is an upward trend
+            if non_regressive_trend(bottom_peak_ratio, value_peak_ratio, remaining_entries[idx],
+                                    remaining_entries[remaining_keys[i - 1]]):
+                cup_result['handle_upward_trend'].append(
+                    {'idx': idx, 'value': remaining_entries[remaining_keys[i - 1]]})
+                up_trend += 1
+            # Break once the upward trend is complete
+            else:
+                # Mark this peak
+                break
+
+        if up_trend > 1:
+            cup_result['handle'] = True
+            # Second last implementation
+            # for k, v in remaining_entries.items():
+            #     if k in remaining_entries and k - 1 in remaining_entries and v > remaining_entries[k - 1]:
+            #         print('jigga')
+            #
+            # findings['end_of_downward_trend'] = v_struct.entries[int(findings['downward_trend'][-1]['idx']):]
+            #
+            # # Oldest implementation
+            # for i, idx in enumerate(remaining_keys):
+            # TODO: Check if gap_exists actually works !
+            #     if gap_exists(idx, remaining_entries[i + 1]):
+            #
+            #         for j, base in enumerate(bases):
+            #             if between_peaks(peak['idx'], peaks[i + 1]['idx'], base['idx']):
+            #                 findings['handle_downward_trend'].append(base)
+            #                 # delete the base so we don't have to iterate it ever again
+            #                 del (bases[j])
+            #         if len(findings['handle_downward_trend']) > 0:
+            #             findings['handle_breakout'] = peaks[i + i]
+            #             findings['handle_bottom'] = \
+            #             sorted(findings['handle_downward_trend'], key=lambda x: Decimal(x['value']))[
+            #                 0]
+            #             findings['handle'] = True
+    return cup_result
+
+
+def combine_cups(curr, prev):
+    downward_zip = zip(
+                        prev['downward_trend'],
+                        [prev['second_peak'],
+                        curr['first_peak']], curr['downward_trend']
+                        )
+    downward_trend = list(next(downward_zip))
+    return {
+        'first_peak': prev['first_peak'],
+        'second_peak': curr['second_peak'],
+        'downward_trend': downward_trend,
+        'cup_bottom': sorted(downward_trend, key=lambda x: Decimal(x['value']))[0]
+    }
+
+
+def adjacent_cups(cur, prev):
+    return prev['second_peak']['idx'] == cur['first_peak']['idx']
+
+
+def extend_cup(a, b, portion_to_change):
+    downward_set_1 = [x['idx'] for x in a['downward_trend']]
+    downward_trend = a['downward_trend'] + [x for x in b['downward_trend'] if x['idx'] not in downward_set_1]
+
+    if portion_to_change == 'start':
+        return {
+            'first_peak': b['first_peak'],
+            'downward_trend': downward_trend,
+            'cup_bottom': sorted(downward_trend, key=lambda x: Decimal(x['value']))[0],
+            'second_peak': a['second_peak']
+        }
+
+    elif portion_to_change == 'end':
+        return {
+            'first_peak': a['first_peak'],
+            'downward_trend': downward_trend,
+            'cup_bottom': sorted(downward_trend, key=lambda x: Decimal(x['value']))[0],
+            'second_peak': b['second_peak']
+        }
+
+def find_cup_with_indexes(first, second, cups):
+    return next((x for x in cups if x['first_peak']['idx'] == first and x['second_peak']['idx'] == second))
+
+def old_cup_verification(curr, prev):
+    used_indexes = []
+    cup_indexes = []
+
+    surrounding_for_prev = find_surrounding_cup(used_indexes, **{'start': prev['first_peak']['idx'], 'end': prev['second_peak']['idx']})
+    surrounding_for_prev_and_curr = find_surrounding_cup(cup_indexes, **{'start': prev['second_peak']['idx'], 'end': curr['first_peak']['idx']})
+
+    if curr['first_peak']['idx'] == prev['second_peak']['idx'] and surrounding_for_prev_and_curr is not None:
+        surrounding_result_outcome = surrounding_for_prev_and_curr[1]
+        # Adjacent cups detected - these need to be conjoined. Note that
+        # the prev's second_peak and curr's first_peak now become part of
+        # the downward trend
+        # We still need to determine whether to extend the Start, extend the End or forget about this pattern (in the case of it being completely contained within a larger pattern)
+        # downward_trend = list(
+
+        if surrounding_result_outcome == cup_constants['EXTEND_START']:
+            # Extend the start of the pattern and forget about the other peak
+            # TODO: Do we have to do anything special, concerning the fact that a previously found pattern needs to be extended in anyway?
+            # Or are we safe knowing that we're iterating them anew and can, thus, forget about such conflicts?
+            downward_zip = zip(
+                    prev['downward_trend'],
+                    [prev['second_peak'],
+                    curr['first_peak']], curr['downward_trend']
+                    )
+            downward_trend = list(next(downward_zip))
+            final_findings.append({
+                'first_peak': prev['first_peak'],
+                'second_peak': curr['second_peak'],
+                'downward_trend': downward_trend,
+                'cup_bottom': sorted(downward_trend, key=lambda x: Decimal(x['value']))[0]
+                }
+            )
+            used_indexes.append((prev['second_peak']['idx'], curr['first_peak']['idx']))
+        elif surrounding_result_outcome == cup_constants['EXTEND_END']:
+            # Extend the end of the pattern and forget about the first peak
+            # TODO: Same as the above case of `EXTEND_START`
+            downward_zip = zip(
+                    prev['downward_trend'],
+                    [prev['second_peak'],
+                    curr['first_peak']], curr['downward_trend']
+                    )
+            downward_trend = list(next(downward_zip))
+            final_findings.append({
+                'first_peak': prev['first_peak'],
+                'second_peak': curr['second_peak'],
+                'downward_trend': downward_trend,
+                'cup_bottom': sorted(downward_trend, key=lambda x: Decimal(x['value']))[0]
+                }
+            )
+            used_indexes.append((prev['second_peak']['idx'], curr['first_peak']['idx']))
+        else:
+            # Pattern is completely contained within a larger pattern and can be thrown away
+            # TODO: why aren't placeholders working here?
+            self.logger.info('Throwaway pattern found at %s and %s' % str(prev['second_peak']['idx']) % str(curr['first_peak']['idx']))
+    # elif find_surrounding_cup(used_indexes, **{'start': prev['second_peak']['idx'], 'end': prev['first_peak']['idx']}) is not None:
+    elif surrounding_for_prev is not None:
+        # curr and prev are not adjacent patterns
+        # prev is contained within a larger pattern, thus we must extend that pattern before adding it to our findings
+        surrounding_result_outcome = surrounding_for_prev_and_curr[1]
+        final_findings.append(prev)
+        used_indexes.append((prev['first_peak']['idx'], prev['second_peak']['idx']))
+
+    elif surrounding_for_prev is None and surrounding_for_prev_and_curr is not None:
+        # curr and prev are not adjacent patterns
+        # TODO: Determine whether this is even possible
+        self.logger.debug('SUSPICIOUS CIRCUMSTANCE: prev and curr are not adjacent, but are both contained within a larger pattern. This circumstance is not yet being handled')
+
+    elif surrounding_for_prev is None and surrounding_for_prev_and_curr is None:
+        # No surrounding patterns by any measure
+        # curr and prev are not adjacent patterns, thus we ASSUME is safe to put prev in the findings
+        final_findings.append(prev)
+        used_indexes.append((prev['first_peak']['idx'], prev['second_peak']['idx']))

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Tornado
 from tornado.websocket import WebSocketHandler, WebSocketError, StreamClosedError
 from tornado.web import Application, RequestHandler, HTTPError
@@ -71,7 +72,6 @@ class StartHandler(RequestHandler):
                 for bot in application.bots:
                     application.logger.debug(bot.identify())
                     identities.append({'message': bot.identify(), 'id': str(bot.id), 'number': bot.number})
-                    # bot_conn = await bot.connect()
                     await bot.write_message()
                     await bot.relay_message('Jigga jigga WHAT?!?!?!')
 
@@ -332,7 +332,6 @@ async def handle_ws_request(type, data):
                 patterns = await bot.find_all_patterns()
                 findings = patterns['cup_and_handle']
                 price_history = await bot.retrieve_price_history(60)
-                # bot.digest_price_history(price_history)
                 bot.analyze_price_history()
                 price_data = await bot.post_data_as_json()
                 filename = build_graph(price_data, bot.number, findings)
@@ -521,25 +520,18 @@ def build_graph(price_data, bot_number, patterns=None):
 
     if patterns is not None:
         for i, pattern in enumerate(patterns):
-            x0, xm, x1, y0, ym, y1 = extract_bezier_points(pattern)
-            x = datetime([x0, xm, x1])
-            y = [y0, ym, y1]
+            # TODO: pattern should never be None
+            if pattern is not None:
+                x0, xm, x1, y0, ym, y1 = extract_bezier_points(pattern)
+                x = datetime([x0, xm, x1])
+                y = [y0, ym, y1]
 
-            # t, c, k = intrpl.splrep(x, y, k=2, s=0)
-            # spline = intrpl.BSpline(t, c, k, extrapolate=False)
-
-            # smooth_source = ColumnDataSource({
-            #     'date': x,
-            #     # 'price': spline(y)
-            #     'price': y
-            # })
-            # smooth_source = cubic_column_datasource(x, y)
-            cup_source = ColumnDataSource({
-                'date': x,
-                'price': y
-            })
-            cup_line = p1.line(x='date', y='price', source=cup_source, color="#b241ff", legend="cup%s" % str(i), line_cap='round', line_width=4)
-            lines_to_render.append(cup_line)
+                cup_source = ColumnDataSource({
+                    'date': x,
+                    'price': y
+                })
+                cup_line = p1.line(x='date', y='price', source=cup_source, color="#b241ff", legend="cup%s" % str(i), line_cap='round', line_width=4)
+                lines_to_render.append(cup_line)
 
     p1.add_tools(HoverTool(
         renderers=lines_to_render,
