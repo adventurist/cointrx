@@ -2,10 +2,11 @@ from tornado import httpclient as tornado_client
 from tornado.httpclient import HTTPRequest
 from utils.loop_handler import IOHandler
 import aiohttp
+
 from types import SimpleNamespace
 
 config = SimpleNamespace()
-config.blockchain_url = "http://blockchain.info/ticker"
+config.blockchain_url = "https://blockchain.info/ticker"
 
 http_client = tornado_client.AsyncHTTPClient()
 io_handler = IOHandler()
