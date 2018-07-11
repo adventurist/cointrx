@@ -7,11 +7,13 @@
 }
 #trade-left {
     float: left;
-    width: 33.5%
+    width: 33.5%;
+    background-color: #333333;
 }
 #trade-right {
     float: right;
-    width: 66.5%
+    width: 66.5%;
+    background-color: #333333;
 }
 .app-bar-icon {
     float: right;
@@ -24,4 +26,13 @@
 .TrxAppBar h1 {
     width: 100%!important;
     text-align: right;
+}
+
+.react-grid-Canvas .react-grid-Cell, #trade-left, #trade-right {
+    background-color: #333333;
+    color: #ffffff!important;
+}
+
+.react-stockchart text {
+    fill: #ffffff!important;
 }

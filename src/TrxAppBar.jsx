@@ -5,7 +5,16 @@ import Navigation from 'react-toolbox/lib/navigation';
 import * as theme from '../static/css/nav.css'
 import Link from 'react-toolbox/lib/link';
 import Avatar from 'material-ui/Avatar';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
+import IconButton from 'material-ui/IconButton';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
+const trxLogo = () => {
+    return <div>
+        <img id="trx-logo-img" height="64px" src="/static/images/logo.png"/>
+    </div>
+}
 
 export class TrxNav extends React.Component {
     constructor(props) {
@@ -54,19 +63,47 @@ export class TrxNav extends React.Component {
     render() {
         return (
             <Layout className="trx-mui-layout">
-                <NavDrawer active={this.state.drawerActive} pinned={this.state.drawerPinned} permanentAt='xxxl' onOverlayClick={this.toggleDrawerActive}>
+                <NavDrawer active={this.state.drawerActive} pinned={this.state.drawerPinned} permanentAt='xxxl'
+                           onOverlayClick={this.toggleDrawerActive}>
                     <p>
-                        <Link href='https://app.cointrx.com/regtest/all-users' label='TX Test Interface' icon='bug_report' />
-                        <Link href='https://app.cointrx.com/prices/graph' active label='D3 Graphs' icon='trending_up' />
+                        <Link href='https://app.cointrx.com/regtest/all-users' label='TX Test Interface'
+                              icon='bug_report'/>
+                        <Link href='https://app.cointrx.com/prices/graph' active label='D3 Graphs' icon='trending_up'/>
                     </p>
                 </NavDrawer>
                 <Panel>
-                    <AppBar className="TrxAppBar" title="Coin TRX" styleName="theme.AppBar" theme={theme} leftIcon='menu' onLeftIconClick={this.toggleDrawerActive}>
-                        <Navigation className='trx-appbar-nav' type='horizontal'>
-                            <Link className="app-bar-icon app-bar-user" href='/user' active label=''>
-                                <Avatar src="https://cointrx.com/sites/default/files/2017-09/X58Q4cA.jpg" size={30} />
-                            </Link>
-                            <Link className="app-bar-icon app-bar-trade" href='/transaction/tx-gui' label='' icon='inbox'/>
+                    <AppBar className="TrxAppBar"
+                            id="trx-app-bar"
+                            title={trxLogo()}
+                            styleName="theme.AppBar"
+                            theme={theme}
+                            style={{backgroundColor: '#333333'}}
+                            leftIcon="menu"
+                            onLeftIconClick={this.toggleDrawerActive}>
+
+                        <Navigation className='trx-appbar-nav' type='horizontal' style={{backgroundColor: '#333333'}}>
+                            <div className="app-bar-icons">
+                                <Link className="app-bar-icon app-bar-trade"
+                                      href='/transaction/tx-gui' label='' icon='inbox'/>
+                                <Link className="app-bar-icon app-bar-user"
+                                      href='/user' active label=''>
+                                    <Avatar
+                                        src="https://cointrx.com/sites/default/files/2017-09/X58Q4cA.jpg"
+                                        size={30}/>
+                                </Link>
+                                <Link className="app-bar-icon app-bar-user-menu"
+                                      href="#">
+                                    <IconMenu className="user-menu"
+                                              iconButtonElement={<IconButton className="user-menu-iconbutton">
+                                                  <MoreVertIcon />
+                                              </IconButton>}
+                                              anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+                                              targetOrigin={{horizontal: 'right', vertical: 'top'}}>
+                                        <Link className="user-logout"
+                                              href="/logout"><MenuItem primaryText="Log Out"/></Link>
+                                    </IconMenu>
+                                </Link>
+                            </div>
                         </Navigation>
                     </AppBar>
                 </Panel>

@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const bitcore_lib_1 = require("bitcore-lib");
-const bitcoin = require("bitcoinjs-lib");
 bitcore_lib_1.Networks.enableRegtest();
 const satoshi = 100000000;
 exports.txFactory = (config) => {
@@ -28,10 +27,6 @@ class TrxTransaction {
             .sign(keys);
         let errors = typeof transaction !== 'undefined' ? 0 : 1;
         return { tx: transaction.serialize(), error: errors };
-        // const txBuilder = buildTx(txIn, txOut)
-        // const buildResult = txBuilder.build()
-        // const errors = typeof buildResult !== 'undefined' ? 0 : 1
-        // return { tx: buildResult.toHex(), error: errors }
     }
 }
 var NetworkTypes;
@@ -52,24 +47,6 @@ const buildTxIn = (txRaw) => {
         script: new bitcore_lib_1.Script(bitcore_lib_1.PrivateKey.fromWIF(txRaw.key).toAddress(bitcore_lib_1.Networks.testnet)).toHex(),
         satoshis: txRaw.value
     };
-};
-const buildTx = (txIns, txOuts) => {
-    const txBuilder = new bitcoin.TransactionBuilder(bitcoin.networks.testnet);
-    txIns.forEach((txIn) => {
-        txBuilder.addInput(txIn.id.indexOf(':0') ? txIn.id.substr(0, txIn.id.indexOf(':0')) : txIn.id, txIn.idx);
-    });
-    txOuts.forEach((txOut) => {
-        txBuilder.addOutput(txOut.address, txOut.value);
-    });
-    txIns.forEach((txIn) => {
-        try {
-            txBuilder.sign(txIn.idx, bitcoin.ECPair.fromWIF(txIn.key, bitcoin.networks.testnet));
-        }
-        catch (e) {
-            console.log(e);
-        }
-    });
-    return txBuilder;
 };
 const buildTxOut = function (txRaw) {
     return {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { render }from 'react-dom'
 import Chart from './Chart';
-import { getData } from "./Utils"
+import { getData, getJson } from "./Utils"
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -10,7 +10,10 @@ import { TrxNav } from '../TrxAppBar.jsx'
 
 class ChartComponent extends React.Component {
     componentDidMount() {
-        getData().then(data => {
+        // getData().then(data => {
+        //     this.setState({ data })
+        // })
+        getJson().then(data => {
             this.setState({ data })
         })
     }

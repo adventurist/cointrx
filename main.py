@@ -3,50 +3,41 @@ import asyncio
 import logging
 import sys
 import uuid
+import traceback
 
 import base64
 import json
 import os
 import random
 import warnings
-from tornado import escape
+import re
+
+from graphql.error import GraphQLError
+from graphql.error import format_error as format_graphql_error
+
+from functools import wraps
+
+from tornado import escape, httpserver
 from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.options import define
 from tornado.websocket import WebSocketHandler
-from tornado.web import Application, RequestHandler, StaticFileHandler
+from tornado.web import Application, RequestHandler, StaticFileHandler, HTTPError, asynchronous
 
 from config import config as TRXConfig
 from db import db
-from iox.loop_handler import IOHandler
-from tx import trx__tx_out
-from utils import drupal_utils, session
+from utils.loop_handler import IOHandler
+from utils.tx import trx__tx_out
+from utils import drupal_utils, session, trc_utils, eth_utils
 from utils.cointrx_client import Client
 from utils.mail_helper import Sender as mail_sender
 
-from requests.auth import HTTPBasicAuth
-
-parser = argparse.ArgumentParser('debugging asyncio')
-parser.add_argument(
-    '-v',
-    dest='verbose',
-    default=False,
-    action='store_true',
-)
-args = parser.parse_args()
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(levelname)7s: %(message)s',
-    stream=sys.stderr,
-)
-
-LOG = logging.getLogger('')
+from utils.login_helpers import retrieve_api_request_headers, retrieve_json_login_headers, \
+    retrieve_json_login_credentials, check_basic_auth, create_user_session_data, \
+    retrieve_login_credentials
 
 io_handler = IOHandler()
 http_client = Client()
-
-static_path = os.path.join(os.path.dirname(__file__), "static")
 
 define("port", default=6969, help="Default port for the WebServer")
 
@@ -61,6 +52,56 @@ define("port", default=6969, help="Default port for the WebServer")
 #         if isinstance(obj, datetime.datetime):
 #             return str(obj)
 #         return super(MJSONEncoder, self).default(obj)
+
+def error_response(func):
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        try:
+            result = func(self, *args, **kwargs)
+        except Exception as ex:
+            if not isinstance(ex, (HTTPError, ExecutionError, GraphQLError)):
+                tb = ''.join(traceback.format_exception(*sys.exc_info()))
+                logging.error('Error: {0} {1}'.format(ex, tb))
+            self.set_status(error_status(ex))
+            error_json = escape.json_encode({'errors': error_format(ex)})
+            logging.debug('error_json: %s', error_json)
+            self.write(error_json)
+        else:
+            return result
+
+    return wrapper
+
+
+class ExecutionError(Exception):
+    def __init__(self, status_code=400, errors=None):
+        self.status_code = status_code
+        if errors is None:
+            self.errors = []
+        else:
+            self.errors = [str(e) for e in errors]
+        self.message = '\n'.join(self.errors)
+
+
+def error_status(exception):
+    if isinstance(exception, HTTPError):
+        return exception.status_code
+    elif isinstance(exception, (ExecutionError, GraphQLError)):
+        return 400
+    else:
+        return 500
+
+
+def error_format(exception):
+    if isinstance(exception, ExecutionError):
+        return [{'message': e} for e in exception.errors]
+    elif isinstance(exception, GraphQLError):
+        return [format_graphql_error(exception)]
+    elif isinstance(exception, HTTPError):
+        return [{'message': exception.log_message,
+                 'reason': exception.reason}]
+    else:
+        return [{'message': 'Unknown server error'}]
+
 
 def check_attribute(obj, att):
     return getattr(obj, att, None) is not None
@@ -85,79 +126,139 @@ class WunderHandler(RequestHandler):
 
 class LoginHandler(RequestHandler):
     def data_received(self, chunk):
-        pass
+        print('Receiving data')
 
-    async def post(self) -> str:
-        cookie_data = self.get_secure_cookie('trx_cookie')
-        current_header = self.request.headers.get("Content-Type")
-        print(current_header)
-        if self.request.headers.get("Content-Type") == 'application/json':
-            request_data = {k: ''.join(v) for k, v in escape.json_decode(self.request.body).items()}
-            email = request_data.get('email')
-            password = request_data.get('password')
-            name = request_data.get('name')
+    async def post(self, *args, **kwargs) -> str:
+        """
 
-            if email is None or password is None or name is None:
+        .. http:post:: /login
+
+        ---------------
+        REQUEST EXAMPLE
+
+        :POST: /login
+        :Accept: application/json
+        :Content-Type: application/json
+        :Authorization: Basic aGVsaW9zOmphc2tqYTg5cjN5dW9yaWFzamY=
+        :Body: {"name":"yourname", "password":"yourpassword", "email":"youremail"}
+
+        |
+
+        :HEADERS:
+
+        |
+
+        :Accept: application/json
+
+        - Declare your expectation to receive a response in JSON format
+
+        **Example** ``Accept: application/json``
+
+        |
+
+        :Authorization: Basic (Base64 encoding of name:password)
+
+        - Basic Auth is expected in the header (with a key of `Authorization` and a value of `Basic base64encoded` where base64encoded is the base64 encoding of `name:password`
+
+        **Example** ``Authorization: Basic aGVsaW9zOmphc2tqYTg5cjN5dW9yaWFzamY=``
+
+        |
+
+        :Content-Type: application/json
+
+            - Requests must state that that Content-Type will be application/json
+
+            **Example** ``Content-Type: application/json``
+
+        |
+
+        :**BODY**:
+        :Body content {string}: JSON object containing `name`, `email` and `password` keys
+
+        - POST Parameters should be provided as the request body in JSON format
+
+        **Example** ``{"email":"johannes@composers.com", "name":"JSBach", "password":"k0wnTT||er}@{RER3point{@LGkillah"}``
+
+        |
+
+        :**RESPONSE CODES**:
+        :200: No error
+        :400: Malformed request
+        :401: Unauthorized
+        :404: User not found
+
+        |
+
+        :**RESPONSE DATA**:
+        :return: Session data as JSON: ``{"csrf-token":"value", "trx-cookie":"value"}``
+
+        *Use the returned session data for all subsquent authenticated requests*
+
+        """
+
+        basic_auth, content_type = retrieve_json_login_headers(self.request.headers)
+
+        if content_type == 'application/json':
+            # auth_name, auth_pass = check_basic_auth(basic_auth)
+            email, name, password = retrieve_json_login_credentials(
+                {k: ''.join(v) for k, v in escape.json_decode(self.request.body).items()})
+
+            if name is None or password is None:
                 self.write("You must supply more arguments")
-                self.write_error(401)
+                self.set_status(400)
+                self.write_error(400)
+
+            user_verify = db.check_authentication_by_name(name, password)
+            if user_verify is not None and user_verify is not -1:
+                csrf = user_verify.generate_auth_token(expiration=1200)
+                application.create_session(user=create_user_session_data(name, password, user_verify, csrf))
+                if application.session is not None and isinstance(application.session, session.Session):
+                    self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+
+                    return self.write(escape.json_encode(
+                        {'statuscode': 200, 'token': str(application.session.user['csrf'], 'utf-8'),
+                         'trx_cookie': str(self.get_secure_cookie('trx_cookie'))}))
+
+            elif user_verify < -1:
+                self.set_status(404)
+                return self.write(escape.json_encode({'statuscode': 404}))
             else:
-                user_verify = db.check_authentication(name, password, email)
-                if user_verify is not -1:
-                    csrf = user_verify.generate_auth_token(expiration=1200)
-                    application.create_session(
-                        user={'name': name, 'pass': password, 'id': user_verify.id, 'csrf': csrf})
-                    if application.session is not None and isinstance(application.session, session.Session):
-                        self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                self.set_status(401)
+                return self.write(escape.json_encode({'statuscode': 401}))
 
-                        return self.write(escape.json_encode({'token': str(application.session.user['csrf'], 'utf-8'),
-                                                              'cookie': str(self.get_secure_cookie('trx_cookie'))}))
-
-                    print(str(user_verify))
         elif self.request.headers.get("Content-Type") == 'text/html':
             name = self.get_argument('name')
             print(name)
 
-        elif current_header == 'application/x-www-form-urlencoded':
+        elif content_type == 'application/x-www-form-urlencoded':
 
-            name, password = self.get_body_argument('name'), self.get_body_argument('pass')
+            name, password = retrieve_login_credentials(self)
 
             if name is not None and password is not None and len(name) > 0:
                 user_verified = db.check_auth_by_name(name, password)
                 if user_verified is not None and user_verified is not -1:
-                    drupal_login = await drupal_utils.attempt_login(
-                        escape.json_encode({'name': name, 'pass': password}))
-                    if drupal_login is not None:
-                        drupal_user_data = escape.json_decode(escape.to_basestring(drupal_login.body))
-                        csrf = user_verified.generate_auth_token(expiration=1200)
-                        application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
-                                                   csrf=csrf, dcsrf=drupal_user_data['csrf_token'])
-                        self.set_secure_cookie("dcsrf", application.session.drupal_token())
-                        self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
-                    else:
-                        csrf = user_verified.generate_auth_token(expiration=1200)
-                        application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
-                                                   csrf=csrf)
-                        self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
-                        if self.get_secure_cookie('redirect_target') is not None:
-                            redirect_target = self.get_secure_cookie('redirect_target')
-                            self.clear_cookie('redirect_target')
-                            return self.redirect(redirect_target)
-                        self.write(user_verified.name)
+                    csrf = user_verified.generate_auth_token(expiration=1200)
+                    application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
+                                               csrf=csrf)
+                    self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                    self.set_cookie(name='csrf', value=csrf)
+                    if self.get_secure_cookie('redirect_target') is not None:
+                        redirect_target = self.get_secure_cookie('redirect_target')
+                        self.clear_cookie('redirect_target')
+                        return self.redirect(redirect_target)
+                    self.write(user_verified.name)
+
 
     def get(self, *args, **kwargs):
-        print('get getting get')
         cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
         current_header = self.request.headers.get("Content-Type")
         print(cookie_secret)
         print(self._headers)
         print(self.get_status())
-        # name = self.get_argument('name')
-        # print(name)
         print(current_header)
 
         if self.request.headers.get("Content-Type") == 'text/html':
             name = self.get_argument('name')
-            print('text/html, yo')
             print(name)
 
         message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut",
@@ -190,11 +291,32 @@ class UpdatePriceHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    @gen.coroutine
-    def get(self):
-        http_client.get_prices()
+    # async def get(self):
+    #     await http_client.get_prices()
+    #
+    #     self.write('Sent request')
+    # @gen.coroutine
+    async def get(self):
+        price_update_result = await http_client.get_prices()
 
         self.write('Sent request')
+
+
+class ETHPriceUpdateHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self):
+        """
+        @api
+        @internal
+        Parse ETH ticker data, store revision data and update current pricing table
+        :return: application/json response
+        """
+
+        eth_data = await eth_utils.update_eth_prices()
+        if eth_data is not None:
+            self.write(json.dumps({'response': 201, 'data': 'placeholder CHANGE THIS'}))
 
 
 class LatestPriceHandler(RequestHandler):
@@ -273,7 +395,7 @@ class RegisterHandler(RequestHandler):
                 self.write_error(401)
             else:
                 user_verify = db.check_authentication(name, password, email)
-                if user_verify is -1 or None:
+                if isinstance(user_verify, int) and user_verify < 0:
                     user_verify = db.create_user(name, password, email)
 
                 csrf = user_verify.generate_auth_token(expiration=1200)
@@ -576,6 +698,19 @@ class RegTestPayUserHandler(RequestHandler):
             self.write(str(user_pay_result))
 
 
+class RegTestPayKeyHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        wif = self.get_argument('wif')
+        amount = self.get_argument('amount')
+
+        if wif and amount is not None:
+            key_pay_result = await db.regtest_pay_key(wif, amount)
+            self.write(str(key_pay_result))
+
+
 class UiReactHandler(RequestHandler):
     def data_received(self, chunk):
         pass
@@ -589,11 +724,13 @@ class UserProfileHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        # if self.get_secure_cookie("trx_cookie") is not None:
+        cookie = self.get_secure_cookie("trx_cookie")
         if check_attribute(application.session, 'user'):
             user_data, prices = await retrieve_user_data()
-            tx_url, blockgen_url, userbalance_url = retrieve_user_urls()
-            self.render("templates/user.html", title="TRX USER PROFILE", tx_url=tx_url, blockgen_url=blockgen_url,
+            tx_url, blockgen_url, userbalance_url, btckeygen_url = retrieve_user_urls()
+            self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+            self.render("templates/user.html", title="TRX USER PROFILE", keygen_url=btckeygen_url, tx_url=tx_url,
+                        blockgen_url=blockgen_url,
                         userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
         else:
             self.set_secure_cookie('redirect_target', '/user')
@@ -611,8 +748,356 @@ def retrieve_user_urls():
     tx_url = trx_urls['tx_request']
     blockgen_url = trx_urls['blockgen_url']
     userbalance_url = trx_urls['userbalance_url']
+    btckeygen_url = trx_urls['key_gen_url']
 
-    return tx_url, blockgen_url, userbalance_url
+    return tx_url, blockgen_url, userbalance_url, btckeygen_url
+
+
+class KeyWTPHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        """
+        @API
+
+        Convert a WIF secret to private key
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        wif = self.get_argument('wif')
+        if wif is not None:
+            response = await http_client.connect(
+                TRXConfig.get_urls(application.settings['env']['TRX_ENV'])['wif_to_private_url'],
+                escape.json.dumps({'wif': wif}))
+            if response:
+                print(response)
+                data = escape.json_decode(response.body.decode())
+                self.write(data)
+
+
+class RegTestUserKeyGenerateHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        found_cookie = self.get_secure_cookie("trx_cookie")
+
+        if found_cookie is not None and application.session.user is not None:
+            new_address = await db.regtest_make_user_address(application.session.user['id'])
+            user_data = await db.regtest_user_data(application.session.user['id'])
+            self.write(escape.json_encode(user_data))
+
+    async def post(self, *args, **kwargs):
+        content_type = self.request.headers.get('Content-Type')
+        if content_type == 'application/json':
+            csrf = self.request.headers.get('csrf-token')
+            if db.User.verify_auth_token(csrf):
+                new_address = await db.regtest_make_user_address(application.session.user['id'])
+                user_data = await db.regtest_user_data(application.session.user['id'])
+                self.write(escape.json_encode(user_data))
+            else:
+                self.write(escape.json_encode([{'error': 'Token not valid', 'code': 401}]))
+
+
+def check_content_types(handler: RequestHandler):
+    return handler.request.headers.get('Content-Type')
+
+
+def get_csrf(handler: RequestHandler):
+    return handler.request.headers.get('csrf-token')
+
+
+class RegTestKillKeyHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def post(self, *args, **kwargs):
+        if check_content_types(self) == 'application/json':
+            csrf = self.request.headers.get('csrf-token')
+            if db.User.verify_auth_token(csrf):
+                key_id = self.request.headers.get('key')  # TODO make this work
+
+
+class LogoutHandler(RequestHandler):
+    def data_received(self, chunk):
+        print(chunk)
+
+    def get(self, *args, **kwargs):
+        self.clear_all_cookies()
+        application.session = None
+        self.write("Logout successful")
+        self.redirect('/login')
+
+
+class TestKeyHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        jigga = self.get_argument('jigga')
+        print(jigga)
+        key_id = self.request.path.split('/api/key/')[1].split('/update')[0]
+        print(key_id)
+
+    async def post(self, *args, **kwargs):
+        csrf, content_type = retrieve_api_request_headers(self.request.headers)
+        if content_type == 'application/json':
+            # TODO Check this properly cookie = self.get_secure_cookie("trx_cookie")
+            if check_attribute(application.session, 'user'):
+                if db.User.verify_auth_token(csrf):
+                    key_id = self.request.path.split('/api/key/')[1].split('/update')[0].lstrip('0')
+                    key_data = json.loads(self.request.body.decode())
+                    if 'label' in key_data:
+                        if await db.update_key(key_id, key_data['label']):
+                            self.write(escape.json_encode([{'Update': 'Successful', 'code': 204}]))
+                        else:
+                            self.write(escape.json_encode([{'error': 'Key not found', 'code': 404}]))
+                    else:
+                        self.write(escape.json_encode([{'error': 'Bad request', 'code': 400}]))
+                else:
+                    self.write(escape.json_encode([{'error': 'Not authorized', 'code': 401}]))
+            else:
+                login_redirect(self, self.request.path)
+
+
+class UserUpdateHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        jigga = self.get_argument('jigga')
+        print(jigga)
+        key_id = self.request.path.split('/api/key/')[1].split('/update')[0]
+        print(key_id)
+
+    async def post(self, *args, **kwargs):
+        csrf, content_type = retrieve_api_request_headers(self.request.headers)
+        if content_type == 'application/json':
+            # TODO Check this properly cookie = self.get_secure_cookie("trx_cookie")
+            if check_attribute(application.session, 'user'):
+                if db.User.verify_auth_token(csrf):
+                    uid = self.request.path.split('/api/user/')[1].split('/update')[0].lstrip('0')
+                    user_data = json.loads(self.request.body.decode())
+                    if user_data is not None:
+                        if await db.update_user(uid, user_data):
+                            self.write(escape.json_encode([{'Update': 'Successful', 'code': 204}]))
+                        else:
+                            self.write(escape.json_encode([{'error': 'Key not found', 'code': 404}]))
+                    else:
+                        self.write(escape.json_encode([{'error': 'Bad request', 'code': 400}]))
+                else:
+                    self.write(escape.json_encode([{'error': 'Not authorized', 'code': 401}]))
+            else:
+                login_redirect(self, self.request.path)
+
+
+class RegTestPayAllKeyHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        result = await db.regtest_pay_keys('10')
+        self.write(str(result))
+
+
+class BtcMinMaxHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        time = self.get_argument('time')
+        minmax_data = await db.regtest_graph_data(time)
+        self.write(minmax_data)
+
+
+# class GraphQLHandler(RequestHandler):
+#     def data_received(self, chunk):
+#         pass
+#
+#     def __init__(self, application, request, **kwargs):
+#         super().__init__(application, request, **kwargs)
+#         self.schema = graphql.schema
+#
+#     @error_response
+#     def get(self, *args, **kwargs):
+#         placeholder = 'placeholder'
+#
+#     def post(self):
+#         return self.handle_graqhql()
+#
+#     def handle_graqhql(self):
+#         result = self.execute_graphql()
+#         logging.log('DEBUG', 'GraphQL result data: %s errors: %s invalid %s',
+#                     result.data, result.errors, result.invalid)
+#         if result and result.invalid:
+#             ex = ExecutionError(errors=result.errors)
+#             logging.warn('GraphQL Error: %s', ex)
+#             raise ex
+#
+#         response = {'data': result.data}
+#         self.write(escape.json_encode(response))
+#
+#     def execute_graphql(self):
+#         graphql_req = self.graphql_request
+#         return self.schema.execute(
+#             graphql_req.get('query'),
+#             variable_values=graphql_req.get('variables'),
+#             operation_name=graphql_req.get('operationName'),
+#             context_value=graphql_req.get('context'),
+#             middleware=self.middleware
+#         )
+#
+#     @property
+#     def graphql_request(self):
+#         return escape.json_decode(self.request.body)
+#
+#     @property
+#     def content_type(self):
+#         return self.request.headers.get('Content-Type', 'text/plain').split(';')[0]
+#
+#     @property
+#     def schema(self):
+#         raise NotImplementedError('schema must be provided')
+#
+#     @property
+#     def middleware(self):
+#         return []
+#
+#     @property
+#     def context(self):
+#         return None
+#
+#     @schema.setter
+#     def schema(self, value):
+#         self._schema = value
+
+
+class TRCPriceUpdateHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        current_trx_prices = await db.btc_hour_minmax_price()
+        latest_trc_price = await db.trc_latest_price()
+        for price in current_trx_prices:
+            if price[0] > latest_trc_price.time:
+                trc_price = trc_utils.create_mock_price(price.min, price.max)
+                trc_insert_result = db.trc_insert_price(price.date, trc_price)
+                logger.debug('Insert result is: ' + str(trc_insert_result))
+
+
+class BotGuiHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        cookie = self.get_secure_cookie("trx_cookie")
+        if check_attribute(application.session, 'user'):
+
+            bot_gui_data = {}
+            bot_gui_urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
+
+            self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+            self.render("templates/bot.html", title="TRX BOT GUI", bot_gui_urls=bot_gui_urls, bot_gui_data=bot_gui_data)
+        else:
+            self.set_secure_cookie('redirect_target', self.request.path)
+            self.redirect('/login')
+
+
+class BotStartHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        cookie = self.get_secure_cookie('trx_cookie')
+        number = self.get_argument('number')
+        urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
+        response = await http_client.get(
+            'http://localhost:9977/start' + '?number=' + str(number) + '&trx_cookie=' + str(cookie))
+        if response is not None and hasattr(response, 'body'):
+            response_data = str(response.body, 'utf-8')
+            self.set_status(200)
+            self.write(response_data)
+        else:
+            self.set_status(500)
+            self.write(json.dumps({'response': 500, 'text': 'Error starting bots'}))
+
+
+class BotTrcPriceRetrieveHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        cookie = self.get_secure_cookie('trx_cookie')
+        time_length = self.get_argument('time')
+        bot_id = self.get_argument('bot_id')
+        urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
+        response = await http_client.get(
+            'http://localhost:9977/bots/trc/prices' + '?bot_id=' + str(bot_id) + '&time=' + str(
+                time_length) + '&trx_cookie=' + str(cookie))
+        response_data = str(response.body, 'utf-8')
+        self.set_status(200)
+        self.write(response_data)
+
+
+class BotWsTestHandler(WebSocketHandler):
+    def data_received(self, chunk):
+        pass
+
+    # def check_origin(self, origin):
+    #     return bool(re.match(r'^.*?\.cointrx\.com', origin))
+
+    async def on_message(self, message):
+        logger.debug('Message received: %s' % str(message))
+        if trc_utils.valid_json(message):
+            logger.debug('Valid JSON detected - Processing request')
+            parsed = json.loads(message)
+            result = await handle_ws_request(parsed['type'], parsed['data'])
+            logger.debug('WS Request: %s' % str(result))
+            response = json.dumps(result) if isinstance(result, dict) else str(result, 'utf-8')
+            # TODO Handle this internally and send a TRX response
+            self.write_message(response)
+
+        return_message = {'keepAlive': 1, 'message': 'Back at you, punk'}
+        self.write_message(json.dumps(return_message))
+
+    def open(self):
+        logger.debug('Connection opened: ' + str(self))
+        self.write_message('Connection opened')
+
+
+async def handle_ws_request(type, data):
+    """
+    Utility to handle requests sent through the websocket stream
+    :param type:
+    :param data:
+    :return dict:
+    """
+    async def analyze_market(url, data):
+        """
+        Request that bot with ID perform a technical analysis
+        """
+        request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
+        if hasattr(request_result, 'body'):
+            return {'action': 'addfile', 'payload': json.loads(str(request_result.body, 'utf-8'))}
+    async def fetch_bots(type, data):
+        """
+        Retrieve info on all active bots
+        """
+        request_result = await http_client.get('http://localhost:9977/bots/fetch')
+        if hasattr(request_result, 'body'):
+            return {'action': 'updatebots', 'payload': json.loads(str(request_result.body, 'utf-8'))}
+
+
+    switch = {
+        'request': analyze_market,
+        'bots:all': fetch_bots
+    }
+    func = switch.get(type, lambda: 'Invalid request type')
+    result = await func(type, data)
+    return result
 
 
 class TRXApplication(Application):
@@ -628,6 +1113,7 @@ class TRXApplication(Application):
             (r"/user", UserProfileHandler),
             # - Primary
             (r"/login", LoginHandler),
+            (r"/logout", LogoutHandler),
             (r"/register", RegisterHandler),
             (r"/transaction/tx-gui", TxGuiHandler),
             (r"/heartbeat/feed", HeartbeatHandler),
@@ -639,13 +1125,28 @@ class TRXApplication(Application):
             # Regression Testing
             (r"/regtest/all-users", RegTestAllUsers),
             (r"/regtest/user/pay", RegTestPayUserHandler),
+            [r"/regtest/key/pay-all", RegTestPayAllKeyHandler],
+            (r"/regtest/key/pay", RegTestPayKeyHandler),
+            (r"/regtest/key/retire", RegTestKillKeyHandler),
             (r"/regtest/user-balance", RegTestUserBalanceHandler),
             (r"/regtest/tx-history", RegTestTxHistory),
             (r"/regtest/generate/block", RegTestBlockGenerateHandler),
             (r"/regtest/address/provision-all", RegTestAddressAllHandler),
+            (r"/keys/btc/regtest/generate", RegTestUserKeyGenerateHandler),
+
+            # Regression Mock Chain
+            (r"/trc/price/update", TRCPriceUpdateHandler),
 
             # CRON Processes
             (r"/updateprices", UpdatePriceHandler),
+            (r"/eth/price/update", ETHPriceUpdateHandler),
+
+            # Bot Utilities
+            (r"/admin/bot", BotGuiHandler),
+            (r"/analysis/analysis[0-9].html", StaticFileHandler),
+            (r"/bot/start", BotStartHandler),
+            (r"/bot/trc/prices/all", BotTrcPriceRetrieveHandler),
+            (r"/bot/ws-test", BotWsTestHandler),
 
             # REST API
 
@@ -654,6 +1155,14 @@ class TRXApplication(Application):
             (r"/transaction/test", TestTransactionHandler),
             (r"/transaction/sendraw", SendTrawTransactionHandler),
             (r"/transaction/secret/rollback", TrxRollbackHandler),
+
+            # USERS
+            (r"/api/user/[0-9][0-9][0-9][0-9]/update", UserUpdateHandler),
+
+            # KEYS
+
+            (r"/key/convert/wiftoprivate", KeyWTPHandler),
+            (r"/api/key/[0-9][0-9][0-9][0-9]/update", TestKeyHandler),
 
             # - Prices
             # -- Graph
@@ -664,6 +1173,8 @@ class TRXApplication(Application):
             (r"/prices/graph/json", GraphJsonHandler),
             (r"/prices/latest", LatestPriceHandler),
             (r"/prices/currency", CurrencyHandler),
+            (r"/api/prices/regtest/btc/cad/minmax/json", BtcMinMaxHandler),
+            (r"/api/prices/regtest-mock/btc/cad/minmax/json", BtcMinMaxHandler),
 
             # -- Heartbeat / Social Media
             (r"/heartbeat/create", HeartbeatCreateHandler),
@@ -679,8 +1190,11 @@ class TRXApplication(Application):
             (r"/sendmail", SendMailHandler),
             (r"/fakenews", FakeNewsHandler),
 
+            # (r"/graphql", GraphQLHandler),
+
             # Static
             (r"/static/(.*)", StaticFileHandler, {"path": "/static"}),
+            (r"/analysis/(.*)", StaticFileHandler, {"path": "/analysis"}),
             (r"/sites/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "sites")}),
             (r"/themes/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "themes")})
         ]
@@ -700,15 +1214,53 @@ class TRXApplication(Application):
         self.session.redirect_login = False
 
 
+def env_setup():
+    parser = argparse.ArgumentParser('debugging asyncio')
+    parser.add_argument(
+        '-v',
+        dest='verbose',
+        default=False,
+        action='store_true',
+    )
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(levelname)7s: %(message)s',
+        stream=sys.stderr,
+    )
+
+    LOG = logging.getLogger('')
+
+    static_path = os.path.join(os.path.dirname(__file__), "static")
+
+
+def login_redirect(handler: RequestHandler, origin: str):
+    handler.set_secure_cookie('redirect_target', origin)
+    handler.redirect('/login')
+
+
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    env_setup()
+    logger = logging.getLogger('MAIN')
+    logger.setLevel(logging.DEBUG)
+
+    log_handler = logging.FileHandler('trx.log')
+    logger_formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+    log_handler.setFormatter(logger_formatter)
+
+    logger.addHandler(log_handler)
+    logger.info('Logger configured')
+
     looper = asyncio.get_event_loop()
     looper.set_debug(True)
     looper.slow_callback_duration = 0.001
 
     warnings.simplefilter('always')
     application = TRXApplication()
-    application.listen(6969)
+    http_server = httpserver.HTTPServer(application)
+    http_server.listen(6969)
+    # application.listen(6969)
 
     application.settings['env'] = TRXConfig.get_env_variables()
 

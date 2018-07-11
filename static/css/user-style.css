@@ -21,8 +21,14 @@
     background-color: rgb(48, 48, 48);
 }
 
-.app-bar-icon {
+.app-bar-icons {
     float: right;
+    display: inline-block;
+}
+
+.app-bar-icon {
+    /* padding: 4px; */
+    display: inline!important;
 }
 
 .trx-appbar-nav {
@@ -32,4 +38,82 @@
 .TrxAppBar h1 {
     width: 100%!important;
     text-align: right;
+}
+
+/*.user-key-grid {*/
+    /*min-height: 3em!important;*/
+/*}*/
+
+/*.react-grid-Grid {*/
+    /*min-height: 5em!important;*/
+/*}*/
+
+.btc-key-btn-wrap {
+    float: right!important;
+    margin: 0;
+    top: auto;
+    right: 20px;
+    bottom: 20px;
+    left: auto;
+    position: fixed;
+}
+.user-form {
+    padding-bottom: 12px;
+}
+
+#estimated-value {
+    color: rgb(89, 229, 252)!important;
+    font-size: 14pt;
+}
+
+.estimated-value hr {
+    display: none;
+}
+
+.userform:last-of-type {
+    margin-bottom: 12px;
+}
+
+.react-grid-HeaderRow {
+    overflow: hidden!important;
+}
+
+.datepicker, .datepicker > button, .datepicker > div {
+    display: inline-block;
+}
+
+.timezone-picker {
+    width: 19em;
+}
+.timezone-picker-list-item-active {
+    background: #303030;
+}
+
+#timezone-container {
+    margin-bottom: 8px;
+}
+
+.userform-separator {
+    border: 1px rgb(0, 151, 167);
+    border-bottom: 2px solid;
+    bottom: 8px;
+    box-sizing: content-box;
+    /* margin: 12px; */
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+}
+
+.user-snackbar, .user-snackbar div {
+    background: rgb(0, 151, 167)!important;
+}
+
+.user-snackbar span {
+    color: #333333!important;
+    font-weight: 700!important;
+}
+
+.react-grid-Canvas .react-grid-Cell, #trade-left, #trade-right {
+    background-color: #333333;
 }

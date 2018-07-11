@@ -47,6 +47,12 @@ const stoAppearance = {
         { top: "#37a600", middle: "#b8ab00", bottom: "#37a600" })
 };
 
+const candlesAppearance = {
+    candleStrokeWidth: 1,
+    widthRatio: 1,
+    opacity: 1,
+}
+
 class CandleStickChartWithDarkTheme extends React.Component {
     render() {
         const height = 750;
@@ -123,7 +129,7 @@ class CandleStickChartWithDarkTheme extends React.Component {
 
 				<Chart id={1} height={325}
 					   yExtents={[d => [d.high, d.low], bb.accessor(), ema20.accessor(), ema50.accessor()]}
-					   padding={{ top: 10, bottom: 20 }}
+					   padding={{ top: 20, bottom: 20 }}
 				>
 					<YAxis axisAt="right" orient="right" ticks={5} {...yGrid} inverted={true}
 						   tickStroke="#FFFFFF" />
@@ -136,9 +142,10 @@ class CandleStickChartWithDarkTheme extends React.Component {
 						displayFormat={format(".2f")} />
 
 					<CandlestickSeries
-						stroke={d => d.close > d.open ? "#6BA583" : "#DB0000"}
-						wickStroke={d => d.close > d.open ? "#6BA583" : "#DB0000"}
-						fill={d => d.close > d.open ? "#6BA583" : "#DB0000"} />
+						stroke={d => d.close > d.open ? "#31C213" : "#FF0000"}
+						wickStroke={d => d.close > d.open ? "#31C213" : "#FF0000"}
+						fill={d => d.close > d.open ? "#31C213" : "#FF0000"}
+						{...candlesAppearance}/>
 
 					<LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>
 					<LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()}/>
@@ -149,7 +156,7 @@ class CandleStickChartWithDarkTheme extends React.Component {
 					<CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
 
 					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
-								   yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#DB0000"}/>
+								   yAccessor={d => d.close} fill={d => d.close > d.open ? "#31C213" : "#FF0000"}/>
 
 					<OHLCTooltip origin={[-40, -10]}/>
 					<MovingAverageTooltip
@@ -184,7 +191,7 @@ class CandleStickChartWithDarkTheme extends React.Component {
 						   tickStroke="#FFFFFF" />
 					<BarSeries
 						yAccessor={d => d.volume}
-						fill={d => d.close > d.open ? "#6BA583" : "#DB0000"} />
+						fill={d => d.close > d.open ? "#31C213" : "#FF0000"} />
 				</Chart>
 				<Chart id={3}
 					   yExtents={[0, 100]}

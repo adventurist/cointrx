@@ -1,11 +1,10 @@
 from typing import Union
-
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from passlib.apps import custom_app_context as pwd_context
 from aiopg.sa import create_engine as async_engine
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, CheckConstraint
 from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, String, Text, DECIMAL, Boolean, exc, event, MetaData, select
+from sqlalchemy import Column, Integer, String, Text, DECIMAL, Boolean, exc, event, MetaData, select, DateTime
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.sql.expression import true, false
@@ -13,13 +12,13 @@ from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker, relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, as_declarative, declared_attr
+from bitcoin.core import COIN
 from db import db_config
 from types import SimpleNamespace
+from decimal import Decimal, ROUND_HALF_UP
 from utils import btcd_utils
+from config.config import DEFAULT_LANGUAGE
 
-from mypy import *
-
-import asyncio
 import timeago
 import re
 import time
@@ -36,11 +35,16 @@ session = Session()
 trxapp = SimpleNamespace()
 trxapp.config = {'SECRET_KEY': "jigga does as jigga does"}
 
+# metadata.create_all(bind=engine)
+
 
 class TrxKey(Base):
     __tablename__ = 'trxkey'
     id = Column(Integer, primary_key=True)
     uid = Column(Integer, ForeignKey('users.id'))
+    # label = relationship("KeyLabel", backref='keylabel', uselist=False)
+    # user = relationship("HeartbeatUser", backref='pic', uselist=False)
+    label = relationship("KeyLabel", uselist=False, back_populates="trxkey")
     value = Column(String)
     multi = Column(Boolean)
     status = Column(Boolean)
@@ -62,6 +66,28 @@ class MKey(Base):
     pub = Column(String)
 
 
+class KeySchedule(Base):
+    __tablename__ = 'keyschedule'
+    id = Column(Integer, primary_key=True)
+    kid = Column(Integer, ForeignKey('trxkey.id'))
+    end_date = Column(DateTime(timezone=True))
+
+
+class KeyLabel(Base):
+    __tablename__ = 'keylabel'
+    id = Column(Integer, primary_key=True)
+    text = Column(String, server_default="Unnamed")
+    kid = Column(Integer, ForeignKey('trxkey.id'))
+    trxkey = relationship("TrxKey", back_populates='label')
+
+
+class TRCHistory(Base):
+    __tablename__ = 'trc_history'
+    id = Column(Integer, primary_key=True)
+    time = Column(DateTime(timezone=True))
+    value = Column(DECIMAL(12, 2))
+
+
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -71,7 +97,11 @@ class User(Base):
     created = Column(Integer)
     status = Column(Integer)
     trxkey = relationship("TrxKey", backref='user', uselist=True)
+    utc_offset = Column(Integer)
+    level = Column(Integer, nullable=False, server_default='0')
+    CheckConstraint('level BETWEEN 0 and 4')
 
+    # TODO
     def hash_password(self, password):
         self.hash = pwd_context.encrypt(password)
 
@@ -142,6 +172,15 @@ class User(Base):
         return user
 
 
+class ETHPrice(Base):
+    __tablename__ = 'eth_price'
+    id = Column(Integer, primary_key=True)
+    currency = Column(String(4))
+    last = Column(DECIMAL(12, 2))
+    modified = Column(DateTime(timezone=False))
+    revisions = relationship("ETHPriceRevision", back_populates="eth_price", lazy="select")
+
+
 class CXPrice(Base):
     __tablename__ = 'cx_price'
     id = Column(Integer, primary_key=True)
@@ -161,6 +200,17 @@ class CXPrice(Base):
             'sell': re.sub("[^0-9^.]", "", str(self.sell)),
             'modified': self.modified
         }
+
+
+class ETHPriceRevision(Base):
+    __tablename__ = "eth_price_revision"
+    id = Column(Integer, primary_key=True)
+    rid = Column(Integer)
+    currency = Column(String(4))
+    last = Column(DECIMAL(12, 2))
+    date = Column(DateTime(timezone=False))
+    currency_id = Column(Integer, ForeignKey('eth_price.id'))
+    eth_price = relationship("ETHPrice", back_populates="revisions")
 
 
 class CXPriceRevision(Base):
@@ -397,10 +447,21 @@ def handle_db_data(response):
         if isinstance(row, CXPriceRevision):
             print(row.serialize())
 
+async def handle_eth_update_data(data):
+    distilled_data = await parse_eth_price_data(data)
 
-def update_prices(data):
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(parse_price_data(data))
+
+# async def update_prices(data):
+#     loop = asyncio.get_event_loop()
+#     loop.run_until_complete(await parse_price_data(data))
+
+
+async def update_prices(data):
+    # loop = asyncio.get_event_loop()
+    return await parse_price_data(data)
+
+async def update_eth_prices(data):
+    await parse_eth_price_data(data)
 
 
 async def latest_prices():
@@ -424,10 +485,9 @@ async def latest_prices_async():
         for r in result:
             if isinstance(r, CXPrice):
                 data.append(r.serialize())
-        print(data)
         return data
     except exc.SQLAlchemyError as err:
-        print(err.args)
+
         session.rollback()
 
 
@@ -437,6 +497,9 @@ def latest_price(currency: str) -> str:
         print(result.serialize())
         return 'jigga'
 
+async def latest_price_data(currency: str) -> CXPrice:
+    result = session.query(CXPrice).filter(CXPrice.currency == currency).one_or_none()
+    return result if result is not None else False
 
 async def latest_price_async(currency: str) -> str:
     result = await session.query(CXPrice).filter(CXPrice.currency == currency).one_or_none()
@@ -476,68 +539,85 @@ def get_users():
 
 async def parse_price_data(data):
     for k, v in data.items():
-        engine = await async_engine(user=db_config.DATABASE['username'], database=db_config.DATABASE['database'],
-                                    host=db_config.DATABASE['host'], password=db_config.DATABASE['password'])
 
-        async with engine:
-            async with engine.acquire() as conn:
-                try:
-                    query = select([CXPrice]).where(CXPrice.currency == k)
-                    cur_time = time.time()
-                    result = await conn.execute(query)
+        result = session.query(CXPrice).filter(CXPrice.currency == k).one_or_none()
+        cur_time = time.time()
+        if result is None:
+            result = CXPrice(currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time)
 
-                    if result.rowcount < 1:
-                        async with conn.begin():
-                            await conn.execute(
-                                CXPrice.__table__.insert().values(currency=k, sell=v['sell'],
-                                                                  last=v['last'],
-                                                                  buy=v['buy'],
-                                                                  modified=cur_time))
+        try:
+            session.add(result)
+            session.commit()
+            session.flush()
 
-                    else:
-                        async with conn.begin():
-                            await conn.execute(
-                                CXPrice.__table__.update().where(CXPrice.currency == k).values(sell=v['sell'],
-                                                                                               last=v['last'],
-                                                                                               buy=v['buy'],
-                                                                                               modified=cur_time))
-                    query2 = select([CXPriceRevision]).where(CXPriceRevision.currency == k).group_by(
-                        CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid)))
-                    result2 = await conn.execute(query2)
-                    rid = find_rid(result2)
-                    rid = rid + 1 if rid is not None else 1
+        except exc.SQLAlchemyError as e:
+            print(e)
+            return False
 
-                    await conn.execute(
-                        CXPriceRevision.__table__.insert().values(rid=rid, currency=k, sell=v['sell'],
-                                                                  last=v['last'],
-                                                                  buy=v['buy'],
-                                                                  modified=cur_time))
+        result2 = session.query(CXPriceRevision).filter(CXPriceRevision.currency == k).group_by(CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid))).first()
+        rid = find_rid(result2)
+        rid = rid + 1 if rid is not None else 1
+
+        revision_insert = CXPriceRevision(rid=rid, currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time, currency_id=result.id)
+        try:
+            session.add(revision_insert)
+            session.commit()
+            session.flush()
+
+        except exc.SQLAlchemyError as e:
+            print(e)
+            return False
+
+    return True
 
 
-                except exc.SQLAlchemyError as error:
-                    print(error)
+async def parse_eth_price_data(data, currency='cad'):
+    result = session.query(ETHPrice).filter(ETHPrice.currency == currency).one()
+    cur_time = datetime.datetime.now()
+    if result is None:
+        result = ETHPrice(currency=currency, last=data[0], modified=cur_time)
 
-                finally:
-                    conn.close()
+    try:
+        session.add(result)
+        session.commit()
+        session.flush()
+
+    except exc.SQLAlchemyError as e:
+        print(e)
+        return False
+
+    result2 = session.query(ETHPriceRevision).filter(ETHPriceRevision.currency == currency).group_by(ETHPriceRevision.id).order_by(desc(func.max(ETHPriceRevision.rid))).first()
+    rid = find_rid(result2)
+    rid = rid + 1 if rid is not None else 1
+
+    revision_insert = ETHPriceRevision(rid=rid, currency=currency, last=data[0], date=cur_time, currency_id=result.id)
+    try:
+        session.add(revision_insert)
+        session.commit()
+        session.flush()
+
+    except exc.SQLAlchemyError as e:
+        print(e)
+        return False
+
+    return True
 
 
 def find_rid(data):
-    for d in data:
-        if d is not None and d.rid is not None:
-            return d.rid
-        else:
-            return None
+    # TODO Normalize this for both ETH and BTC (aka CXPrice)
+    if data is not None and hasattr(data, 'rid'):
+        return data.rid
+    return None
 
 
 def check_authentication(user, password, email):
     query_user = session.query(User).filter(User.name == user).first()
     if query_user is not None:
         if not User.verify_password(email, password):
-            return "Login is no good"
-
+            return -1
         return query_user
     else:
-        return -1
+        return -2
 
 
 def check_authentication_by_name(user, password):
@@ -692,42 +772,40 @@ async def addSingleKey(key: str, uid: int):
 
     if key is not None and uid is not None:
         new_trx_key = TrxKey(value=key, uid=uid, multi=False, status=True)
-        find_key = await find_key_for_uid(uid)
-        if not find_key:
+        # TODO we should be checking if a key exists with the same hash
+        # find_key = await find_key_for_uid(uid)
+        session.add(new_trx_key)
+        session.flush()
+        single_key = SKey(value=key, uid=uid, kid=new_trx_key.id)
+        session.add(single_key)
 
-            session.add(new_trx_key)
-            session.flush()
-            single_key = SKey(value=key, uid=uid, kid=new_trx_key.id)
-            session.add(single_key)
+        try:
+            session.commit()
+            return single_key.id
 
-            try:
-                session.commit()
-                return single_key.id
+        except exc.SQLAlchemyError as err:
+            print(err.args)
+            session.rollback()
+            return err
 
-            except exc.SQLAlchemyError as err:
-                print(err.args)
-                session.rollback()
-                return err
-
-        else:
-            if isinstance(find_key, TrxKey):
-                if not find_key.multi:
-                    s_key = await find_single_key(int(find_key.id))
-                    if s_key:
-                        if isinstance(s_key, SKey):
-                            s_key.value = key
-                            find_key.value = key
-                            session.add(s_key)
-                            session.add(find_key)
-
-                            try:
-                                session.commit()
-                                return find_key.id
-
-                            except exc.SQLAlchemyError as err:
-                                print(err.args)
-                                session.rollback()
-                                return err
+            # if isinstance(find_key, TrxKey):
+            #     if not find_key.multi:
+            #         s_key = await find_single_key(int(find_key.id))
+            #         if s_key:
+            #             if isinstance(s_key, SKey):
+            #                 s_key.value = key
+            #                 find_key.value = key
+            #                 session.add(s_key)
+            #                 session.add(find_key)
+            #
+            #                 try:
+            #                     session.commit()
+            #                     return find_key.id
+            #
+            #                 except exc.SQLAlchemyError as err:
+            #                     print(err.args)
+            #                     session.rollback()
+            #                     return err
 
 
 async def findKey(key: str):
@@ -755,6 +833,36 @@ async def find_key_for_uid(uid: int) -> Union[bool, TrxKey]:
         return False
     else:
         return key
+
+async def disable_key(kid: int) -> bool:
+    key = session.query(TrxKey).filter(TrxKey.id == kid).one_or_none()
+    if key is not None:
+        key.status = false()
+        session.add(key)
+
+        try:
+            session.commit()
+            session.flush()
+            return True
+        except exc.SQLAlchemyError as err:
+            print(err)
+
+    return False
+
+async def update_key(kid: int, label: str) -> dict:
+    key = session.query(TrxKey).filter(TrxKey.id == kid).one_or_none()
+    if key is not None:
+        key.label.text = label
+        session.add(key)
+        try:
+            session.commit()
+            session.flush()
+            return True
+        except exc.SQLAlchemyError as err:
+            print(err)
+            return err
+
+
 
 
 async def regtest_make_user_addresses() -> list:
@@ -788,13 +896,13 @@ async def regtest_all_user_data():
     user_data = []
     users = session.query(User).all()
     for user in users:
-        print(str(user.trxkey))
         data = {
             'id': user.id,
             'name': user.name,
             'email': user.email,
+            'level': user.level,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
-            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status} for x in user.trxkey]
+            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey]
         }
         user_data.append(data)
 
@@ -808,18 +916,29 @@ async def regtest_user_data(uid: str):
             'id': user.id,
             'name': user.name,
             'email': user.email,
+            'level': user.level,
+            'utc_offset': user.utc_offset if user.utc_offset is not None else 0,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
-            'keys': [{'id': x.id, 'value': x.value, 'status': x.status} for x in user.trxkey]
+            'keys': [{'id': x.id, 'value': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey]
         }
 
         for key in data['keys']:
             key['balance'] = await btcd_utils.RegTest.get_key_balance(key)
+            key['address'] = btcd_utils.wif_to_address(key.pop('value'))
+            key['label'] = key['label'].text if key['label'] is not None else 'Unnamed'
+
+        data['estimated'] = await regtest_user_estimated_value(uid)
 
         user_data.append(data)
     return user_data
 
 async def regtest_pay_user(uid: str, amount: str):
-    key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).one_or_none()
+    """
+    :param uid:
+    :param amount:
+    :return:
+    """
+    key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).group_by(TrxKey.id).order_by(func.max(TrxKey.id).desc()).limit(1).one_or_none()
     if key is not None:
         address = btcd_utils.wif_to_address(key.value)
     else:
@@ -828,6 +947,25 @@ async def regtest_pay_user(uid: str, amount: str):
     if address is not None:
         user_pay_result = await btcd_utils.RegTest.give_user_balance(address, int(amount))
         return user_pay_result
+
+async def regtest_pay_key(wif: str, amount: str):
+    """
+    :param wif:
+    :param amount:
+    :return:
+    """
+    key = session.query(TrxKey).filter(TrxKey.value == wif, TrxKey.status == true()).one_or_none()
+    if key is not None:
+        address = btcd_utils.wif_to_address(key.value)
+        if address is not None:
+            user_pay_result = await btcd_utils.RegTest.give_user_balance(address, int(amount))
+            return user_pay_result
+
+async def regtest_pay_keys(amount: str):
+    keys = session.query(TrxKey).filter(TrxKey.status == true()).all()
+    for key in keys:
+        pay_result = await regtest_pay_key(wif=key.value, amount=amount)
+        print(pay_result)
 
 
 async def regtest_user_balance(uid: str):
@@ -841,3 +979,107 @@ async def regtest_block_info():
     block_info = json.loads(await btcd_utils.RegTest.get_info())
     unspent_transactions = json.loads(await btcd_utils.RegTest.list_unspent())
     return json.dumps({'info': block_info, 'unspent': unspent_transactions}, indent=4, sort_keys=True)
+
+
+async def regtest_user_estimated_value(uid: str):
+    user = await get_user(uid)
+    if user and user.trxkey is not None:
+        price = await latest_price_data(DEFAULT_LANGUAGE)
+        if price and price.last is not None:
+            satoshis = Decimal(await btcd_utils.RegTest.get_user_balance(user.trxkey))
+            estimated_value = satoshis / COIN * price.last
+            return str(estimated_value.quantize(Decimal(".01"), rounding=ROUND_HALF_UP))
+
+
+async def get_user(uid: str):
+    user = session.query(User).filter(User.id == int(uid)).one_or_none()
+    return user if user is not None else False
+
+async def update_user(uid: str, data: dict):
+    changed = False
+    user = await get_user(uid)
+    if user is not None:
+        for k, v in data.items():
+            if hasattr(user, k):
+                if getattr(user, k) != v:
+                    changed = True
+                    setattr(user, k, v)
+    if changed:
+        try:
+            session.add(user)
+            session.commit()
+            return True
+
+        except exc.SQLAlchemyError as error:
+            print(error)
+            return False
+
+
+async def regtest_graph_data(time):
+    minmax_dataset = await btc_hour_minmax_price(time)
+    hourly_minmax = []
+    for row in minmax_dataset:
+        hourly_minmax.append({'date': row[0].strftime("%Y-%m-%d %H:%M:%S"), 'low': str(row[1]), 'high': str(row[2])})
+    return json.dumps(hourly_minmax)
+
+
+async def btc_hour_minmax_price(time='60'):
+    return engine.execute("SELECT date_trunc('minute', to_timestamp(modified)) - "
+                   "(EXTRACT('minute' FROM to_timestamp(modified))::integer %% 60) * interval '15 minutes' as date, min(last), max(last) "
+                   "FROM cx_price_revision "
+                   "WHERE currency='CAD' "
+                    "AND to_timestamp(modified) < CURRENT_TIMESTAMP AND to_timestamp(modified) > (CURRENT_TIMESTAMP - INTERVAL '5 days')"
+                   "GROUP BY 1 ORDER BY date;")
+
+
+def min_30_interval():
+    engine.execute("SELECT date_trunc('hour', to_timestamp(modified)) - "
+                   "(EXTRACT('hour' FROM to_timestamp(modified))::integer % 30) * interval '1 minute' as date, min(last), max(last) "
+                   "FROM cx_price_revision "
+                   "WHERE currency='CAD' "
+                   "GROUP BY 1 ORDER BY date;")
+
+def max_last_hour():
+    engine.execute(""
+
+                   "SELECT to_timestamp(modified), buy "
+                   "FROM cx_price_revision "
+                   "WHERE modified < extract(epoch from now())::int and modified > (extract(epoch from now())::int -3600) "
+                   "AND currency = 'CAD' "
+                   "GROUP BY buy, to_timestamp(modified) "
+                   "ORDER BY buy DESC LIMIT 1;")
+
+
+def min_last_hour():
+    engine.execute(""
+
+                   "SELECT to_timestamp(modified), buy "
+                   "FROM cx_price_revision "
+                   "WHERE modified < extract(epoch from now())::int and modified > (extract(epoch from now())::int -3600) "
+                   "AND currency = 'CAD' "
+                   "GROUP BY buy, to_timestamp(modified) "
+                   "ORDER BY buy ASC LIMIT 1;")
+
+
+async def trc_latest_price():
+    """
+    Retrieves the latest price recorded on the TRC Mockchain (in CAD)
+    :return:
+    """
+    latest_trc_price = session.query(TRCHistory).group_by(TRCHistory.id).order_by(func.max(TRCHistory.id).desc()).limit(1).one_or_none()
+    return latest_trc_price
+
+
+def trc_insert_price(date, value):
+    new_price = TRCHistory(time=date, value=value)
+
+    try:
+        session.add(new_price)
+        session.commit()
+        session.flush()
+
+        return True
+
+    except exc.SQLAlchemyError as err:
+        print('This should be logged: \n' + str(err))
+        return False
