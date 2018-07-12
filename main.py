@@ -192,7 +192,7 @@ class LoginHandler(RequestHandler):
         :**RESPONSE DATA**:
         :return: Session data as JSON: ``{"csrf-token":"value", "trx-cookie":"value"}``
 
-        *Use the returned session data for all subsquent authenticated requests*
+        *Use the returned session data for all subsequent authenticated requests*
 
         """
 
@@ -1100,6 +1100,17 @@ async def handle_ws_request(type, data):
     return result
 
 
+class UserHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        match_pattern = escape.url_unescape(self.request.path.split('/api/user/')[1])
+        user = await db.fetch_users_by_name(match_pattern)
+        if user is not -1:
+            self.write(json.dumps(user.serialize()))
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -1157,7 +1168,9 @@ class TRXApplication(Application):
             (r"/transaction/secret/rollback", TrxRollbackHandler),
 
             # USERS
-            (r"/api/user/[0-9][0-9][0-9][0-9]/update", UserUpdateHandler),
+            (r"/api/user/[0-9][0-9][0-9][0-9]", UserUpdateHandler),
+            # (r"/api/user/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$", UserHandler),
+            (r"/api/user/(?=.{4,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._@%]+(?<![_.])", UserHandler),
 
             # KEYS
 
