@@ -35,6 +35,7 @@ session = Session()
 trxapp = SimpleNamespace()
 trxapp.config = {'SECRET_KEY': "jigga does as jigga does"}
 
+
 # metadata.create_all(bind=engine)
 
 
@@ -48,6 +49,14 @@ class TrxKey(Base):
     value = Column(String)
     multi = Column(Boolean)
     status = Column(Boolean)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'status': self.status,
+            'uid': self.uid,
+            'value': self.value,
+        }
 
 
 class SKey(Base):
@@ -79,6 +88,9 @@ class KeyLabel(Base):
     text = Column(String, server_default="Unnamed")
     kid = Column(Integer, ForeignKey('trxkey.id'))
     trxkey = relationship("TrxKey", back_populates='label')
+
+    def text(self):
+        return self.text
 
 
 class TRCHistory(Base):
@@ -123,9 +135,11 @@ class User(Base):
         return {
             'id': self.id,
             'name': self.name,
+            'level': self.level,
             'email': self.email,
             'created': self.created,
-            'status': self.status
+            'status': self.status,
+            'keys': [x.serialize() for x in self.trxkey if x is not None]
         }
 
     @staticmethod
@@ -447,6 +461,7 @@ def handle_db_data(response):
         if isinstance(row, CXPriceRevision):
             print(row.serialize())
 
+
 async def handle_eth_update_data(data):
     distilled_data = await parse_eth_price_data(data)
 
@@ -459,6 +474,7 @@ async def handle_eth_update_data(data):
 async def update_prices(data):
     # loop = asyncio.get_event_loop()
     return await parse_price_data(data)
+
 
 async def update_eth_prices(data):
     await parse_eth_price_data(data)
@@ -497,9 +513,11 @@ def latest_price(currency: str) -> str:
         print(result.serialize())
         return 'jigga'
 
+
 async def latest_price_data(currency: str) -> CXPrice:
     result = session.query(CXPrice).filter(CXPrice.currency == currency).one_or_none()
     return result if result is not None else False
+
 
 async def latest_price_async(currency: str) -> str:
     result = await session.query(CXPrice).filter(CXPrice.currency == currency).one_or_none()
@@ -537,6 +555,22 @@ def get_users():
     return result
 
 
+async def fetch_users_by_name(match_pattern):
+    result = session.query(User).filter(User.name.like(match_pattern)).one_or_none()
+    if result is not None:
+        return result
+    else:
+        return -1
+
+
+def fetch_label_text(id):
+    result = session.query(KeyLabel).filter(KeyLabel.id == id).one_or_none()
+    if result is not None:
+        text = result.text()
+        return text
+    return 'no label'
+
+
 async def parse_price_data(data):
     for k, v in data.items():
 
@@ -554,11 +588,13 @@ async def parse_price_data(data):
             print(e)
             return False
 
-        result2 = session.query(CXPriceRevision).filter(CXPriceRevision.currency == k).group_by(CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid))).first()
+        result2 = session.query(CXPriceRevision).filter(CXPriceRevision.currency == k).group_by(
+            CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid))).first()
         rid = find_rid(result2)
         rid = rid + 1 if rid is not None else 1
 
-        revision_insert = CXPriceRevision(rid=rid, currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time, currency_id=result.id)
+        revision_insert = CXPriceRevision(rid=rid, currency=k, sell=v['sell'], last=v['last'], buy=v['buy'],
+                                          modified=cur_time, currency_id=result.id)
         try:
             session.add(revision_insert)
             session.commit()
@@ -586,7 +622,8 @@ async def parse_eth_price_data(data, currency='cad'):
         print(e)
         return False
 
-    result2 = session.query(ETHPriceRevision).filter(ETHPriceRevision.currency == currency).group_by(ETHPriceRevision.id).order_by(desc(func.max(ETHPriceRevision.rid))).first()
+    result2 = session.query(ETHPriceRevision).filter(ETHPriceRevision.currency == currency).group_by(
+        ETHPriceRevision.id).order_by(desc(func.max(ETHPriceRevision.rid))).first()
     rid = find_rid(result2)
     rid = rid + 1 if rid is not None else 1
 
@@ -694,25 +731,25 @@ def cx_update_listener(*args):
 def build_sub_comments(comments, now, session):
     if comments is not None:
         return [{
-                    'cid': x.cid,
-                    'body': x.body,
-                    'user': session.query(HeartbeatUser).filter(HeartbeatUser.uid == x.uid).one(),
-                    'timeago': timeago.format(x.created, now),
-                } for x in comments]
+            'cid': x.cid,
+            'body': x.body,
+            'user': session.query(HeartbeatUser).filter(HeartbeatUser.uid == x.uid).one(),
+            'timeago': timeago.format(x.created, now),
+        } for x in comments]
 
 
 def build_comments(comments, now, session):
     if comments is not None:
         return [{
-                    'cid': x.cid,
-                    'body': x.body,
-                    'user': session.query(HeartbeatUser).filter(HeartbeatUser.uid == x.uid).one(),
-                    'timeago': timeago.format(x.created, now),
-                    'subcomments': build_sub_comments(
-                        session.query(HeartbeatComment).filter(HeartbeatComment.entity_id == x.cid,
-                                                               HeartbeatComment.entity_type == 'comment').all(), now,
-                        session)
-                } for x in comments]
+            'cid': x.cid,
+            'body': x.body,
+            'user': session.query(HeartbeatUser).filter(HeartbeatUser.uid == x.uid).one(),
+            'timeago': timeago.format(x.created, now),
+            'subcomments': build_sub_comments(
+                session.query(HeartbeatComment).filter(HeartbeatComment.entity_id == x.cid,
+                                                       HeartbeatComment.entity_type == 'comment').all(), now,
+                session)
+        } for x in comments]
 
 
 async def heartbeat_get_all():
@@ -744,7 +781,6 @@ async def heartbeat_get_all():
 
 
 async def addMultiSigAddress(pub_addr: str, keys: list, uid: int):
-
     if pub_addr is not None and len(keys) > 0:
         for key in keys:
             trx_key = TrxKey(value=key, uid=uid)
@@ -763,7 +799,6 @@ async def addMultiSigAddress(pub_addr: str, keys: list, uid: int):
 
 
 async def addSingleKey(key: str, uid: int):
-
     """
     :param key:
     :param uid:
@@ -834,6 +869,7 @@ async def find_key_for_uid(uid: int) -> Union[bool, TrxKey]:
     else:
         return key
 
+
 async def disable_key(kid: int) -> bool:
     key = session.query(TrxKey).filter(TrxKey.id == kid).one_or_none()
     if key is not None:
@@ -849,6 +885,7 @@ async def disable_key(kid: int) -> bool:
 
     return False
 
+
 async def update_key(kid: int, label: str) -> dict:
     key = session.query(TrxKey).filter(TrxKey.id == kid).one_or_none()
     if key is not None:
@@ -861,8 +898,6 @@ async def update_key(kid: int, label: str) -> dict:
         except exc.SQLAlchemyError as err:
             print(err)
             return err
-
-
 
 
 async def regtest_make_user_addresses() -> list:
@@ -883,6 +918,7 @@ async def regtest_make_user_addresses() -> list:
 
     return result
 
+
 async def regtest_make_user_address(uid):
     user = session.query(User).filter(User.id == uid).order_by(User.created.desc()).one_or_none()
     if user is not None:
@@ -891,6 +927,7 @@ async def regtest_make_user_address(uid):
             wif = btcd_utils.RegTest.address_to_wif(new_address)
             add_key_attempt = await addSingleKey(wif, user.id)
             return new_address if add_key_attempt is not None else false
+
 
 async def regtest_all_user_data():
     user_data = []
@@ -907,6 +944,7 @@ async def regtest_all_user_data():
         user_data.append(data)
 
     return user_data
+
 
 async def regtest_user_data(uid: str):
     user_data = []
@@ -932,13 +970,15 @@ async def regtest_user_data(uid: str):
         user_data.append(data)
     return user_data
 
+
 async def regtest_pay_user(uid: str, amount: str):
     """
     :param uid:
     :param amount:
     :return:
     """
-    key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).group_by(TrxKey.id).order_by(func.max(TrxKey.id).desc()).limit(1).one_or_none()
+    key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).group_by(TrxKey.id).order_by(
+        func.max(TrxKey.id).desc()).limit(1).one_or_none()
     if key is not None:
         address = btcd_utils.wif_to_address(key.value)
     else:
@@ -947,6 +987,7 @@ async def regtest_pay_user(uid: str, amount: str):
     if address is not None:
         user_pay_result = await btcd_utils.RegTest.give_user_balance(address, int(amount))
         return user_pay_result
+
 
 async def regtest_pay_key(wif: str, amount: str):
     """
@@ -960,6 +1001,7 @@ async def regtest_pay_key(wif: str, amount: str):
         if address is not None:
             user_pay_result = await btcd_utils.RegTest.give_user_balance(address, int(amount))
             return user_pay_result
+
 
 async def regtest_pay_keys(amount: str):
     keys = session.query(TrxKey).filter(TrxKey.status == true()).all()
@@ -995,6 +1037,7 @@ async def get_user(uid: str):
     user = session.query(User).filter(User.id == int(uid)).one_or_none()
     return user if user is not None else False
 
+
 async def update_user(uid: str, data: dict):
     changed = False
     user = await get_user(uid)
@@ -1025,11 +1068,11 @@ async def regtest_graph_data(time):
 
 async def btc_hour_minmax_price(time='60'):
     return engine.execute("SELECT date_trunc('minute', to_timestamp(modified)) - "
-                   "(EXTRACT('minute' FROM to_timestamp(modified))::integer %% 60) * interval '15 minutes' as date, min(last), max(last) "
-                   "FROM cx_price_revision "
-                   "WHERE currency='CAD' "
-                    "AND to_timestamp(modified) < CURRENT_TIMESTAMP AND to_timestamp(modified) > (CURRENT_TIMESTAMP - INTERVAL '5 days')"
-                   "GROUP BY 1 ORDER BY date;")
+                          "(EXTRACT('minute' FROM to_timestamp(modified))::integer %% 60) * interval '15 minutes' as date, min(last), max(last) "
+                          "FROM cx_price_revision "
+                          "WHERE currency='CAD' "
+                          "AND to_timestamp(modified) < CURRENT_TIMESTAMP AND to_timestamp(modified) > (CURRENT_TIMESTAMP - INTERVAL '3 days')"
+                          "GROUP BY 1 ORDER BY date;")
 
 
 def min_30_interval():
@@ -1038,6 +1081,7 @@ def min_30_interval():
                    "FROM cx_price_revision "
                    "WHERE currency='CAD' "
                    "GROUP BY 1 ORDER BY date;")
+
 
 def max_last_hour():
     engine.execute(""
@@ -1066,7 +1110,8 @@ async def trc_latest_price():
     Retrieves the latest price recorded on the TRC Mockchain (in CAD)
     :return:
     """
-    latest_trc_price = session.query(TRCHistory).group_by(TRCHistory.id).order_by(func.max(TRCHistory.id).desc()).limit(1).one_or_none()
+    latest_trc_price = session.query(TRCHistory).group_by(TRCHistory.id).order_by(func.max(TRCHistory.id).desc()).limit(
+        1).one_or_none()
     return latest_trc_price
 
 
