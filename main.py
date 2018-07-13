@@ -1110,6 +1110,14 @@ class UserHandler(RequestHandler):
         if user is not -1:
             self.write(json.dumps(user.serialize()))
 
+    async def put(self, *args, **kwargs):
+        if self.request.headers.get("Content-Type") == 'application/json':
+            match_pattern = escape.url_unescape(self.request.path.split('/api/user/')[1])
+            body = json.loads(self.request.body.decode('utf-8'))
+            update_result = await db.update_user_by_name(match_pattern, body)
+            if update_result is not -1:
+                self.write(json.dumps(update_result.serialize()))
+
 
 class TRXApplication(Application):
     def __init__(self):

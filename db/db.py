@@ -563,6 +563,27 @@ async def fetch_users_by_name(match_pattern):
         return -1
 
 
+async def update_user_by_name(match_pattern, data):
+    changed = False
+    user = session.query(User).filter(User.name.like(match_pattern)).one_or_none()
+    if user is not None:
+        for k, v in data.items():
+            if hasattr(user, k):
+                if getattr(user, k) != v:
+                    changed = True
+                    setattr(user, k, v)
+    if changed:
+        try:
+            session.add(user)
+            session.commit()
+            return user
+
+        except exc.SQLAlchemyError as error:
+            return error
+    else:
+        return -1
+
+
 def fetch_label_text(id):
     result = session.query(KeyLabel).filter(KeyLabel.id == id).one_or_none()
     if result is not None:
