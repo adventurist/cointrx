@@ -10,5 +10,19 @@ sites2
 themes
 Coin\ X.iml
 *.iml
-bot/bot.log
+*.sql
+bot.log
+trx.log
+*/*.log
 bot/benv
+bot/users.json
+.vscode
+*/.vscode
+*.map
+*/*.map
+analysis/*.html
+static/analysis
+.alarmist
+documentation
+fetch_db.sh
+sync_db.sh
