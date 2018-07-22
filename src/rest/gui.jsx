@@ -7,7 +7,7 @@ const styles = {
   }
 }
 
-class RestGui extends React.Component {
+export class RestGui extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -17,7 +17,7 @@ class RestGui extends React.Component {
 
   render () {
     return (
-      <div id='container' style={styles.rest} >
+      <div id='container'>
         <h1>I love InYoung!</h1>
       </div>
     )
