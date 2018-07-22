@@ -13,7 +13,8 @@
     "build:user": "node_modules/webpack/bin/webpack.js --config webpack-user.config.js",
     "build:bot": "node_modules/webpack/bin/webpack.js --config webpack-bot.config.js",
     "build:rest": "node_modules/webpack/bin/webpack.js --config webpack-rest.config.js",
-    "alarmist-build": "node_modules/.bin/alarmist-webpack -n build -f webpack-bot.config.js"
+    "alarmist-build": "node_modules/.bin/alarmist-webpack -n build -f webpack-bot.config.js",
+    "alarmist-rest": "node_modules/.bin/alarmist-webpack -n build -f webpack-rest.config.js"
   },
   "repository": "git@git.stronglogic.xyz:/logicp/coinx.git",
   "author": "adventurist@gmail.com",
