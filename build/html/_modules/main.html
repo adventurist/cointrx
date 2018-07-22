@@ -1,0 +1,996 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>main &#8212; CoinTRX 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for main</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">tornado</span> <span class="k">import</span> <span class="n">escape</span>
+<span class="kn">from</span> <span class="nn">tornado</span> <span class="k">import</span> <span class="n">gen</span>
+<span class="kn">from</span> <span class="nn">tornado.ioloop</span> <span class="k">import</span> <span class="n">IOLoop</span>
+<span class="kn">from</span> <span class="nn">tornado.options</span> <span class="k">import</span> <span class="n">define</span>
+<span class="kn">from</span> <span class="nn">tornado.websocket</span> <span class="k">import</span> <span class="n">WebSocketHandler</span>
+<span class="kn">from</span> <span class="nn">tornado.web</span> <span class="k">import</span> <span class="n">Application</span><span class="p">,</span> <span class="n">RequestHandler</span><span class="p">,</span> <span class="n">StaticFileHandler</span>
+
+<span class="kn">from</span> <span class="nn">config</span> <span class="k">import</span> <span class="n">config</span> <span class="k">as</span> <span class="n">TRXConfig</span>
+<span class="kn">from</span> <span class="nn">db</span> <span class="k">import</span> <span class="n">db</span>
+<span class="kn">from</span> <span class="nn">utils.loop_handler</span> <span class="k">import</span> <span class="n">IOHandler</span>
+<span class="kn">from</span> <span class="nn">utils.tx</span> <span class="k">import</span> <span class="n">trx__tx_out</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="k">import</span> <span class="n">drupal_utils</span><span class="p">,</span> <span class="n">session</span>
+<span class="kn">from</span> <span class="nn">utils.cointrx_client</span> <span class="k">import</span> <span class="n">Client</span>
+<span class="kn">from</span> <span class="nn">utils.mail_helper</span> <span class="k">import</span> <span class="n">Sender</span> <span class="k">as</span> <span class="n">mail_sender</span>
+
+<span class="kn">from</span> <span class="nn">utils.login_helpers</span> <span class="k">import</span> <span class="n">retrieve_json_login_headers</span><span class="p">,</span> <span class="n">retrieve_json_login_credentials</span><span class="p">,</span> <span class="n">check_basic_auth</span><span class="p">,</span> <span class="n">create_user_session_data</span><span class="p">,</span> \
+    <span class="n">retrieve_login_credentials</span>
+
+<span class="n">io_handler</span> <span class="o">=</span> <span class="n">IOHandler</span><span class="p">()</span>
+<span class="n">http_client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+
+<span class="n">define</span><span class="p">(</span><span class="s2">&quot;port&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">6969</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Default port for the WebServer&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># class MJSONEncoder(json.JSONEncoder):</span>
+<span class="c1">#     def default(self, obj):</span>
+<span class="c1">#         if isinstance(obj, decimal.Decimal):</span>
+<span class="c1">#             return str(obj)</span>
+<span class="c1">#         return super(MJSONEncoder, self).default(obj)</span>
+<span class="c1">#</span>
+<span class="c1">#     def datetime(self, obj):</span>
+<span class="c1">#         if isinstance(obj, datetime.datetime):</span>
+<span class="c1">#             return str(obj)</span>
+<span class="c1">#         return super(MJSONEncoder, self).default(obj)</span>
+
+<div class="viewcode-block" id="check_attribute"><a class="viewcode-back" href="../main.html#main.check_attribute">[docs]</a><span class="k">def</span> <span class="nf">check_attribute</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">att</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">att</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MainHandler"><a class="viewcode-back" href="../main.html#main.MainHandler">[docs]</a><span class="k">class</span> <span class="nc">MainHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="MainHandler.data_received"><a class="viewcode-back" href="../main.html#main.MainHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="MainHandler.get"><a class="viewcode-back" href="../main.html#main.MainHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Hi Jigga, Welcome to Tornado Web Framework.&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="WunderHandler"><a class="viewcode-back" href="../main.html#main.WunderHandler">[docs]</a><span class="k">class</span> <span class="nc">WunderHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="WunderHandler.data_received"><a class="viewcode-back" href="../main.html#main.WunderHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="WunderHandler.get"><a class="viewcode-back" href="../main.html#main.WunderHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;jigga1&#39;</span><span class="p">:</span> <span class="s1">&#39;always jigga&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="LoginHandler"><a class="viewcode-back" href="../main.html#main.LoginHandler">[docs]</a><span class="k">class</span> <span class="nc">LoginHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="LoginHandler.data_received"><a class="viewcode-back" href="../main.html#main.LoginHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Receiving data&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LoginHandler.post"><a class="viewcode-back" href="../main.html#main.LoginHandler.post">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        .. http:post:: /login</span>
+
+<span class="sd">        ---------------</span>
+<span class="sd">        REQUEST EXAMPLE</span>
+
+<span class="sd">        :POST: /login</span>
+<span class="sd">        :Accept: application/json</span>
+<span class="sd">        :Content-Type: application/json</span>
+<span class="sd">        :Authorization: Basic aGVsaW9zOmphc2tqYTg5cjN5dW9yaWFzamY=</span>
+<span class="sd">        :Body: {&quot;name&quot;:&quot;yourname&quot;, &quot;password&quot;:&quot;yourpassword&quot;, &quot;email&quot;:&quot;youremail&quot;}</span>
+
+<span class="sd">        |</span>
+
+<span class="sd">        :HEADERS:</span>
+
+<span class="sd">        |</span>
+
+<span class="sd">        :Accept: application/json</span>
+
+<span class="sd">        - Declare your expectation to receive a response in JSON format</span>
+
+<span class="sd">        **Example** ``Accept: application/json``</span>
+
+<span class="sd">        |</span>
+
+<span class="sd">        :Authorization: Basic (Base64 encoding of name:password)</span>
+
+<span class="sd">        - Basic Auth is expected in the header (with a key of `Authorization` and a value of `Basic base64encoded` where base64encoded is the base64 encoding of `name:password`</span>
+
+<span class="sd">        **Example** ``Authorization: Basic aGVsaW9zOmphc2tqYTg5cjN5dW9yaWFzamY=``</span>
+
+<span class="sd">        |</span>
+
+<span class="sd">        :Content-Type: application/json</span>
+
+<span class="sd">            - Requests must state that that Content-Type will be application/json</span>
+
+<span class="sd">            **Example** ``Content-Type: application/json``</span>
+
+<span class="sd">        |</span>
+
+<span class="sd">        :**BODY**:</span>
+<span class="sd">        :Body content {string}: JSON object containing `name`, `email` and `password` keys</span>
+
+<span class="sd">        - POST Parameters should be provided as the request body in JSON format</span>
+
+<span class="sd">        **Example** ``{&quot;email&quot;:&quot;johannes@composers.com&quot;, &quot;name&quot;:&quot;JSBach&quot;, &quot;password&quot;:&quot;k0wnTT||er}@{RER3point{@LGkillah&quot;}``</span>
+
+<span class="sd">        |</span>
+
+<span class="sd">        :**RESPONSE CODES**:</span>
+<span class="sd">        :200: No error</span>
+<span class="sd">        :400: Malformed request</span>
+<span class="sd">        :401: Unauthorized</span>
+<span class="sd">        :404: User not found</span>
+
+<span class="sd">        |</span>
+
+<span class="sd">        :**RESPONSE DATA**:</span>
+<span class="sd">        :return: Session data as JSON: ``{&quot;csrf-token&quot;:&quot;value&quot;, &quot;trx-cookie&quot;:&quot;value&quot;}``</span>
+
+<span class="sd">        *Use the returned session data for all subsquent authenticated requests*</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">basic_auth</span><span class="p">,</span> <span class="n">content_type</span> <span class="o">=</span> <span class="n">retrieve_json_login_headers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+        <span class="n">auth_name</span><span class="p">,</span> <span class="n">auth_pass</span> <span class="o">=</span> <span class="n">check_basic_auth</span><span class="p">(</span><span class="n">basic_auth</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">content_type</span> <span class="o">==</span> <span class="s1">&#39;application/json&#39;</span><span class="p">:</span>
+            <span class="n">email</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">password</span> <span class="o">=</span> <span class="n">retrieve_json_login_credentials</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">escape</span><span class="o">.</span><span class="n">json_decode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+
+            <span class="k">if</span> <span class="n">email</span> <span class="ow">or</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;You must supply more arguments&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_error</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">auth_name</span> <span class="o">!=</span> <span class="n">name</span> <span class="ow">or</span> <span class="n">auth_pass</span> <span class="o">!=</span> <span class="n">password</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">({</span><span class="s1">&#39;statuscode&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">}))</span>
+
+                <span class="n">user_verify</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">check_authentication</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">user_verify</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">csrf</span> <span class="o">=</span> <span class="n">user_verify</span><span class="o">.</span><span class="n">generate_auth_token</span><span class="p">(</span><span class="n">expiration</span><span class="o">=</span><span class="mi">1200</span><span class="p">)</span>
+                    <span class="n">application</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">create_user_session_data</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">user_verify</span><span class="p">,</span> <span class="n">csrf</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">application</span><span class="o">.</span><span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">set_secure_cookie</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;trx_cookie&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">generate_cookie</span><span class="p">())</span>
+
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">(</span>
+                            <span class="p">{</span><span class="s1">&#39;statuscode&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;token&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;csrf&#39;</span><span class="p">],</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+                             <span class="s1">&#39;trx_cookie&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_secure_cookie</span><span class="p">(</span><span class="s1">&#39;trx_cookie&#39;</span><span class="p">))}))</span>
+
+                <span class="k">elif</span> <span class="n">user_verify</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">({</span><span class="s1">&#39;statuscode&#39;</span><span class="p">:</span> <span class="mi">404</span><span class="p">}))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">({</span><span class="s1">&#39;statuscode&#39;</span><span class="p">:</span> <span class="mi">401</span><span class="p">}))</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;text/html&#39;</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">content_type</span> <span class="o">==</span> <span class="s1">&#39;application/x-www-form-urlencoded&#39;</span><span class="p">:</span>
+
+            <span class="n">name</span><span class="p">,</span> <span class="n">password</span> <span class="o">=</span> <span class="n">retrieve_login_credentials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">password</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">user_verified</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">check_auth_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">user_verified</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">user_verified</span> <span class="ow">is</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">drupal_login</span> <span class="o">=</span> <span class="k">await</span> <span class="n">drupal_utils</span><span class="o">.</span><span class="n">attempt_login</span><span class="p">(</span>
+                        <span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span><span class="p">:</span> <span class="n">password</span><span class="p">}))</span>
+                    <span class="k">if</span> <span class="n">drupal_login</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">drupal_user_data</span> <span class="o">=</span> <span class="n">escape</span><span class="o">.</span><span class="n">json_decode</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">to_basestring</span><span class="p">(</span><span class="n">drupal_login</span><span class="o">.</span><span class="n">body</span><span class="p">))</span>
+                        <span class="n">csrf</span> <span class="o">=</span> <span class="n">user_verified</span><span class="o">.</span><span class="n">generate_auth_token</span><span class="p">(</span><span class="n">expiration</span><span class="o">=</span><span class="mi">1200</span><span class="p">)</span>
+                        <span class="n">application</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span><span class="p">:</span> <span class="n">password</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">user_verified</span><span class="o">.</span><span class="n">id</span><span class="p">},</span>
+                                                   <span class="n">csrf</span><span class="o">=</span><span class="n">csrf</span><span class="p">,</span> <span class="n">dcsrf</span><span class="o">=</span><span class="n">drupal_user_data</span><span class="p">[</span><span class="s1">&#39;csrf_token&#39;</span><span class="p">])</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">set_secure_cookie</span><span class="p">(</span><span class="s2">&quot;dcsrf&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">drupal_token</span><span class="p">())</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">set_secure_cookie</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;trx_cookie&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">generate_cookie</span><span class="p">())</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">csrf</span> <span class="o">=</span> <span class="n">user_verified</span><span class="o">.</span><span class="n">generate_auth_token</span><span class="p">(</span><span class="n">expiration</span><span class="o">=</span><span class="mi">1200</span><span class="p">)</span>
+                        <span class="n">application</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span><span class="p">:</span> <span class="n">password</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">user_verified</span><span class="o">.</span><span class="n">id</span><span class="p">},</span>
+                                                   <span class="n">csrf</span><span class="o">=</span><span class="n">csrf</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">set_secure_cookie</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;trx_cookie&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">generate_cookie</span><span class="p">())</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">set_cookie</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;csrf&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">csrf</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_secure_cookie</span><span class="p">(</span><span class="s1">&#39;redirect_target&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">redirect_target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_secure_cookie</span><span class="p">(</span><span class="s1">&#39;redirect_target&#39;</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">clear_cookie</span><span class="p">(</span><span class="s1">&#39;redirect_target&#39;</span><span class="p">)</span>
+                            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="n">redirect_target</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">user_verified</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LoginHandler.get"><a class="viewcode-back" href="../main.html#main.LoginHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get getting get&#39;</span><span class="p">)</span>
+        <span class="n">cookie_secret</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">bytes</span> <span class="o">+</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">bytes</span><span class="p">)</span>
+        <span class="n">current_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">cookie_secret</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_status</span><span class="p">())</span>
+        <span class="c1"># name = self.get_argument(&#39;name&#39;)</span>
+        <span class="c1"># print(name)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">current_header</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;text/html&#39;</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;text/html, yo&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">message</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s2">&quot;Be Cool&quot;</span><span class="p">,</span> <span class="s2">&quot;Don&#39;t be a Bitch&quot;</span><span class="p">,</span> <span class="s2">&quot;Try not to be a Cunt&quot;</span><span class="p">,</span> <span class="s2">&quot;Don&#39;t be a fat ass slut&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;Respect yourself, bitch&quot;</span><span class="p">,</span> <span class="s2">&quot;Try not to be such a Cuck, at least some of the time&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;If you can not be a bitch for 10 seconds, it will be a magnificent achievement&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;templates/login.html&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Jiggas Login Handler&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SendMailHandler"><a class="viewcode-back" href="../main.html#main.SendMailHandler">[docs]</a><span class="k">class</span> <span class="nc">SendMailHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="SendMailHandler.data_received"><a class="viewcode-back" href="../main.html#main.SendMailHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="SendMailHandler.post"><a class="viewcode-back" href="../main.html#main.SendMailHandler.post">[docs]</a>    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sender</span> <span class="o">=</span> <span class="n">mail_sender</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;application/json&#39;</span><span class="p">:</span>
+            <span class="n">sender</span><span class="o">.</span><span class="n">send_mail</span><span class="p">(</span><span class="s2">&quot;adventurist@gmail.com&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="FakeNewsHandler"><a class="viewcode-back" href="../main.html#main.FakeNewsHandler">[docs]</a><span class="k">class</span> <span class="nc">FakeNewsHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="FakeNewsHandler.data_received"><a class="viewcode-back" href="../main.html#main.FakeNewsHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="FakeNewsHandler.get"><a class="viewcode-back" href="../main.html#main.FakeNewsHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;News&#39;</span><span class="p">:</span> <span class="s1">&#39;VERY fake news&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="UpdatePriceHandler"><a class="viewcode-back" href="../main.html#main.UpdatePriceHandler">[docs]</a><span class="k">class</span> <span class="nc">UpdatePriceHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="UpdatePriceHandler.data_received"><a class="viewcode-back" href="../main.html#main.UpdatePriceHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="UpdatePriceHandler.get"><a class="viewcode-back" href="../main.html#main.UpdatePriceHandler.get">[docs]</a>    <span class="nd">@gen</span><span class="o">.</span><span class="n">coroutine</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">http_client</span><span class="o">.</span><span class="n">get_prices</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Sent request&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="LatestPriceHandler"><a class="viewcode-back" href="../main.html#main.LatestPriceHandler">[docs]</a><span class="k">class</span> <span class="nc">LatestPriceHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="LatestPriceHandler.data_received"><a class="viewcode-back" href="../main.html#main.LatestPriceHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="LatestPriceHandler.get"><a class="viewcode-back" href="../main.html#main.LatestPriceHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">latest_prices</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">({</span><span class="s1">&#39;TRX&#39;</span><span class="p">:</span> <span class="n">result</span><span class="p">}))</span></div></div>
+
+
+<div class="viewcode-block" id="UserListHandler"><a class="viewcode-back" href="../main.html#main.UserListHandler">[docs]</a><span class="k">class</span> <span class="nc">UserListHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="UserListHandler.data_received"><a class="viewcode-back" href="../main.html#main.UserListHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="UserListHandler.get"><a class="viewcode-back" href="../main.html#main.UserListHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">get_users</span><span class="p">())</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">User</span><span class="p">):</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">({</span><span class="s1">&#39;USERS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">data</span><span class="p">]}))</span></div></div>
+
+
+<div class="viewcode-block" id="CurrencyHandler"><a class="viewcode-back" href="../main.html#main.CurrencyHandler">[docs]</a><span class="k">class</span> <span class="nc">CurrencyHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="CurrencyHandler.data_received"><a class="viewcode-back" href="../main.html#main.CurrencyHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="CurrencyHandler.get"><a class="viewcode-back" href="../main.html#main.CurrencyHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># for k,v in arguments.items():</span>
+        <span class="k">if</span> <span class="s1">&#39;currency&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">arguments</span><span class="p">:</span>
+            <span class="n">currency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s1">&#39;currency&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">currency</span><span class="p">)</span>
+            <span class="n">price</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">latest_price_async</span><span class="p">(</span><span class="n">currency</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">price</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Whatchoo think this is, jigga!?&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CurrencyRevisionHandler"><a class="viewcode-back" href="../main.html#main.CurrencyRevisionHandler">[docs]</a><span class="k">class</span> <span class="nc">CurrencyRevisionHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="CurrencyRevisionHandler.data_received"><a class="viewcode-back" href="../main.html#main.CurrencyRevisionHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="CurrencyRevisionHandler.get"><a class="viewcode-back" href="../main.html#main.CurrencyRevisionHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;currency&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">arguments</span><span class="p">:</span>
+            <span class="n">currency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s1">&#39;currency&#39;</span><span class="p">)</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="n">looper</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">latest_price_history_async</span><span class="p">(</span><span class="n">currency</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">({</span><span class="n">currency</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Whatchoo think this is, jigga!?&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RegisterHandler"><a class="viewcode-back" href="../main.html#main.RegisterHandler">[docs]</a><span class="k">class</span> <span class="nc">RegisterHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="RegisterHandler.data_received"><a class="viewcode-back" href="../main.html#main.RegisterHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RegisterHandler.get"><a class="viewcode-back" href="../main.html#main.RegisterHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s2">&quot;Be Cool&quot;</span><span class="p">,</span> <span class="s2">&quot;Don&#39;t be a Bitch&quot;</span><span class="p">,</span> <span class="s2">&quot;Try not to be a Cunt&quot;</span><span class="p">,</span> <span class="s2">&quot;Don&#39;t be a fat ass slut&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;Respect yourself, bitch&quot;</span><span class="p">,</span> <span class="s2">&quot;Try not to be such a Cuck, at least some of the time&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;If you can not be a bitch for 10 seconds, it will be a magnificent achievement&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;templates/register.html&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Jiggas Register Handler&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RegisterHandler.post"><a class="viewcode-back" href="../main.html#main.RegisterHandler.post">[docs]</a>    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;application/x-www-form-urlencoded&#39;</span><span class="p">:</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">email</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_body_argument</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_body_argument</span><span class="p">(</span>
+                <span class="s1">&#39;pass&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_body_argument</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">email</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;You must supply more arguments&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_error</span><span class="p">(</span><span class="mi">401</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">user_verify</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">check_authentication</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">user_verify</span> <span class="ow">is</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">user_verify</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+
+                <span class="n">csrf</span> <span class="o">=</span> <span class="n">user_verify</span><span class="o">.</span><span class="n">generate_auth_token</span><span class="p">(</span><span class="n">expiration</span><span class="o">=</span><span class="mi">1200</span><span class="p">)</span>
+                <span class="n">application</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span>
+                    <span class="n">user</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span><span class="p">:</span> <span class="n">password</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">user_verify</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">&#39;csrf&#39;</span><span class="p">:</span> <span class="n">csrf</span><span class="p">})</span>
+                <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user_verify</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">application</span><span class="o">.</span><span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">set_secure_cookie</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;trx_cookie&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">generate_cookie</span><span class="p">())</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">({</span><span class="s1">&#39;token&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;csrf&#39;</span><span class="p">],</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+                                                          <span class="s1">&#39;cookie&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_secure_cookie</span><span class="p">(</span><span class="s1">&#39;trx_cookie&#39;</span><span class="p">))}))</span></div></div>
+
+
+<div class="viewcode-block" id="PasswordHandler"><a class="viewcode-back" href="../main.html#main.PasswordHandler">[docs]</a><span class="k">class</span> <span class="nc">PasswordHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="PasswordHandler.data_received"><a class="viewcode-back" href="../main.html#main.PasswordHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="PasswordHandler.get"><a class="viewcode-back" href="../main.html#main.PasswordHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;We gonna DOX you, slut&quot;</span><span class="p">,</span> <span class="s2">&quot;A hackathon on yo ass, bitch&quot;</span><span class="p">,</span> <span class="s2">&quot;You never gonna be able to log into SHIT&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;Now we have all your informations&quot;</span><span class="p">,</span> <span class="s2">&quot;We sell your passwords to Nigeria&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;templates/password.html&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Jiggas Password Handler&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GraphHandler"><a class="viewcode-back" href="../main.html#main.GraphHandler">[docs]</a><span class="k">class</span> <span class="nc">GraphHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="GraphHandler.data_received"><a class="viewcode-back" href="../main.html#main.GraphHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="GraphHandler.get"><a class="viewcode-back" href="../main.html#main.GraphHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">latest_prices_async</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;templates/graph.html&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Price Trends&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">result</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GraphJsonHandler"><a class="viewcode-back" href="../main.html#main.GraphJsonHandler">[docs]</a><span class="k">class</span> <span class="nc">GraphJsonHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="GraphJsonHandler.data_received"><a class="viewcode-back" href="../main.html#main.GraphJsonHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="GraphJsonHandler.get"><a class="viewcode-back" href="../main.html#main.GraphJsonHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">latest_prices_async</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">(</span><span class="n">result</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="GraphFilterHandler"><a class="viewcode-back" href="../main.html#main.GraphFilterHandler">[docs]</a><span class="k">class</span> <span class="nc">GraphFilterHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="GraphFilterHandler.data_received"><a class="viewcode-back" href="../main.html#main.GraphFilterHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="TestTransactionHandler"><a class="viewcode-back" href="../main.html#main.TestTransactionHandler">[docs]</a><span class="k">class</span> <span class="nc">TestTransactionHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="TestTransactionHandler.data_received"><a class="viewcode-back" href="../main.html#main.TestTransactionHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TestTransactionHandler.get"><a class="viewcode-back" href="../main.html#main.TestTransactionHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">transaction</span> <span class="o">=</span> <span class="n">trx__tx_out</span><span class="o">.</span><span class="n">Transaction</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="p">)</span>
+        <span class="c1"># attempt = transaction.run()</span>
+        <span class="c1"># attempt = transaction.regtest_run()</span>
+        <span class="c1"># attempt = transaction.pytool_run()</span>
+        <span class="n">attempt</span> <span class="o">=</span> <span class="k">await</span> <span class="n">transaction</span><span class="o">.</span><span class="n">testnet_run</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">({</span><span class="s1">&#39;Try&#39;</span><span class="p">:</span> <span class="n">attempt</span><span class="p">})</span></div></div>
+
+
+<div class="viewcode-block" id="ReactTestHandler"><a class="viewcode-back" href="../main.html#main.ReactTestHandler">[docs]</a><span class="k">class</span> <span class="nc">ReactTestHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="ReactTestHandler.data_received"><a class="viewcode-back" href="../main.html#main.ReactTestHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ReactTestHandler.get"><a class="viewcode-back" href="../main.html#main.ReactTestHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;templates/test.html&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;React Test&quot;</span><span class="p">)</span></div></div>
+
+
+<span class="c1"># addr = &quot;address&quot;</span>
+<span class="c1"># html = (&quot;&quot;&quot;&lt;html&gt;</span>
+<span class="c1">#</span>
+<span class="c1">#   &lt;head&gt;</span>
+<span class="c1">#     &lt;script language=\&quot;javascript\&quot;&gt;</span>
+<span class="c1">#       var ws = new WebSocket(&quot;&quot;&quot; + addr +&quot;&quot;&quot;);</span>
+<span class="c1">#       ws.onopen = function() {</span>
+<span class="c1">#          ws.send(\&quot;Hello\&quot;);</span>
+<span class="c1">#       };</span>
+<span class="c1">#       ws.onmessage = function (evt) {</span>
+<span class="c1">#          alert(evt.data);</span>
+<span class="c1">#       };</span>
+<span class="c1">#     &lt;/script&gt;</span>
+<span class="c1">#   &lt;/head&gt;</span>
+<span class="c1">#</span>
+<span class="c1">#   &lt;body&gt;</span>
+<span class="c1">#     &lt;p&gt;sample websocket with Tornado&lt;/p&gt;</span>
+<span class="c1">#   &lt;/body&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># &lt;/html&gt;</span>
+<span class="c1"># &quot;&quot;&quot;)</span>
+
+
+<div class="viewcode-block" id="SendTrawTransactionHandler"><a class="viewcode-back" href="../main.html#main.SendTrawTransactionHandler">[docs]</a><span class="k">class</span> <span class="nc">SendTrawTransactionHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="SendTrawTransactionHandler.data_received"><a class="viewcode-back" href="../main.html#main.SendTrawTransactionHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+        <span class="c1"># def get(self, *args, **kwargs):</span>
+        <span class="c1"># if &#39;txid_out&#39; in self.request.arguments:</span>
+        <span class="c1">#     txid_out = self.get_argument(&#39;txid_out&#39;)</span>
+        <span class="c1">#     if len(txid_out) &gt; 0:</span>
+
+
+<div class="viewcode-block" id="HeartbeatHandler"><a class="viewcode-back" href="../main.html#main.HeartbeatHandler">[docs]</a><span class="k">class</span> <span class="nc">HeartbeatHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="HeartbeatHandler.data_received"><a class="viewcode-back" href="../main.html#main.HeartbeatHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="HeartbeatHandler.get"><a class="viewcode-back" href="../main.html#main.HeartbeatHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">found_cookie</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_secure_cookie</span><span class="p">(</span><span class="s2">&quot;trx_cookie&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">found_cookie</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">looper</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">heartbeat_get_all</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;templates/heartbeat.html&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Heartbeat&quot;</span><span class="p">,</span> <span class="n">heartbeats</span><span class="o">=</span><span class="n">result</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HeartbeatCreateHandler"><a class="viewcode-back" href="../main.html#main.HeartbeatCreateHandler">[docs]</a><span class="k">class</span> <span class="nc">HeartbeatCreateHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="HeartbeatCreateHandler.data_received"><a class="viewcode-back" href="../main.html#main.HeartbeatCreateHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="HeartbeatCreateHandler.get"><a class="viewcode-back" href="../main.html#main.HeartbeatCreateHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">create_all_heartbeat</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Good boy&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HeartbeatShareHandler"><a class="viewcode-back" href="../main.html#main.HeartbeatShareHandler">[docs]</a><span class="k">class</span> <span class="nc">HeartbeatShareHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="HeartbeatShareHandler.data_received"><a class="viewcode-back" href="../main.html#main.HeartbeatShareHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="HeartbeatShareHandler.post"><a class="viewcode-back" href="../main.html#main.HeartbeatShareHandler.post">[docs]</a>    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">self_cookie</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_secure_cookie</span><span class="p">(</span><span class="s2">&quot;dcsrf&quot;</span><span class="p">)</span>
+        <span class="n">client_cookie</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;dcsrf&quot;</span><span class="p">)</span>
+        <span class="n">client_cookies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">cookies</span>
+        <span class="n">compare</span> <span class="o">=</span> <span class="n">self_cookie</span> <span class="o">==</span> <span class="n">client_cookie</span></div></div>
+
+
+<div class="viewcode-block" id="HeartbeatSocketShareHandler"><a class="viewcode-back" href="../main.html#main.HeartbeatSocketShareHandler">[docs]</a><span class="k">class</span> <span class="nc">HeartbeatSocketShareHandler</span><span class="p">(</span><span class="n">WebSocketHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="HeartbeatSocketShareHandler.data_received"><a class="viewcode-back" href="../main.html#main.HeartbeatSocketShareHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+    <span class="c1"># TODO - Sort this shit out</span>
+<div class="viewcode-block" id="HeartbeatSocketShareHandler.on_message"><a class="viewcode-back" href="../main.html#main.HeartbeatSocketShareHandler.on_message">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">on_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">drupal_user</span><span class="p">()</span>
+        <span class="n">decoded_user</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">drupal_user</span><span class="p">()</span>
+        <span class="n">credString</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;pass&#39;</span><span class="p">]</span>
+        <span class="n">encodedCreds</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">credString</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="c1"># encodedCreds = base64.b64encode(str(user[&#39;name&#39;] + &#39;:&#39; + user[&#39;pass&#39;]).encode())</span>
+
+        <span class="n">post_attempt</span> <span class="o">=</span> <span class="k">await</span> <span class="n">drupal_utils</span><span class="o">.</span><span class="n">post_status_message</span><span class="p">(</span>
+            <span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">({</span><span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;pass&#39;</span><span class="p">:</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;pass&#39;</span><span class="p">]}),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;X-CSRF-TOKEN&#39;</span><span class="p">:</span> <span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">drupal_token</span><span class="p">()},</span> <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="c1"># post_attempt = await drupal_utils.post_status_message(</span>
+        <span class="c1">#     escape.json_encode({&#39;message&#39;: message, &#39;name&#39;: user[&#39;name&#39;], &#39;pass&#39;: user[&#39;pass&#39;]}),</span>
+        <span class="c1">#     headers=drupal_utils.make_headers(user[&#39;name&#39;], user[&#39;pass&#39;], application.session))</span>
+        <span class="c1"># {&#39;X-CSRF-Token&#39;: application.session.drupal_token(), &#39;Authorization&#39;: &#39;Basic &#39; + str(</span>
+        <span class="c1">#     base64.b64encode(str(user[&#39;name&#39;] + &#39;:&#39; + user[&#39;pass&#39;]).encode())),</span>
+        <span class="c1">#          })</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="s1">&#39;done&#39;</span></div>
+
+<div class="viewcode-block" id="HeartbeatSocketShareHandler.open"><a class="viewcode-back" href="../main.html#main.HeartbeatSocketShareHandler.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dcsrf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">cookies</span>
+        <span class="n">dcsrf_decoded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_secure_cookie</span><span class="p">(</span><span class="s1">&#39;dcsrf&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dcsrf</span><span class="p">))</span>
+        <span class="n">cookies</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">drupal_token</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">cookies</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span> <span class="o">==</span> <span class="n">dcsrf_decoded</span><span class="p">:</span>
+            <span class="n">status_message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="s1">&#39;You should know not to, punk&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TxGuiHandler"><a class="viewcode-back" href="../main.html#main.TxGuiHandler">[docs]</a><span class="k">class</span> <span class="nc">TxGuiHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="TxGuiHandler.data_received"><a class="viewcode-back" href="../main.html#main.TxGuiHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TxGuiHandler.get"><a class="viewcode-back" href="../main.html#main.TxGuiHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">found_cookie</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_secure_cookie</span><span class="p">(</span><span class="s2">&quot;trx_cookie&quot;</span><span class="p">)</span>
+        <span class="n">trx_urls</span> <span class="o">=</span> <span class="n">TRXConfig</span><span class="o">.</span><span class="n">get_urls</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">][</span><span class="s1">&#39;TRX_ENV&#39;</span><span class="p">])</span>
+        <span class="n">tx_url</span> <span class="o">=</span> <span class="n">trx_urls</span><span class="p">[</span><span class="s1">&#39;tx_request&#39;</span><span class="p">]</span>
+        <span class="n">blockgen_url</span> <span class="o">=</span> <span class="n">trx_urls</span><span class="p">[</span><span class="s1">&#39;blockgen_url&#39;</span><span class="p">]</span>
+        <span class="n">userbalance_url</span> <span class="o">=</span> <span class="n">trx_urls</span><span class="p">[</span><span class="s1">&#39;userbalance_url&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">check_attribute</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">):</span>
+            <span class="n">user_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_user_data</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+            <span class="n">prices</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">latest_prices_async</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">found_cookie</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;templates/tx.html&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;TRX TX Interface&quot;</span><span class="p">,</span> <span class="n">tx_url</span><span class="o">=</span><span class="n">tx_url</span><span class="p">,</span> <span class="n">blockgen_url</span><span class="o">=</span><span class="n">blockgen_url</span><span class="p">,</span>
+                            <span class="n">userbalance_url</span><span class="o">=</span><span class="n">userbalance_url</span><span class="p">,</span> <span class="n">user_data</span><span class="o">=</span><span class="n">user_data</span><span class="p">,</span> <span class="n">trx_prices</span><span class="o">=</span><span class="n">prices</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_secure_cookie</span><span class="p">(</span><span class="s1">&#39;redirect_target&#39;</span><span class="p">,</span> <span class="s1">&#39;/transaction/tx-gui&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/login&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TxGuiHandler.post"><a class="viewcode-back" href="../main.html#main.TxGuiHandler.post">[docs]</a>    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="TxRequestHandler"><a class="viewcode-back" href="../main.html#main.TxRequestHandler">[docs]</a><span class="k">class</span> <span class="nc">TxRequestHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="TxRequestHandler.data_received"><a class="viewcode-back" href="../main.html#main.TxRequestHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TxRequestHandler.post"><a class="viewcode-back" href="../main.html#main.TxRequestHandler.post">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">tx_request_data</span> <span class="o">=</span> <span class="n">escape</span><span class="o">.</span><span class="n">json_decode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;sender&#39;</span> <span class="ow">in</span> <span class="n">tx_request_data</span> <span class="ow">and</span> <span class="s1">&#39;recipient&#39;</span> <span class="ow">in</span> <span class="n">tx_request_data</span> <span class="ow">and</span> <span class="s1">&#39;amount&#39;</span> <span class="ow">in</span> <span class="n">tx_request_data</span><span class="p">:</span>
+            <span class="n">transaction_result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">trx__tx_out</span><span class="o">.</span><span class="n">Transaction</span><span class="o">.</span><span class="n">request_transaction</span><span class="p">(</span>
+                <span class="p">{</span><span class="s1">&#39;sender&#39;</span><span class="p">:</span> <span class="n">tx_request_data</span><span class="p">[</span><span class="s1">&#39;sender&#39;</span><span class="p">],</span> <span class="s1">&#39;recipient&#39;</span><span class="p">:</span> <span class="n">tx_request_data</span><span class="p">[</span><span class="s1">&#39;recipient&#39;</span><span class="p">],</span>
+                 <span class="s1">&#39;amount&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">tx_request_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]))})</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">transaction_result</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">({</span><span class="s1">&#39;response&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">}</span> <span class="k">if</span> <span class="n">transaction_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{</span><span class="s1">&#39;response&#39;</span><span class="p">:</span> <span class="mi">500</span><span class="p">}))</span></div></div>
+
+
+<div class="viewcode-block" id="RegTestAddressAllHandler"><a class="viewcode-back" href="../main.html#main.RegTestAddressAllHandler">[docs]</a><span class="k">class</span> <span class="nc">RegTestAddressAllHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="RegTestAddressAllHandler.data_received"><a class="viewcode-back" href="../main.html#main.RegTestAddressAllHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RegTestAddressAllHandler.get"><a class="viewcode-back" href="../main.html#main.RegTestAddressAllHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">blockcypher_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_make_user_addresses</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">(</span><span class="n">blockcypher_data</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="RegTestAllUsers"><a class="viewcode-back" href="../main.html#main.RegTestAllUsers">[docs]</a><span class="k">class</span> <span class="nc">RegTestAllUsers</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="RegTestAllUsers.data_received"><a class="viewcode-back" href="../main.html#main.RegTestAllUsers.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RegTestAllUsers.get"><a class="viewcode-back" href="../main.html#main.RegTestAllUsers.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">trx_urls</span> <span class="o">=</span> <span class="n">TRXConfig</span><span class="o">.</span><span class="n">get_urls</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">][</span><span class="s1">&#39;TRX_ENV&#39;</span><span class="p">])</span>
+        <span class="n">tx_url</span> <span class="o">=</span> <span class="n">trx_urls</span><span class="p">[</span><span class="s1">&#39;tx_request&#39;</span><span class="p">]</span>
+        <span class="n">blockgen_url</span> <span class="o">=</span> <span class="n">trx_urls</span><span class="p">[</span><span class="s1">&#39;blockgen_url&#39;</span><span class="p">]</span>
+        <span class="n">userbalance_url</span> <span class="o">=</span> <span class="n">trx_urls</span><span class="p">[</span><span class="s1">&#39;userbalance_url&#39;</span><span class="p">]</span>
+        <span class="n">user_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_all_user_data</span><span class="p">()</span>
+        <span class="n">blockchain_info</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_block_info</span><span class="p">()</span>
+        <span class="n">currencies</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">latest_prices_async</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;templates/tx-test.html&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Test TX Interface&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">user_data</span><span class="p">,</span>
+                    <span class="n">blockchain_info</span><span class="o">=</span><span class="n">blockchain_info</span><span class="p">,</span> <span class="n">tx_url</span><span class="o">=</span><span class="n">tx_url</span><span class="p">,</span> <span class="n">blockgen_url</span><span class="o">=</span><span class="n">blockgen_url</span><span class="p">,</span>
+                    <span class="n">userbalance_url</span><span class="o">=</span><span class="n">userbalance_url</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RegTestTxHistory"><a class="viewcode-back" href="../main.html#main.RegTestTxHistory">[docs]</a><span class="k">class</span> <span class="nc">RegTestTxHistory</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="RegTestTxHistory.data_received"><a class="viewcode-back" href="../main.html#main.RegTestTxHistory.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RegTestTxHistory.get"><a class="viewcode-back" href="../main.html#main.RegTestTxHistory.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">utils.btcd_utils</span> <span class="k">import</span> <span class="n">RegTest</span>
+
+        <span class="n">tx_history</span> <span class="o">=</span> <span class="k">await</span> <span class="n">RegTest</span><span class="o">.</span><span class="n">get_tx_history</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="TrxRollbackHandler"><a class="viewcode-back" href="../main.html#main.TrxRollbackHandler">[docs]</a><span class="k">class</span> <span class="nc">TrxRollbackHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="TrxRollbackHandler.data_received"><a class="viewcode-back" href="../main.html#main.TrxRollbackHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TrxRollbackHandler.get"><a class="viewcode-back" href="../main.html#main.TrxRollbackHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">rollback_transaction</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Successfully rolled back&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RegTestBlockGenerateHandler"><a class="viewcode-back" href="../main.html#main.RegTestBlockGenerateHandler">[docs]</a><span class="k">class</span> <span class="nc">RegTestBlockGenerateHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="RegTestBlockGenerateHandler.data_received"><a class="viewcode-back" href="../main.html#main.RegTestBlockGenerateHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RegTestBlockGenerateHandler.get"><a class="viewcode-back" href="../main.html#main.RegTestBlockGenerateHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">utils.btcd_utils</span> <span class="k">import</span> <span class="n">RegTest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">RegTest</span><span class="o">.</span><span class="n">create_new_block</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="RegTestUserBalanceHandler"><a class="viewcode-back" href="../main.html#main.RegTestUserBalanceHandler">[docs]</a><span class="k">class</span> <span class="nc">RegTestUserBalanceHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="RegTestUserBalanceHandler.data_received"><a class="viewcode-back" href="../main.html#main.RegTestUserBalanceHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RegTestUserBalanceHandler.get"><a class="viewcode-back" href="../main.html#main.RegTestUserBalanceHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s1">&#39;sid&#39;</span><span class="p">)</span>
+        <span class="n">rid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s1">&#39;rid&#39;</span><span class="p">)</span>
+        <span class="n">sender_balance</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_user_balance</span><span class="p">(</span><span class="n">uid</span><span class="o">=</span><span class="n">sid</span><span class="p">)</span>
+        <span class="n">recipient_balance</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_user_balance</span><span class="p">(</span><span class="n">uid</span><span class="o">=</span><span class="n">rid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">({</span><span class="s1">&#39;users&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">sid</span><span class="p">:</span> <span class="n">sender_balance</span><span class="p">,</span> <span class="n">rid</span><span class="p">:</span> <span class="n">recipient_balance</span><span class="p">},</span>
+                                       <span class="s1">&#39;response&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">}</span> <span class="k">if</span> <span class="n">sender_balance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sender_balance</span><span class="p">,</span>
+                                                                                                     <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="s1">&#39;response&#39;</span><span class="p">:</span> <span class="mi">404</span><span class="p">}))</span></div></div>
+
+
+<div class="viewcode-block" id="RegTestPayUserHandler"><a class="viewcode-back" href="../main.html#main.RegTestPayUserHandler">[docs]</a><span class="k">class</span> <span class="nc">RegTestPayUserHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="RegTestPayUserHandler.data_received"><a class="viewcode-back" href="../main.html#main.RegTestPayUserHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RegTestPayUserHandler.get"><a class="viewcode-back" href="../main.html#main.RegTestPayUserHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s1">&#39;uid&#39;</span><span class="p">)</span>
+        <span class="n">amount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s1">&#39;amount&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">uid</span> <span class="ow">and</span> <span class="n">amount</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">user_pay_result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_pay_user</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">amount</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user_pay_result</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="RegTestPayKeyHandler"><a class="viewcode-back" href="../main.html#main.RegTestPayKeyHandler">[docs]</a><span class="k">class</span> <span class="nc">RegTestPayKeyHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="RegTestPayKeyHandler.data_received"><a class="viewcode-back" href="../main.html#main.RegTestPayKeyHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RegTestPayKeyHandler.get"><a class="viewcode-back" href="../main.html#main.RegTestPayKeyHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">wif</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s1">&#39;wif&#39;</span><span class="p">)</span>
+        <span class="n">amount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s1">&#39;amount&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">wif</span> <span class="ow">and</span> <span class="n">amount</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">key_pay_result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_pay_key</span><span class="p">(</span><span class="n">wif</span><span class="p">,</span> <span class="n">amount</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">key_pay_result</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="UiReactHandler"><a class="viewcode-back" href="../main.html#main.UiReactHandler">[docs]</a><span class="k">class</span> <span class="nc">UiReactHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="UiReactHandler.data_received"><a class="viewcode-back" href="../main.html#main.UiReactHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="UiReactHandler.get"><a class="viewcode-back" href="../main.html#main.UiReactHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;templates/ui-main.html&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;TRX UI MAIN&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="UserProfileHandler"><a class="viewcode-back" href="../main.html#main.UserProfileHandler">[docs]</a><span class="k">class</span> <span class="nc">UserProfileHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="UserProfileHandler.data_received"><a class="viewcode-back" href="../main.html#main.UserProfileHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="UserProfileHandler.get"><a class="viewcode-back" href="../main.html#main.UserProfileHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">cookie</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_secure_cookie</span><span class="p">(</span><span class="s2">&quot;trx_cookie&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check_attribute</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">):</span>
+            <span class="n">user_data</span><span class="p">,</span> <span class="n">prices</span> <span class="o">=</span> <span class="k">await</span> <span class="n">retrieve_user_data</span><span class="p">()</span>
+            <span class="n">tx_url</span><span class="p">,</span> <span class="n">blockgen_url</span><span class="p">,</span> <span class="n">userbalance_url</span><span class="p">,</span> <span class="n">btckeygen_url</span> <span class="o">=</span> <span class="n">retrieve_user_urls</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_secure_cookie</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;trx_cookie&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">generate_cookie</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;templates/user.html&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;TRX USER PROFILE&quot;</span><span class="p">,</span> <span class="n">keygen_url</span><span class="o">=</span><span class="n">btckeygen_url</span><span class="p">,</span> <span class="n">tx_url</span><span class="o">=</span><span class="n">tx_url</span><span class="p">,</span>
+                        <span class="n">blockgen_url</span><span class="o">=</span><span class="n">blockgen_url</span><span class="p">,</span>
+                        <span class="n">userbalance_url</span><span class="o">=</span><span class="n">userbalance_url</span><span class="p">,</span> <span class="n">user_data</span><span class="o">=</span><span class="n">user_data</span><span class="p">,</span> <span class="n">trx_prices</span><span class="o">=</span><span class="n">prices</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_secure_cookie</span><span class="p">(</span><span class="s1">&#39;redirect_target&#39;</span><span class="p">,</span> <span class="s1">&#39;/user&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/login&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="retrieve_user_data"><a class="viewcode-back" href="../main.html#main.retrieve_user_data">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">retrieve_user_data</span><span class="p">():</span>
+    <span class="n">user_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_user_data</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+    <span class="n">prices</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">latest_prices_async</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">user_data</span><span class="p">,</span> <span class="n">prices</span></div>
+
+
+<div class="viewcode-block" id="retrieve_user_urls"><a class="viewcode-back" href="../main.html#main.retrieve_user_urls">[docs]</a><span class="k">def</span> <span class="nf">retrieve_user_urls</span><span class="p">():</span>
+    <span class="n">trx_urls</span> <span class="o">=</span> <span class="n">TRXConfig</span><span class="o">.</span><span class="n">get_urls</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">][</span><span class="s1">&#39;TRX_ENV&#39;</span><span class="p">])</span>
+    <span class="n">tx_url</span> <span class="o">=</span> <span class="n">trx_urls</span><span class="p">[</span><span class="s1">&#39;tx_request&#39;</span><span class="p">]</span>
+    <span class="n">blockgen_url</span> <span class="o">=</span> <span class="n">trx_urls</span><span class="p">[</span><span class="s1">&#39;blockgen_url&#39;</span><span class="p">]</span>
+    <span class="n">userbalance_url</span> <span class="o">=</span> <span class="n">trx_urls</span><span class="p">[</span><span class="s1">&#39;userbalance_url&#39;</span><span class="p">]</span>
+    <span class="n">btckeygen_url</span> <span class="o">=</span> <span class="n">trx_urls</span><span class="p">[</span><span class="s1">&#39;key_gen_url&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">tx_url</span><span class="p">,</span> <span class="n">blockgen_url</span><span class="p">,</span> <span class="n">userbalance_url</span><span class="p">,</span> <span class="n">btckeygen_url</span></div>
+
+
+<div class="viewcode-block" id="KeyWTPHandler"><a class="viewcode-back" href="../main.html#main.KeyWTPHandler">[docs]</a><span class="k">class</span> <span class="nc">KeyWTPHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="KeyWTPHandler.data_received"><a class="viewcode-back" href="../main.html#main.KeyWTPHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="KeyWTPHandler.get"><a class="viewcode-back" href="../main.html#main.KeyWTPHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        @API</span>
+
+<span class="sd">        Convert a WIF secret to private key</span>
+<span class="sd">        :param args:</span>
+<span class="sd">        :param kwargs:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">wif</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s1">&#39;wif&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">wif</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">http_client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="n">TRXConfig</span><span class="o">.</span><span class="n">get_urls</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">][</span><span class="s1">&#39;TRX_ENV&#39;</span><span class="p">])[</span><span class="s1">&#39;wif_to_private_url&#39;</span><span class="p">],</span>
+                <span class="n">escape</span><span class="o">.</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s1">&#39;wif&#39;</span><span class="p">:</span> <span class="n">wif</span><span class="p">}))</span>
+            <span class="k">if</span> <span class="n">response</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">escape</span><span class="o">.</span><span class="n">json_decode</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RegTestUserKeyGenerateHandler"><a class="viewcode-back" href="../main.html#main.RegTestUserKeyGenerateHandler">[docs]</a><span class="k">class</span> <span class="nc">RegTestUserKeyGenerateHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="RegTestUserKeyGenerateHandler.data_received"><a class="viewcode-back" href="../main.html#main.RegTestUserKeyGenerateHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RegTestUserKeyGenerateHandler.get"><a class="viewcode-back" href="../main.html#main.RegTestUserKeyGenerateHandler.get">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">found_cookie</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_secure_cookie</span><span class="p">(</span><span class="s2">&quot;trx_cookie&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">found_cookie</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_address</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_make_user_address</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+            <span class="n">user_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_user_data</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">(</span><span class="n">user_data</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RegTestUserKeyGenerateHandler.post"><a class="viewcode-back" href="../main.html#main.RegTestUserKeyGenerateHandler.post">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">content_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">content_type</span> <span class="o">==</span> <span class="s1">&#39;application/json&#39;</span><span class="p">:</span>
+            <span class="n">csrf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;csrf-token&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">db</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">verify_auth_token</span><span class="p">(</span><span class="n">csrf</span><span class="p">):</span>
+                <span class="n">new_address</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_make_user_address</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+                <span class="n">user_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">regtest_user_data</span><span class="p">(</span><span class="n">application</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">(</span><span class="n">user_data</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="o">.</span><span class="n">json_encode</span><span class="p">([{</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Token not valid&#39;</span><span class="p">,</span> <span class="s1">&#39;code&#39;</span><span class="p">:</span> <span class="mi">401</span><span class="p">}]))</span></div></div>
+
+
+<div class="viewcode-block" id="check_content_types"><a class="viewcode-back" href="../main.html#main.check_content_types">[docs]</a><span class="k">def</span> <span class="nf">check_content_types</span><span class="p">(</span><span class="n">handler</span><span class="p">:</span> <span class="n">RequestHandler</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">handler</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_csrf"><a class="viewcode-back" href="../main.html#main.get_csrf">[docs]</a><span class="k">def</span> <span class="nf">get_csrf</span><span class="p">(</span><span class="n">handler</span><span class="p">:</span> <span class="n">RequestHandler</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">handler</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;csrf-token&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RegTestKillKeyHandler"><a class="viewcode-back" href="../main.html#main.RegTestKillKeyHandler">[docs]</a><span class="k">class</span> <span class="nc">RegTestKillKeyHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="RegTestKillKeyHandler.data_received"><a class="viewcode-back" href="../main.html#main.RegTestKillKeyHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RegTestKillKeyHandler.post"><a class="viewcode-back" href="../main.html#main.RegTestKillKeyHandler.post">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">check_content_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;application/json&#39;</span><span class="p">:</span>
+            <span class="n">csrf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;csrf-token&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">db</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">verify_auth_token</span><span class="p">(</span><span class="n">csrf</span><span class="p">):</span>
+                <span class="n">key_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">)</span>  <span class="c1"># TODO make this work</span></div></div>
+
+
+<div class="viewcode-block" id="LogoutHandler"><a class="viewcode-back" href="../main.html#main.LogoutHandler">[docs]</a><span class="k">class</span> <span class="nc">LogoutHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="LogoutHandler.data_received"><a class="viewcode-back" href="../main.html#main.LogoutHandler.data_received">[docs]</a>    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogoutHandler.get"><a class="viewcode-back" href="../main.html#main.LogoutHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_all_cookies</span><span class="p">()</span>
+        <span class="n">application</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Logout successful&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/login&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TRXApplication"><a class="viewcode-back" href="../main.html#main.TRXApplication">[docs]</a><span class="k">class</span> <span class="nc">TRXApplication</span><span class="p">(</span><span class="n">Application</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">handlers</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="c1"># Home</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">MainHandler</span><span class="p">),</span>
+
+            <span class="c1"># User GUI</span>
+
+            <span class="c1"># - Profile</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/user&quot;</span><span class="p">,</span> <span class="n">UserProfileHandler</span><span class="p">),</span>
+            <span class="c1"># - Primary</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span> <span class="n">LoginHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/logout&quot;</span><span class="p">,</span> <span class="n">LogoutHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/register&quot;</span><span class="p">,</span> <span class="n">RegisterHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/transaction/tx-gui&quot;</span><span class="p">,</span> <span class="n">TxGuiHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/heartbeat/feed&quot;</span><span class="p">,</span> <span class="n">HeartbeatHandler</span><span class="p">),</span>
+
+            <span class="c1"># - Dev/Testing</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/react/test&quot;</span><span class="p">,</span> <span class="n">ReactTestHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/ui/main&quot;</span><span class="p">,</span> <span class="n">UiReactHandler</span><span class="p">),</span>
+
+            <span class="c1"># Regression Testing</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/regtest/all-users&quot;</span><span class="p">,</span> <span class="n">RegTestAllUsers</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/regtest/user/pay&quot;</span><span class="p">,</span> <span class="n">RegTestPayUserHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/regtest/key/pay&quot;</span><span class="p">,</span> <span class="n">RegTestPayKeyHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/regtest/key/retire&quot;</span><span class="p">,</span> <span class="n">RegTestKillKeyHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/regtest/user-balance&quot;</span><span class="p">,</span> <span class="n">RegTestUserBalanceHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/regtest/tx-history&quot;</span><span class="p">,</span> <span class="n">RegTestTxHistory</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/regtest/generate/block&quot;</span><span class="p">,</span> <span class="n">RegTestBlockGenerateHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/regtest/address/provision-all&quot;</span><span class="p">,</span> <span class="n">RegTestAddressAllHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/keys/btc/regtest/generate&quot;</span><span class="p">,</span> <span class="n">RegTestUserKeyGenerateHandler</span><span class="p">),</span>
+
+            <span class="c1"># CRON Processes</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/updateprices&quot;</span><span class="p">,</span> <span class="n">UpdatePriceHandler</span><span class="p">),</span>
+
+            <span class="c1"># REST API</span>
+
+            <span class="c1"># - Transactions</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/transaction/request&quot;</span><span class="p">,</span> <span class="n">TxRequestHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/transaction/test&quot;</span><span class="p">,</span> <span class="n">TestTransactionHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/transaction/sendraw&quot;</span><span class="p">,</span> <span class="n">SendTrawTransactionHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/transaction/secret/rollback&quot;</span><span class="p">,</span> <span class="n">TrxRollbackHandler</span><span class="p">),</span>
+
+            <span class="c1"># KEYS</span>
+
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/key/convert/wiftoprivate&quot;</span><span class="p">,</span> <span class="n">KeyWTPHandler</span><span class="p">),</span>
+
+            <span class="c1"># - Prices</span>
+            <span class="c1"># -- Graph</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/prices/graph&quot;</span><span class="p">,</span> <span class="n">GraphHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/prices/graph/currency&quot;</span><span class="p">,</span> <span class="n">CurrencyRevisionHandler</span><span class="p">),</span>
+
+            <span class="c1"># -- JSON</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/prices/graph/json&quot;</span><span class="p">,</span> <span class="n">GraphJsonHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/prices/latest&quot;</span><span class="p">,</span> <span class="n">LatestPriceHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/prices/currency&quot;</span><span class="p">,</span> <span class="n">CurrencyHandler</span><span class="p">),</span>
+
+            <span class="c1"># -- Heartbeat / Social Media</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/heartbeat/create&quot;</span><span class="p">,</span> <span class="n">HeartbeatCreateHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/heartbeat/share/new&quot;</span><span class="p">,</span> <span class="n">HeartbeatShareHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/heartbeat/share/socket-new&quot;</span><span class="p">,</span> <span class="n">HeartbeatSocketShareHandler</span><span class="p">),</span>
+
+            <span class="c1"># Private Utilities</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/users/all&quot;</span><span class="p">,</span> <span class="n">UserListHandler</span><span class="p">),</span>
+
+            <span class="c1"># CRUFT</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/jigga&quot;</span><span class="p">,</span> <span class="n">WunderHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/password&quot;</span><span class="p">,</span> <span class="n">PasswordHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/sendmail&quot;</span><span class="p">,</span> <span class="n">SendMailHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/fakenews&quot;</span><span class="p">,</span> <span class="n">FakeNewsHandler</span><span class="p">),</span>
+
+            <span class="c1"># Static</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/static/(.*)&quot;</span><span class="p">,</span> <span class="n">StaticFileHandler</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/static&quot;</span><span class="p">}),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/sites/(.*)&quot;</span><span class="p">,</span> <span class="n">StaticFileHandler</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;sites&quot;</span><span class="p">)}),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/themes/(.*)&quot;</span><span class="p">,</span> <span class="n">StaticFileHandler</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;themes&quot;</span><span class="p">)})</span>
+        <span class="p">]</span>
+
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;debug&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;static_path&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;static&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;template_path&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+            <span class="s2">&quot;cookie_secret&quot;</span><span class="p">:</span> <span class="s2">&quot;8a573v89h7jociauroj435897j34&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="kc">None</span>
+        <span class="p">}</span>
+
+        <span class="n">Application</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handlers</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TRXApplication.create_session"><a class="viewcode-back" href="../main.html#main.TRXApplication.create_session">[docs]</a>    <span class="k">def</span> <span class="nf">create_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">csrf</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dcsrf</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">csrf</span><span class="o">=</span><span class="n">csrf</span><span class="p">,</span> <span class="n">dcsrf</span><span class="o">=</span><span class="n">dcsrf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">redirect_login</span> <span class="o">=</span> <span class="kc">False</span></div></div>
+
+
+<div class="viewcode-block" id="env_setup"><a class="viewcode-back" href="../main.html#main.env_setup">[docs]</a><span class="k">def</span> <span class="nf">env_setup</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="s1">&#39;debugging asyncio&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;-v&#39;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;verbose&#39;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+        <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+        <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(levelname)7s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="n">static_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;static&quot;</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">env_setup</span><span class="p">()</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+    <span class="n">looper</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+    <span class="n">looper</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">looper</span><span class="o">.</span><span class="n">slow_callback_duration</span> <span class="o">=</span> <span class="mf">0.001</span>
+
+    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;always&#39;</span><span class="p">)</span>
+    <span class="n">application</span> <span class="o">=</span> <span class="n">TRXApplication</span><span class="p">()</span>
+    <span class="n">application</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">6969</span><span class="p">)</span>
+
+    <span class="n">application</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">TRXConfig</span><span class="o">.</span><span class="n">get_env_variables</span><span class="p">()</span>
+
+    <span class="n">db</span><span class="o">.</span><span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="n">IOLoop</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">CoinTRX</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../main.html">main module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Emmanuel Buckshi.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
