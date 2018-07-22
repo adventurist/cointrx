@@ -11,12 +11,15 @@
     "build:txtest": "node_modules/webpack/bin/webpack.js --config webpack-txgui.config.js",
     "build:txgui": "node_modules/webpack/bin/webpack.js --config webpack-txgui.config.js",
     "build:user": "node_modules/webpack/bin/webpack.js --config webpack-user.config.js",
-    "build:bot": "node_modules/webpack/bin/webpack.js --config webpack-bot.config.js"
+    "build:bot": "node_modules/webpack/bin/webpack.js --config webpack-bot.config.js",
+    "build:rest": "node_modules/webpack/bin/webpack.js --config webpack-rest.config.js",
+    "alarmist-build": "node_modules/.bin/alarmist-webpack -n build -f webpack-bot.config.js"
   },
   "repository": "git@git.stronglogic.xyz:/logicp/coinx.git",
   "author": "adventurist@gmail.com",
   "license": "MIT",
   "devDependencies": {
+    "alarmist": "^1.0.26",
     "babel-core": "^6.23.1",
     "babel-loader": "^6.3.2",
     "babel-plugin-react-css-modules": "^2.2.0",
@@ -38,6 +41,7 @@
   },
   "dependencies": {
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.39",
+    "alarmist-webpack": "^1.0.11",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-runtime": "^6.23.0",
     "d3-dsv": "^1.0.8",
@@ -64,6 +68,7 @@
     "redux": "^3.7.2",
     "redux-actions": "^2.2.1",
     "redux-devtools-extension": "^2.13.2",
+    "redux-saga": "^0.16.0",
     "semantic-ui-react": "^0.78.2",
     "semantic-ui-react-numberpicker": "^0.0.1-b"
   }

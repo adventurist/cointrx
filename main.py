@@ -386,26 +386,32 @@ class RegisterHandler(RequestHandler):
         self.render("templates/register.html", title="Jiggas Register Handler", message=message)
 
     def post(self, *args, **kwargs):
-        if self.request.headers.get("Content-Type") == 'application/x-www-form-urlencoded':
+        name = password = email = None
+
+        req_type = self.request.headers.get("Content-Type")
+        if req_type == 'application/x-www-form-urlencoded':
             name, password, email = self.get_body_argument('name'), self.get_body_argument(
                 'pass'), self.get_body_argument('email')
+        elif req_type == 'application/json':
+            body = json.loads(self.request.body.decode('utf-8'))
+            name, password, email = body['name'], body['password'], body['email']
 
-            if email is None or password is None or name is None:
-                self.write("You must supply more arguments")
-                self.write_error(401)
-            else:
-                user_verify = db.check_authentication(name, password, email)
-                if isinstance(user_verify, int) and user_verify < 0:
-                    user_verify = db.create_user(name, password, email)
+        if email is None or password is None or name is None:
+            self.write("You must supply more arguments")
+            self.write_error(401)
+        else:
+            user_verify = db.check_authentication(name, password, email)
+            if isinstance(user_verify, int) and user_verify < 0:
+                user_verify = db.create_user(name, password, email)
 
-                csrf = user_verify.generate_auth_token(expiration=1200)
-                application.create_session(
-                    user={'name': name, 'pass': password, 'id': user_verify.id, 'csrf': csrf})
-                print(str(user_verify))
-                if application.session is not None and isinstance(application.session, session.Session):
-                    self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
-                    return self.write(escape.json_encode({'token': str(application.session.user['csrf'], 'utf-8'),
-                                                          'cookie': str(self.get_secure_cookie('trx_cookie'))}))
+            csrf = user_verify.generate_auth_token(expiration=1200)
+            application.create_session(
+                user={'name': name, 'pass': password, 'id': user_verify.id, 'csrf': csrf})
+            print(str(user_verify))
+            if application.session is not None and isinstance(application.session, session.Session):
+                self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                return self.write(escape.json_encode({'token': str(application.session.user['csrf'], 'utf-8'),
+                                                      'cookie': str(self.get_secure_cookie('trx_cookie'))}))
 
 
 class PasswordHandler(RequestHandler):
@@ -1000,7 +1006,7 @@ class BotGuiHandler(RequestHandler):
             bot_gui_urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
 
             self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
-            self.render("templates/bot.html", title="TRX BOT GUI", bot_gui_urls=bot_gui_urls, bot_gui_data=bot_gui_data)
+            self.render("templates/bot.html", title="TRX BOT GUI", bot_gui_urls=bot_gui_urls, bot_gui_data=bot_gui_data, trx_env=application.settings['env']['TRX_ENV'])
         else:
             self.set_secure_cookie('redirect_target', self.request.path)
             self.redirect('/login')
@@ -1110,7 +1116,7 @@ class UserHandler(RequestHandler):
         if user is not -1:
             self.write(json.dumps(user.serialize()))
 
-    async def put(self, *args, **kwargs):
+    async def patch(self, *args, **kwargs):
         if self.request.headers.get("Content-Type") == 'application/json':
             match_pattern = escape.url_unescape(self.request.path.split('/api/user/')[1])
             body = json.loads(self.request.body.decode('utf-8'))
@@ -1118,6 +1124,13 @@ class UserHandler(RequestHandler):
             if update_result is not -1:
                 self.write(json.dumps(update_result.serialize()))
 
+
+class RestGuiHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        self.render("templates/rest-test-gui.html", title="REST Test GUI")
 
 class TRXApplication(Application):
     def __init__(self):
@@ -1168,6 +1181,9 @@ class TRXApplication(Application):
             (r"/bot/ws-test", BotWsTestHandler),
 
             # REST API
+
+            # - Testing
+            (r"/api/test/rest-gui", RestGuiHandler),
 
             # - Transactions
             (r"/transaction/request", TxRequestHandler),
