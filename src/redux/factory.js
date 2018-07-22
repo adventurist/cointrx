@@ -66,6 +66,7 @@ export function factory(plugins) {
         }
 
     })
+
     store = createStore(combineReducers(reducers),
         composeWithDevTools(applyMiddleware(...middlewares)))
 
@@ -80,6 +81,7 @@ export function factory(plugins) {
         })
         return exposedState
     }
+
     selectState = memoize(selectState)
 
     const publicAPI = {
@@ -94,5 +96,3 @@ export function factory(plugins) {
 
     return publicAPI
 }
-
-const rootReducer = combineReducers()
