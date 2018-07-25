@@ -6,12 +6,21 @@ import Cup from './Cup'
 export default class PatternAnalyzer implements AnalysisTool {
   dataset: Array<Cup>
 
+  /**
+   * Constructor for the PatternAnalyzer class
+   *
+   * Must be provided with a dataset
+   * @param {Array} dataset An Array of patterns (which, at the time of this writing, is limited to the `Cup` pattern type)
+   */
   constructor (dataset: Array<Cup>) {
     this.dataset = dataset
   }
 
   /**
-   * name
+   * analyze
+   *
+   * Performs an analysis of this.dataset and makes a simple determination
+   * @returns Boolean
    */
   public analyze() {
     if (this.dataset && Array.isArray(this.dataset) && this.dataset.length > 0 && isCup(this.dataset[0])) {
@@ -21,6 +30,10 @@ export default class PatternAnalyzer implements AnalysisTool {
   }
 }
 
+/**
+ * Helper function to check if a given argument has implemented the Cup interface
+ * @param arg
+ */
 function isCup(arg: any): arg is Cup {
   return arg.firstPeak !== void 0
 }
