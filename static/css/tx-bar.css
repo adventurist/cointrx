@@ -17,3 +17,7 @@
     width: 100%!important;
     text-align: right;
 }
+
+#trx-nav-paragraph a {
+    font-size: 14pt;
+}
