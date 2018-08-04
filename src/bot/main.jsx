@@ -15,6 +15,7 @@ import { TrxNav } from '../TrxAppBar.jsx'
 
 /* Colour and Icon */
 import TrendingUp from 'material-ui/svg-icons/action/trending-up'
+import AccountBalance from 'material-ui/svg-icons/action/account-balance'
 import CompareArrows from 'material-ui/svg-icons/action/compare-arrows'
 import AutoRenew from 'material-ui/svg-icons/action/autorenew'
 import PowerSettingsNew from 'material-ui/svg-icons/action/power-settings-new'
@@ -41,9 +42,16 @@ import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
 import Chip from 'material-ui/Chip'
 
+
 /* utils */
 import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
+import Bot from '../utils/bot'
 import log from 'loglevel'
+
+// import trx from '../redux'
+
+// const trxState = trx()
+// console.log(trxState)
 // The urls provided by the back end
 const urls = JSON.parse(botUrls.replace(/'/g, '"'))
 
@@ -121,6 +129,7 @@ const buildBotMenuItems = (length) => {
     items.push(<MenuItem value={-1} key={-1} primaryText={`All`} />)
     return items
 }
+
 
 /**
  * Helper method for building the File Menu
@@ -366,8 +375,9 @@ export class TrxLayout extends React.Component {
                     // Open a message stream for each bot
                     const ws = requestWsForBot(this.msgHandler)
                     if (ws) {
+                        const analysisBot = new Bot(ws, [])
                         // Place in the container where they will await instruction
-                        botConnections.push({id: bot.id, ws: ws, number: bot.number, dataReady: false})
+                        botConnections.push({id: bot.id, ws: ws, analysisBot: analysisBot, number: bot.number, dataReady: false, users: []})
                     }
                 })
                 let currentBotNumber = botConnections.length
@@ -477,6 +487,46 @@ export class TrxLayout extends React.Component {
         }
     }
 
+    fetchBalance = async () => {
+        const bot = getSelectedBot(this.state)
+        const data = {
+            data: {
+                bot_id: bot.analysisBot.id,
+                recipient: 'recipient',
+            },
+            type: 'fetch:balance'
+        }
+        if (sendMessage(bot, data)) {
+            const msg = `Bot ${bot.number} (${bot.id}) is attempting to fetch balance`
+            this.consoleOut(msg)
+            log.info(msg, bot.analysisBot.recipient)
+        }
+    }
+
+    performTrade = async () => {
+        const bot = botConnections[this.state.selectedBot]
+        if ('analysisBot' in bot && bot.analysisBot.isReady()) {
+            const analysisResult = bot.analysisBot.decide()
+            if (analysisResult) {
+                const recipient = botConnections[findRandomBotIndex()]
+                bot.analysisBot.trade(recipient, true)
+            }
+        }
+    }
+
+    loginBot = async () => {
+        const bot = botConnections[this.state.selectedBot]
+        const data = {
+            data: { bot_id: bot.id},
+            type: 'bot:login'
+        }
+        if (sendMessage(bot, data)) {
+            const msg = `Bot ${selectedBot.number} (${selectedBot.id}) is attempting a login`
+            this.consoleOut(msg)
+            log.info(msg)
+        }
+    }
+
     /**
      * Message handler provided to our web socket object. Parses incoming messages
      * from a bot's socket stream for requested actions and reported errors from
@@ -503,7 +553,8 @@ export class TrxLayout extends React.Component {
                                 id: bot.id,
                                 ws: requestWsForBot(this.msgHandler),
                                 number: bot.number,
-                                dataReady: false
+                                dataReady: false,
+                                users: []
                             }))
                             this.onBotsCreate(botConnections.length)
                             log.info('Bot connections updated')
@@ -536,6 +587,22 @@ export class TrxLayout extends React.Component {
                     if ('filename' in data) {
                         this.updateFileList(data.filename)
                         delete data.filename
+                        const bot = getSelectedBot(this.state)
+                        const patternName = findPatternName(data)
+                        // TODO: make analysis bot here?
+                         bot.analysisBot = new Bot(bot.id, bot.ws, data.patterns[patternName])
+                         log.debug('Analysis bot created', bot.analysisBot)
+                    }
+                    break
+                case 'bot:login:result':
+                    log.info('Bot login result', data)
+                    break
+                case 'account:balance:update':
+                    log.info('Fetch balance result', data)
+                    if ('balance' in data) {
+                        if (this.updateBotUser(data)) {
+                            log.info(`Updated user ${data.balance.uid} for bot ${getSelectedBot(this.state)}`)
+                        }
                     }
                     break
             }
@@ -576,6 +643,34 @@ export class TrxLayout extends React.Component {
             this.setState({selectedFile: value})
             this.consoleOut(`Opening ${file.filename}`)
             window.open(`${window.location.origin + file.url}`, '_blank')
+        }
+    }
+
+    /**
+     * updateBotUser
+     *
+     * Update user data for the selected bot
+     * @param {Object} data
+     */
+    updateBotUser (data) {
+        try {
+            const bot = getSelectedBot(this.state)
+            let update = false
+            bot.users = bot.users.map( user => {
+                if (user.uid === data.uid) {
+                    update = true
+                    return {...user, ...data}
+                } else {
+                    return user
+                }
+            })
+            if (!update) {
+                bot.users.push({...data})
+            }
+            return true
+        } catch (err) {
+            log.error('Error updating user for bot', err)
+            return false
         }
     }
 
@@ -693,18 +788,24 @@ export class TrxLayout extends React.Component {
                     onClick={this.reconnectBot}
                     primary={false}
                     icon={<Sync />} />
+                <FlatButton
+                    label="Balance"
+                    labelPosition="before"
+                    onClick={this.fetchBalance}
+                    primary={false}
+                    icon={<AccountBalance style={{color: '#F44336'}} />} />
                 <RaisedButton
                     label="Find Patterns"
                     labelPosition="before"
                     onClick={this.findPatterns}
                     primary={false}
-                    checkedIcon={<Patterns style={{color: '#F44336'}} />} />
+                    icon={<Patterns style={{color: '#F44336'}} />} />
                 <RaisedButton
                     label="Trade"
                     labelPosition="before"
                     onClick={this.performTrade}
                     primary={false}
-                    checkedIcon={<TrendingUp style={{color: '#F44336'}} />}
+                    icon={<TrendingUp style={{color: '#F44336'}} />}
                 />
             </Card>
         </Panel>
@@ -785,4 +886,82 @@ function sendMessage(bot, data) {
 
 function allDataReady() {
     return botConnections.filter(bot => bot.dataReady).length === botConnections.length
+}
+
+const defaultConfig = () => {
+    /* exported defaultConfig */
+return {
+
+    user: {},
+    authentication: {
+      subscription: {
+        server: 'iot2-cim-auth-ottlab.genband.com'
+      },
+      websocket: {
+        server: 'iot2-cim-auth-ottlab.genband.com'
+      }
+    },
+    call: {
+      serverProvidedTurnCredentials: true
+    },
+    logs: {
+      logLevel: 'debug',
+      logActions: {
+        flattenActions: false,
+        actionOnly: false
+      },
+      enableFcsLogs: true
+    }
+  }
+}
+
+function findPatternName (data) {
+    if ('patterns' in data) {
+        const keys = Object.keys(data.patterns)
+        if (keys.length === 1) {
+            return keys[0]
+        } else {
+            log.error('There is not one single pattern name found')
+        }
+    }
+}
+
+/**
+ * findRandomBot
+ *
+ * Find the index for a random bot which is NOT currently selected
+ *
+ * @returns {Number} returns an Integer representing the index of a bot
+ */
+function findRandomBotIndex () {
+    const num = botConnections.length
+    let randomNumber = num
+    while (randomNumber === num) {
+        randomNumber = getRandomInt(num)
+    }
+    return randomNumber
+}
+
+/**
+ * getRandomInt
+ *
+ * Provides a random integer
+ *
+ * @param {Number} num An integer
+ * @returns {Number} returns a random integer between 0 and num
+ */
+function getRandomInt (num) {
+    return Math.floor(Math.random() * Math.floor(num))
+}
+
+/**
+ * getSelectedBot
+ *
+ * Provides the bot as selected by the UI
+ *
+ * @param {Object} state
+ * @returns {Object} The currently selected bot
+ */
+function getSelectedBot (state) {
+    return botConnections[state.selectedBot]
 }
