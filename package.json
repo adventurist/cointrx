@@ -13,8 +13,10 @@
     "build:user": "node_modules/webpack/bin/webpack.js --config webpack-user.config.js",
     "build:bot": "node_modules/webpack/bin/webpack.js --config webpack-bot.config.js",
     "build:rest": "node_modules/webpack/bin/webpack.js --config webpack-rest.config.js",
-    "alarmist-build": "node_modules/.bin/alarmist-webpack -n build -f webpack-bot.config.js",
-    "alarmist-rest": "node_modules/.bin/alarmist-webpack -n build -f webpack-rest.config.js"
+    "alarmist:bot": "node_modules/.bin/alarmist-webpack -n build -f webpack-bot.config.js",
+    "alarmist:rest": "node_modules/.bin/alarmist-webpack -n build -f webpack-rest.config.js",
+    "dev": "node_modules/.bin/alarmist-monitor npm-run-all -p alarmist:* ts:build",
+    "ts:build": "gulp scripts"
   },
   "repository": "git@git.stronglogic.xyz:/logicp/coinx.git",
   "author": "adventurist@gmail.com",
@@ -47,6 +49,8 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "d3-dsv": "^1.0.8",
     "d3-time-format": "^2.1.1",
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^5.0.0-alpha.3",
     "jquery": "^3.3.1",
     "lodash": "^4.17.5",
     "loglevel": "^1.6.1",
@@ -72,6 +76,7 @@
     "redux-devtools-extension": "^2.13.2",
     "redux-saga": "^0.16.0",
     "semantic-ui-react": "^0.78.2",
-    "semantic-ui-react-numberpicker": "^0.0.1-b"
+    "semantic-ui-react-numberpicker": "^0.0.1-b",
+    "typescript": "^2.9.2"
   }
 }
