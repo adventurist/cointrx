@@ -16,6 +16,75 @@ const trxLogo = () => {
     </div>
 }
 
+const menuItems =
+// trx_env === 'LOCAL_DEVELOPMENT' ?
+[{
+    url: '/user',
+    label: 'User Profile',
+    icon: 'person'
+},
+{
+    url: '/user/all',
+    label: 'Users: All',
+    icon: ''
+},
+{
+    url: '/login',
+    label: 'Login',
+    icon: ''
+},
+{
+    url: '/register',
+    label: 'Register',
+    icon: ''
+},
+{
+    url: '/heartbeat/feed',
+    label: 'Social Feed',
+    icon: ''
+},
+{
+    url: '/transaction/tx-gui',
+    label: 'Transaction GUI',
+    icon: ''
+},
+{
+    url: '/regtest/all-users',
+    label: 'Transaction GUI - All users',
+    icon: ''
+},
+{
+    url: '/admin/bot',
+    label: 'Bot Interface',
+    icon: ''
+},
+{
+    url: '/prices/graph',
+    label: 'BTC Price Graph',
+    icon: 'trending_up'
+}
+]
+
+// :
+
+// [
+
+// ]
+
+/**
+ *
+ * @param {Array} menuItems An Array of menu item objects
+ * @param {String} menuItems.url The URL for the menu item
+ * @param {String} menuItems.label The Label for the menu item
+ * @param {String} menuItems.icon The Icon for the menu item
+ *
+ */
+const buildSideMenuItems = (menuItems) => {
+    return menuItems.map( (item) => {
+        return <Link href={item.url} label={item.label} icon={item.icon} />
+    })
+}
+
 export class TrxNav extends React.Component {
     constructor(props) {
         super(props);
@@ -63,12 +132,10 @@ export class TrxNav extends React.Component {
     render() {
         return (
             <Layout className="trx-mui-layout">
-                <NavDrawer active={this.state.drawerActive} pinned={this.state.drawerPinned} permanentAt='xxxl'
+                <NavDrawer className='trx-side-nav' active={this.state.drawerActive} pinned={this.state.drawerPinned} permanentAt='xxxl'
                            onOverlayClick={this.toggleDrawerActive}>
-                    <p>
-                        <Link href='https://app.cointrx.com/regtest/all-users' label='TX Test Interface'
-                              icon='bug_report'/>
-                        <Link href='https://app.cointrx.com/prices/graph' active label='D3 Graphs' icon='trending_up'/>
+                    <p id='trx-nav-paragraph'>
+                        {buildSideMenuItems(menuItems)}
                     </p>
                 </NavDrawer>
                 <Panel>
