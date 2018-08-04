@@ -255,7 +255,10 @@ class BotWsStartHandler(WebSocketHandler):
             # Send request to the handler
             result = await handle_ws_request(parsed['type'], parsed['data'])
             application.logger.debug('WS Request: %s' % str(result))
-            response = json.dumps(result) if isinstance(result, dict) else str(result, 'utf-8')
+            if result is not None:
+                response = json.dumps(result) if isinstance(result, dict) else str(result, 'utf-8')
+            else:
+                response = json.dumps({'error': 'Error handling socket request'})
             # TODO Handle this internally and send a TRX response
             self.write_message(response)
         # Simply messages from a bot which don't contain any JSON should be responded to by
@@ -292,6 +295,27 @@ async def handle_ws_request(type, data):
         request_result = await http_client.get('http://localhost:9977/bots/fetch')
         if hasattr(request_result, 'body'):
             return {'action': 'updatebots', 'payload': json.loads(str(request_result.body, 'utf-8'))}
+
+    async def fetch_user_balance(type, data):
+        """
+
+        :param type:
+        :param data:
+        :return:
+        """
+        bot_id = data['bot_id']
+        bot = application.retrieve_bot_by_id(bot_id)
+        print(bot)
+        await bot.login()
+        if bot.is_logged_in():
+            uid = str(bot.session['uid'])
+            response = await http_client.get('http://127.0.0.1:6969/api/account/balance?uid=' + uid + '&token=' + str(bot.session['token']))
+            if hasattr(response, 'body'):
+                body = json.loads(str(response.body, 'utf-8'))
+                if 'balance' in body:
+                    return {'action': 'account:balance:update', 'payload': {'balance': body['balance'], 'uid': uid}}
+                else:
+                    return {'action': 'account:balance:update', 'error': True, 'payload': 'Error fetching balance'}
 
     async def close_bot_connections(type, data):
         """
@@ -348,6 +372,7 @@ async def handle_ws_request(type, data):
         'bots:close': close_bot_connections,
         'bot:close': close_bot_connection,
         'patterns:search': find_market_patterns,
+        'fetch:balance': fetch_user_balance
     }
     func = switch.get(type, lambda: 'Invalid request type')
     result = await func(type, data)
