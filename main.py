@@ -217,7 +217,7 @@ class LoginHandler(RequestHandler):
 
                     return self.write(escape.json_encode(
                         {'statuscode': 200, 'token': str(application.session.user['csrf'], 'utf-8'),
-                         'trx_cookie': str(self.get_secure_cookie('trx_cookie'))}))
+                         'trx_cookie': str(self.get_secure_cookie('trx_cookie')), 'uid': user_verify.id}))
 
             elif user_verify < -1:
                 self.set_status(404)
@@ -247,7 +247,6 @@ class LoginHandler(RequestHandler):
                         self.clear_cookie('redirect_target')
                         return self.redirect(redirect_target)
                     self.write(user_verified.name)
-
 
     def get(self, *args, **kwargs):
         cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
@@ -1006,7 +1005,8 @@ class BotGuiHandler(RequestHandler):
             bot_gui_urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
 
             self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
-            self.render("templates/bot.html", title="TRX BOT GUI", bot_gui_urls=bot_gui_urls, bot_gui_data=bot_gui_data, trx_env=application.settings['env']['TRX_ENV'])
+            self.render("templates/bot.html", title="TRX BOT GUI", bot_gui_urls=bot_gui_urls, bot_gui_data=bot_gui_data,
+                        trx_env=application.settings['env']['TRX_ENV'])
         else:
             self.set_secure_cookie('redirect_target', self.request.path)
             self.redirect('/login')
@@ -1081,6 +1081,7 @@ async def handle_ws_request(type, data):
     :param data:
     :return dict:
     """
+
     async def analyze_market(url, data):
         """
         Request that bot with ID perform a technical analysis
@@ -1088,6 +1089,7 @@ async def handle_ws_request(type, data):
         request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
         if hasattr(request_result, 'body'):
             return {'action': 'addfile', 'payload': json.loads(str(request_result.body, 'utf-8'))}
+
     async def fetch_bots(type, data):
         """
         Retrieve info on all active bots
@@ -1095,7 +1097,6 @@ async def handle_ws_request(type, data):
         request_result = await http_client.get('http://localhost:9977/bots/fetch')
         if hasattr(request_result, 'body'):
             return {'action': 'updatebots', 'payload': json.loads(str(request_result.body, 'utf-8'))}
-
 
     switch = {
         'request': analyze_market,
@@ -1131,6 +1132,35 @@ class RestGuiHandler(RequestHandler):
 
     def get(self, *args, **kwargs):
         self.render("templates/rest-test-gui.html", title="REST Test GUI")
+
+
+class UserBalanceHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        uid = self.get_argument('uid')
+        balance = await db.regtest_user_balance(uid=uid)
+        response_code = 200 if balance is not None else 400
+        response_body = {'response': response_code, 'uid': uid, 'balance': balance} if response_code == 200 else {
+            'response': response_code, 'error': 'Unable to retrieve user balance'}
+        self.write(json.dumps(response_body))
+
+    # async def get(self, *args, **kwargs):
+    #     answer = 'what the fuck'
+    #     self.write(answer)
+    # args = self.request.arguments
+    # balance = 0
+    # print(args)
+    # if args.get('uid'):
+    #     uid = args.get('uid')
+    #     # balance = await db.regtest_user_balance(uid)
+    # for k, v in args.items():
+    #     print(k)
+    # self.set_status(200)
+    # # self.write(json.dumps({'response': 200, 'balance': balance, 'uid': uid}))
+    # self.write('this is a test')
+
 
 class TRXApplication(Application):
     def __init__(self):
@@ -1195,6 +1225,7 @@ class TRXApplication(Application):
             (r"/api/user/[0-9][0-9][0-9][0-9]", UserUpdateHandler),
             # (r"/api/user/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$", UserHandler),
             (r"/api/user/(?=.{4,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._@%]+(?<![_.])", UserHandler),
+            (r"/api/account/balance", UserBalanceHandler),
 
             # KEYS
 
