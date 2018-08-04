@@ -21,9 +21,24 @@ export default class PatternAnalyzer implements AnalysisTool {
    *
    * Performs an analysis of this.dataset and makes a simple determination
    * @returns Boolean
+   * @override
    */
-  public analyze() {
+  public analyze() : boolean {
     if (this.dataset && Array.isArray(this.dataset) && this.dataset.length > 0 && isCup(this.dataset[0])) {
+      return true
+    }
+    return false
+  }
+
+  /**
+   * isReady
+   *
+   * Reports ready status
+   * @returns Boolean
+   * @override
+   */
+  public isReady() : boolean {
+    if (this.dataset && Array.isArray(this.dataset)) {
       return true
     }
     return false
