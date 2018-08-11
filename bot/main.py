@@ -33,7 +33,20 @@ socket_handlers = []
 http_client = Client()
 enable_pretty_logging()
 
-class MainHandler(WebSocketHandler):
+
+class WSHandler(WebSocketHandler):
+
+    def open(self):
+        application.connections.append(self)
+        log.info('connection added')
+
+    def on_close(self):
+        print('superfluous information')
+        application.connections.remove(self)
+        log.info('connection removed')
+
+
+class MainHandler(WSHandler):
     def data_received(self, chunk):
         pass
 
@@ -44,6 +57,10 @@ class MainHandler(WebSocketHandler):
         socket_handlers.append(self)
         print('Websocket opened')
         self.write_message('Connection successful')
+
+    def close(self, code=None, reason=None):
+        log.debug('Closing connection')
+        print(self)
 
 
 class StartHandler(RequestHandler):
@@ -66,11 +83,11 @@ class StartHandler(RequestHandler):
 
         create_bot_result = application.set_bots(await make_bots(num_requested))
         if not has_error(create_bot_result):
-            application.logger.info('Bots received')
+            log.info('Bots received')
 
             if len(application.bots) > 0:
                 for bot in application.bots:
-                    application.logger.debug(bot.identify())
+                    log.debug(bot.identify())
                     identities.append({'message': bot.identify(), 'id': str(bot.id), 'number': bot.number})
                     await bot.write_message()
                     await bot.relay_message('Jigga jigga WHAT?!?!?!')
@@ -80,7 +97,7 @@ class StartHandler(RequestHandler):
                                    'response_text': 'Created %s bots successfully' % str(num_requested),
                                    'data': identities}))
         else:
-            application.logger.info('Unable to create bots')
+            log.info('Unable to create bots')
             self.write(json.dumps({'response': 500, 'resource': 'bot', 'num': num_requested, 'error': True,
                                    'response_text': 'Error when attempting to create bots.\nReason given: %s' %
                                                     create_bot_result['error']}))
@@ -93,7 +110,7 @@ class BotAllHandler(RequestHandler):
     def get(self, *args, **kwargs):
         if len(application.bots) > 0:
             for bot in application.bots:
-                application.logger.debug(bot.identify())
+                log.debug(bot.identify())
                 bot.connect()
                 bot.write_message()
                 bot.relay_message('Jigga jigga WHAT?!?!?!')
@@ -104,7 +121,7 @@ class BotLoginHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-
+        user = self.get_current_user()
         login_num_requested = self.get_argument('number')
         bot_num = len(application.bots)
         error = False
@@ -163,7 +180,7 @@ class BotTrcPriceHandler(RequestHandler):
         bot_id = self.get_argument('bot_id')
         time = self.get_argument('time')
         if len(application.bots) > 0 and application.retrieve_bot_by_id(bot_id) is not None:
-            application.logger.info('Retrieving prices for %s' % bot_id)
+            log.info('Retrieving prices for %s' % bot_id)
             bot = application.retrieve_bot_by_id(bot_id)
             price_history = await bot.retrieve_price_history(time)
             digest_price_result = await bot.digest_price_history(price_history.body)
@@ -195,7 +212,7 @@ class BotTrcAnalysisHandler(RequestHandler):
 
         if len(application.bots) > 0 and application.retrieve_bot_by_id(bot_id) is not None:
             bot = application.retrieve_bot_by_id(bot_id)
-            application.logger.info(
+            log.info(
                 'Bot {0} (id {1} performing technical analysis of market data'.format(str(bot.number), str(bot.id)))
             bot.analyze_price_history()
             price_data = await bot.post_data_as_json()
@@ -219,7 +236,7 @@ def datetime(x):
     return np.array(x, dtype=np.datetime64)
 
 
-class BotWsStartHandler(WebSocketHandler):
+class BotWsStartHandler(WSHandler):
     def data_received(self, chunk):
         pass
 
@@ -233,9 +250,6 @@ class BotWsStartHandler(WebSocketHandler):
         Returns:
             [bool] -- returns True or False, which decides whether the request is granted
         """
-
-        vars = get_env_variables()
-        env = vars['TRX_ENV']
         return bool(re.match(r'^.*?\.cointrx\.com', origin)) if application.settings['env'] == 'SNOWFLAKE' else True
 
     async def on_message(self, message):
@@ -247,14 +261,14 @@ class BotWsStartHandler(WebSocketHandler):
             to by the server. Requests are handled by the `handle_ws_request` method
         """
 
-        application.logger.debug('Message received: %s' % str(message))
+        log.debug('Message received: %s' % str(message))
         # If valid JSON, parse and ensure `type` and `date` keys are present
         if valid_json(message):
-            application.logger.debug('Valid JSON detected - Processing request')
+            log.debug('Valid JSON detected - Processing request')
             parsed = json.loads(message)
             # Send request to the handler
             result = await handle_ws_request(parsed['type'], parsed['data'])
-            application.logger.debug('WS Request: %s' % str(result))
+            log.debug('WS Request: %s' % str(result))
             if result is not None:
                 response = json.dumps(result) if isinstance(result, dict) else str(result, 'utf-8')
             else:
@@ -268,7 +282,7 @@ class BotWsStartHandler(WebSocketHandler):
         self.write_message(json.dumps(return_message))
 
     def open(self):
-        application.logger.debug('Connection opened: ' + str(self))
+        log.debug('Connection opened: ' + str(self))
         self.write_message('Connection opened')
 
 
@@ -296,6 +310,11 @@ async def handle_ws_request(type, data):
         if hasattr(request_result, 'body'):
             return {'action': 'updatebots', 'payload': json.loads(str(request_result.body, 'utf-8'))}
 
+    async def transaction_create_test(type, data):
+        recipient_uid = data['rid']
+        sender_uid = data['uid']
+
+
     async def fetch_user_balance(type, data):
         """
 
@@ -306,10 +325,13 @@ async def handle_ws_request(type, data):
         bot_id = data['bot_id']
         bot = application.retrieve_bot_by_id(bot_id)
         print(bot)
-        await bot.login()
+        if not bot.is_logged_in():
+            await bot.login(application.users_available)
         if bot.is_logged_in():
             uid = str(bot.session['uid'])
-            response = await http_client.get('http://127.0.0.1:6969/api/account/balance?uid=' + uid + '&token=' + str(bot.session['token']))
+            application.user_sessions.append(uid)
+            response = await http_client.get(
+                'http://127.0.0.1:6969/api/account/balance?uid=' + uid + '&token=' + str(bot.session['token']))
             if hasattr(response, 'body'):
                 body = json.loads(str(response.body, 'utf-8'))
                 if 'balance' in body:
@@ -372,7 +394,8 @@ async def handle_ws_request(type, data):
         'bots:close': close_bot_connections,
         'bot:close': close_bot_connection,
         'patterns:search': find_market_patterns,
-        'fetch:balance': fetch_user_balance
+        'fetch:balance': fetch_user_balance,
+        'transaction:test:create': transaction_create_test
     }
     func = switch.get(type, lambda: 'Invalid request type')
     result = await func(type, data)
@@ -417,9 +440,9 @@ class BotApplication(Application):
             "env": get_env_variables()['TRX_ENV']
         }
         self.bots = []
-
+        self.connections = []
+        self.user_sessions = []
         self.logger = setup_logger('BOT_APPLICATION', logging.DEBUG)
-
         Application.__init__(self, handlers, **settings)
 
     def set_bots(self, bots):
@@ -439,6 +462,7 @@ class BotApplication(Application):
             if search is not None and len(search) > 0:
                 return search[0]
 
+    # TODO: rename this to `get_bots`
     def fetch_bots(self):
         if isinstance(self.bots, list) and len(self.bots) > 0:
             return self.bots
@@ -465,9 +489,7 @@ def setup_logger(name, level, json_logging=False):
     logger = logging.getLogger(name)
     logger.setLevel(level)
     log_handler = logging.FileHandler('bot.log')
-    logger_formatter = logging.Formatter(
-        '%(name)s - %(levelname)s - %(message)s') \
-        # if json_logging is False else jsonlogger.JsonFormatter(json_indent=2)
+    logger_formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
     log_handler.setFormatter(logger_formatter)
 
     logger.addHandler(log_handler)
@@ -500,11 +522,14 @@ async def make_bots(num):
     if len(users) >= num:
         try:
             for i in range(num):
-                config.number = i + 1
-                new_bot = Bot(config, setup_logger('Bot ' + str(i + 1), logging.DEBUG, json_logging=True))
-                new_bot.set_credentials(users[i])
-                await new_bot.connect()
-                bots.append(new_bot)
+                user = next(iter(x for x in users if int(x['uid']) in application.users_available))
+                if user is not None:
+                    config.number = i + 1
+                    new_bot = Bot(config, setup_logger('Bot ' + str(i + 1), logging.DEBUG, json_logging=True))
+                    new_bot.set_credentials(user)
+                    await new_bot.connect()
+                    bots.append(new_bot)
+                    application.users_available.remove(new_bot.credentials['uid'])
 
         except WebSocketError as e:
             handle_error(e, 'WebSocketErr')
@@ -555,7 +580,8 @@ def build_graph(price_data, bot_number, patterns=None):
                     'date': x,
                     'price': y
                 })
-                cup_line = p1.line(x='date', y='price', source=cup_source, color="#b241ff", legend="cup%s" % str(i), line_cap='round', line_width=4)
+                cup_line = p1.line(x='date', y='price', source=cup_source, color="#b241ff", legend="cup%s" % str(i),
+                                   line_cap='round', line_width=4)
                 lines_to_render.append(cup_line)
 
     p1.add_tools(HoverTool(
@@ -593,7 +619,7 @@ def build_graph(price_data, bot_number, patterns=None):
         save(gridplot([[p1]], plot_width=1600, plot_height=960))
 
     file_mv_result = expose_analysis_files()
-    application.logger.debug('File move result: %s' % file_mv_result)
+    log.debug('File move result: %s' % file_mv_result)
 
     return filename
 
@@ -611,14 +637,14 @@ def extract_bezier_points(data):
 
 def smooth(y, box_pts):
     y = [float(x) for x in y]
-    box = np.ones(box_pts)/box_pts
+    box = np.ones(box_pts) / box_pts
     y_smooth = np.convolve(y, box, mode='same')
     return y_smooth
 
 
 def handle_error(err, name):
     print(err)
-    application.logger.debug(name + ' error: ', str(err))
+    log.debug(name + ' error: ', str(err))
 
 
 def has_error(d):
@@ -641,5 +667,6 @@ def cubic_column_datasource(x, y):
 if __name__ == "__main__":
     application = BotApplication()
     log = application.logger
+    application.users_available = [x['uid'] for x in user_data()]
     application.listen(9977)
     tornado.ioloop.IOLoop.current().start()
