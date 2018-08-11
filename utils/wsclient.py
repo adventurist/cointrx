@@ -109,6 +109,8 @@ class Bot(object):
         await self.client.connect(url='ws://localhost:9977/')
 
     def close_connection(self):
+        if self.is_logged_in():
+            self.logout()
         self.client.close_connection()
 
     def identify(self):
@@ -302,7 +304,20 @@ class Bot(object):
         self.trc_struct.max = None
         self.trc_struct.max_offset = Decimal(0)
 
-    async def login(self):
+    async def logout(self):
+        logout_url = 'http://localhost:6969/logout'
+
+        logout_result = await self.http_client.connect(
+            url=logout_url,
+            body=json.dumps(self.session),
+            headers={'Content-Type': 'application/json'}
+        )
+
+        if logout_result:
+            del self.session
+            self.session = None
+
+    async def login(self, uid=None):
         print('login')
         login_url = 'http://localhost:6969/login'
 
