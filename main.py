@@ -10,16 +10,16 @@ import json
 import os
 import random
 import warnings
-import re
+import time
 
 from graphql.error import GraphQLError
 from graphql.error import format_error as format_graphql_error
 
 from functools import wraps
+from utils.btcd_utils import RegTest
 
 from tornado import escape, httpserver
-from tornado import gen
-from tornado.ioloop import IOLoop
+from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.options import define
 from tornado.websocket import WebSocketHandler
 from tornado.web import Application, RequestHandler, StaticFileHandler, HTTPError, asynchronous
@@ -200,8 +200,9 @@ class LoginHandler(RequestHandler):
 
         if content_type == 'application/json':
             # auth_name, auth_pass = check_basic_auth(basic_auth)
-            email, name, password = retrieve_json_login_credentials(
-                {k: ''.join(v) for k, v in escape.json_decode(self.request.body).items()})
+            decoded_body = escape.json_decode(self.request.body)
+            iterables = decoded_body.items()
+            email, name, password = retrieve_json_login_credentials(json.loads(str(self.request.body, 'utf-8')))
 
             if name is None or password is None:
                 self.write("You must supply more arguments")
@@ -616,7 +617,13 @@ class TxRequestHandler(RequestHandler):
                 {'sender': tx_request_data['sender'], 'recipient': tx_request_data['recipient'],
                  'amount': int(round(tx_request_data['amount']))})
             print(transaction_result)
-            self.write(escape.json_encode({'response': 200} if transaction_result is not None else {'response': 500}))
+            if transaction_result is not None:
+                await db.trx_block_pending()
+                self.write(escape.json_encode({'response': 200}))
+
+            else:
+
+                self.write(escape.json_encode({'response': 500}))
 
 
 class RegTestAddressAllHandler(RequestHandler):
@@ -650,8 +657,6 @@ class RegTestTxHistory(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        from utils.btcd_utils import RegTest
-
         tx_history = await RegTest.get_tx_history()
 
 
@@ -671,7 +676,6 @@ class RegTestBlockGenerateHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        from utils.btcd_utils import RegTest
         self.write(RegTest.create_new_block())
 
 
@@ -834,6 +838,13 @@ class LogoutHandler(RequestHandler):
         application.session = None
         self.write("Logout successful")
         self.redirect('/login')
+
+    async def post(self, *args, **kwargs):
+        uid = self.get_body_argument('uid')
+        token = self.get_body_argument('token')
+
+        if uid and token:
+            user_verify = db.User.verify_auth_token(token)
 
 
 class TestKeyHandler(RequestHandler):
@@ -1290,7 +1301,6 @@ def env_setup():
         default=False,
         action='store_true',
     )
-    args = parser.parse_args()
 
     logging.basicConfig(
         level=logging.DEBUG,
@@ -1298,14 +1308,19 @@ def env_setup():
         stream=sys.stderr,
     )
 
-    LOG = logging.getLogger('')
-
     static_path = os.path.join(os.path.dirname(__file__), "static")
 
 
 def login_redirect(handler: RequestHandler, origin: str):
     handler.set_secure_cookie('redirect_target', origin)
     handler.redirect('/login')
+
+
+def manage_blockchain():
+    if db.trx_block_is_pending():
+        if RegTest.create_new_block():
+            logger.info('New block added to blockchain')
+            db.trx_block_not_pending()
 
 
 if __name__ == "__main__":
@@ -1333,5 +1348,6 @@ if __name__ == "__main__":
     application.settings['env'] = TRXConfig.get_env_variables()
 
     db.Base.metadata.create_all(bind=db.engine)
-
-    IOLoop.instance().start()
+    loop_instance = IOLoop.instance()
+    PeriodicCallback(manage_blockchain, 30000).start()
+    loop_instance.start()
