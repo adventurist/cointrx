@@ -110,7 +110,7 @@ class RegTest:
         block_generate_result = RegTest.make_command(interface, command, param)
 
         return str(block_generate_result.stdout, 'utf-8')[
-               :-1] if block_generate_result is not None else 'Error generating block'
+               :-1] if block_generate_result is not None else False
 
     @staticmethod
     async def get_user_balance(keys: list):
