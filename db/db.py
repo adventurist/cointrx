@@ -59,6 +59,11 @@ class TrxKey(Base):
         }
 
 
+class TRX(Base):
+    __tablename__ = 'trx'
+    pending = Column(Boolean, default=False, primary_key=True)
+
+
 class SKey(Base):
     __tablename__ = 'skey'
     id = Column(Integer, primary_key=True)
@@ -682,7 +687,7 @@ def check_authentication_by_name(user, password):
     query_user = session.query(User).filter(User.name == user).first()
     if query_user is not None:
         if not User.verify_password_by_name(user, password):
-            return "Login is no good"
+            return -1
 
         return query_user
     else:
@@ -960,7 +965,7 @@ async def regtest_all_user_data():
             'email': user.email,
             'level': user.level,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
-            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey]
+            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if x.status is not False]
         }
         user_data.append(data)
 
@@ -978,7 +983,7 @@ async def regtest_user_data(uid: str):
             'level': user.level,
             'utc_offset': user.utc_offset if user.utc_offset is not None else 0,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
-            'keys': [{'id': x.id, 'value': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey]
+            'keys': [{'id': x.id, 'value': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if x.status]
         }
 
         for key in data['keys']:
@@ -1149,3 +1154,36 @@ def trc_insert_price(date, value):
     except exc.SQLAlchemyError as err:
         print('This should be logged: \n' + str(err))
         return False
+
+
+async def trx_block_pending():
+    trx_state = session.query(TRX).one()
+    try:
+        trx_state.pending = True
+        session.add(trx_state)
+        session.commit()
+
+        return {'result': True, 'error': False}
+
+    except exc.SQLAlchemyError as err:
+        print(err)
+        return {'result': err, 'error': True}
+
+
+def trx_block_not_pending():
+    trx_state = session.query(TRX).one()
+    try:
+        trx_state.pending = False
+        session.add(trx_state)
+        session.commit()
+
+        return {'result': True, 'error': False}
+
+    except exc.SQLAlchemyError as err:
+        print(err)
+        return {'result': err, 'error': True}
+
+
+def trx_block_is_pending():
+    trx_state = session.query(TRX).one()
+    return trx_state.pending
