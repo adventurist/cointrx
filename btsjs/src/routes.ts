@@ -17,9 +17,11 @@ router.post('/transaction', (req, res, next) => {
     var txIn = [], txOut = [], network = ''
 
     for (const [key, value] of Object.entries(req.body)) {
-        console.log(`${key} ${value}`)
+        console.log(value[key])
+        const time = new Date()
+        console.log(time.getTime() + ': TX Request')
         for (const [k, v] of Object.entries(JSON.parse(key))) {
-            console.log(`${k} ::: ${v}`)
+            console.log(k + ':::' + v)
             switch (k) {
                 case 'txIn':
                     v.forEach((v) => {
