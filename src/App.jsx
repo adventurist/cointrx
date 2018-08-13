@@ -62,8 +62,7 @@ class App extends React.Component {
                 <Layout className="trx-mui-layout">
                     <NavDrawer active={this.state.drawerActive} pinned={this.state.drawerPinned} permanentAt='xxxl' onOverlayClick={this.toggleDrawerActive}>
                         <p>
-                            <Link href='https://app.cointrx.com/regtest/all-users' label='TX Test Interface' icon='bug_report' />
-                            <Link href='https://app.cointrx.com/prices/graph' active label='D3 Graphs' icon='trending_up' />
+                            buildSideMenuItems(menuItems)
                         </p>
                     </NavDrawer>
                     <Panel>
