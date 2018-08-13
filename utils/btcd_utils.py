@@ -163,7 +163,7 @@ class RegTest:
         send_to_address_result = RegTest.make_command(interface, command, address, str(satoshis))
 
         return str(send_to_address_result.stdout,
-                   'utf-8') if send_to_address_result is not None else 'Error retrieving unspent transactions'
+                   'utf-8') if send_to_address_result is not None else None
 
 
 def get_tx_history(addr: str):
