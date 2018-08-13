@@ -914,8 +914,8 @@ class RegTestPayAllKeyHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        result = await db.regtest_pay_keys('10')
-        self.write(str(result))
+        keys_paid = await db.regtest_pay_keys('10')
+        self.write(json.dumps({'response': 200, 'error': False, 'message': 'Successfully paid 10 btc to %s addresses' % str(keys_paid)} if keys_paid > 0 else {'response': 400, 'error': True, 'message': 'Unable to pay any keys'}))
 
 
 class BtcMinMaxHandler(RequestHandler):
