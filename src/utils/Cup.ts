@@ -2,7 +2,7 @@
  * @interface
  */
 export default interface cup {
-  firstPeak: any,
-  secondPeak: any,
-  downwardTrend: any,
+  first_peak: any,
+  second_peak: any,
+  downward_trend: any,
 }
