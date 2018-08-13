@@ -55,6 +55,7 @@ import log from 'loglevel'
 // The urls provided by the back end
 const urls = JSON.parse(botUrls.replace(/'/g, '"'))
 
+const line58 = 'line 58'
 // All stylesheet values
 const styles = {
     chip: {
@@ -422,12 +423,12 @@ export class TrxLayout extends React.Component {
      * @param {Number} value position value of the selected bot, relevant to the container
      */
     loadMarketData = async (event, index, value) => {
-        const selectedBot = botConnections[this.state.selectedBot]
+        const bot = getSelectedBot(this.state)
         log.info(event)
         const data = await request({
             url: urls.trc.prices,
             headers: {'Content-Type': 'application/json'},
-            params: {bot_id: selectedBot.id, time: this.state.timePeriod},
+            params: {bot_id: bot.id, time: this.state.timePeriod},
             credentials: 'include'
         })
 
@@ -435,10 +436,9 @@ export class TrxLayout extends React.Component {
         log.info(response)
         if (!response.error) {
             // State needs to reflect that this bot is ready to analyze
-            const bot = botConnections[this.state.selectedBot]
-            botConnections[this.state.selectedBot].dataReady = true
+            bot.dataReady = true
             this.setState({dataReady: true})
-            this.consoleOut(`${selectedBot} has loaded market data`)
+            this.consoleOut(`${bot.id} has loaded market data`)
         }
     }
 
@@ -451,18 +451,18 @@ export class TrxLayout extends React.Component {
      */
     // TODO rename 'request' to 'bot:analyze'
     analyzeMarketData = async () => {
-        const selectedBot = botConnections[this.state.selectedBot]
+        const bot = getSelectedBot(this.state)
 
         const data = {
             url: urls.trc.analyze,
             data: {
-                bot_id: selectedBot.id, time: this.state.timePeriod
+                bot_id: bot.id, time: this.state.timePeriod
             },
             type: 'request'
         }
 
-        if (sendMessage(selectedBot, data)) {
-            this.consoleOut(`Bot ${selectedBot.number} (${selectedBot.id}) has analyzed market data`)
+        if (sendMessage(bot, data)) {
+            this.consoleOut(`Bot ${bot.number} (${bot.id}) has analyzed market data`)
         }
     }
 
@@ -504,12 +504,17 @@ export class TrxLayout extends React.Component {
     }
 
     performTrade = async () => {
-        const bot = botConnections[this.state.selectedBot]
+        const bot = getSelectedBot(this.state)
         if ('analysisBot' in bot && bot.analysisBot.isReady()) {
             const analysisResult = bot.analysisBot.decide()
             if (analysisResult) {
-                const recipient = botConnections[findRandomBotIndex()]
-                bot.analysisBot.trade(recipient, true)
+                if (botConnections.length === 1) {
+                    bot.analysisBot.trade(false, true)
+                } else {
+                    const recipient = botConnections[findRandomBotIndex()]
+                    bot.analysisBot.trade(recipient, true)
+                    sendMessage(bot, {type: ''})
+                }
             }
         }
     }
@@ -601,7 +606,9 @@ export class TrxLayout extends React.Component {
                     log.info('Fetch balance result', data)
                     if ('balance' in data) {
                         if (this.updateBotUser(data)) {
-                            log.info(`Updated user ${data.balance.uid} for bot ${getSelectedBot(this.state)}`)
+                            const logMsg = `Updated user ${data.uid} (Balance: ${data.balance}) for bot ${getSelectedBot(this.state).id}`
+                            log.info(logMsg)
+                            this.consoleOut(logMsg)
                         }
                     }
                     break
