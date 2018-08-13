@@ -1025,15 +1025,19 @@ async def regtest_pay_key(wif: str, amount: str):
     if key is not None:
         address = btcd_utils.wif_to_address(key.value)
         if address is not None:
-            user_pay_result = await btcd_utils.RegTest.give_user_balance(address, int(amount))
-            return user_pay_result
+            return await btcd_utils.RegTest.give_user_balance(address, int(amount))
 
 
 async def regtest_pay_keys(amount: str):
     keys = session.query(TrxKey).filter(TrxKey.status == true()).all()
+    additions_to_ledger = 0
     for key in keys:
-        pay_result = await regtest_pay_key(wif=key.value, amount=amount)
-        print(pay_result)
+        if await regtest_pay_key(wif=key.value, amount=amount) is not None:
+            additions_to_ledger += 1
+    if additions_to_ledger > 0:
+        await trx_block_pending()
+    return additions_to_ledger
+
 
 
 async def regtest_user_balance(uid: str):
