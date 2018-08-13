@@ -52,7 +52,7 @@ class Bot {
      *
      * @returns {Object} trade info object
      */
-    trade(recipient, selfDetermine = false) {
+    trade(recipient = false, selfDetermine = false) {
         return { result: true, error: false };
     }
 }

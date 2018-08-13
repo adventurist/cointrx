@@ -43,5 +43,5 @@ exports.default = PatternAnalyzer;
  * @param arg
  */
 function isCup(arg) {
-    return arg.firstPeak !== void 0;
+    return arg.first_peak !== void 0;
 }

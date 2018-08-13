@@ -50,5 +50,5 @@ export default class PatternAnalyzer implements AnalysisTool {
  * @param arg
  */
 function isCup(arg: any): arg is Cup {
-  return arg.firstPeak !== void 0
+  return arg.first_peak !== void 0
 }

@@ -1,5 +1,6 @@
 import PatternAnalyzer from './PatternAnalyzer'
 import Cup from './Cup'
+import { request } from './'
 
 export default class Bot {
   id: string
@@ -65,8 +66,7 @@ export default class Bot {
    *
    * @returns {Object} trade info object
    */
-  public trade (recipient, selfDetermine = false) : object {
+  public trade (recipient = false, selfDetermine = false) : object {
     return { result: true, error: false }
   }
-
 }
