@@ -26,3 +26,4 @@ static/analysis
 documentation
 fetch_db.sh
 sync_db.sh
+build_rest.sh
