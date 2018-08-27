@@ -294,7 +294,7 @@ async def handle_ws_request(type, data):
     :return dict: Returned dictionaries should contain an **action** and a **payload**
     """
 
-    async def analyze_market(url, data):
+    async def analyze_market(type: any, data: dict):
         """
         Request that bot with ID perform a technical analysis
         """
@@ -313,7 +313,32 @@ async def handle_ws_request(type, data):
     async def transaction_create_test(type, data):
         recipient_uid = data['rid']
         sender_uid = data['uid']
+        amount = data['amount']
+        response = await http_client.get(
+            'http://localhost:6969/transaction/test?sid=' + str(sender_uid) + '&rid=' + str(
+                recipient_uid + '&amount=' + str(amount)))
+        if response.body:
+            result_obj = {'sender': sender_uid, 'recipient': recipient_uid, 'amount': amount, 'error': False,
+                          'result': str(response.body, 'utf-8')}
+            return_object = {'action': 'transaction:test:result', 'payload': result_obj}
+        else:
+            return_object = {'action': 'transaction:test:result',
+                             'payload': {'error': True, 'message': 'Unable to perform transaction'}}
 
+        return return_object
+
+    async def login_bot(type: str, data: dict):
+        bot = application.retrieve_bot_by_id(data['bot_id'])
+        if bot:
+            if not bot.is_logged_in():
+                login_response = await bot.login(application.users_available)
+                if hasattr(login_response, 'body'):
+                    print(json.dumps(login_response.body))
+            if bot.is_logged_in():
+                uid = str(bot.session['uid'])
+                name = str(bot.session['name'])
+                application.user_sessions.append(uid)
+                return {'action': 'bot:login:result', 'payload': {'uid': uid, 'name': name, 'bot_id': data['bot_id']}}
 
     async def fetch_user_balance(type, data):
         """
@@ -335,7 +360,8 @@ async def handle_ws_request(type, data):
             if hasattr(response, 'body'):
                 body = json.loads(str(response.body, 'utf-8'))
                 if 'balance' in body:
-                    return {'action': 'account:balance:update', 'payload': {'balance': body['balance'], 'uid': uid}}
+                    return {'action': 'account:balance:update',
+                            'payload': {'balance': body['balance'], 'uid': uid, 'name': bot.session['name']}}
                 else:
                     return {'action': 'account:balance:update', 'error': True, 'payload': 'Error fetching balance'}
 
@@ -393,6 +419,7 @@ async def handle_ws_request(type, data):
         'bots:all': fetch_bots,
         'bots:close': close_bot_connections,
         'bot:close': close_bot_connection,
+        'bot:login': login_bot,
         'patterns:search': find_market_patterns,
         'fetch:balance': fetch_user_balance,
         'transaction:test:create': transaction_create_test
