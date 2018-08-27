@@ -161,7 +161,6 @@ function ping(ws) {
  * @param ws
  */
 function pong(ws) {
-    console.log('Server active', ws);
     clearTimeout(ws.timer);
     ws.timer = setTimeout(function () {
         ping(ws);
