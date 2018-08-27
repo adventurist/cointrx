@@ -50,6 +50,7 @@ class TrxKey(Base):
     multi = Column(Boolean)
     status = Column(Boolean)
 
+
     def serialize(self):
         return {
             'id': self.id,
@@ -113,7 +114,7 @@ class User(Base):
     email = Column(String(64))
     created = Column(Integer)
     status = Column(Integer)
-    trxkey = relationship("TrxKey", backref='user', uselist=True)
+    trxkey = relationship("TrxKey", backref='user', uselist=True, order_by='TrxKey.status')
     utc_offset = Column(Integer)
     level = Column(Integer, nullable=False, server_default='0')
     CheckConstraint('level BETWEEN 0 and 4')
@@ -915,7 +916,10 @@ async def disable_key(kid: int) -> bool:
 async def update_key(kid: int, label: str) -> dict:
     key = session.query(TrxKey).filter(TrxKey.id == kid).one_or_none()
     if key is not None:
-        key.label.text = label
+        if key.label is not None:
+            key.label.text = label
+        else:
+            key.label = KeyLabel(text=label, kid=kid)
         session.add(key)
         try:
             session.commit()
@@ -1039,6 +1043,17 @@ async def regtest_pay_keys(amount: str):
     return additions_to_ledger
 
 
+async def regtest_pay_users(amount: str):
+    additions_to_ledger = 0
+    for user in get_users():
+        if await regtest_pay_user(user.id, amount) is not None:
+            additions_to_ledger += 1
+
+    if additions_to_ledger > 0:
+        await trx_block_pending()
+    return additions_to_ledger
+
+
 
 async def regtest_user_balance(uid: str):
     user = session.query(User).filter(User.id == int(uid), User.status == 1).one_or_none()
@@ -1062,6 +1077,26 @@ async def regtest_user_estimated_value(uid: str):
             estimated_value = satoshis / COIN * price.last
             return str(estimated_value.quantize(Decimal(".01"), rounding=ROUND_HALF_UP))
 
+
+async def regtest_users_clear_keys():
+    for user in get_users():
+        for key in user.trxkey:
+            skey = session.query(SKey).filter(SKey.kid == key.id).one()
+            if skey is not None:
+                session.delete(skey)
+            session.delete(key)
+    try:
+        session.commit()
+        return {'error': False}
+    except exc.SQLAlchemyError as err:
+        return {'error': True, 'message': json.dumps(err)}
+
+
+async def wif_to_address(wif):
+    if wif is not None:
+        address = btcd_utils.wif_to_address(wif)
+
+        return address if address is not None else -1
 
 async def get_user(uid: str):
     user = session.query(User).filter(User.id == int(uid)).one_or_none()
