@@ -17008,6 +17008,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TrxLayout = exports.BotButtons = undefined;
 
+var _getIterator2 = __webpack_require__(630);
+
+var _getIterator3 = _interopRequireDefault(_getIterator2);
+
 var _keys = __webpack_require__(79);
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -17156,9 +17160,9 @@ var _Chip2 = _interopRequireDefault(_Chip);
 
 var _utils = __webpack_require__(626);
 
-var _bot = __webpack_require__(627);
+var _bot2 = __webpack_require__(627);
 
-var _bot2 = _interopRequireDefault(_bot);
+var _bot3 = _interopRequireDefault(_bot2);
 
 var _loglevel = __webpack_require__(629);
 
@@ -17178,6 +17182,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* Colour and Icon */
 var urls = JSON.parse(botUrls.replace(/'/g, '"'));
 
+// All stylesheet values
+
+
 /* utils */
 
 
@@ -17196,10 +17203,6 @@ var urls = JSON.parse(botUrls.replace(/'/g, '"'));
 * Theme and Layout
 */
 /* React */
-
-
-var line58 = 'line 58';
-// All stylesheet values
 var styles = {
     chip: {
         float: 'right',
@@ -17381,13 +17384,13 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
         _this2.botNumberChange = function (event, value) {
             // TODO this can't be right
             _this2.setState({ botNum: value });
-            _this2.consoleOut('Number of bots to be built: ' + value);
+            _this2.logInfo('Number of bots to be built: ' + value);
         };
 
         _this2.onBotsCreate = function (num) {
             var newItems = buildBotMenuItems(num);
             _this2.setState({ botMenuItems: newItems });
-            _this2.consoleOut(num + ' bots currently connected');
+            _this2.logInfo(num + ' bots currently connected');
         };
 
         _this2.handleConsoleChange = function (event, index, value) {
@@ -17418,8 +17421,8 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                                         while (1) {
                                             switch (_context.prev = _context.next) {
                                                 case 0:
-                                                    _loglevel2.default.info('Primary channel open');
-                                                    _loglevel2.default.info('Fetching bots');
+                                                    _this2.logInfo('Primary channel open');
+                                                    _this2.logInfo('Fetching bots');
                                                     _context.next = 4;
                                                     return _this2.sendWsRequest('fetchBots');
 
@@ -17532,7 +17535,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                             response = (0, _utils.handleResponse)(data);
 
                             if (!response.error) {
-                                _this2.consoleOut(_this2.state.botNum + ' bots created');
+                                _this2.logInfo(_this2.state.botNum + ' bots created');
                             }
                             _loglevel2.default.info(response);
                             if ('body' in response && 'data' in response.body) {
@@ -17544,7 +17547,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                                         // Open a message stream for each bot
                                         var ws = requestWsForBot(_this2.msgHandler);
                                         if (ws) {
-                                            var analysisBot = new _bot2.default(ws, []);
+                                            var analysisBot = new _bot3.default(ws, []);
                                             // Place in the container where they will await instruction
                                             botConnections.push({ id: bot.id, ws: ws, analysisBot: analysisBot, number: bot.number, dataReady: false, users: [] });
                                         }
@@ -17555,7 +17558,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
 
 
                                     if (!createResult) {
-                                        _loglevel2.default.info('Problem creating the requested number of bots');
+                                        _this2.logInfo('Problem creating the requested number of bots');
                                     }
                                     // Update state
                                     _this2.onBotsCreate(currentBotNumber);
@@ -17597,7 +17600,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                                     // State needs to reflect that this bot is ready to analyze
                                     bot.dataReady = true;
                                     _this2.setState({ dataReady: true });
-                                    _this2.consoleOut(bot.id + ' has loaded market data');
+                                    _this2.logInfo(bot.id + ' has loaded market data');
                                 }
 
                             case 8:
@@ -17630,7 +17633,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
 
 
                             if (sendMessage(bot, data)) {
-                                _this2.consoleOut('Bot ' + bot.number + ' (' + bot.id + ') has analyzed market data');
+                                _this2.logInfo('Bot ' + bot.number + ' (' + bot.id + ') has analyzed market data');
                             }
 
                         case 3:
@@ -17641,7 +17644,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
             }, _callee7, _this3);
         }));
         _this2.findPatterns = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8() {
-            var selectedBot, data, msg;
+            var selectedBot, data;
             return _regenerator2.default.wrap(function _callee8$(_context8) {
                 while (1) {
                     switch (_context8.prev = _context8.next) {
@@ -17654,10 +17657,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
 
 
                             if (sendMessage(container, data)) {
-                                msg = 'Bot ' + selectedBot.number + ' (' + selectedBot.id + ') is conducting a pattern search';
-
-                                _this2.consoleOut(msg);
-                                _loglevel2.default.info(msg);
+                                _this2.logInfo('Bot ' + selectedBot.number + ' (' + selectedBot.id + ') is conducting a pattern search');
                             }
 
                         case 3:
@@ -17668,7 +17668,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
             }, _callee8, _this3);
         }));
         _this2.fetchBalance = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9() {
-            var bot, data, msg;
+            var bot, data;
             return _regenerator2.default.wrap(function _callee9$(_context9) {
                 while (1) {
                     switch (_context9.prev = _context9.next) {
@@ -17683,10 +17683,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                             };
 
                             if (sendMessage(bot, data)) {
-                                msg = 'Bot ' + bot.number + ' (' + bot.id + ') is attempting to fetch balance';
-
-                                _this2.consoleOut(msg);
-                                _loglevel2.default.info(msg, bot.analysisBot.recipient);
+                                _this2.logInfo('Bot ' + bot.number + ' (' + bot.id + ') is attempting to fetch balance');
                             }
 
                         case 3:
@@ -17712,9 +17709,16 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                                         bot.analysisBot.trade(false, true);
                                     } else {
                                         recipient = botConnections[findRandomBotIndex()];
+                                        // bot.analysisBot.trade(recipient, true)
 
-                                        bot.analysisBot.trade(recipient, true);
-                                        sendMessage(bot, { type: '' });
+                                        if ('users' in recipient && recipient.users.length > 0) {}
+                                        sendMessage(bot, {
+                                            type: 'transaction:test:create',
+                                            data: {
+                                                uid: bot.users[0].uid,
+                                                rid: recipient.users[0].uid,
+                                                amount: 10000
+                                            } });
                                     }
                                 }
                             }
@@ -17727,22 +17731,19 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
             }, _callee10, _this3);
         }));
         _this2.loginBot = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee11() {
-            var bot, data, msg;
+            var bot, data;
             return _regenerator2.default.wrap(function _callee11$(_context11) {
                 while (1) {
                     switch (_context11.prev = _context11.next) {
                         case 0:
-                            bot = botConnections[_this2.state.selectedBot];
+                            bot = getSelectedBot(_this2.state);
                             data = {
                                 data: { bot_id: bot.id },
                                 type: 'bot:login'
                             };
 
                             if (sendMessage(bot, data)) {
-                                msg = 'Bot ' + selectedBot.number + ' (' + selectedBot.id + ') is attempting a login';
-
-                                _this2.consoleOut(msg);
-                                _loglevel2.default.info(msg);
+                                _this2.logInfo('Bot ' + bot.number + ' (' + bot.id + ') is attempting a login');
                             }
 
                         case 3:
@@ -17756,7 +17757,6 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
         _this2.msgHandler = function (_ref12) {
             var message = (0, _objectWithoutProperties3.default)(_ref12, []);
 
-            console.log('Making the msgHandler visible');
             if ('type' in message) {
                 _loglevel2.default.info('WS Data Event Type', message.type);
             }
@@ -17780,9 +17780,9 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                                     });
                                 });
                                 _this2.onBotsCreate(botConnections.length);
-                                _loglevel2.default.info('Bot connections updated');
+                                _this2.logInfo('Bot connections updated');
                             } else {
-                                _loglevel2.default.info('No bots available');
+                                _this2.logInfo('No bots available');
                                 botConnections.map(function (bot) {
                                     return bot.ws.close();
                                 });
@@ -17797,13 +17797,14 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                             return bot.ws.close();
                         });
                         botConnections.splice(0, botConnections.length);
+                        // TODO: find out why this isn't working - back end issue?
                         _this2.consoleOut('Bots killed (0 connections)');
                         break;
                     case 'addfile':
                         // A new visualization file is ready to be used. Update the UI to make it accessible
                         if ('filename' in data) {
                             _this2.updateFileList(data.filename);
-                            _loglevel2.default.info('Updating file list');
+                            _this2.logInfo('Updating file list');
                             delete data.filename;
                         }
                         break;
@@ -17816,22 +17817,46 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                             var bot = getSelectedBot(_this2.state);
                             var patternName = findPatternName(data);
                             // TODO: make analysis bot here?
-                            bot.analysisBot = new _bot2.default(bot.id, bot.ws, data.patterns[patternName]);
+                            bot.analysisBot = new _bot3.default(bot.id, bot.ws, data.patterns[patternName]);
                             _loglevel2.default.debug('Analysis bot created', bot.analysisBot);
                         }
                         break;
                     case 'bot:login:result':
                         _loglevel2.default.info('Bot login result', data);
+                        if ('error' in data) {
+                            // TODO: better error handling
+                        } else {
+                            var id = data['bot_id'];
+                            var _bot = getBotById(_this2.state, id);
+                            if (_bot) {
+                                if ('analysisBot' in _bot) {
+                                    // TODO: handle this
+                                }
+
+                                if (_this2.updateBotUser(data, id)) {
+                                    _loglevel2.default.debug('User added to bot with id', id);
+                                }
+                            }
+                        }
                         break;
                     case 'account:balance:update':
                         _loglevel2.default.info('Fetch balance result', data);
                         if ('balance' in data) {
                             if (_this2.updateBotUser(data)) {
-                                var logMsg = 'Updated user ' + data.uid + ' (Balance: ' + data.balance + ') for bot ' + getSelectedBot(_this2.state).id;
-                                _loglevel2.default.info(logMsg);
-                                _this2.consoleOut(logMsg);
+                                _this2.logInfo('Updated user ' + data.uid + ' (Balance: ' + data.balance + ') for bot ' + getSelectedBot(_this2.state).id);
                             }
                         }
+                        break;
+                    case 'transaction:test:result':
+                        _loglevel2.default.info('Transaction test result', data);
+                        if (data.result) {
+                            var result = _this2.updateUserBalance(data.sender, data.recipient, data.amount);
+                            if (result) {
+                                _this2.logInfo('Successful transaction of ' + data.amount + ' satoshis between ' + result.sender.name + ' and ' + result.recipient.name);
+                            }
+                        }
+                    default:
+                        _loglevel2.default.info('Unhandled Websocket message received', data);
                         break;
                 }
             }
@@ -17857,12 +17882,12 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
             var dataReady = value !== -1 ? botConnections[value].dataReady : allDataReady();
             _this2.setState({ selectedBot: value });
             _this2.setState({ dataReady: dataReady });
-            _this2.consoleOut('Bot ' + (value + 1) + ' selected');
+            _this2.logInfo('Bot ' + (value + 1) + ' selected');
         };
 
         _this2.handleMarketSelect = function (event, value) {
             _this2.setState({ market: value });
-            _this2.consoleOut('Market set to ' + value);
+            _this2.logInfo('Market set to ' + value);
         };
 
         _this2.updateState = function (key, value) {
@@ -17935,6 +17960,19 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                 textArr.splice(0, 1);
             }
             this.setState({ consoleText: textArr.join('\n') + '\n' + time + ' - ' + incomingText });
+        }
+
+        /**
+         * Helper function to log both to UI console and info logger simultaneously
+         *
+         * @param {string} logMsg The log message
+         */
+
+    }, {
+        key: 'logInfo',
+        value: function logInfo(logMsg) {
+            _loglevel2.default.info(logMsg);
+            this.consoleOut(logMsg);
         }
 
         /**
@@ -18014,7 +18052,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                                 };
 
                                 if (sendMessage(container, data)) {
-                                    _loglevel2.default.info('Close bot connections requested');
+                                    this.logInfo('Close bot connections requested');
                                 }
 
                             case 2:
@@ -18071,14 +18109,41 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
          */
 
     }, {
-        key: 'updateFileList',
+        key: 'updateUserBalance',
 
+
+        /**
+         * Helper function to update user balances after successful completion of a transaction
+         *
+         * @param {Array} users
+         * @param {string|number} amount
+         * @param {string|number} sid
+         * @param {string|number} rid
+         */
+        value: function updateUserBalance(sid, rid, amount) {
+            try {
+                var recipient = getBotWithUser(this.state, rid);
+                var sender = getBotWithUser(this.state, sid);
+                recipient.user.balance = recipient.user.balance + amount;
+                sender.user.balance = sender.user.balance - amount - 1000;
+                return {
+                    recipient: (0, _extends3.default)({}, recipient.user),
+                    sender: (0, _extends3.default)({}, sender.user)
+                };
+            } catch (err) {
+                console.error(err);
+                return false;
+            }
+        }
 
         /**
          * Helper function to update the list of files in the GUI
          *
          * @param {String} filename
          */
+
+    }, {
+        key: 'updateFileList',
         value: function updateFileList(filename) {
             var file = {
                 url: '/static/analysis/' + filename,
@@ -18107,8 +18172,16 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
          * @param {Object} data
          */
         value: function updateBotUser(data) {
+            var id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+
             try {
-                var bot = getSelectedBot(this.state);
+                var bot = void 0;
+                if (!id) {
+                    bot = getSelectedBot(this.state);
+                } else {
+                    bot = getBotById(this.state, id);
+                }
+
                 var update = false;
                 bot.users = bot.users.map(function (user) {
                     if (user.uid === data.uid) {
@@ -18230,6 +18303,12 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                                 onClick: this.loadMarketData,
                                 primary: false,
                                 icon: React.createElement(_autorenew2.default, null)
+                            }),
+                            React.createElement(_FlatButton2.default, {
+                                label: 'Login',
+                                labelPosition: 'before',
+                                onClick: this.loginBot,
+                                primary: false
                             }),
                             React.createElement(_RaisedButton2.default, {
                                 label: 'Analyze',
@@ -18461,6 +18540,64 @@ function getRandomInt(num) {
  */
 function getSelectedBot(state) {
     return botConnections[state.selectedBot];
+}
+
+/**
+ * Helper function to return bot by id
+ *
+ * @param {Object} state
+ * @param {string} id
+ */
+function getBotById(state, id) {
+    if (Array.isArray(botConnections) && botConnections.length > 1) {
+        return botConnections.find(function (connection) {
+            return connection.id === id;
+        });
+    }
+}
+
+/**
+ * getBotWithUser
+ *
+ * @param {Object} state
+ * @param {string|number} uid
+ */
+function getBotWithUser(state, uid) {
+    var matchedBot = void 0,
+        matchedUser = void 0;
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+        for (var _iterator = (0, _getIterator3.default)(botConnections), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var bot = _step.value;
+
+            var user = bot.users.find(function (user) {
+                return user.uid === uid;
+            });
+            if (user) {
+                matchedBot = bot;
+                matchedUser = user;
+                break;
+            }
+        }
+    } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+    } finally {
+        try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+            }
+        } finally {
+            if (_didIteratorError) {
+                throw _iteratorError;
+            }
+        }
+    }
+
+    return { bot: matchedBot, user: matchedUser };
 }
 
 /***/ }),
@@ -67455,7 +67592,6 @@ function ping(ws) {
  * @param ws
  */
 function pong(ws) {
-    console.log('Server active', ws);
     clearTimeout(ws.timer);
     ws.timer = setTimeout(function () {
         ping(ws);
@@ -67932,6 +68068,34 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
 
     return defaultLogger;
 }));
+
+
+/***/ }),
+/* 630 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(631), __esModule: true };
+
+/***/ }),
+/* 631 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(168);
+__webpack_require__(113);
+module.exports = __webpack_require__(632);
+
+
+/***/ }),
+/* 632 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var anObject = __webpack_require__(33);
+var get = __webpack_require__(172);
+module.exports = __webpack_require__(20).getIterator = function (it) {
+  var iterFn = get(it);
+  if (typeof iterFn != 'function') throw TypeError(it + ' is not iterable!');
+  return anObject(iterFn.call(it));
+};
 
 
 /***/ })
