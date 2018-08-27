@@ -2,6 +2,7 @@ import base64
 import uuid
 from tornado import log
 
+
 class Session:
     def __init__(self, user, csrf=0, dcsrf=0):
         self.csrf = csrf
