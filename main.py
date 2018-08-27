@@ -218,7 +218,7 @@ class LoginHandler(RequestHandler):
 
                     return self.write(escape.json_encode(
                         {'statuscode': 200, 'token': str(application.session.user['csrf'], 'utf-8'),
-                         'trx_cookie': str(self.get_secure_cookie('trx_cookie')), 'uid': user_verify.id}))
+                         'trx_cookie': str(self.get_secure_cookie('trx_cookie')), 'uid': user_verify.id, 'name': user_verify.name}))
 
             elif user_verify < -1:
                 self.set_status(404)
@@ -694,6 +694,52 @@ class RegTestUserBalanceHandler(RequestHandler):
             'response': 404}))
 
 
+class TransactionTestHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        sid = self.get_argument('sid')
+        rid = self.get_argument('rid')
+        amount = self.get_argument('amount')
+        sender = await db.get_user(sid)
+        recipient = await db.get_user(rid)
+        if sender and recipient:
+            if hasattr(sender, 'trxkey') and hasattr(recipient, 'trxkey'):
+                print(sender.trxkey)
+                if await self.create_transaction(sender, recipient, amount):
+                    await db.trx_block_pending()
+                    self.write('Success')
+                else:
+                    self.set_status(400)
+
+    @staticmethod
+    async def create_transaction(sender, recipient, amount):
+        from utils.btcd_utils import wif_to_address
+        sender_keys = []
+        for key in sender.trxkey:
+            if key.status:
+                sender_keys.append({'address': wif_to_address(key.value), 'key': key.value})
+        
+        if len(sender_keys) > 0:
+            data = {
+                'sender': {
+                    'address': sender_keys[0]['address'],
+                    'key': sender_keys[0]['key'],
+                },
+                'recipient': wif_to_address(recipient.trxkey[0].value),
+                'amount': amount
+            }
+
+            transaction_result = await trx__tx_out.Transaction.request_transaction(
+                {'sender': data['sender'], 'recipient': data['recipient'],
+                 'amount': int(round(int(data['amount'])))})
+            if transaction_result:
+                return True
+            else:
+                return False
+
+
 class RegTestPayUserHandler(RequestHandler):
     def data_received(self, chunk):
         pass
@@ -705,6 +751,16 @@ class RegTestPayUserHandler(RequestHandler):
         if uid and amount is not None:
             user_pay_result = await db.regtest_pay_user(uid, amount)
             self.write(str(user_pay_result))
+
+
+class RegTestPayAllUserHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        amount = self.get_argument('amount')
+        user_pay_result = await db.regtest_pay_users(amount)
+        self.write(str(user_pay_result))
 
 
 class RegTestPayKeyHandler(RequestHandler):
@@ -775,15 +831,17 @@ class KeyWTPHandler(RequestHandler):
         :param kwargs:
         :return:
         """
+        from utils.btcd_utils import wif_to_address
         wif = self.get_argument('wif')
         if wif is not None:
-            response = await http_client.connect(
-                TRXConfig.get_urls(application.settings['env']['TRX_ENV'])['wif_to_private_url'],
-                escape.json.dumps({'wif': wif}))
-            if response:
-                print(response)
-                data = escape.json_decode(response.body.decode())
-                self.write(data)
+            self.write(wif_to_address(wif))
+            # response = await http_client.connect(
+            #     TRXConfig.get_urls(application.settings['env']['TRX_ENV'])['wif_to_private_url'],
+            #     escape.json.dumps({'wif': wif}))
+            # if response:
+            #     print(response)
+            #     data = escape.json_decode(response.body.decode())
+            #     self.write(data)
 
 
 class RegTestUserKeyGenerateHandler(RequestHandler):
@@ -1173,6 +1231,14 @@ class UserBalanceHandler(RequestHandler):
     # self.write('this is a test')
 
 
+class RegTestClearKeysHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        self.write(json.dumps(await db.regtest_users_clear_keys()))
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -1198,8 +1264,10 @@ class TRXApplication(Application):
             # Regression Testing
             (r"/regtest/all-users", RegTestAllUsers),
             (r"/regtest/user/pay", RegTestPayUserHandler),
+            (r"/regtest/user/pay-all", RegTestPayAllUserHandler),
             [r"/regtest/key/pay-all", RegTestPayAllKeyHandler],
             (r"/regtest/key/pay", RegTestPayKeyHandler),
+            (r"/regtest/key/clear-all", RegTestClearKeysHandler),
             (r"/regtest/key/retire", RegTestKillKeyHandler),
             (r"/regtest/user-balance", RegTestUserBalanceHandler),
             (r"/regtest/tx-history", RegTestTxHistory),
@@ -1228,7 +1296,7 @@ class TRXApplication(Application):
 
             # - Transactions
             (r"/transaction/request", TxRequestHandler),
-            (r"/transaction/test", TestTransactionHandler),
+            (r"/transaction/test", TransactionTestHandler),
             (r"/transaction/sendraw", SendTrawTransactionHandler),
             (r"/transaction/secret/rollback", TrxRollbackHandler),
 
