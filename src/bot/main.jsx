@@ -55,7 +55,6 @@ import log from 'loglevel'
 // The urls provided by the back end
 const urls = JSON.parse(botUrls.replace(/'/g, '"'))
 
-const line58 = 'line 58'
 // All stylesheet values
 const styles = {
     chip: {
@@ -258,6 +257,16 @@ export class TrxLayout extends React.Component {
     }
 
     /**
+     * Helper function to log both to UI console and info logger simultaneously
+     *
+     * @param {string} logMsg The log message
+     */
+    logInfo (logMsg) {
+        log.info(logMsg)
+        this.consoleOut(logMsg)
+    }
+
+    /**
      * @STATE
      * @param {Object} event triggering the selection
      * @param {Number} value The number of bots chosen with the select list
@@ -265,7 +274,7 @@ export class TrxLayout extends React.Component {
     botNumberChange = (event, value) => {
         // TODO this can't be right
         this.setState({botNum: value})
-        this.consoleOut(`Number of bots to be built: ${value}`)
+        this.logInfo(`Number of bots to be built: ${value}`)
     }
 
     /**
@@ -278,7 +287,7 @@ export class TrxLayout extends React.Component {
     onBotsCreate = (num) => {
         const newItems = buildBotMenuItems(num)
         this.setState({botMenuItems: newItems})
-        this.consoleOut(`${num} bots currently connected`)
+        this.logInfo(`${num} bots currently connected`)
     }
 
     /**
@@ -302,8 +311,8 @@ export class TrxLayout extends React.Component {
         }, this.msgHandler)
         if (container.ws) {
             container.ws.onopen = async () => {
-                log.info('Primary channel open')
-                log.info('Fetching bots')
+                this.logInfo('Primary channel open')
+                this.logInfo('Fetching bots')
                 const response = await this.sendWsRequest('fetchBots')
                 if (response) {
                     container.bots = botConnections
@@ -365,7 +374,7 @@ export class TrxLayout extends React.Component {
 
         const response = handleResponse(data)
         if (!response.error) {
-            this.consoleOut(`${this.state.botNum} bots created`)
+            this.logInfo(`${this.state.botNum} bots created`)
         }
         log.info(response)
         if ('body' in response && 'data' in response.body) {
@@ -386,7 +395,7 @@ export class TrxLayout extends React.Component {
                 let createResult = Math.abs(numDiff) === data.body.data.length
 
                 if (!createResult) {
-                    log.info('Problem creating the requested number of bots')
+                    this.logInfo('Problem creating the requested number of bots')
                 }
                 // Update state
                 this.onBotsCreate(currentBotNumber)
@@ -408,7 +417,7 @@ export class TrxLayout extends React.Component {
             type: 'bots:close'
         }
         if (sendMessage(container, data)) {
-            log.info('Close bot connections requested')
+            this.logInfo('Close bot connections requested')
         }
     }
 
@@ -438,7 +447,7 @@ export class TrxLayout extends React.Component {
             // State needs to reflect that this bot is ready to analyze
             bot.dataReady = true
             this.setState({dataReady: true})
-            this.consoleOut(`${bot.id} has loaded market data`)
+            this.logInfo(`${bot.id} has loaded market data`)
         }
     }
 
@@ -462,7 +471,7 @@ export class TrxLayout extends React.Component {
         }
 
         if (sendMessage(bot, data)) {
-            this.consoleOut(`Bot ${bot.number} (${bot.id}) has analyzed market data`)
+            this.logInfo(`Bot ${bot.number} (${bot.id}) has analyzed market data`)
         }
     }
 
@@ -481,9 +490,7 @@ export class TrxLayout extends React.Component {
         }
 
         if (sendMessage(container, data)) {
-            const msg = `Bot ${selectedBot.number} (${selectedBot.id}) is conducting a pattern search`
-            this.consoleOut(msg)
-            log.info(msg)
+            this.logInfo(`Bot ${selectedBot.number} (${selectedBot.id}) is conducting a pattern search`)
         }
     }
 
@@ -497,9 +504,7 @@ export class TrxLayout extends React.Component {
             type: 'fetch:balance'
         }
         if (sendMessage(bot, data)) {
-            const msg = `Bot ${bot.number} (${bot.id}) is attempting to fetch balance`
-            this.consoleOut(msg)
-            log.info(msg, bot.analysisBot.recipient)
+            this.logInfo(`Bot ${bot.number} (${bot.id}) is attempting to fetch balance`)
         }
     }
 
@@ -512,23 +517,30 @@ export class TrxLayout extends React.Component {
                     bot.analysisBot.trade(false, true)
                 } else {
                     const recipient = botConnections[findRandomBotIndex()]
-                    bot.analysisBot.trade(recipient, true)
-                    sendMessage(bot, {type: ''})
+                    // bot.analysisBot.trade(recipient, true)
+                    if ('users' in recipient && recipient.users.length > 0) {
+
+                    }
+                    sendMessage(bot, {
+                        type: 'transaction:test:create',
+                        data: {
+                            uid: bot.users[0].uid,
+                            rid: recipient.users[0].uid,
+                            amount: 10000
+                    }})
                 }
             }
         }
     }
 
     loginBot = async () => {
-        const bot = botConnections[this.state.selectedBot]
+        const bot = getSelectedBot(this.state)
         const data = {
             data: { bot_id: bot.id},
             type: 'bot:login'
         }
         if (sendMessage(bot, data)) {
-            const msg = `Bot ${selectedBot.number} (${selectedBot.id}) is attempting a login`
-            this.consoleOut(msg)
-            log.info(msg)
+            this.logInfo(`Bot ${bot.number} (${bot.id}) is attempting a login`)
         }
     }
 
@@ -540,7 +552,6 @@ export class TrxLayout extends React.Component {
      * @param message
      */
     msgHandler = ({...message}) => {
-        console.log('Making the msgHandler visible')
         if ('type' in message) {
             log.info(`WS Data Event Type`, message.type)
         }
@@ -562,9 +573,9 @@ export class TrxLayout extends React.Component {
                                 users: []
                             }))
                             this.onBotsCreate(botConnections.length)
-                            log.info('Bot connections updated')
+                            this.logInfo('Bot connections updated')
                         } else {
-                            log.info('No bots available')
+                            this.logInfo('No bots available')
                             botConnections.map(bot => bot.ws.close())
                             botConnections.splice(0, botConnections.length)
                         }
@@ -576,13 +587,14 @@ export class TrxLayout extends React.Component {
                 // request, thus all bot connections should be closed
                     botConnections.map(bot => bot.ws.close())
                     botConnections.splice(0, botConnections.length)
+                    // TODO: find out why this isn't working - back end issue?
                     this.consoleOut('Bots killed (0 connections)')
                     break
                 case 'addfile':
                 // A new visualization file is ready to be used. Update the UI to make it accessible
                     if ('filename' in data) {
                         this.updateFileList(data.filename)
-                        log.info('Updating file list')
+                        this.logInfo('Updating file list')
                         delete data.filename
                     }
                     break
@@ -601,16 +613,40 @@ export class TrxLayout extends React.Component {
                     break
                 case 'bot:login:result':
                     log.info('Bot login result', data)
+                    if ('error' in data) {
+                    // TODO: better error handling
+                    } else {
+                        const id = data['bot_id']
+                        const bot = getBotById(this.state, id)
+                        if (bot) {
+                            if ('analysisBot' in bot) {
+                                // TODO: handle this
+                            }
+
+                            if (this.updateBotUser(data, id)) {
+                                log.debug('User added to bot with id', id)
+                            }
+                        }
+                    }
                     break
                 case 'account:balance:update':
                     log.info('Fetch balance result', data)
                     if ('balance' in data) {
                         if (this.updateBotUser(data)) {
-                            const logMsg = `Updated user ${data.uid} (Balance: ${data.balance}) for bot ${getSelectedBot(this.state).id}`
-                            log.info(logMsg)
-                            this.consoleOut(logMsg)
+                            this.logInfo(`Updated user ${data.uid} (Balance: ${data.balance}) for bot ${getSelectedBot(this.state).id}`)
                         }
                     }
+                    break
+                case 'transaction:test:result':
+                    log.info('Transaction test result', data)
+                    if (data.result) {
+                        const result = this.updateUserBalance(data.sender, data.recipient, data.amount)
+                        if (result) {
+                            this.logInfo(`Successful transaction of ${data.amount} satoshis between ${result.sender.name} and ${result.recipient.name}`)
+                        }
+                    }
+                default:
+                    log.info('Unhandled Websocket message received', data)
                     break
             }
         }
@@ -619,6 +655,34 @@ export class TrxLayout extends React.Component {
             log.info(error)
         }
         log.info(`Remaining data to be handled`, message)
+    }
+
+    /**
+     * Helper function to update user balances after successful completion of a transaction
+     *
+     * @param {Array} users
+     * @param {string|number} amount
+     * @param {string|number} sid
+     * @param {string|number} rid
+     */
+    updateUserBalance (sid, rid, amount) {
+        try {
+            const recipient = getBotWithUser(this.state, rid)
+            const sender = getBotWithUser(this.state, sid)
+            recipient.user.balance = recipient.user.balance + amount
+            sender.user.balance = sender.user.balance - amount - 1000
+            return {
+                recipient: {
+                    ...recipient.user
+                },
+                sender: {
+                    ...sender.user
+                }
+            }
+        } catch (err) {
+            console.error(err)
+            return false
+        }
     }
 
     /**
@@ -659,9 +723,15 @@ export class TrxLayout extends React.Component {
      * Update user data for the selected bot
      * @param {Object} data
      */
-    updateBotUser (data) {
+    updateBotUser (data, id = undefined) {
         try {
-            const bot = getSelectedBot(this.state)
+            let bot
+            if (!id) {
+                bot = getSelectedBot(this.state)
+            } else {
+                bot = getBotById(this.state, id)
+            }
+
             let update = false
             bot.users = bot.users.map( user => {
                 if (user.uid === data.uid) {
@@ -754,6 +824,12 @@ export class TrxLayout extends React.Component {
                     primary={false}
                     icon={<AutoRenew />}
                 />
+                <FlatButton
+                    label="Login"
+                    labelPosition="before"
+                    onClick={this.loginBot}
+                    primary={false}
+                />
                 <RaisedButton
                     label="Analyze"
                     labelPosition="before"
@@ -832,7 +908,7 @@ export class TrxLayout extends React.Component {
         const dataReady = value !== -1 ? botConnections[value].dataReady : allDataReady()
         this.setState({selectedBot: value})
         this.setState({dataReady: dataReady})
-        this.consoleOut(`Bot ${value + 1} selected`)
+        this.logInfo(`Bot ${value + 1} selected`)
     }
 
     /**
@@ -845,7 +921,7 @@ export class TrxLayout extends React.Component {
      */
     handleMarketSelect = (event, value) => {
         this.setState({market: value})
-        this.consoleOut(`Market set to ${value}`)
+        this.logInfo(`Market set to ${value}`)
     }
 
     /**
@@ -971,4 +1047,35 @@ function getRandomInt (num) {
  */
 function getSelectedBot (state) {
     return botConnections[state.selectedBot]
+}
+
+/**
+ * Helper function to return bot by id
+ *
+ * @param {Object} state
+ * @param {string} id
+ */
+function getBotById (state, id) {
+    if (Array.isArray(botConnections) && botConnections.length > 1) {
+        return botConnections.find( connection => connection.id === id)
+    }
+}
+
+/**
+ * getBotWithUser
+ *
+ * @param {Object} state
+ * @param {string|number} uid
+ */
+function getBotWithUser (state, uid) {
+    let matchedBot, matchedUser
+    for (let bot of botConnections) {
+        const user = bot.users.find ( user => user.uid === uid)
+        if (user) {
+            matchedBot = bot
+            matchedUser = user
+            break
+        }
+    }
+    return { bot: matchedBot, user: matchedUser }
 }

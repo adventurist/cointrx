@@ -38,8 +38,9 @@ router.post('/transaction', (req, res, next) => {
     });
 });
 router.post('/key/from-wif', (req, res, next) => {
-    console.dir(req.body);
-    const wif = JSON.parse(req.body);
+    console.log(req.body);
+    const body = JSON.parse(Object.keys(req.body)[0]);
+    const wif = body.wif;
     if (wif) {
         res.json({ result: keytool_1.convertWifToPrivate({ wif: wif, multi: false }) });
     }
