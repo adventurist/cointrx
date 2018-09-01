@@ -135,7 +135,6 @@ class RegTest:
                 return sum(x['value'] for x in unspent_tx)
             return 0
 
-
     @staticmethod
     async def get_info():
         interface = 'bitcoin-cli'

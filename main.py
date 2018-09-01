@@ -646,7 +646,7 @@ class RegTestAllUsers(RequestHandler):
         userbalance_url = trx_urls['userbalance_url']
         user_data = await db.regtest_all_user_data()
         blockchain_info = await db.regtest_block_info()
-        currencies = db.latest_prices_async()
+
         self.render("templates/tx-test.html", title="Test TX Interface", data=user_data,
                     blockchain_info=blockchain_info, tx_url=tx_url, blockgen_url=blockgen_url,
                     userbalance_url=userbalance_url)
@@ -679,7 +679,7 @@ class RegTestBlockGenerateHandler(RequestHandler):
         self.write(RegTest.create_new_block())
 
 
-class RegTestUserBalanceHandler(RequestHandler):
+class RegTestUserTotalBalanceHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
@@ -1239,6 +1239,41 @@ class RegTestClearKeysHandler(RequestHandler):
         self.write(json.dumps(await db.regtest_users_clear_keys()))
 
 
+class RegTestTotalBalanceHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        self.write(json.dumps({'balance': await(db.regtest_total_balance())}))
+
+
+class RegTestBalanceByUserHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        self.write(json.dumps({'users': await db.regtest_balance_by_user()}))
+
+
+class RegTestActiveBalanceByUserHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        self.write(json.dumps({'users': await db.regtest_active_balance_by_user()}))
+
+
+class RegtestUserBalanceHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        match_pattern = escape.url_unescape(self.request.path.split('/api/user/')[1]).split('/balance/regtest')[0]
+        self.write(json.dumps({'users': await db.regtest_user_balance_by_key(match_pattern)}))
+
+
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -1269,10 +1304,13 @@ class TRXApplication(Application):
             (r"/regtest/key/pay", RegTestPayKeyHandler),
             (r"/regtest/key/clear-all", RegTestClearKeysHandler),
             (r"/regtest/key/retire", RegTestKillKeyHandler),
-            (r"/regtest/user-balance", RegTestUserBalanceHandler),
+            (r"/regtest/user-balance", RegTestUserTotalBalanceHandler),
             (r"/regtest/tx-history", RegTestTxHistory),
             (r"/regtest/generate/block", RegTestBlockGenerateHandler),
             (r"/regtest/address/provision-all", RegTestAddressAllHandler),
+            (r"/regtest/balance/total", RegTestTotalBalanceHandler),
+            (r"/regtest/balance/user", RegTestBalanceByUserHandler),
+            (r"/regtest/balance/user/active", RegTestActiveBalanceByUserHandler),
             (r"/keys/btc/regtest/generate", RegTestUserKeyGenerateHandler),
 
             # Regression Mock Chain
@@ -1304,6 +1342,7 @@ class TRXApplication(Application):
             (r"/api/user/[0-9][0-9][0-9][0-9]", UserUpdateHandler),
             # (r"/api/user/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$", UserHandler),
             (r"/api/user/(?=.{4,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._@%]+(?<![_.])", UserHandler),
+            (r"/api/user/(.*)/balance/regtest", RegtestUserBalanceHandler),
             (r"/api/account/balance", UserBalanceHandler),
 
             # KEYS

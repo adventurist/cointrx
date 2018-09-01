@@ -17708,7 +17708,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                                     if (botConnections.length === 1) {
                                         bot.analysisBot.trade(false, true);
                                     } else {
-                                        recipient = botConnections[findRandomBotIndex()];
+                                        recipient = botConnections[findRandomBotIndex(_this2.state.selectedBot)];
                                         // bot.analysisBot.trade(recipient, true)
 
                                         if ('users' in recipient && recipient.users.length > 0) {}
@@ -17717,7 +17717,7 @@ var TrxLayout = exports.TrxLayout = function (_React$Component2) {
                                             data: {
                                                 uid: bot.users[0].uid,
                                                 rid: recipient.users[0].uid,
-                                                amount: 10000
+                                                amount: 1000000
                                             } });
                                     }
                                 }
@@ -18507,12 +18507,14 @@ function findPatternName(data) {
  *
  * Find the index for a random bot which is NOT currently selected
  *
- * @returns {Number} returns an Integer representing the index of a bot
+ * @returns {Number} returns an Intege6r representing the index of a bot
  */
 function findRandomBotIndex() {
+    var cursor = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
     var num = botConnections.length;
     var randomNumber = num;
-    while (randomNumber === num) {
+    while (randomNumber === num || randomNumber === cursor) {
         randomNumber = getRandomInt(num);
     }
     return randomNumber;

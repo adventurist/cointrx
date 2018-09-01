@@ -1226,3 +1226,44 @@ def trx_block_not_pending():
 def trx_block_is_pending():
     trx_state = session.query(TRX).one()
     return trx_state.pending
+
+
+async def regtest_total_balance():
+    key_objects = session.query(TrxKey).filter(TrxKey.status == true()).group_by(TrxKey.id).order_by(
+        func.max(TrxKey.id).desc()).all()
+    keys = [x.value for x in key_objects]
+    balance = await btcd_utils.RegTest.get_user_balance(key_objects)
+    return balance
+
+
+async def regtest_balance_by_user():
+    data = []
+    users = session.query(User).group_by(User.id).order_by(func.max(User.id).desc()).all()
+    for user in users:
+        user_data = {'name': user.name, 'id': user.id, 'keys': []}
+        for key in user.trxkey:
+            user_data['keys'].append({'id': key.id, 'value': key.value, 'balance': await btcd_utils.RegTest.get_user_balance([key])})
+        data.append(user_data)
+    return data
+
+
+async def regtest_active_balance_by_user():
+    data = []
+    users = session.query(User).group_by(User.id).order_by(func.max(User.id).desc()).all()
+    for user in users:
+        user_data = {'name': user.name, 'id': user.id, 'keys': []}
+        for key in user.trxkey:
+            balance = await btcd_utils.RegTest.get_user_balance([key])
+            if balance > 0:
+                user_data['keys'].append({'id': key.id, 'value': key.value, 'balance': balance})
+        data.append(user_data)
+    return data
+
+
+async def regtest_user_balance_by_key(name):
+    user = session.query(User).filter(User.name == name).group_by(User.id).order_by(func.max(User.id).desc()).one_or_none()
+    if user:
+        user_data = {'name': user.name, 'id': user.id, 'keys': []}
+        for key in user.trxkey:
+            user_data['keys'].append({'id': key.id, 'value': key.value, 'balance': await btcd_utils.RegTest.get_user_balance([key])})
+        return user_data
