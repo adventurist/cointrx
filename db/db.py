@@ -24,6 +24,7 @@ import re
 import time
 import datetime
 import json
+import logging
 
 Base = declarative_base()
 metadata = MetaData()
@@ -35,7 +36,12 @@ session = Session()
 trxapp = SimpleNamespace()
 trxapp.config = {'SECRET_KEY': "jigga does as jigga does"}
 
-
+logger = logging.getLogger('DB')
+logger.setLevel(logging.DEBUG)
+log_handler = logging.FileHandler('db.log')
+logger_formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+log_handler.setFormatter(logger_formatter)
+logger.addHandler(log_handler)
 # metadata.create_all(bind=engine)
 
 
@@ -50,7 +56,6 @@ class TrxKey(Base):
     multi = Column(Boolean)
     status = Column(Boolean)
 
-
     def serialize(self):
         return {
             'id': self.id,
@@ -63,6 +68,14 @@ class TrxKey(Base):
 class TRX(Base):
     __tablename__ = 'trx'
     pending = Column(Boolean, default=False, primary_key=True)
+
+
+class TxQueue(Base):
+    __tablename__ = 'tx_queue'
+    sender = Column(Integer, ForeignKey('users.id'))
+    recipient = Column(Integer, ForeignKey('users.id'))
+    amount = Column(Decimal(12, 2))
+    complete = Column(Boolean, server_default=False)
 
 
 class SKey(Base):
@@ -117,6 +130,7 @@ class User(Base):
     trxkey = relationship("TrxKey", backref='user', uselist=True, order_by='TrxKey.status')
     utc_offset = Column(Integer)
     level = Column(Integer, nullable=False, server_default='0')
+    balance = Column(DECIMAL(12, 2), server_default='0.00')
     CheckConstraint('level BETWEEN 0 and 4')
 
     # TODO
@@ -995,7 +1009,8 @@ async def regtest_user_data(uid: str):
             key['address'] = btcd_utils.wif_to_address(key.pop('value'))
             key['label'] = key['label'].text if key['label'] is not None else 'Unnamed'
 
-        data['estimated'] = await regtest_user_estimated_value(uid)
+        data['estimated'] = await regtest_user_estimated_value(uid, data['balance'])
+        await update_user_balance(user, data['balance'])
 
         user_data.append(data)
     return user_data
@@ -1016,6 +1031,8 @@ async def regtest_pay_user(uid: str, amount: str):
 
     if address is not None:
         user_pay_result = await btcd_utils.RegTest.give_user_balance(address, int(amount))
+        if user_pay_result is not None:
+            await trx_block_pending()
         return user_pay_result
 
 
@@ -1054,13 +1071,26 @@ async def regtest_pay_users(amount: str):
     return additions_to_ledger
 
 
-
 async def regtest_user_balance(uid: str):
     user = session.query(User).filter(User.id == int(uid), User.status == 1).one_or_none()
     if user is not None:
-        balance = await btcd_utils.RegTest.get_user_balance(user.trxkey)
-        return sum(balance) if isinstance(balance, list) else balance
+        balance_data = await btcd_utils.RegTest.get_user_balance(user.trxkey)
+        balance = sum(balance_data) if isinstance(balance_data, list) else balance_data
+        user.balance = balance
+        await update_user_balance(user, balance)
+        return balance
 
+
+async def update_user_balance(user: User, balance: any):
+    user.balance = balance
+    try:
+        session.add(user)
+        session.commit()
+        session.flush()
+        return True
+    except exc.SQLAlchemyError as err:
+        logger.debug('Error updating user balance for user %s' % user.name + ': \n' + json.dumps(err))
+        return False
 
 async def regtest_block_info():
     block_info = json.loads(await btcd_utils.RegTest.get_info())
@@ -1068,12 +1098,12 @@ async def regtest_block_info():
     return json.dumps({'info': block_info, 'unspent': unspent_transactions}, indent=4, sort_keys=True)
 
 
-async def regtest_user_estimated_value(uid: str):
+async def regtest_user_estimated_value(uid: str, balance: any=None):
     user = await get_user(uid)
     if user and user.trxkey is not None:
         price = await latest_price_data(DEFAULT_LANGUAGE)
         if price and price.last is not None:
-            satoshis = Decimal(await btcd_utils.RegTest.get_user_balance(user.trxkey))
+            satoshis = Decimal(await btcd_utils.RegTest.get_user_balance(user.trxkey)) if balance is None else Decimal(balance)
             estimated_value = satoshis / COIN * price.last
             return str(estimated_value.quantize(Decimal(".01"), rounding=ROUND_HALF_UP))
 
@@ -1098,8 +1128,14 @@ async def wif_to_address(wif):
 
         return address if address is not None else -1
 
+
 async def get_user(uid: str):
     user = session.query(User).filter(User.id == int(uid)).one_or_none()
+    return user if user is not None else False
+
+
+async def get_user_by_name(name: str):
+    user = session.query(User).filter(User.name == name).one_or_none()
     return user if user is not None else False
 
 
@@ -1231,7 +1267,6 @@ def trx_block_is_pending():
 async def regtest_total_balance():
     key_objects = session.query(TrxKey).filter(TrxKey.status == true()).group_by(TrxKey.id).order_by(
         func.max(TrxKey.id).desc()).all()
-    keys = [x.value for x in key_objects]
     balance = await btcd_utils.RegTest.get_user_balance(key_objects)
     return balance
 
@@ -1267,3 +1302,45 @@ async def regtest_user_balance_by_key(name):
         for key in user.trxkey:
             user_data['keys'].append({'id': key.id, 'value': key.value, 'balance': await btcd_utils.RegTest.get_user_balance([key])})
         return user_data
+
+
+async def trx_pay_user(uid, amount_to_send):
+    """
+    :param uid:
+    :param amount:
+    :return:
+    """
+    from utils.tx.trx__tx_out import Transaction
+    from bitcoin.core import COIN
+    key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).group_by(TrxKey.id).order_by(
+        func.max(TrxKey.id).desc()).limit(1).one_or_none()
+    if key is not None:
+        address = btcd_utils.wif_to_address(key.value)
+    else:
+        address = await regtest_make_user_address(int(uid))
+
+    if address is not None:
+        amount = amount_to_send if not is_dust_amount(amount_to_send) else COIN * int(amount_to_send)
+        coinmaster = await get_user(16)
+        print(str(coinmaster.name))
+        coinmaster_key = [x for x in coinmaster.trxkey if x.status][0]
+        coinmaster_address = btcd_utils.wif_to_address(coinmaster_key.value)
+
+        pay_object = {
+            'amount': int(round(int(amount))),
+            'sender': {
+                'address': coinmaster_address,
+                'key': coinmaster_key.value
+            },
+            'recipient': address}
+
+        transaction_result = await Transaction.request_transaction(pay_object)
+        if transaction_result:
+            await trx_block_pending()
+            return True
+        else:
+            return False
+
+
+def is_dust_amount(amount):
+    return len(str(amount)) == 1
