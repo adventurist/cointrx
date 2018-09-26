@@ -48,12 +48,13 @@ import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../util
 import Bot from '../utils/bot'
 import log from 'loglevel'
 
-// import trx from '../redux'
+import trx from '../redux'
 
-// const trxState = trx()
+const trxState = trx()
 // console.log(trxState)
 // The urls provided by the back end
 const urls = JSON.parse(botUrls.replace(/'/g, '"'))
+log.setLevel('debug')
 
 // All stylesheet values
 const styles = {
@@ -508,6 +509,25 @@ export class TrxLayout extends React.Component {
         }
     }
 
+    /**
+     * prepareBot
+     *
+     * Helper function to prepare the selected bot for trading
+     */
+    prepareBot = async () => {
+        this.loadMarketData()
+        this.loginBot()
+
+        setTimeout( () => {
+            this.findPatterns()
+        }, 1000)
+
+        setTimeout( () => this.fetchBalance(), 500)
+    }
+
+    /**
+     * Perform a trade between the currently selected bot and a random bot also currently in the state
+     */
     performTrade = async () => {
         const bot = getSelectedBot(this.state)
         if ('analysisBot' in bot && bot.analysisBot.isReady()) {
@@ -834,6 +854,13 @@ export class TrxLayout extends React.Component {
                     label="Analyze"
                     labelPosition="before"
                     onClick={this.analyzeMarketData}
+                    primary={false}
+                    icon={<PlayCircle />}
+                />
+                <RaisedButton
+                    label="Prepare Bots"
+                    labelPosition="before"
+                    onClick={this.prepareBot}
                     primary={false}
                     icon={<PlayCircle />}
                 />

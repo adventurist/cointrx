@@ -2,6 +2,7 @@ import { combineReducers, createStore, applyMiddleware } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { memoize, mergeWith } from 'lodash/fp'
 import log from 'loglevel'
+import createSagaMiddleware from 'redux-saga'
 
 const ERR_NO_STORE = 'Unable to access store in factory'
 
@@ -66,9 +67,9 @@ export function factory(plugins) {
         }
 
     })
-
+    const sagaMiddleware = createSagaMiddleware()
     store = createStore(combineReducers(reducers),
-        composeWithDevTools(applyMiddleware(...middlewares)))
+        composeWithDevTools(applyMiddleware(sagaMiddleware, ...middlewares)))
 
     var selectState = (trxState) => {
         var exposedState = {}

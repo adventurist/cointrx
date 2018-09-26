@@ -119,7 +119,6 @@ export function requestWs(options, msgHandler = undefined) {
      * @param {string} [message.data] Additional data in the message
      */
     ws.onmessage = (message) => {
-        console.log(message)
         if ('data' in message && isJson(message.data)) {
             const data = JSON.parse(message.data)
             if ('keepAlive' in data) {
@@ -139,7 +138,6 @@ export function requestWs(options, msgHandler = undefined) {
                 msgHandler(data)
             }
         }
-
     }
     return ws
 }
@@ -181,12 +179,6 @@ function paramsToQuery (params) {
     }
     return false
 }
-
-// async function wsReady(ws) => {
-//     setTimeout( () => {
-//         // if (ws.)
-//     })
-// }
 
 /**
  *

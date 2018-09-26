@@ -17,4 +17,5 @@ reducers[actionTypes.FETCH_USERS] = {
 }
 
 const reducer = handleActions(reducers, {users: {}})
+
 export default reducer
