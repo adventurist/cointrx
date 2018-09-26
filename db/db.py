@@ -44,6 +44,7 @@ log_handler.setFormatter(logger_formatter)
 logger.addHandler(log_handler)
 # metadata.create_all(bind=engine)
 
+COINMASTER_USER_ID = 16
 
 class TrxKey(Base):
     __tablename__ = 'trxkey'
@@ -72,10 +73,11 @@ class TRX(Base):
 
 class TxQueue(Base):
     __tablename__ = 'tx_queue'
+    id = Column(Integer, primary_key=True, autoincrement=True)
     sender = Column(Integer, ForeignKey('users.id'))
     recipient = Column(Integer, ForeignKey('users.id'))
-    amount = Column(Decimal(12, 2))
-    complete = Column(Boolean, server_default=False)
+    amount = Column(DECIMAL(12, 2))
+    complete = Column(Boolean, server_default='false')
 
 
 class SKey(Base):
@@ -566,7 +568,7 @@ async def latest_price_history_async(currency: str):
 
 
 def get_users():
-    result = session.query(User).all()
+    result = session.query(User).filter(User.id != COINMASTER_USER_ID).all()
     data = {}
     for r in result:
         if isinstance(r, User):
@@ -1092,6 +1094,7 @@ async def update_user_balance(user: User, balance: any):
         logger.debug('Error updating user balance for user %s' % user.name + ': \n' + json.dumps(err))
         return False
 
+
 async def regtest_block_info():
     block_info = json.loads(await btcd_utils.RegTest.get_info())
     unspent_transactions = json.loads(await btcd_utils.RegTest.list_unspent())
@@ -1304,14 +1307,44 @@ async def regtest_user_balance_by_key(name):
         return user_data
 
 
+async def trx_pay_users(amount_to_send):
+    from utils.tx.trx__tx_out import Transaction
+    failed_transactions = []
+    amount = amount_to_send if not is_dust_amount(amount_to_send) else COIN * int(amount_to_send)
+    coinmaster = await get_user(COINMASTER_USER_ID)
+    coinmaster_key = [x for x in coinmaster.trxkey if x.status][0]
+    coinmaster_address = btcd_utils.wif_to_address(coinmaster_key.value)
+    for user in get_users():
+        keys_test = [x.id for x in user.trxkey if x.status == True]
+        keys = sorted([x for x in user.trxkey if x.status], key=lambda y: y.id, reverse=True)
+        if keys is not None and len(keys) > 0:
+            key = keys[0]
+            address = btcd_utils.wif_to_address(key.value)
+
+            if address is not None:
+                pay_object = {
+                    'amount': int(round(int(amount))),
+                    'sender': {
+                        'address': coinmaster_address,
+                        'key': coinmaster_key.value
+                    },
+                    'recipient': address}
+
+                transaction_result = await Transaction.request_transaction(pay_object)
+                if transaction_result:
+                    await trx_block_pending()
+                else:
+                    failed_transactions.append(user.id)
+    return failed_transactions
+
+
 async def trx_pay_user(uid, amount_to_send):
+    from utils.tx.trx__tx_out import Transaction
     """
     :param uid:
     :param amount:
     :return:
     """
-    from utils.tx.trx__tx_out import Transaction
-    from bitcoin.core import COIN
     key = session.query(TrxKey).filter(TrxKey.uid == int(uid), TrxKey.status == true()).group_by(TrxKey.id).order_by(
         func.max(TrxKey.id).desc()).limit(1).one_or_none()
     if key is not None:
