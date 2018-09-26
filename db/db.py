@@ -1294,7 +1294,8 @@ async def regtest_active_balance_by_user():
             balance = await btcd_utils.RegTest.get_user_balance([key])
             if balance > 0:
                 user_data['keys'].append({'id': key.id, 'value': key.value, 'balance': balance})
-        data.append(user_data)
+        if len(user_data['keys']) > 0:
+            data.append(user_data)
     return data
 
 
