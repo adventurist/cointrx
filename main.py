@@ -10,7 +10,6 @@ import json
 import os
 import random
 import warnings
-import time
 
 from graphql.error import GraphQLError
 from graphql.error import format_error as format_graphql_error
@@ -28,13 +27,13 @@ from config import config as TRXConfig
 from db import db
 from utils.loop_handler import IOHandler
 from utils.tx import trx__tx_out
+from utils.tx.queue import Queue, TRXTransaction
 from utils import drupal_utils, session, trc_utils, eth_utils
 from utils.cointrx_client import Client
 from utils.mail_helper import Sender as mail_sender
 
 from utils.login_helpers import retrieve_api_request_headers, retrieve_json_login_headers, \
-    retrieve_json_login_credentials, check_basic_auth, create_user_session_data, \
-    retrieve_login_credentials
+    retrieve_json_login_credentials, create_user_session_data, retrieve_login_credentials
 
 io_handler = IOHandler()
 http_client = Client()
@@ -218,7 +217,8 @@ class LoginHandler(RequestHandler):
 
                     return self.write(escape.json_encode(
                         {'statuscode': 200, 'token': str(application.session.user['csrf'], 'utf-8'),
-                         'trx_cookie': str(self.get_secure_cookie('trx_cookie')), 'uid': user_verify.id, 'name': user_verify.name}))
+                         'trx_cookie': str(self.get_secure_cookie('trx_cookie')), 'uid': user_verify.id,
+                         'name': user_verify.name}))
 
             elif user_verify < -1:
                 self.set_status(404)
@@ -711,6 +711,7 @@ class TransactionTestHandler(RequestHandler):
                     await db.trx_block_pending()
                     self.write('Success')
                 else:
+                    application.queue.enqueue(TRXTransaction(sid, rid, amount))
                     self.set_status(400)
 
     @staticmethod
@@ -720,7 +721,7 @@ class TransactionTestHandler(RequestHandler):
         for key in sender.trxkey:
             if key.status:
                 sender_keys.append({'address': wif_to_address(key.value), 'key': key.value})
-        
+
         if len(sender_keys) > 0:
             data = {
                 'sender': {
@@ -789,7 +790,6 @@ class UserProfileHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        cookie = self.get_secure_cookie("trx_cookie")
         if check_attribute(application.session, 'user'):
             user_data, prices = await retrieve_user_data()
             tx_url, blockgen_url, userbalance_url, btckeygen_url = retrieve_user_urls()
@@ -835,13 +835,6 @@ class KeyWTPHandler(RequestHandler):
         wif = self.get_argument('wif')
         if wif is not None:
             self.write(wif_to_address(wif))
-            # response = await http_client.connect(
-            #     TRXConfig.get_urls(application.settings['env']['TRX_ENV'])['wif_to_private_url'],
-            #     escape.json.dumps({'wif': wif}))
-            # if response:
-            #     print(response)
-            #     data = escape.json_decode(response.body.decode())
-            #     self.write(data)
 
 
 class RegTestUserKeyGenerateHandler(RequestHandler):
@@ -852,7 +845,7 @@ class RegTestUserKeyGenerateHandler(RequestHandler):
         found_cookie = self.get_secure_cookie("trx_cookie")
 
         if found_cookie is not None and application.session.user is not None:
-            new_address = await db.regtest_make_user_address(application.session.user['id'])
+            await db.regtest_make_user_address(application.session.user['id'])
             user_data = await db.regtest_user_data(application.session.user['id'])
             self.write(escape.json_encode(user_data))
 
@@ -861,7 +854,7 @@ class RegTestUserKeyGenerateHandler(RequestHandler):
         if content_type == 'application/json':
             csrf = self.request.headers.get('csrf-token')
             if db.User.verify_auth_token(csrf):
-                new_address = await db.regtest_make_user_address(application.session.user['id'])
+                await db.regtest_make_user_address(application.session.user['id'])
                 user_data = await db.regtest_user_data(application.session.user['id'])
                 self.write(escape.json_encode(user_data))
             else:
@@ -973,7 +966,10 @@ class RegTestPayAllKeyHandler(RequestHandler):
 
     async def get(self, *args, **kwargs):
         keys_paid = await db.regtest_pay_keys('10')
-        self.write(json.dumps({'response': 200, 'error': False, 'message': 'Successfully paid 10 btc to %s addresses' % str(keys_paid)} if keys_paid > 0 else {'response': 400, 'error': True, 'message': 'Unable to pay any keys'}))
+        self.write(json.dumps({'response': 200, 'error': False,
+                               'message': 'Successfully paid 10 btc to %s addresses' % str(
+                                   keys_paid)} if keys_paid > 0 else {'response': 400, 'error': True,
+                                                                      'message': 'Unable to pay any keys'}))
 
 
 class BtcMinMaxHandler(RequestHandler):
@@ -1067,9 +1063,7 @@ class BotGuiHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        cookie = self.get_secure_cookie("trx_cookie")
         if check_attribute(application.session, 'user'):
-
             bot_gui_data = {}
             bot_gui_urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
 
@@ -1117,65 +1111,6 @@ class BotTrcPriceRetrieveHandler(RequestHandler):
         self.write(response_data)
 
 
-class BotWsTestHandler(WebSocketHandler):
-    def data_received(self, chunk):
-        pass
-
-    # def check_origin(self, origin):
-    #     return bool(re.match(r'^.*?\.cointrx\.com', origin))
-
-    async def on_message(self, message):
-        logger.debug('Message received: %s' % str(message))
-        if trc_utils.valid_json(message):
-            logger.debug('Valid JSON detected - Processing request')
-            parsed = json.loads(message)
-            result = await handle_ws_request(parsed['type'], parsed['data'])
-            logger.debug('WS Request: %s' % str(result))
-            response = json.dumps(result) if isinstance(result, dict) else str(result, 'utf-8')
-            # TODO Handle this internally and send a TRX response
-            self.write_message(response)
-
-        return_message = {'keepAlive': 1, 'message': 'Back at you, punk'}
-        self.write_message(json.dumps(return_message))
-
-    def open(self):
-        logger.debug('Connection opened: ' + str(self))
-        self.write_message('Connection opened')
-
-
-async def handle_ws_request(type, data):
-    """
-    Utility to handle requests sent through the websocket stream
-    :param type:
-    :param data:
-    :return dict:
-    """
-
-    async def analyze_market(url, data):
-        """
-        Request that bot with ID perform a technical analysis
-        """
-        request_result = await http_client.get('http://localhost:9977/bots/trc/analyze' + '?bot_id=%s' % data['bot_id'])
-        if hasattr(request_result, 'body'):
-            return {'action': 'addfile', 'payload': json.loads(str(request_result.body, 'utf-8'))}
-
-    async def fetch_bots(type, data):
-        """
-        Retrieve info on all active bots
-        """
-        request_result = await http_client.get('http://localhost:9977/bots/fetch')
-        if hasattr(request_result, 'body'):
-            return {'action': 'updatebots', 'payload': json.loads(str(request_result.body, 'utf-8'))}
-
-    switch = {
-        'request': analyze_market,
-        'bots:all': fetch_bots
-    }
-    func = switch.get(type, lambda: 'Invalid request type')
-    result = await func(type, data)
-    return result
-
-
 class UserHandler(RequestHandler):
     def data_received(self, chunk):
         pass
@@ -1200,7 +1135,8 @@ class RestGuiHandler(RequestHandler):
         pass
 
     def get(self, *args, **kwargs):
-        self.render("templates/rest-test-gui.html", title="REST Test GUI")
+        routes = application.get_routes()
+        self.render("templates/rest-test-gui.html", title="REST Test GUI", routes=routes)
 
 
 class UserBalanceHandler(RequestHandler):
@@ -1214,21 +1150,6 @@ class UserBalanceHandler(RequestHandler):
         response_body = {'response': response_code, 'uid': uid, 'balance': balance} if response_code == 200 else {
             'response': response_code, 'error': 'Unable to retrieve user balance'}
         self.write(json.dumps(response_body))
-
-    # async def get(self, *args, **kwargs):
-    #     answer = 'what the fuck'
-    #     self.write(answer)
-    # args = self.request.arguments
-    # balance = 0
-    # print(args)
-    # if args.get('uid'):
-    #     uid = args.get('uid')
-    #     # balance = await db.regtest_user_balance(uid)
-    # for k, v in args.items():
-    #     print(k)
-    # self.set_status(200)
-    # # self.write(json.dumps({'response': 200, 'balance': balance, 'uid': uid}))
-    # self.write('this is a test')
 
 
 class RegTestClearKeysHandler(RequestHandler):
@@ -1272,11 +1193,45 @@ class RegtestUserBalanceHandler(RequestHandler):
         self.write(json.dumps({'users': await db.regtest_user_balance_by_key(match_pattern)}))
 
 
+class TrxRouteAllHandler(RequestHandler):
+    def data_received(self, chunk):
+        pass
+
+    async def get(self, *args, **kwargs):
+        routes = application.get_routes()
+        self.write(json.dumps(routes))
+
+
+def coinmaster():
+    return 16
+
+
+class TRXPayUser(RequestHandler):
+    async def get(self, *args, **kwargs):
+        amount = self.get_argument('amount')
+        name = self.request.path.split('/api/pay/user/')[1]
+        user = await db.get_user_by_name(name)
+
+        if user is not None and amount is not None:
+            user_pay_result = await db.trx_pay_user(user.id, amount)
+            if not user_pay_result:
+                self.application.queue.enqueue(TRXTransaction(coinmaster(), user.id, amount))
+            self.write(str(user_pay_result))
+
+
+class TRXPayAllUsers(RequestHandler):
+    async def get(self, *args, **kwargs):
+        amount = self.get_argument('amount')
+        pay_all_result = await db.trx_pay_users(amount)
+        if pay_all_result and len(pay_all_result) > 0:
+            for recipient in pay_all_result:
+                application.queue.enqueue(TRXTransaction(coinmaster(), recipient, amount))
 
 
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
+
         handlers = [
             # Home
             (r"/", MainHandler),
@@ -1297,6 +1252,8 @@ class TRXApplication(Application):
             (r"/ui/main", UiReactHandler),
 
             # Regression Testing
+
+            # Pay
             (r"/regtest/all-users", RegTestAllUsers),
             (r"/regtest/user/pay", RegTestPayUserHandler),
             (r"/regtest/user/pay-all", RegTestPayAllUserHandler),
@@ -1313,6 +1270,10 @@ class TRXApplication(Application):
             (r"/regtest/balance/user/active", RegTestActiveBalanceByUserHandler),
             (r"/keys/btc/regtest/generate", RegTestUserKeyGenerateHandler),
 
+            # Regression CoinTRX GW
+            (r"/api/pay/user/(.*)", TRXPayUser),
+            (r"/api/user/pay-all", TRXPayAllUsers),
+
             # Regression Mock Chain
             (r"/trc/price/update", TRCPriceUpdateHandler),
 
@@ -1325,12 +1286,12 @@ class TRXApplication(Application):
             (r"/analysis/analysis[0-9].html", StaticFileHandler),
             (r"/bot/start", BotStartHandler),
             (r"/bot/trc/prices/all", BotTrcPriceRetrieveHandler),
-            (r"/bot/ws-test", BotWsTestHandler),
 
             # REST API
 
             # - Testing
             (r"/api/test/rest-gui", RestGuiHandler),
+            (r"/api/route/all", TrxRouteAllHandler),
 
             # - Transactions
             (r"/transaction/request", TxRequestHandler),
@@ -1384,7 +1345,6 @@ class TRXApplication(Application):
             (r"/sites/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "sites")}),
             (r"/themes/(.*)", StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "themes")})
         ]
-
         settings = {
             "debug": True,
             "static_path": os.path.join(os.path.dirname(__file__), "static"),
@@ -1393,11 +1353,17 @@ class TRXApplication(Application):
             "env": None
         }
 
+        self.queue = Queue()
+
         Application.__init__(self, handlers, **settings)
 
     def create_session(self, user, csrf=0, dcsrf=0):
         self.session = session.Session(user=user, csrf=csrf, dcsrf=dcsrf)
         self.session.redirect_login = False
+
+    def get_routes(self):
+        return [{'path': x.matcher._path} for x in self.default_router.rules[0].target.rules if
+                x.matcher._path is not None]
 
 
 def env_setup():
@@ -1415,7 +1381,7 @@ def env_setup():
         stream=sys.stderr,
     )
 
-    static_path = os.path.join(os.path.dirname(__file__), "static")
+    os.path.join(os.path.dirname(__file__), "static")
 
 
 def login_redirect(handler: RequestHandler, origin: str):
@@ -1423,11 +1389,38 @@ def login_redirect(handler: RequestHandler, origin: str):
     handler.redirect('/login')
 
 
-def manage_blockchain():
+async def request_transaction(sid, rid, amount):
+    return await TransactionTestHandler.create_transaction(sid, rid, amount)
+
+
+async def handle_transaction_queue():
+    coinmaster_available = True
+    intra_user_pending = None
+    paused = False
+    while not paused and not application.queue.is_empty():
+        transaction = application.queue.dequeue()
+        if transaction is not None:
+            if transaction.sender == coinmaster() and coinmaster_available:
+                result = await db.trx_pay_user(transaction.recipient, transaction.amount)
+            elif not transaction.sender == coinmaster():
+                intra_user_pending = True
+                result = await request_transaction(transaction.sender, transaction.recipient, transaction.amount)
+                if result:
+                    intra_user_pending = False
+            if not result:
+                application.queue.enqueue(transaction)
+                if transaction.sender == coinmaster():
+                    coinmaster_available = False
+        if transaction == application.queue.tail.data and not intra_user_pending and not coinmaster_available:
+            paused = True
+
+
+async def manage_blockchain():
     if db.trx_block_is_pending():
         if RegTest.create_new_block():
             logger.info('New block added to blockchain')
             db.trx_block_not_pending()
+            await handle_transaction_queue()
 
 
 if __name__ == "__main__":
@@ -1450,7 +1443,6 @@ if __name__ == "__main__":
     application = TRXApplication()
     http_server = httpserver.HTTPServer(application)
     http_server.listen(6969)
-    # application.listen(6969)
 
     application.settings['env'] = TRXConfig.get_env_variables()
 
