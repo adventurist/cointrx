@@ -1228,6 +1228,14 @@ class TRXPayAllUsers(RequestHandler):
                 application.queue.enqueue(TRXTransaction(coinmaster(), recipient, amount))
 
 
+class AccountGuiHandler(RequestHandler):
+    pass
+
+    def get(self, *args, **kwargs):
+        # if self.request.headers.get("Content-Type") == 'text/html':
+        self.render("templates/account.html", title="TRX Accounts")
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -1250,6 +1258,9 @@ class TRXApplication(Application):
             # - Dev/Testing
             (r"/react/test", ReactTestHandler),
             (r"/ui/main", UiReactHandler),
+
+            # Accounts
+            (r"/admin/account", AccountGuiHandler),
 
             # Regression Testing
 
@@ -1390,7 +1401,7 @@ def login_redirect(handler: RequestHandler, origin: str):
 
 
 async def request_transaction(sid, rid, amount):
-    return await TransactionTestHandler.create_transaction(sid, rid, amount)
+    return await TransactionTestHandler.create_transaction(await db.get_user(sid), await db.get_user(rid), amount)
 
 
 async def handle_transaction_queue():
