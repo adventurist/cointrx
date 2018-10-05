@@ -933,8 +933,10 @@ export class TrxLayout extends React.Component {
      */
     handleBotSelect = (event, index, value) => {
         const dataReady = value !== -1 ? botConnections[value].dataReady : allDataReady()
-        this.setState({selectedBot: value})
-        this.setState({dataReady: dataReady})
+        this.setState({
+            selectedBot: value,
+            dataReady: dataReady
+        })
         this.logInfo(`Bot ${value + 1} selected`)
     }
 
