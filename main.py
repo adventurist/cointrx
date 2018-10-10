@@ -1066,9 +1066,10 @@ class BotGuiHandler(RequestHandler):
         if check_attribute(application.session, 'user'):
             bot_gui_data = {}
             bot_gui_urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
+            bot_urls_json = json.dumps({'urls': bot_gui_urls})
 
             self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
-            self.set_cookie(name="bot_urls", value=bot_gui_urls)
+            self.set_secure_cookie(name="bot_urls", value=bot_urls_json)
             self.render("templates/bot.html", title="TRX BOT GUI", bot_gui_urls=bot_gui_urls, bot_gui_data=bot_gui_data,
                         trx_env=application.settings['env']['TRX_ENV'])
         else:
@@ -1207,6 +1208,11 @@ def coinmaster():
     return 16
 
 
+class TRXActiveAccountHandler(RequestHandler):
+    async def get(self, *args, **kwargs):
+        self.write(json.dumps({'users': await db.regtest_balance_by_account()}))
+
+
 class TRXPayUser(RequestHandler):
     async def get(self, *args, **kwargs):
         amount = self.get_argument('amount')
@@ -1229,12 +1235,24 @@ class TRXPayAllUsers(RequestHandler):
                 application.queue.enqueue(TRXTransaction(coinmaster(), recipient, amount))
 
 
+
+
 class AccountGuiHandler(RequestHandler):
     pass
 
     def get(self, *args, **kwargs):
         # if self.request.headers.get("Content-Type") == 'text/html':
+        account_urls = TRXConfig.get_urls()
         self.render("templates/account.html", title="TRX Accounts")
+
+
+class TRXQueueHandler(RequestHandler):
+
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        self.write(json.dumps(application.get_queue()))
 
 
 class TRXApplication(Application):
@@ -1285,6 +1303,7 @@ class TRXApplication(Application):
             # Regression CoinTRX GW
             (r"/api/pay/user/(.*)", TRXPayUser),
             (r"/api/user/pay-all", TRXPayAllUsers),
+            (r"/api/account/active", TRXActiveAccountHandler),
 
             # Regression Mock Chain
             (r"/trc/price/update", TRCPriceUpdateHandler),
@@ -1342,6 +1361,7 @@ class TRXApplication(Application):
 
             # Private Utilities
             (r"/users/all", UserListHandler),
+            (r"/api/queue", TRXQueueHandler),
 
             # CRUFT
             (r"/jigga", WunderHandler),
@@ -1376,6 +1396,9 @@ class TRXApplication(Application):
     def get_routes(self):
         return [{'path': x.matcher._path} for x in self.default_router.rules[0].target.rules if
                 x.matcher._path is not None]
+
+    def get_queue(self):
+        return self.queue.get_all_nodes()
 
 
 def env_setup():
