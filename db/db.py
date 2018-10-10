@@ -1274,6 +1274,23 @@ async def regtest_total_balance():
     return balance
 
 
+async def regtest_balance_by_account():
+    account_data = []
+    keys = session.query(TrxKey).filter(TrxKey.status == true()).group_by(TrxKey.id).order_by(func.max(TrxKey.id).desc()).all()
+    for key in keys:
+        account_data.append({
+            'balance': await btcd_utils.RegTest.get_key_balance({'status': key.status, 'value': key.value}),
+            'user': {
+                'id': key.user.id,
+                'level': key.user.level,
+                'email': key.user.email,
+                'last_balance': str(key.user.balance),
+                'created': datetime.datetime.utcfromtimestamp(key.user.created).strftime('%Y-%m-%d %H:%M:%S')
+            }
+        })
+    return account_data
+
+
 async def regtest_balance_by_user():
     data = []
     users = session.query(User).group_by(User.id).order_by(func.max(User.id).desc()).all()
