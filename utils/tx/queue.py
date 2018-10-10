@@ -47,3 +47,16 @@ class Queue:
                 count += 1
                 iteratee = iteratee.next
         return count
+
+    def get_all_nodes(self):
+        if self.head is not None:
+            data = []
+            iteratee = self.head
+            data.append(iteratee.data.get_data())
+            while iteratee.next is not None and iteratee != iteratee.next:
+                iteratee = iteratee.next
+                data.append(iteratee.data.get_data())
+            return {
+                'count': len(data),
+                'nodes': data
+            }
