@@ -1208,9 +1208,14 @@ def coinmaster():
     return 16
 
 
-class TRXActiveAccountHandler(RequestHandler):
+class TRXAccountHandler(RequestHandler):
     async def get(self, *args, **kwargs):
-        self.write(json.dumps({'users': await db.regtest_balance_by_account()}))
+        self.write(json.dumps({
+            'accounts': await db.regtest_balance_by_account(
+                self.get_argument('active', False) == 'true'
+            ),
+            'code': 200
+        }))
 
 
 class TRXPayUser(RequestHandler):
@@ -1235,15 +1240,17 @@ class TRXPayAllUsers(RequestHandler):
                 application.queue.enqueue(TRXTransaction(coinmaster(), recipient, amount))
 
 
-
-
 class AccountGuiHandler(RequestHandler):
     pass
 
     def get(self, *args, **kwargs):
-        # if self.request.headers.get("Content-Type") == 'text/html':
-        account_urls = TRXConfig.get_urls()
-        self.render("templates/account.html", title="TRX Accounts")
+
+        if check_attribute(application.session, 'user'):
+            set_trx_cookie(self)
+            account_urls = TRXConfig.account_urls(application.get_env())
+            self.render("templates/account.html", title="TRX Accounts", account_urls=account_urls)
+        else:
+            login_redirect(self, '/admin/account')
 
 
 class TRXQueueHandler(RequestHandler):
@@ -1253,6 +1260,30 @@ class TRXQueueHandler(RequestHandler):
 
     def get(self, *args, **kwargs):
         self.write(json.dumps(application.get_queue()))
+
+
+class TRXKeyActivateHandler(RequestHandler):
+    async def get(self, *args, **kwargs):
+        key_id = self.get_argument('key_id', None)
+        if key_id:
+            self.write(json.dumps({
+                'code': 200 if await db.enable_key(key_id) else 400,
+                'kid': key_id
+            }))
+        else:
+            self.write(json.dumps({'code': 400, 'message': 'No key ID given'}))
+
+
+class TRXKeyDeactivateHandler(RequestHandler):
+    async def get(self, *args, **kwargs):
+        key_id = self.get_argument('key_id', None)
+        if key_id:
+            self.write(json.dumps({
+                'code': 200 if await db.disable_key(key_id) else 400,
+                'kid': key_id
+            }))
+        else:
+            self.write(json.dumps({'code': 400, 'message': 'No key ID given'}))
 
 
 class TRXApplication(Application):
@@ -1303,8 +1334,11 @@ class TRXApplication(Application):
             # Regression CoinTRX GW
             (r"/api/pay/user/(.*)", TRXPayUser),
             (r"/api/user/pay-all", TRXPayAllUsers),
-            (r"/api/account/active", TRXActiveAccountHandler),
+            (r"/api/account", TRXAccountHandler),
 
+            # Regression CoinTRX GW: Keys
+            (r"/api/key/activate", TRXKeyActivateHandler),
+            (r"/api/key/deactivate", TRXKeyDeactivateHandler),
             # Regression Mock Chain
             (r"/trc/price/update", TRCPriceUpdateHandler),
 
@@ -1397,6 +1431,9 @@ class TRXApplication(Application):
         return [{'path': x.matcher._path} for x in self.default_router.rules[0].target.rules if
                 x.matcher._path is not None]
 
+    def get_env(self):
+        return self.settings['env']
+
     def get_queue(self):
         return self.queue.get_all_nodes()
 
@@ -1456,6 +1493,10 @@ async def manage_blockchain():
             logger.info('New block added to blockchain')
             db.trx_block_not_pending()
             await handle_transaction_queue()
+
+
+def set_trx_cookie(handler: RequestHandler):
+    handler.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
 
 
 if __name__ == "__main__":
