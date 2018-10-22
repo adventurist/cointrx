@@ -110,9 +110,6 @@ class KeyLabel(Base):
     kid = Column(Integer, ForeignKey('trxkey.id'))
     trxkey = relationship("TrxKey", back_populates='label')
 
-    def text(self):
-        return self.text
-
 
 class TRCHistory(Base):
     __tablename__ = 'trc_history'
@@ -929,6 +926,25 @@ async def disable_key(kid: int) -> bool:
     return False
 
 
+async def enable_key(kid: int) -> bool:
+    key = session.query(TrxKey).filter(TrxKey.id == kid).one_or_none()
+    if key is not None:
+        key.status = true()
+        return await update_resource(key)
+
+
+async def update_resource(db_object: Base) -> bool:
+    try:
+        session.add(db_object)
+        session.commit()
+        session.flush()
+        return True
+    except exc.SQLAlchemyError as err:
+        logging.log('info', str(err))
+        print(err)
+        return False
+
+
 async def update_key(kid: int, label: str) -> dict:
     key = session.query(TrxKey).filter(TrxKey.id == kid).one_or_none()
     if key is not None:
@@ -1274,21 +1290,30 @@ async def regtest_total_balance():
     return balance
 
 
-async def regtest_balance_by_account():
+async def regtest_balance_by_account(active=False):
     account_data = []
-    keys = session.query(TrxKey).filter(TrxKey.status == true()).group_by(TrxKey.id).order_by(func.max(TrxKey.id).desc()).all()
-    for key in keys:
-        account_data.append({
-            'balance': await btcd_utils.RegTest.get_key_balance({'status': key.status, 'value': key.value}),
-            'user': {
-                'id': key.user.id,
-                'level': key.user.level,
-                'email': key.user.email,
-                'last_balance': str(key.user.balance),
-                'created': datetime.datetime.utcfromtimestamp(key.user.created).strftime('%Y-%m-%d %H:%M:%S')
-            }
-        })
-    return account_data
+    if active:
+        keys = session.query(TrxKey).filter(TrxKey.status == true()).group_by(TrxKey.id).order_by(func.max(TrxKey.id).desc()).all()
+    else:
+        keys = session.query(TrxKey).group_by(TrxKey.id).order_by(func.max(TrxKey.id).desc()).all()
+    if keys is not None and len(keys) > 0:
+        for key in keys:
+            account_data.append({
+                'balance': await btcd_utils.RegTest.get_key_balance({'status': key.status, 'value': key.value}),
+                'id': key.id,
+                'status': key.status,
+                'label': str(key.label.text) if key.label is not None else 'No Label',
+                'multi': key.multi,
+                'user': {
+                    'id': key.user.id,
+                    'level': key.user.level,
+                    'email': key.user.email,
+                    'name': key.user.name,
+                    'last_balance': str(key.user.balance),
+                    'created': datetime.datetime.utcfromtimestamp(key.user.created).strftime('%Y-%m-%d %H:%M:%S')
+                }
+            })
+        return account_data
 
 
 async def regtest_balance_by_user():
