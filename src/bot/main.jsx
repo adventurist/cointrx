@@ -1,3 +1,5 @@
+import "@babel/polyfill";
+
 /* React */
 import * as React from 'react'
 import { render }from 'react-dom'
@@ -48,9 +50,9 @@ import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../util
 import Bot from '../utils/bot'
 import log from 'loglevel'
 
-import trx from '../redux'
+// import trx from '../redux'
 
-const trxState = trx()
+// const trxState = trx()
 // console.log(trxState)
 // The urls provided by the back end
 const urls = JSON.parse(botUrls.replace(/'/g, '"'))
@@ -130,7 +132,6 @@ const buildBotMenuItems = (length) => {
     items.push(<MenuItem value={-1} key={-1} primaryText={`All`} />)
     return items
 }
-
 
 /**
  * Helper method for building the File Menu

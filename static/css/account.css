@@ -1,0 +1,57 @@
+.account-list-scroll {
+  max-height: 38.13em;
+}
+/**
+* Account list item
+*/
+.account-item {
+  height: 36px;
+}
+.account-item span {
+  /* font-size: 2em; */
+}
+
+.account-item:hover {
+  opacity: 0.7;
+  background-color: rgb(112, 112, 112);
+}
+
+.account-list {
+  max-height: 480px;
+  overflow: auto;
+}
+.app-bar {
+  background-color: rgb(0, 160, 176);
+}
+/**
+* Account details
+*/
+.account-details-card {
+  background-color: inherit
+}
+
+.account-details-label {
+  font-weight: 700;
+}
+
+.buttons-div {
+  margin-top: 8px;
+  justify-content: space-evenly;
+}
+
+.details-button {
+  /* padding: 15px!important; */
+  margin: 8px!important;
+}
+
+.status-active {
+  border-radius: 8px;
+  height: 1.2em;
+  background-color: #57cf00;
+}
+
+.status-deactive {
+  border-radius: 8px;
+  height: 1.2em;
+  background-color: #ff0000;
+}

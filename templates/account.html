@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{% raw title %}</title>
-    <link rel="stylesheet" href="/static/css/bot-style.css" />
+    <link rel="stylesheet" href="/static/css/account.css" />
     <link rel="stylesheet" href="/static/css/tx-bar.css" />
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -11,6 +11,11 @@
     <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
 </head>
 <body>
+<script>
+    console.log('test')
+    var accountUrls = `{% raw account_urls %}`
+    console.log('Account urls are', accountUrls)
+</script>
 <div id="root">
 </div>
 <script src="/static/js/account-bundle.js"></script>

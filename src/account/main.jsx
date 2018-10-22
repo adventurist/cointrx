@@ -1,3 +1,4 @@
+import "@babel/polyfill"
 import React from 'react'
 import { render }from 'react-dom'
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
@@ -11,13 +12,19 @@ import AccountLayout from './App.jsx'
 
 
 
-render(
-    <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-        <div id="container">
-            <TrxNav />
-            <AccountLayout />
-        </div>
+// render(
+//     <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+//         <div id="container">
+//             <TrxNav />
+//             <AccountLayout />
+//         </div>
 
-    </MuiThemeProvider>
+//     </MuiThemeProvider>
+//     , document.getElementById('root')
+// )
+render(
+    <div id="container">
+        <AccountLayout />
+    </div>
     , document.getElementById('root')
 )

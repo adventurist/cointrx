@@ -18,7 +18,7 @@ let config = {
                 loader: 'babel-loader',
                 include: [path.resolve(__dirname, './src')],
                 query: {
-                    presets: ['env', 'stage-0', 'react']
+                    presets: ['@babel/preset-env', '@babel/react']
                 }
             }]
     },
@@ -26,6 +26,7 @@ let config = {
         new webpack.ProvidePlugin({
             "React": "react",
         }),
+
     ],
     devtool: "source-map"
 };

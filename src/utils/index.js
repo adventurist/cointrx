@@ -50,7 +50,7 @@ export async function request(options) {
 
     requestOptions = {
         method: method !== void 0 ? method : 'GET',
-        body: body !== void 0 ? body : '',
+        body: body !== void 0 ? typeof body === 'string' ? body : JSON.stringify(body): '',
         headers: requestHeaders,
         credentials: credentials !== void 0 ? credentials : 'omit',
         // Pass all remaining options
@@ -82,7 +82,7 @@ export function handleResponse(response) {
     const data = typeof response === 'string' ? JSON.parse(response) : response
     let error = false
     if ('error' in data) {
-            error = data.error
+        error = data.error
     }
 
     return {
