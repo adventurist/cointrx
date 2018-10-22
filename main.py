@@ -1247,6 +1247,9 @@ class AccountGuiHandler(RequestHandler):
 
         if check_attribute(application.session, 'user'):
             set_trx_cookie(self)
+            logger.info('System TRX_ENV variable currently set to')
+            logger.info(application.get_env())
+
             account_urls = TRXConfig.account_urls(application.get_env())
             self.render("templates/account.html", title="TRX Accounts", account_urls=account_urls)
         else:
@@ -1521,6 +1524,7 @@ if __name__ == "__main__":
     http_server.listen(6969)
 
     application.settings['env'] = TRXConfig.get_env_variables()
+    logger.debug('Environment set', application.settings['env'])
 
     db.Base.metadata.create_all(bind=db.engine)
     loop_instance = IOLoop.instance()
