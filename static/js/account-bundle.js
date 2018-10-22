@@ -105395,7 +105395,7 @@ function last(array) {
     return callback(partialObject, element);
   }, {});
 });
-
+ 
 /***/ })
 /******/ ]);
 //# sourceMappingURL=account-bundle.js.map
