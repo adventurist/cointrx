@@ -219,6 +219,18 @@ export default class AccountLayout extends Component {
        })
     }
 
+    accountUpdateHandler = (accountData) => {
+      this.setState({
+        accounts: this.state.accounts.map( account => {
+          if (account.id === accountData.id) {
+            return accountData
+          }
+          return account
+        }),
+        account: accountData
+      })
+    }
+
     async init () {
       const data = await request({
         url: urls.account_list,
@@ -270,7 +282,12 @@ export default class AccountLayout extends Component {
           </Grid>
           <Grid item xs={12} sm={6}>
             <Paper className={classes.accountDetails}>
-              <AccountDetails account={this.state.account} selectedAccount={this.state.selectedAccount} snackbarHandler={this.showSnackbar}/>
+              <AccountDetails
+                account={this.state.account}
+                selectedAccount={this.state.selectedAccount}
+                snackbarHandler={this.showSnackbar}
+                accountUpdateHandler={this.accountUpdateHandler}
+              />
             </Paper>
           </Grid>
         </Grid>
@@ -405,7 +422,11 @@ class AccountDetails extends React.Component {
 <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
   <CardContent className={classes.detailsCard}>
     <Typography component="div">
-      <RenderedDetails snackbarHandler={this.props.snackbarHandler} account={this.state.account} />
+      <RenderedDetails
+        snackbarHandler={this.props.snackbarHandler}
+        account={this.state.account}
+        accountUpdateHandler={this.props.accountUpdateHandler}
+      />
     </Typography>
   </CardContent>
 </Collapse>
@@ -472,6 +493,9 @@ export class RenderedDetails extends React.Component {
     }
     if (props.snackbarHandler) {
       this.showSnackbar = props.snackbarHandler
+    }
+    if (props.accountUpdateHandler) {
+      this.accountUpdateHandler = props.accountUpdateHandler
     }
   }
 
@@ -542,6 +566,20 @@ export class RenderedDetails extends React.Component {
       console.log('Error', handleResponse(response))
     } else {
       console.log('Key changes saved', response)
+
+      this.accountUpdateHandler({
+        label: this.state.label,
+        id: this.state.id,
+        status: this.state.status,
+        balance: this.state.balance,
+        multi: this.state.multi,
+        user: {
+          name: this.state.userName,
+          email: this.state.email,
+          level: this.state.level,
+          created: this.state.created
+        }
+      })
     }
   }
 

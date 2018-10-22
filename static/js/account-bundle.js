@@ -65282,6 +65282,19 @@ function (_Component) {
       });
     });
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "accountUpdateHandler", function (accountData) {
+      _this.setState({
+        accounts: _this.state.accounts.map(function (account) {
+          if (account.id === accountData.id) {
+            return accountData;
+          }
+
+          return account;
+        }),
+        account: accountData
+      });
+    });
+
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "showSnackbar", function (message) {
       _this.setState({
         snackbarMessage: message,
@@ -65424,7 +65437,8 @@ function (_Component) {
       }, React.createElement(AccountDetails, {
         account: this.state.account,
         selectedAccount: this.state.selectedAccount,
-        snackbarHandler: this.showSnackbar
+        snackbarHandler: this.showSnackbar,
+        accountUpdateHandler: this.accountUpdateHandler
       }))))), React.createElement(__WEBPACK_IMPORTED_MODULE_13__snackbar__["a" /* default */], {
         message: this.state.snackbarMessage,
         open: this.state.snackbarOpen
@@ -65611,7 +65625,8 @@ function (_React$Component) {
         component: "div"
       }, React.createElement(RenderedDetails, {
         snackbarHandler: this.props.snackbarHandler,
-        account: this.state.account
+        account: this.state.account,
+        accountUpdateHandler: this.props.accountUpdateHandler
       })))));
     } // TODO: use it or lose it
 
@@ -65795,6 +65810,20 @@ function (_React$Component3) {
                 console.log('Error', Object(__WEBPACK_IMPORTED_MODULE_35__utils___["a" /* handleResponse */])(response));
               } else {
                 console.log('Key changes saved', response);
+
+                _this5.accountUpdateHandler({
+                  label: _this5.state.label,
+                  id: _this5.state.id,
+                  status: _this5.state.status,
+                  balance: _this5.state.balance,
+                  multi: _this5.state.multi,
+                  user: {
+                    name: _this5.state.userName,
+                    email: _this5.state.email,
+                    level: _this5.state.level,
+                    created: _this5.state.created
+                  }
+                });
               }
 
             case 5:
@@ -65834,6 +65863,10 @@ function (_React$Component3) {
 
       if (props.snackbarHandler) {
         this.showSnackbar = props.snackbarHandler;
+      }
+
+      if (props.accountUpdateHandler) {
+        this.accountUpdateHandler = props.accountUpdateHandler;
       }
     }
   }, {
@@ -105395,7 +105428,7 @@ function last(array) {
     return callback(partialObject, element);
   }, {});
 });
- 
+
 /***/ })
 /******/ ]);
 //# sourceMappingURL=account-bundle.js.map
