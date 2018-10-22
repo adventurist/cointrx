@@ -65,7 +65,12 @@ def trx_urls(trx_env):
 
 def account_urls(trx_env):
     return {
-        'account_list': 'https://app.cointrx.com/api/account'
+        'account_list': 'https://app.cointrx.com/api/account',
+        'activate_key': 'https://app.cointrx.com/api/key/activate',
+        'deactivate_key': 'https://app.cointrx.com/api/key/deactivate',
+        'update_key': 'https://app.cointrx.com/api/key/0000/update',
+        'delete_key': 'https://app.cointrx.com/api/account'
+
     } if trx_env == 'SNOWFLAKE' else {
         'account_list': 'http://localhost:6969/api/account',
         'activate_key': 'http://localhost:6969/api/key/activate',
