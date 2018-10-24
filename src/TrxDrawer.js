@@ -180,7 +180,31 @@ class TemporaryDrawer extends React.Component {
     this.setState({
       [side]: open,
     });
+
+    if (this.drawerStateHandler) {
+      this.drawerStateHandler(open)
+    }
   };
+
+  handleOpenDrawer = () => {
+    this.setState({
+      left: true
+    })
+  }
+
+  handleCloseDrawer = () => {
+    this.setState({
+      left: false
+    })
+  }
+
+  componentWillReceiveProps (props) {
+    this.setState({left: props.open})
+
+    if (props.drawerStateHandler) {
+      this.drawerStateHandler = props.drawerStateHandler
+    }
+  }
 
   render() {
     const { classes } = this.props;

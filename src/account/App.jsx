@@ -167,7 +167,9 @@ export default class AccountLayout extends Component {
             accountDetails: undefined,
             account: undefined,
             snackbarMessage: 'Test',
-            snackbarOpen: false
+            snackbarOpen: false,
+            drawerOpen: false,
+            mounted: false
         }
 
         this.accountSelectHandler = this.accountSelectHandler.bind(this)
@@ -181,6 +183,7 @@ export default class AccountLayout extends Component {
 
     async componentDidMount() {
       await this.init()
+      this.setState({ mounted: true })
     }
 
     handleClick = () => {
@@ -212,6 +215,10 @@ export default class AccountLayout extends Component {
             sidebarPinned: !this.state.sidebarPinned
         });
     };
+
+    drawerStateHandler = (open) => {
+      this.setState({ drawerOpen: open })
+    }
 
     accountSelectHandler (e) {
       this.setState({
@@ -252,15 +259,30 @@ export default class AccountLayout extends Component {
       })
     }
 
+    handleDrawer = (open) => {
+
+    }
+
+    mouseMove = (e) => {
+      if (e.screenX < 10) {
+        this.setState({ drawerOpen: true })
+      }
+      if (e.screenX > 300) {
+        this.setState({ drawerOpen: false })
+      }
+    }
+
     /**
      * Render the component
      */
     render() {
         return (
     <Fragment>
-      <div id="main-wrap">
+      <div id="main-wrap" onMouseMove={this.mouseMove}>
         <TrxNav />
-        <TrxDrawer2/>
+        <TrxDrawer2 open={this.state.drawerOpen} drawerStateHandler={this.drawerStateHandler}
+          onMouseEnter={this.handleDrawer(true)} onMouseLeave={this.handleDrawer(false)}
+        />
 
         <Grid container spacing={24}>
           <Grid item xs={8} sm={4}>
@@ -361,9 +383,10 @@ class AccountDetails extends React.Component {
   }
 
   componentWillReceiveProps (props) {
-    console.log('AccountDetails receiving props', props)
-    this.setState({ selectedAccount: props.selectedAccount })
-    this.setState({ account: props.account })
+    this.setState({
+      selectedAccount: props.selectedAccount,
+      account: props.account
+    })
   }
 
   handleExpandClick = () => {

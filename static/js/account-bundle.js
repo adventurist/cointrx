@@ -65285,6 +65285,12 @@ function (_Component) {
       });
     });
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "drawerStateHandler", function (open) {
+      _this.setState({
+        drawerOpen: open
+      });
+    });
+
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "accountUpdateHandler", function (accountData) {
       _this.setState({
         accounts: _this.state.accounts.map(function (account) {
@@ -65305,6 +65311,22 @@ function (_Component) {
       });
     });
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleDrawer", function (open) {});
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "mouseMove", function (e) {
+      if (e.screenX < 10) {
+        _this.setState({
+          drawerOpen: true
+        });
+      }
+
+      if (e.screenX > 300) {
+        _this.setState({
+          drawerOpen: false
+        });
+      }
+    });
+
     _this.state = {
       open: false,
       accounts: undefined,
@@ -65312,7 +65334,9 @@ function (_Component) {
       accountDetails: undefined,
       account: undefined,
       snackbarMessage: 'Test',
-      snackbarOpen: false
+      snackbarOpen: false,
+      drawerOpen: false,
+      mounted: false
     };
     _this.accountSelectHandler = _this.accountSelectHandler.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
@@ -65332,6 +65356,11 @@ function (_Component) {
                 return this.init();
 
               case 2:
+                this.setState({
+                  mounted: true
+                });
+
+              case 3:
               case "end":
                 return _context.stop();
             }
@@ -65400,8 +65429,14 @@ function (_Component) {
      */
     value: function render() {
       return React.createElement(__WEBPACK_IMPORTED_MODULE_1_react__["Fragment"], null, React.createElement("div", {
-        id: "main-wrap"
-      }, React.createElement(__WEBPACK_IMPORTED_MODULE_2__TrxAppBar2_jsx__["a" /* TrxNav */], null), React.createElement(__WEBPACK_IMPORTED_MODULE_16__TrxDrawer__["a" /* default */], null), React.createElement(__WEBPACK_IMPORTED_MODULE_36__material_ui_core__["a" /* Grid */], {
+        id: "main-wrap",
+        onMouseMove: this.mouseMove
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_2__TrxAppBar2_jsx__["a" /* TrxNav */], null), React.createElement(__WEBPACK_IMPORTED_MODULE_16__TrxDrawer__["a" /* default */], {
+        open: this.state.drawerOpen,
+        drawerStateHandler: this.drawerStateHandler,
+        onMouseEnter: this.handleDrawer(true),
+        onMouseLeave: this.handleDrawer(false)
+      }), React.createElement(__WEBPACK_IMPORTED_MODULE_36__material_ui_core__["a" /* Grid */], {
         container: true,
         spacing: 24
       }, React.createElement(__WEBPACK_IMPORTED_MODULE_36__material_ui_core__["a" /* Grid */], {
@@ -65570,11 +65605,8 @@ function (_React$Component) {
   _createClass(AccountDetails, [{
     key: "componentWillReceiveProps",
     value: function componentWillReceiveProps(props) {
-      console.log('AccountDetails receiving props', props);
       this.setState({
-        selectedAccount: props.selectedAccount
-      });
-      this.setState({
+        selectedAccount: props.selectedAccount,
         account: props.account
       });
     }
@@ -106078,13 +106110,40 @@ function (_React$Component) {
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "toggleDrawer", function (side, open) {
       return function () {
         _this.setState(_defineProperty({}, side, open));
+
+        if (_this.drawerStateHandler) {
+          _this.drawerStateHandler(open);
+        }
       };
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleOpenDrawer", function () {
+      _this.setState({
+        left: true
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleCloseDrawer", function () {
+      _this.setState({
+        left: false
+      });
     });
 
     return _this;
   }
 
   _createClass(TemporaryDrawer, [{
+    key: "componentWillReceiveProps",
+    value: function componentWillReceiveProps(props) {
+      this.setState({
+        left: props.open
+      });
+
+      if (props.drawerStateHandler) {
+        this.drawerStateHandler = props.drawerStateHandler;
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
       var classes = this.props.classes;
