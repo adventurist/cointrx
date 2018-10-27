@@ -918,12 +918,16 @@ class TestKeyHandler(RequestHandler):
                     key_data = json.loads(self.request.body.decode())
                     if 'label' in key_data:
                         if await db.update_key(key_id, key_data['label']):
+                            self.set_status(204)
                             self.write(escape.json_encode([{'Update': 'Successful', 'code': 204}]))
                         else:
+                            self.set_status(404)
                             self.write(escape.json_encode([{'error': 'Key not found', 'code': 404}]))
                     else:
+                        self.set_status(400)
                         self.write(escape.json_encode([{'error': 'Bad request', 'code': 400}]))
                 else:
+                    self.set_status(401)
                     self.write(escape.json_encode([{'error': 'Not authorized', 'code': 401}]))
             else:
                 login_redirect(self, self.request.path)
@@ -950,12 +954,16 @@ class UserUpdateHandler(RequestHandler):
                     if user_data is not None:
                         if await db.update_user(uid, user_data):
                             self.write(escape.json_encode([{'Update': 'Successful', 'code': 204}]))
+                            self.set_status(204)
                         else:
                             self.write(escape.json_encode([{'error': 'Key not found', 'code': 404}]))
+                            self.set_status(404)
                     else:
                         self.write(escape.json_encode([{'error': 'Bad request', 'code': 400}]))
+                        self.set_status(400)
                 else:
                     self.write(escape.json_encode([{'error': 'Not authorized', 'code': 401}]))
+                    self.set_status(401)
             else:
                 login_redirect(self, self.request.path)
 
@@ -1183,7 +1191,7 @@ class RegTestActiveBalanceByUserHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        self.write(json.dumps({'users': await db.regtest_active_balance_by_user()}))
+        self.write(json.dumps({'users': await db.regtest_active_balance_by_user(), 'code': 200}))
 
 
 class RegtestUserBalanceHandler(RequestHandler):
@@ -1286,6 +1294,17 @@ class TRXKeyDeactivateHandler(RequestHandler):
             self.write(json.dumps({'code': 400, 'message': 'No key ID given'}))
 
 
+class TRXBotHandler(RequestHandler):
+    pass
+
+    async def get(self, *args, **kwargs):
+        self.write(json.dumps({
+            'accounts': await db.regtest_balance_by_account(
+                self.get_argument('active', False) == 'true'
+            ),
+            'code': 200
+        }))
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -1335,6 +1354,7 @@ class TRXApplication(Application):
             (r"/api/pay/user/(.*)", TRXPayUser),
             (r"/api/user/pay-all", TRXPayAllUsers),
             (r"/api/account", TRXAccountHandler),
+            (r"/api/bot", TRXBotHandler),
 
             # Regression CoinTRX GW: Keys
             (r"/api/key/activate", TRXKeyActivateHandler),
