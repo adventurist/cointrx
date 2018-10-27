@@ -1331,7 +1331,16 @@ async def regtest_active_balance_by_user():
     data = []
     users = session.query(User).group_by(User.id).order_by(func.max(User.id).desc()).all()
     for user in users:
-        user_data = {'name': user.name, 'id': user.id, 'keys': []}
+        user_data = {
+            'name': user.name,
+            'id': user.id,
+            'keys': [],
+            'created': datetime.datetime.utcfromtimestamp(user.created).strftime('%Y-%m-%d %H:%M:%S'),
+            'balance': str(user.balance),
+            'level': user.level,
+            'email': user.email,
+            'status': user.status
+        }
         for key in user.trxkey:
             balance = await btcd_utils.RegTest.get_user_balance([key])
             if balance > 0:
@@ -1358,7 +1367,6 @@ async def trx_pay_users(amount_to_send):
     coinmaster_key = [x for x in coinmaster.trxkey if x.status][0]
     coinmaster_address = btcd_utils.wif_to_address(coinmaster_key.value)
     for user in get_users():
-        keys_test = [x.id for x in user.trxkey if x.status == True]
         keys = sorted([x for x in user.trxkey if x.status], key=lambda y: y.id, reverse=True)
         if keys is not None and len(keys) > 0:
             key = keys[0]
@@ -1420,3 +1428,11 @@ async def trx_pay_user(uid, amount_to_send):
 
 def is_dust_amount(amount):
     return len(str(amount)) == 1
+
+
+async def password_override(uid, password):
+    user = session.query(User.id == uid).one_or_none()
+    if user:
+        hashed_password = user.hash_password(password)
+        user.password = hashed_password
+        return await update_resource(user)
