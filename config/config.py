@@ -66,6 +66,8 @@ def trx_urls(trx_env):
 def account_urls(trx_env):
     return {
         'account_list': 'https://app.cointrx.com/api/account',
+        'user_list': 'https://app.cointrx.com/regtest/balance/user/active',
+        'bot_list': 'https://bot.cointrx.com/bots/fetch',
         'activate_key': 'https://app.cointrx.com/api/key/activate',
         'deactivate_key': 'https://app.cointrx.com/api/key/deactivate',
         'update_key': 'https://app.cointrx.com/api/key/0000/update',
@@ -73,11 +75,14 @@ def account_urls(trx_env):
 
     } if trx_env == 'SNOWFLAKE' else {
         'account_list': 'http://localhost:6969/api/account',
+        'user_list': 'http://localhost:6969/regtest/balance/user/active',
+        'bot_list': 'http://localhost:9977/bots/fetch',
         'activate_key': 'http://localhost:6969/api/key/activate',
         'deactivate_key': 'http://localhost:6969/api/key/deactivate',
         'update_key': 'http://localhost:6969/api/key/0000/update',
         'delete_key': 'http://localhost:6969/api/account'
     }
+
 
 def eth_by_currency(currency):
     return 'https://api.kraken.com/0/public/Ticker?pair=ETH%s' % currency
