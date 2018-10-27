@@ -53,6 +53,12 @@ import ListItemText from '@material-ui/core/ListItemText'
 
 /* Inputs */
 import TextField from '@material-ui/core/TextField'
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
 // import NumericInput from 'react-numeric-input'
 
 /* Buttons, Avatars */
@@ -100,7 +106,8 @@ const classes = {
   accountScroll: 'account-list-scroll',
   detailsCard: 'account-details-card',
   detailsLabel: 'account-details-label',
-  listLabel: 'account-list-label'
+  listLabel: 'account-list-label',
+  listTitle: 'list-title'
 }
 const styles = {
     mainLayout: {
@@ -152,6 +159,21 @@ const items = [{id: 'kjHLJHluiHHOuiHGkhvgGig&*y7ohj', balance: 300}, {id: 'ijuhy
 
 const urls = JSON.parse(accountUrls.replace(/'/g, '"'))
 
+function findResourceKey (keys) {
+  if (keys.length < 3) {
+    return normalizeKey(keys.find(key => key !== 'code'))
+  }
+  console.log('Too many keys in response body')
+}
+
+function normalizeKey (key) {
+  switch (key) {
+    case 'users':
+      return 'users'
+    default:
+      return key
+  }
+}
 export default class AccountLayout extends Component {
 
     /**
@@ -163,16 +185,20 @@ export default class AccountLayout extends Component {
         this.state = {
             open: false,
             accounts: undefined,
+            users: undefined,
+            bots: undefined,
             selectedAccount: undefined,
             accountDetails: undefined,
             account: undefined,
             snackbarMessage: 'Test',
             snackbarOpen: false,
             drawerOpen: false,
-            mounted: false
+            mounted: false,
+            type: undefined,
+            selectedResource: undefined,
+            resources: {},
+            resource: undefined
         }
-
-        this.accountSelectHandler = this.accountSelectHandler.bind(this)
     }
 
     state = {
@@ -182,7 +208,6 @@ export default class AccountLayout extends Component {
     };
 
     async componentDidMount() {
-      await this.init()
       this.setState({ mounted: true })
     }
 
@@ -220,11 +245,15 @@ export default class AccountLayout extends Component {
       this.setState({ drawerOpen: open })
     }
 
-    accountSelectHandler (e) {
+    drawerToggle = () => {
+      this.setState({ drawerOpen: !this.state.drawerOpen})
+    }
+
+    resourceSelectHandler = (e) => {
       this.setState({
-        selectedAccount: e.currentTarget.value,
-        account: this.state.accounts[e.currentTarget.value]
-       })
+        selectedResource: e.currentTarget.value,
+        resource: this.state.resources[this.state.type][e.currentTarget.value]
+      })
     }
 
     accountUpdateHandler = (accountData) => {
@@ -239,6 +268,9 @@ export default class AccountLayout extends Component {
       })
     }
 
+    resourceUpdateHandler = (resourceData) => {
+      this.setState({ resource: resourceData })
+    }
     async init () {
       const data = await request({
         url: urls.account_list,
@@ -246,10 +278,17 @@ export default class AccountLayout extends Component {
           active: true
         }
       })
-      console.log('account data:', data)
       if ('body' in data) {
         this.setState({ accounts: data.body.accounts })
       }
+    }
+
+    getResources = () => {
+      return this.state.resources[this.state.type]
+    }
+
+    getSelectedResource = () => {
+      return this.state.resources[this.state.type][this.state.selectedResource]
     }
 
     showSnackbar = (message) => {
@@ -257,10 +296,6 @@ export default class AccountLayout extends Component {
         snackbarMessage: message,
         snackbarOpen: true
       })
-    }
-
-    handleDrawer = (open) => {
-
     }
 
     mouseMove = (e) => {
@@ -272,6 +307,45 @@ export default class AccountLayout extends Component {
       }
     }
 
+    fetchResources = async () => {
+      let url
+      switch (this.state.type) {
+        case 'bots':
+          url = urls.bot_list
+          break
+
+        case 'accounts':
+          url = urls.account_list
+          break
+
+        case 'users':
+          url = urls.user_list
+          break
+        default:
+          return
+      }
+      const data = await request({
+        url: url,
+        params: {
+          active: true
+        }
+      })
+      if (data.error) {
+        log.debug('Error fetching resources', data)
+      } else if(data.body) {
+        const resourceKey = findResourceKey(Object.keys(data.body))
+        console.log(resourceKey)
+        this.setState({ resources: {
+          ...this.resources,
+          [resourceKey]: data.body[resourceKey]
+        }})
+      }
+    }
+
+    typeSelectHandler = (value) => {
+      this.setState({ type: value })
+    }
+
     /**
      * Render the component
      */
@@ -279,31 +353,32 @@ export default class AccountLayout extends Component {
         return (
     <Fragment>
       <div id="main-wrap" onMouseMove={this.mouseMove}>
-        <TrxNav />
-        <TrxDrawer2 open={this.state.drawerOpen} drawerStateHandler={this.drawerStateHandler}
-          onMouseEnter={this.handleDrawer(true)} onMouseLeave={this.handleDrawer(false)}
-        />
+        <TrxNav drawerHandler={this.drawerToggle} />
+        <TrxDrawer2 open={this.state.drawerOpen} drawerStateHandler={this.drawerStateHandler} />
 
         <Grid container spacing={24}>
           <Grid item xs={8} sm={4}>
               <Paper className={classes.paper} elevation={1}>
-                  <Typography variant="headline" component="h3">
+                  <ResourceSelector type={this.state.type} typeSelectHandler={this.typeSelectHandler}/>
+                  <Typography className={classes.listTitle} variant="headline" component="h3">
                     Accounts
                   </Typography>
                 </Paper>
                 <Paper className={classes.paper} elevation={1}>
                   <ReactScrollbar className={classes.accountScroll}>
-                    <AccountList className={classes.accountList} accounts={this.state.accounts} accountSelectHandler={this.accountSelectHandler} />
+                    <ResourceList className={classes.accountList} resources={this.getResources()} type={this.state.type} resourceSelectHandler={this.resourceSelectHandler} />
                   </ReactScrollbar>
                 </Paper>
+                <Button onClick={this.fetchResources}>Fetch</Button>
           </Grid>
           <Grid item xs={12} sm={6}>
             <Paper className={classes.accountDetails}>
-              <AccountDetails
-                account={this.state.account}
-                selectedAccount={this.state.selectedAccount}
+              <ResourceDetails
+                resource={this.state.resource}
+                resourceIndex={this.state.selectedResource}
                 snackbarHandler={this.showSnackbar}
-                accountUpdateHandler={this.accountUpdateHandler}
+                resourceUpdateHandler={this.resourceUpdateHandler}
+                type={this.state.type}
               />
             </Paper>
           </Grid>
@@ -316,36 +391,83 @@ export default class AccountLayout extends Component {
 }
 
 
-class AccountList extends Component {
+class ResourceList extends Component {
   constructor (props) {
     super(props)
     this.state = {
       selectedAccount: undefined,
       accountMenuItems: this.getMenuItems(),
+      menuItems: this.getMenuItems(),
       open: false,
-      expandOpen: false
+      expandOpen: false,
+      type: undefined
     }
   }
 
   componentDidMount () {
-    this.setState({accountMenuItems: this.getMenuItems()})
+    this.setState({menuItems: this.getMenuItems()})
   }
 
   componentWillReceiveProps (props) {
-    this.setState({accountMenuItems: this.getMenuItems(props.accounts)})
+    // this.setState({accountMenuItems: this.getMenuItems(props.accounts)})
+    this.setState({
+      type: props.type,
+      menuItems: this.getMenuItems(props.resources)
+    })
   }
 
-  getMenuItems (accounts) {
-    if (accounts) {
+  buildAccountItem (account, i) {
+    return (
+      <ListItem onClick={this.props.resourceSelectHandler} className={classes.accountItem} value={i} key={i}>
+          <ListItemText key={i} style={styles.listItemText} primary={
+            account.id + ': ' + account.label || ''
+          }/>
+        </ListItem>
+    )
+  }
+
+  buildBotItem (bot, i) {
+    return (
+      <ListItem onClick={this.props.resourceSelectHandler} className={classes.accountItem} value={i} key={i}>
+          <ListItemText key={i} style={styles.listItemText} primary={
+            bot.id + ': ' + bot.info || ''
+          }/>
+        </ListItem>
+    )
+  }
+
+  buildUserItem (user, i) {
+    return (
+      <ListItem onClick={this.props.resourceSelectHandler} className={classes.accountItem} value={i} key={i}>
+          <ListItemText key={i} style={styles.listItemText} primary={
+            user.id + ': ' + user.name || ''
+          }/>
+        </ListItem>
+    )
+  }
+
+  getMenuItems (resources) {
+    if (resources) {
       const items = []
 
-      for (let i = 0; i < accounts.length; i++) {
-        items.push(
-        <ListItem onClick={this.props.accountSelectHandler} className={classes.accountItem} value={i} key={i}>
-          <ListItemText key={i} style={styles.listItemText} primary={
-            accounts[i].id + ': ' + accounts[i].label || ''
-          }/>
-        </ListItem> )
+      switch (this.state.type) {
+        case 'accounts':
+          for (let i = 0; i < resources.length; i++) {
+            items.push(this.buildAccountItem(resources[i], i))
+          }
+          break
+
+          case 'users':
+          for (let i = 0; i < resources.length; i++) {
+            items.push(this.buildUserItem(resources[i], i))
+          }
+          break
+
+          case 'bots':
+          for (let i = 0; i < resources.length; i++) {
+            items.push(this.buildBotItem(resources[i], i))
+          }
+          break
       }
       return items
     }
@@ -365,28 +487,32 @@ class AccountList extends Component {
         <ListItemText primary='Select' onClick={this.toggleCollapse}/>
       </ListItem>
         <Collapse in={this.state.open}>
-          {this.state.accountMenuItems}
+          {this.state.menuItems}
         </Collapse>
       </List>
     )
   }
 }
 
-class AccountDetails extends React.Component {
+class ResourceDetails extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       expanded: false,
-      selectedAccount: undefined,
-      account: undefined
+      type: undefined,
+      resource: undefined,
+      resourceIndex: undefined
     }
   }
 
   componentWillReceiveProps (props) {
-    this.setState({
-      selectedAccount: props.selectedAccount,
-      account: props.account
-    })
+    const propObject = {}
+    for (let prop in props) {
+      if (props[prop]) {
+        propObject[prop] = props[prop]
+      }
+    }
+    this.setState({ ...propObject })
   }
 
   handleExpandClick = () => {
@@ -399,7 +525,7 @@ class AccountDetails extends React.Component {
 <CardHeader
   avatar={
     <Avatar aria-label="Account Details" className={classes.accountAvatar}>
-      {this.state.selectedAccount}
+      {this.state.resourceIndex}
     </Avatar>
   }
   action={
@@ -408,7 +534,7 @@ class AccountDetails extends React.Component {
     </IconButton>
   }
   title="Account Details"
-  subheader={this.state.selectedAccount}
+  subheader={this.state.resourceIndex}
 />
 <CardMedia
   className={classes.accountMedia}
@@ -417,7 +543,7 @@ class AccountDetails extends React.Component {
 />
 <CardContent>
   <Typography component="div">
-    {this.state.account ? this.state.account.label : ''}
+    {this.state.resource ? getResourceLabel(this.state.resource) : ''}
   </Typography>
 </CardContent>
 <CardActions className={classes.accountDetailsActions} disableActionSpacing>
@@ -442,8 +568,9 @@ class AccountDetails extends React.Component {
     <Typography component="div">
       <RenderedDetails
         snackbarHandler={this.props.snackbarHandler}
-        account={this.state.account}
-        accountUpdateHandler={this.props.accountUpdateHandler}
+        resource={this.state.resource}
+        resourceUpdateHandler={this.props.resourceUpdateHandler}
+        type={this.state.type}
       />
     </Typography>
   </CardContent>
@@ -489,37 +616,38 @@ export class MasterButtons extends React.Component {
 }
 
 export class RenderedDetails extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
+  initialState = () => {
+    return {
+      resource: 69,
+      type: undefined
     }
   }
 
+  constructor(props) {
+    super(props)
+    this.state = this.initialState()
+  }
+
   componentWillReceiveProps (props) {
-    if (props.account) {
-      this.setState({
-        label: props.account.label,
-        id: props.account.id,
-        status: props.account.status,
-        balance: props.account.balance,
-        multi: props.account.multi,
-        userName: props.account.user.name,
-        email: props.account.user.email,
-        level: props.account.user.level,
-        created: props.account.user.created
-      })
+    console.log('RenderedDetails receiving props', props)
+    if (props.type && props.type !== this.props.type) {
+      this.setState(this.initialState())
+    } else {
+      this.setState({ ...cleanProps(props) })
     }
     if (props.snackbarHandler) {
       this.showSnackbar = props.snackbarHandler
     }
-    if (props.accountUpdateHandler) {
-      this.accountUpdateHandler = props.accountUpdateHandler
+    if (props.resourceUpdateHandler) {
+      this.resourceUpdateHandler = props.resourceUpdateHandler
     }
   }
 
   updateLabel = (e) => {
     const text = e.target.value
-    this.setState({ label: text })
+    this.setState({ resource: { ...this.state.resource, label: text} }, () => {
+      this.resourceUpdateHandler(this.state.resource)
+    })
   }
 
   toggleStatus = () => {
@@ -569,10 +697,10 @@ export class RenderedDetails extends React.Component {
   saveChanges = async () => {
     console.log('Save changes to key')
     const response = await request({
-      url: urls.update_key.replace('0000', formatKey(this.state.id)),
+      url: urls.update_key.replace('0000', formatKey(this.state.resource.id)),
       method: 'POST',
       body: {
-        label: this.state.label
+        label: this.state.resource.label
       },
       headers: {
         'Content-Type': 'application/json',
@@ -607,52 +735,163 @@ export class RenderedDetails extends React.Component {
   }
 
   render () {
-    if (this.props.account) {
-      const account = this.props.account
-      const user = account.user
-      return (
-                <div>
-                  <h4>Account Info</h4>
-                  <span className={classes.detailsLabel}>ID:</span> {account.id} <span className={classes.detailsLabel}>Status<button className={this.state.status ? 'status-active' : 'status-deactive'}></button></span> <br />
-                  <span className={classes.detailsLabel}>Balance:</span> {account.balance} <br />
-                  <span className={classes.detailsLabel}>Multisig:</span> {account.multi ? 'Yes' : 'No'} <br />
-                  <TextField
-                    id='key-label'
-                    label='Label: '
-                    className={classes.detailsLabelText}
-                    placeholder='Key label'
-                    value={this.state.label}
-                    onChange={(e) => this.updateLabel(e)}
-                    margin="normal"
-                  />
-                  <h4>Owner</h4>
-                  <span className={classes.detailsLabel}>Name:</span> {user.name} <br />
-                  <span className={classes.detailsLabel}>Email:</span> {user.email} <br />
-                  <span className={classes.detailsLabel}>Level:</span> {user.level} <br />
-                  <span className={classes.detailsLabel}>Joined:</span> {user.created} <br />
-
-                  <div className='buttons-div'>
-                    <Button variant="fab" aria-label="Enable" style={styles.enableButton} className={classes.button} onClick={this.enableKey}>
-                      <AddIcon />
-                    </Button>
-                    <Button variant="fab" aria-label="Disable" style={styles.disableButton} className={classes.button} onClick={this.disableKey}>
-                      <RemoveIcon />
-                    </Button>
-                    <Button variant="fab" aria-label="Save" style={styles.saveButton} className={classes.button} onClick={this.saveChanges}>
-                      <SaveIcon />
-                    </Button>
-                    <Button variant="fab" aria-label="Delete" style={styles.deleteButton} className={classes.button} onClick={this.deleteKey}>
-                      <DeleteIcon />
-                    </Button>
-                  </div>
-                </div>)
+    if (this.state.resource && this.state.resource !== 69) {
+      if (this.state.type === 'accounts') {
+        return this.RenderedAccount(this.state.resource)
+      } else if (this.state.type === 'users') {
+        return this.RenderedUser(this.state.resource)
+      } else if (this.state.type === 'bots') {
+        return this.RenderedBot(this.state.resource)
+      }
     } else {
       return (
         <div>
-          <h4>Please select an account</h4>
+          <h4>Please select a resource</h4>
         </div>
       )
     }
+  }
+
+  RenderedAccount = (account) => {
+    if (account && account.user) {
+      const user = account.user
+          return (
+                  <div>
+                    <h4>Account Info</h4>
+                    <span className={classes.detailsLabel}>ID:</span> {account.id} <span className={classes.detailsLabel}>Status<button className={account.status ? 'status-active' : 'status-deactive'}></button></span> <br />
+                    <span className={classes.detailsLabel}>Balance:</span> {account.balance} <br />
+                    <span className={classes.detailsLabel}>Multisig:</span> {account.multi ? 'Yes' : 'No'} <br />
+                    <TextField
+                      id='key-label'
+                      label='Label: '
+                      className={classes.detailsLabelText}
+                      placeholder='Key label'
+                      value={account.label}
+                      onChange={(e) => this.updateLabel(e)}
+                      margin="normal"
+                    />
+                    <h4>Owner</h4>
+                    <span className={classes.detailsLabel}>Name:</span> {user.name} <br />
+                    <span className={classes.detailsLabel}>Email:</span> {user.email} <br />
+                    <span className={classes.detailsLabel}>Level:</span> {user.level} <br />
+                    <span className={classes.detailsLabel}>Joined:</span> {user.created} <br />
+
+                    <div className='buttons-div'>
+                      <Button variant="fab" aria-label="Enable" style={styles.enableButton} className={classes.button} onClick={this.enableKey}>
+                        <AddIcon />
+                      </Button>
+                      <Button variant="fab" aria-label="Disable" style={styles.disableButton} className={classes.button} onClick={this.disableKey}>
+                        <RemoveIcon />
+                      </Button>
+                      <Button variant="fab" aria-label="Save" style={styles.saveButton} className={classes.button} onClick={this.saveChanges}>
+                        <SaveIcon />
+                      </Button>
+                      <Button variant="fab" aria-label="Delete" style={styles.deleteButton} className={classes.button} onClick={this.deleteKey}>
+                        <DeleteIcon />
+                      </Button>
+                    </div>
+                  </div>)
+    } else {
+      return null
+    }
+  }
+
+  RenderedUser = (user) => {
+    if (user && user.name) {
+        return (
+                  <div>
+                    <h4>User Info</h4>
+                    <span className={classes.detailsLabel}>ID:</span> {user.id} <span className={classes.detailsLabel}>Status<button className={user.status ? 'status-active' : 'status-deactive'}></button></span> <br />
+                    <span className={classes.detailsLabel}>Balance:</span> {user.balance} <br />
+                    <TextField
+                      id='key-label'
+                      label='Name: '
+                      className={classes.detailsLabelText}
+                      placeholder='User name'
+                      value={user.name}
+                      onChange={(e) => this.updateName(e)}
+                      margin="normal"
+                    />
+                    <span className={classes.detailsLabel}>Name:</span> {user.name} <br />
+                    <span className={classes.detailsLabel}>Email:</span> {user.email} <br />
+                    <span className={classes.detailsLabel}>Level:</span> {user.level} <br />
+                    <span className={classes.detailsLabel}>Joined:</span> {user.created} <br />
+
+                    <div className='buttons-div'>
+                      <Button variant="fab" aria-label="Enable" style={styles.enableButton} className={classes.button} onClick={this.enableUser}>
+                        <AddIcon />
+                      </Button>
+                      <Button variant="fab" aria-label="Disable" style={styles.disableButton} className={classes.button} onClick={this.disableUser}>
+                        <RemoveIcon />
+                      </Button>
+                      <Button variant="fab" aria-label="Save" style={styles.saveButton} className={classes.button} onClick={this.saveChanges}>
+                        <SaveIcon />
+                      </Button>
+                      <Button variant="fab" aria-label="Delete" style={styles.deleteButton} className={classes.button} onClick={this.deleteUser}>
+                        <DeleteIcon />
+                      </Button>
+                    </div>
+                  </div>)
+    } else {
+      return null
+    }
+  }
+}
+
+class ResourceSelector extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      selected: undefined
+    }
+  }
+
+  componentWillReceiveProps (props) {
+    if (props.typeSelectHandler) {
+      this.typeSelectHandler = props.typeSelectHandler
+    }
+  }
+
+  selectHandler = (e, value) => {
+    console.log('changed to value', value)
+    this.setState({ selected: value })
+    if (this.typeSelectHandler) {
+      this.typeSelectHandler(value)
+    }
+  }
+
+  render () {
+    return (
+      <FormControl component="fieldset" className={classes.formControl}>
+            <FormLabel component="legend">Resource</FormLabel>
+            <RadioGroup
+              aria-label="resource"
+              name="resource"
+              value={this.state.selected}
+              row={true}
+              onChange={this.selectHandler}
+            >
+              <FormControlLabel
+                value="accounts"
+                control={<Radio color="primary" />}
+                label="Account"
+                labelPlacement="start"
+              />
+              <FormControlLabel
+                value="users"
+                control={<Radio color="primary" />}
+                label="User"
+                labelPlacement="start"
+              />
+              <FormControlLabel
+                value="bots"
+                control={<Radio color="primary" />}
+                label="Bot"
+                labelPlacement="start"
+              />
+            </RadioGroup>
+          </FormControl>
+    )
   }
 }
 
@@ -669,4 +908,53 @@ function formatKey (key) {
     urlString = '0' + urlString
   }
   return urlString
+}
+
+function getResourceLabel (resource, type) {
+  switch (type) {
+    case 'bots':
+      return resource.id
+    case 'users':
+      return user.name
+    case 'accounts':
+      return resource.label
+  }
+}
+
+function buildResourceDetails (state, resource, type) {
+  if (type === 'bots') {
+    return
+  } else if (type === 'accounts') {
+    return {
+      label: resource.label,
+        id: resource.id,
+        status: resource.status,
+        balance: resource.balance,
+        multi: resource.multi,
+        userName: resource.user.name,
+        email: resource.user.email,
+        level: resource.user.level,
+        created: resource.user.created
+    }
+  } else if (type === 'users') {
+    return {
+      id: resource.id,
+      name: resource.name,
+      balance: resource.balance,
+      keys: resource.keys,
+      email: resource.email,
+      created: resource.created,
+      level: resource.level
+    }
+  }
+}
+
+function cleanProps (props) {
+  const propObject = {}
+  for (let prop in props) {
+    if (props[prop]) {
+      propObject[prop] = props[prop]
+    }
+  }
+  return propObject
 }

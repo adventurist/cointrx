@@ -65033,28 +65033,42 @@ exports.default = NavigationMoreVert;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_ListItemText___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_ListItemText__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__material_ui_core_TextField__ = __webpack_require__(373);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__material_ui_core_TextField___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_TextField__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__material_ui_core_Avatar__ = __webpack_require__(392);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__material_ui_core_Avatar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Avatar__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30_material_ui_FlatButton_FlatButton__ = __webpack_require__(918);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30_material_ui_FlatButton_FlatButton___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_30_material_ui_FlatButton_FlatButton__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__material_ui_core_Button__ = __webpack_require__(118);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_31__material_ui_core_Button__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__material_ui_icons_Favorite__ = __webpack_require__(920);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__material_ui_icons_Favorite___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_32__material_ui_icons_Favorite__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__material_ui_icons_Share__ = __webpack_require__(921);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__material_ui_icons_Share___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_33__material_ui_icons_Share__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__material_ui_icons_ExpandMore__ = __webpack_require__(922);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__material_ui_icons_ExpandMore___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_34__material_ui_icons_ExpandMore__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_35__material_ui_icons_MoreVert__ = __webpack_require__(923);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_35__material_ui_icons_MoreVert___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_35__material_ui_icons_MoreVert__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_36__material_ui_core__ = __webpack_require__(924);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_37__utils___ = __webpack_require__(1077);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_38__utils_bot__ = __webpack_require__(1078);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_38__utils_bot___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_38__utils_bot__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_39_loglevel__ = __webpack_require__(405);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_39_loglevel___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_39_loglevel__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_40__redux__ = __webpack_require__(1080);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__material_ui_core_Radio__ = __webpack_require__(1020);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__material_ui_core_Radio___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Radio__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__material_ui_core_RadioGroup__ = __webpack_require__(1024);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__material_ui_core_RadioGroup___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_30__material_ui_core_RadioGroup__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__material_ui_core_FormHelperText__ = __webpack_require__(379);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__material_ui_core_FormHelperText___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_31__material_ui_core_FormHelperText__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__material_ui_core_FormControlLabel__ = __webpack_require__(982);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__material_ui_core_FormControlLabel___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_32__material_ui_core_FormControlLabel__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__material_ui_core_FormControl__ = __webpack_require__(378);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__material_ui_core_FormControl___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_33__material_ui_core_FormControl__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__material_ui_core_FormLabel__ = __webpack_require__(377);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__material_ui_core_FormLabel___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_34__material_ui_core_FormLabel__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_35__material_ui_core_Avatar__ = __webpack_require__(392);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_35__material_ui_core_Avatar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_35__material_ui_core_Avatar__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_36_material_ui_FlatButton_FlatButton__ = __webpack_require__(918);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_36_material_ui_FlatButton_FlatButton___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_36_material_ui_FlatButton_FlatButton__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_37__material_ui_core_Button__ = __webpack_require__(118);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_37__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_37__material_ui_core_Button__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_38__material_ui_icons_Favorite__ = __webpack_require__(920);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_38__material_ui_icons_Favorite___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_38__material_ui_icons_Favorite__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_39__material_ui_icons_Share__ = __webpack_require__(921);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_39__material_ui_icons_Share___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_39__material_ui_icons_Share__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_40__material_ui_icons_ExpandMore__ = __webpack_require__(922);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_40__material_ui_icons_ExpandMore___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_40__material_ui_icons_ExpandMore__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_41__material_ui_icons_MoreVert__ = __webpack_require__(923);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_41__material_ui_icons_MoreVert___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_41__material_ui_icons_MoreVert__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_42__material_ui_core__ = __webpack_require__(924);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_43__utils___ = __webpack_require__(1077);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_44__utils_bot__ = __webpack_require__(1078);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_44__utils_bot___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_44__utils_bot__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_45_loglevel__ = __webpack_require__(405);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_45_loglevel___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_45_loglevel__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_46__redux__ = __webpack_require__(1080);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -65133,6 +65147,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /* Inputs */
 
+
+
+
+
+
+
  // import NumericInput from 'react-numeric-input'
 
 /* Buttons, Avatars */
@@ -65155,10 +65175,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var trxState = Object(__WEBPACK_IMPORTED_MODULE_40__redux__["a" /* default */])(); // console.log(trxState)
+var trxState = Object(__WEBPACK_IMPORTED_MODULE_46__redux__["a" /* default */])(); // console.log(trxState)
 // The urls provided by the back end
 
-__WEBPACK_IMPORTED_MODULE_39_loglevel___default.a.setLevel('debug'); // All stylesheet values
+__WEBPACK_IMPORTED_MODULE_45_loglevel___default.a.setLevel('debug'); // All stylesheet values
 
 var classes = {
   main: 'main',
@@ -65176,7 +65196,8 @@ var classes = {
   accountScroll: 'account-list-scroll',
   detailsCard: 'account-details-card',
   detailsLabel: 'account-details-label',
-  listLabel: 'account-list-label'
+  listLabel: 'account-list-label',
+  listTitle: 'list-title'
 };
 var styles = {
   mainLayout: {
@@ -65232,6 +65253,26 @@ var items = [{
   balance: 600
 }];
 var urls = JSON.parse(accountUrls.replace(/'/g, '"'));
+
+function findResourceKey(keys) {
+  if (keys.length < 3) {
+    return normalizeKey(keys.find(function (key) {
+      return key !== 'code';
+    }));
+  }
+
+  console.log('Too many keys in response body');
+}
+
+function normalizeKey(key) {
+  switch (key) {
+    case 'users':
+      return 'users';
+
+    default:
+      return key;
+  }
+}
 
 var AccountLayout =
 /*#__PURE__*/
@@ -65291,6 +65332,19 @@ function (_Component) {
       });
     });
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "drawerToggle", function () {
+      _this.setState({
+        drawerOpen: !_this.state.drawerOpen
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "resourceSelectHandler", function (e) {
+      _this.setState({
+        selectedResource: e.currentTarget.value,
+        resource: _this.state.resources[_this.state.type][e.currentTarget.value]
+      });
+    });
+
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "accountUpdateHandler", function (accountData) {
       _this.setState({
         accounts: _this.state.accounts.map(function (account) {
@@ -65304,14 +65358,26 @@ function (_Component) {
       });
     });
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "resourceUpdateHandler", function (resourceData) {
+      _this.setState({
+        resource: resourceData
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "getResources", function () {
+      return _this.state.resources[_this.state.type];
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "getSelectedResource", function () {
+      return _this.state.resources[_this.state.type][_this.state.selectedResource];
+    });
+
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "showSnackbar", function (message) {
       _this.setState({
         snackbarMessage: message,
         snackbarOpen: true
       });
     });
-
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleDrawer", function (open) {});
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "mouseMove", function (e) {
       if (e.screenX < 10) {
@@ -65327,18 +65393,89 @@ function (_Component) {
       }
     });
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "fetchResources",
+    /*#__PURE__*/
+    _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee() {
+      var url, data, resourceKey;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.t0 = _this.state.type;
+              _context.next = _context.t0 === 'bots' ? 3 : _context.t0 === 'accounts' ? 5 : _context.t0 === 'users' ? 7 : 9;
+              break;
+
+            case 3:
+              url = urls.bot_list;
+              return _context.abrupt("break", 10);
+
+            case 5:
+              url = urls.account_list;
+              return _context.abrupt("break", 10);
+
+            case 7:
+              url = urls.user_list;
+              return _context.abrupt("break", 10);
+
+            case 9:
+              return _context.abrupt("return");
+
+            case 10:
+              _context.next = 12;
+              return Object(__WEBPACK_IMPORTED_MODULE_43__utils___["b" /* request */])({
+                url: url,
+                params: {
+                  active: true
+                }
+              });
+
+            case 12:
+              data = _context.sent;
+
+              if (data.error) {
+                __WEBPACK_IMPORTED_MODULE_45_loglevel___default.a.debug('Error fetching resources', data);
+              } else if (data.body) {
+                resourceKey = findResourceKey(Object.keys(data.body));
+                console.log(resourceKey);
+
+                _this.setState({
+                  resources: _objectSpread({}, _this.resources, _defineProperty({}, resourceKey, data.body[resourceKey]))
+                });
+              }
+
+            case 14:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee, this);
+    })));
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "typeSelectHandler", function (value) {
+      _this.setState({
+        type: value
+      });
+    });
+
     _this.state = {
       open: false,
       accounts: undefined,
+      users: undefined,
+      bots: undefined,
       selectedAccount: undefined,
       accountDetails: undefined,
       account: undefined,
       snackbarMessage: 'Test',
       snackbarOpen: false,
       drawerOpen: false,
-      mounted: false
+      mounted: false,
+      type: undefined,
+      selectedResource: undefined,
+      resources: {},
+      resource: undefined
     };
-    _this.accountSelectHandler = _this.accountSelectHandler.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
 
@@ -65347,25 +65484,21 @@ function (_Component) {
     value: function () {
       var _componentDidMount = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee() {
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+      regeneratorRuntime.mark(function _callee2() {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
-                _context.next = 2;
-                return this.init();
-
-              case 2:
                 this.setState({
                   mounted: true
                 });
 
-              case 3:
+              case 1:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this);
+        }, _callee2, this);
       }));
 
       return function componentDidMount() {
@@ -65373,26 +65506,18 @@ function (_Component) {
       };
     }()
   }, {
-    key: "accountSelectHandler",
-    value: function accountSelectHandler(e) {
-      this.setState({
-        selectedAccount: e.currentTarget.value,
-        account: this.state.accounts[e.currentTarget.value]
-      });
-    }
-  }, {
     key: "init",
     value: function () {
       var _init = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee2() {
+      regeneratorRuntime.mark(function _callee3() {
         var data;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                _context2.next = 2;
-                return Object(__WEBPACK_IMPORTED_MODULE_37__utils___["b" /* request */])({
+                _context3.next = 2;
+                return Object(__WEBPACK_IMPORTED_MODULE_43__utils___["b" /* request */])({
                   url: urls.account_list,
                   params: {
                     active: true
@@ -65400,8 +65525,7 @@ function (_Component) {
                 });
 
               case 2:
-                data = _context2.sent;
-                console.log('account data:', data);
+                data = _context3.sent;
 
                 if ('body' in data) {
                   this.setState({
@@ -65409,12 +65533,12 @@ function (_Component) {
                   });
                 }
 
-              case 5:
+              case 4:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee3, this);
       }));
 
       return function init() {
@@ -65431,22 +65555,26 @@ function (_Component) {
       return React.createElement(__WEBPACK_IMPORTED_MODULE_1_react__["Fragment"], null, React.createElement("div", {
         id: "main-wrap",
         onMouseMove: this.mouseMove
-      }, React.createElement(__WEBPACK_IMPORTED_MODULE_2__TrxAppBar2_jsx__["a" /* TrxNav */], null), React.createElement(__WEBPACK_IMPORTED_MODULE_16__TrxDrawer__["a" /* default */], {
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_2__TrxAppBar2_jsx__["a" /* TrxNav */], {
+        drawerHandler: this.drawerToggle
+      }), React.createElement(__WEBPACK_IMPORTED_MODULE_16__TrxDrawer__["a" /* default */], {
         open: this.state.drawerOpen,
-        drawerStateHandler: this.drawerStateHandler,
-        onMouseEnter: this.handleDrawer(true),
-        onMouseLeave: this.handleDrawer(false)
-      }), React.createElement(__WEBPACK_IMPORTED_MODULE_36__material_ui_core__["a" /* Grid */], {
+        drawerStateHandler: this.drawerStateHandler
+      }), React.createElement(__WEBPACK_IMPORTED_MODULE_42__material_ui_core__["a" /* Grid */], {
         container: true,
         spacing: 24
-      }, React.createElement(__WEBPACK_IMPORTED_MODULE_36__material_ui_core__["a" /* Grid */], {
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_42__material_ui_core__["a" /* Grid */], {
         item: true,
         xs: 8,
         sm: 4
       }, React.createElement(__WEBPACK_IMPORTED_MODULE_6__material_ui_core_Paper___default.a, {
         className: classes.paper,
         elevation: 1
-      }, React.createElement(__WEBPACK_IMPORTED_MODULE_5__material_ui_core_Typography___default.a, {
+      }, React.createElement(ResourceSelector, {
+        type: this.state.type,
+        typeSelectHandler: this.typeSelectHandler
+      }), React.createElement(__WEBPACK_IMPORTED_MODULE_5__material_ui_core_Typography___default.a, {
+        className: classes.listTitle,
         variant: "headline",
         component: "h3"
       }, "Accounts")), React.createElement(__WEBPACK_IMPORTED_MODULE_6__material_ui_core_Paper___default.a, {
@@ -65454,21 +65582,25 @@ function (_Component) {
         elevation: 1
       }, React.createElement(__WEBPACK_IMPORTED_MODULE_15_react_scrollbar___default.a, {
         className: classes.accountScroll
-      }, React.createElement(AccountList, {
+      }, React.createElement(ResourceList, {
         className: classes.accountList,
-        accounts: this.state.accounts,
-        accountSelectHandler: this.accountSelectHandler
-      })))), React.createElement(__WEBPACK_IMPORTED_MODULE_36__material_ui_core__["a" /* Grid */], {
+        resources: this.getResources(),
+        type: this.state.type,
+        resourceSelectHandler: this.resourceSelectHandler
+      }))), React.createElement(__WEBPACK_IMPORTED_MODULE_37__material_ui_core_Button___default.a, {
+        onClick: this.fetchResources
+      }, "Fetch")), React.createElement(__WEBPACK_IMPORTED_MODULE_42__material_ui_core__["a" /* Grid */], {
         item: true,
         xs: 12,
         sm: 6
       }, React.createElement(__WEBPACK_IMPORTED_MODULE_6__material_ui_core_Paper___default.a, {
         className: classes.accountDetails
-      }, React.createElement(AccountDetails, {
-        account: this.state.account,
-        selectedAccount: this.state.selectedAccount,
+      }, React.createElement(ResourceDetails, {
+        resource: this.state.resource,
+        resourceIndex: this.state.selectedResource,
         snackbarHandler: this.showSnackbar,
-        accountUpdateHandler: this.accountUpdateHandler
+        resourceUpdateHandler: this.resourceUpdateHandler,
+        type: this.state.type
       }))))), React.createElement(__WEBPACK_IMPORTED_MODULE_14__snackbar__["a" /* default */], {
         message: this.state.snackbarMessage,
         open: this.state.snackbarOpen
@@ -65481,17 +65613,17 @@ function (_Component) {
 
 
 
-var AccountList =
+var ResourceList =
 /*#__PURE__*/
 function (_Component2) {
-  _inherits(AccountList, _Component2);
+  _inherits(ResourceList, _Component2);
 
-  function AccountList(props) {
+  function ResourceList(props) {
     var _this2;
 
-    _classCallCheck(this, AccountList);
+    _classCallCheck(this, ResourceList);
 
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(AccountList).call(this, props));
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(ResourceList).call(this, props));
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "accountClick", function (e) {
       _this2.setState({
@@ -65508,43 +65640,99 @@ function (_Component2) {
     _this2.state = {
       selectedAccount: undefined,
       accountMenuItems: _this2.getMenuItems(),
+      menuItems: _this2.getMenuItems(),
       open: false,
-      expandOpen: false
+      expandOpen: false,
+      type: undefined
     };
     return _this2;
   }
 
-  _createClass(AccountList, [{
+  _createClass(ResourceList, [{
     key: "componentDidMount",
     value: function componentDidMount() {
       this.setState({
-        accountMenuItems: this.getMenuItems()
+        menuItems: this.getMenuItems()
       });
     }
   }, {
     key: "componentWillReceiveProps",
     value: function componentWillReceiveProps(props) {
+      // this.setState({accountMenuItems: this.getMenuItems(props.accounts)})
       this.setState({
-        accountMenuItems: this.getMenuItems(props.accounts)
+        type: props.type,
+        menuItems: this.getMenuItems(props.resources)
       });
     }
   }, {
+    key: "buildAccountItem",
+    value: function buildAccountItem(account, i) {
+      return React.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_ListItem___default.a, {
+        onClick: this.props.resourceSelectHandler,
+        className: classes.accountItem,
+        value: i,
+        key: i
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_ListItemText___default.a, {
+        key: i,
+        style: styles.listItemText,
+        primary: account.id + ': ' + account.label || ''
+      }));
+    }
+  }, {
+    key: "buildBotItem",
+    value: function buildBotItem(bot, i) {
+      return React.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_ListItem___default.a, {
+        onClick: this.props.resourceSelectHandler,
+        className: classes.accountItem,
+        value: i,
+        key: i
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_ListItemText___default.a, {
+        key: i,
+        style: styles.listItemText,
+        primary: bot.id + ': ' + bot.info || ''
+      }));
+    }
+  }, {
+    key: "buildUserItem",
+    value: function buildUserItem(user, i) {
+      return React.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_ListItem___default.a, {
+        onClick: this.props.resourceSelectHandler,
+        className: classes.accountItem,
+        value: i,
+        key: i
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_ListItemText___default.a, {
+        key: i,
+        style: styles.listItemText,
+        primary: user.id + ': ' + user.name || ''
+      }));
+    }
+  }, {
     key: "getMenuItems",
-    value: function getMenuItems(accounts) {
-      if (accounts) {
+    value: function getMenuItems(resources) {
+      if (resources) {
         var _items = [];
 
-        for (var i = 0; i < accounts.length; i++) {
-          _items.push(React.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_ListItem___default.a, {
-            onClick: this.props.accountSelectHandler,
-            className: classes.accountItem,
-            value: i,
-            key: i
-          }, React.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_ListItemText___default.a, {
-            key: i,
-            style: styles.listItemText,
-            primary: accounts[i].id + ': ' + accounts[i].label || ''
-          })));
+        switch (this.state.type) {
+          case 'accounts':
+            for (var i = 0; i < resources.length; i++) {
+              _items.push(this.buildAccountItem(resources[i], i));
+            }
+
+            break;
+
+          case 'users':
+            for (var _i = 0; _i < resources.length; _i++) {
+              _items.push(this.buildUserItem(resources[_i], _i));
+            }
+
+            break;
+
+          case 'bots':
+            for (var _i2 = 0; _i2 < resources.length; _i2++) {
+              _items.push(this.buildBotItem(resources[_i2], _i2));
+            }
+
+            break;
         }
 
         return _items;
@@ -65565,24 +65753,24 @@ function (_Component2) {
         onClick: this.toggleCollapse
       })), React.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Collapse___default.a, {
         in: this.state.open
-      }, this.state.accountMenuItems));
+      }, this.state.menuItems));
     }
   }]);
 
-  return AccountList;
+  return ResourceList;
 }(__WEBPACK_IMPORTED_MODULE_1_react__["Component"]);
 
-var AccountDetails =
+var ResourceDetails =
 /*#__PURE__*/
 function (_React$Component) {
-  _inherits(AccountDetails, _React$Component);
+  _inherits(ResourceDetails, _React$Component);
 
-  function AccountDetails(props) {
+  function ResourceDetails(props) {
     var _this3;
 
-    _classCallCheck(this, AccountDetails);
+    _classCallCheck(this, ResourceDetails);
 
-    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(AccountDetails).call(this, props));
+    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(ResourceDetails).call(this, props));
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this3)), "handleExpandClick", function () {
       _this3.setState({
@@ -65596,19 +65784,25 @@ function (_React$Component) {
 
     _this3.state = {
       expanded: false,
-      selectedAccount: undefined,
-      account: undefined
+      type: undefined,
+      resource: undefined,
+      resourceIndex: undefined
     };
     return _this3;
   }
 
-  _createClass(AccountDetails, [{
+  _createClass(ResourceDetails, [{
     key: "componentWillReceiveProps",
     value: function componentWillReceiveProps(props) {
-      this.setState({
-        selectedAccount: props.selectedAccount,
-        account: props.account
-      });
+      var propObject = {};
+
+      for (var prop in props) {
+        if (props[prop]) {
+          propObject[prop] = props[prop];
+        }
+      }
+
+      this.setState(_objectSpread({}, propObject));
     }
   }, {
     key: "render",
@@ -65616,33 +65810,33 @@ function (_React$Component) {
       return React.createElement(__WEBPACK_IMPORTED_MODULE_8__material_ui_core_Card___default.a, {
         className: classes.accountDetails
       }, React.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_CardHeader___default.a, {
-        avatar: React.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Avatar___default.a, {
+        avatar: React.createElement(__WEBPACK_IMPORTED_MODULE_35__material_ui_core_Avatar___default.a, {
           "aria-label": "Account Details",
           className: classes.accountAvatar
-        }, this.state.selectedAccount),
-        action: React.createElement(__WEBPACK_IMPORTED_MODULE_13__material_ui_core_IconButton___default.a, null, React.createElement(__WEBPACK_IMPORTED_MODULE_35__material_ui_icons_MoreVert___default.a, null)),
+        }, this.state.resourceIndex),
+        action: React.createElement(__WEBPACK_IMPORTED_MODULE_13__material_ui_core_IconButton___default.a, null, React.createElement(__WEBPACK_IMPORTED_MODULE_41__material_ui_icons_MoreVert___default.a, null)),
         title: "Account Details",
-        subheader: this.state.selectedAccount
+        subheader: this.state.resourceIndex
       }), React.createElement(__WEBPACK_IMPORTED_MODULE_10__material_ui_core_CardMedia___default.a, {
         className: classes.accountMedia,
         image: "/static/images/logo.png",
         title: "TRX"
       }), React.createElement(__WEBPACK_IMPORTED_MODULE_11__material_ui_core_CardContent___default.a, null, React.createElement(__WEBPACK_IMPORTED_MODULE_5__material_ui_core_Typography___default.a, {
         component: "div"
-      }, this.state.account ? this.state.account.label : '')), React.createElement(__WEBPACK_IMPORTED_MODULE_12__material_ui_core_CardActions___default.a, {
+      }, this.state.resource ? getResourceLabel(this.state.resource) : '')), React.createElement(__WEBPACK_IMPORTED_MODULE_12__material_ui_core_CardActions___default.a, {
         className: classes.accountDetailsActions,
         disableActionSpacing: true
       }, React.createElement(__WEBPACK_IMPORTED_MODULE_13__material_ui_core_IconButton___default.a, {
         "aria-label": "Add to favorites"
-      }, React.createElement(__WEBPACK_IMPORTED_MODULE_32__material_ui_icons_Favorite___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_13__material_ui_core_IconButton___default.a, {
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_38__material_ui_icons_Favorite___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_13__material_ui_core_IconButton___default.a, {
         "aria-label": "Share"
-      }, React.createElement(__WEBPACK_IMPORTED_MODULE_33__material_ui_icons_Share___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_13__material_ui_core_IconButton___default.a, {
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_39__material_ui_icons_Share___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_13__material_ui_core_IconButton___default.a, {
         className: classes.accountDetailsExpand,
         style: styles.expandOpen,
         onClick: this.handleExpandClick,
         "aria-expanded": this.state.expanded,
         "aria-label": "Show more"
-      }, React.createElement(__WEBPACK_IMPORTED_MODULE_34__material_ui_icons_ExpandMore___default.a, null))), React.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Collapse___default.a, {
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_40__material_ui_icons_ExpandMore___default.a, null))), React.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Collapse___default.a, {
         in: this.state.expanded,
         timeout: "auto",
         unmountOnExit: true
@@ -65652,14 +65846,15 @@ function (_React$Component) {
         component: "div"
       }, React.createElement(RenderedDetails, {
         snackbarHandler: this.props.snackbarHandler,
-        account: this.state.account,
-        accountUpdateHandler: this.props.accountUpdateHandler
+        resource: this.state.resource,
+        resourceUpdateHandler: this.props.resourceUpdateHandler,
+        type: this.state.type
       })))));
     } // TODO: use it or lose it
 
   }]);
 
-  return AccountDetails;
+  return ResourceDetails;
 }(React.Component);
 
 var MasterButtons =
@@ -65682,12 +65877,12 @@ function (_React$Component2) {
     value: function render() {
       return React.createElement("div", {
         id: "start-button"
-      }, React.createElement(__WEBPACK_IMPORTED_MODULE_30_material_ui_FlatButton_FlatButton___default.a, {
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_36_material_ui_FlatButton_FlatButton___default.a, {
         label: "Refresh",
         labelPosition: "before",
         primary: false,
         icon: React.createElement(__WEBPACK_IMPORTED_MODULE_17_material_ui_svg_icons_action_power_settings_new___default.a, null)
-      }), React.createElement(__WEBPACK_IMPORTED_MODULE_30_material_ui_FlatButton_FlatButton___default.a, {
+      }), React.createElement(__WEBPACK_IMPORTED_MODULE_36_material_ui_FlatButton_FlatButton___default.a, {
         label: "Delete",
         labelPosition: "before",
         primary: false,
@@ -65710,11 +65905,22 @@ function (_React$Component3) {
 
     _this5 = _possibleConstructorReturn(this, _getPrototypeOf(RenderedDetails).call(this, props));
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "initialState", function () {
+      return {
+        resource: 69,
+        type: undefined
+      };
+    });
+
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "updateLabel", function (e) {
       var text = e.target.value;
 
       _this5.setState({
-        label: text
+        resource: _objectSpread({}, _this5.state.resource, {
+          label: text
+        })
+      }, function () {
+        _this5.resourceUpdateHandler(_this5.state.resource);
       });
     });
 
@@ -65728,57 +65934,16 @@ function (_React$Component3) {
     /*#__PURE__*/
     _asyncToGenerator(
     /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee3() {
-      var response;
-      return regeneratorRuntime.wrap(function _callee3$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              console.log('Enable key');
-              _context3.next = 3;
-              return Object(__WEBPACK_IMPORTED_MODULE_37__utils___["b" /* request */])({
-                url: urls.activate_key,
-                method: 'GET',
-                params: {
-                  key_id: _this5.state.id
-                }
-              });
-
-            case 3:
-              response = _context3.sent;
-
-              if (response.error) {
-                console.log('Error', Object(__WEBPACK_IMPORTED_MODULE_37__utils___["a" /* handleResponse */])(response));
-              } else {
-                console.log('Key enabled', response);
-
-                if (!_this5.state.status) {
-                  _this5.toggleStatus();
-                }
-              }
-
-            case 5:
-            case "end":
-              return _context3.stop();
-          }
-        }
-      }, _callee3, this);
-    })));
-
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "disableKey",
-    /*#__PURE__*/
-    _asyncToGenerator(
-    /*#__PURE__*/
     regeneratorRuntime.mark(function _callee4() {
       var response;
       return regeneratorRuntime.wrap(function _callee4$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              console.log('Disable key');
+              console.log('Enable key');
               _context4.next = 3;
-              return Object(__WEBPACK_IMPORTED_MODULE_37__utils___["b" /* request */])({
-                url: urls.deactivate_key,
+              return Object(__WEBPACK_IMPORTED_MODULE_43__utils___["b" /* request */])({
+                url: urls.activate_key,
                 method: 'GET',
                 params: {
                   key_id: _this5.state.id
@@ -65789,11 +65954,11 @@ function (_React$Component3) {
               response = _context4.sent;
 
               if (response.error) {
-                console.log('Error', Object(__WEBPACK_IMPORTED_MODULE_37__utils___["a" /* handleResponse */])(response));
+                console.log('Error', Object(__WEBPACK_IMPORTED_MODULE_43__utils___["a" /* handleResponse */])(response));
               } else {
-                console.log('Key disabled', response);
+                console.log('Key enabled', response);
 
-                if (_this5.state.status) {
+                if (!_this5.state.status) {
                   _this5.toggleStatus();
                 }
               }
@@ -65806,7 +65971,7 @@ function (_React$Component3) {
       }, _callee4, this);
     })));
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "saveChanges",
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "disableKey",
     /*#__PURE__*/
     _asyncToGenerator(
     /*#__PURE__*/
@@ -65816,13 +65981,54 @@ function (_React$Component3) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              console.log('Save changes to key');
+              console.log('Disable key');
               _context5.next = 3;
-              return Object(__WEBPACK_IMPORTED_MODULE_37__utils___["b" /* request */])({
-                url: urls.update_key.replace('0000', formatKey(_this5.state.id)),
+              return Object(__WEBPACK_IMPORTED_MODULE_43__utils___["b" /* request */])({
+                url: urls.deactivate_key,
+                method: 'GET',
+                params: {
+                  key_id: _this5.state.id
+                }
+              });
+
+            case 3:
+              response = _context5.sent;
+
+              if (response.error) {
+                console.log('Error', Object(__WEBPACK_IMPORTED_MODULE_43__utils___["a" /* handleResponse */])(response));
+              } else {
+                console.log('Key disabled', response);
+
+                if (_this5.state.status) {
+                  _this5.toggleStatus();
+                }
+              }
+
+            case 5:
+            case "end":
+              return _context5.stop();
+          }
+        }
+      }, _callee5, this);
+    })));
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "saveChanges",
+    /*#__PURE__*/
+    _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee6() {
+      var response;
+      return regeneratorRuntime.wrap(function _callee6$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              console.log('Save changes to key');
+              _context6.next = 3;
+              return Object(__WEBPACK_IMPORTED_MODULE_43__utils___["b" /* request */])({
+                url: urls.update_key.replace('0000', formatKey(_this5.state.resource.id)),
                 method: 'POST',
                 body: {
-                  label: _this5.state.label
+                  label: _this5.state.resource.label
                 },
                 headers: {
                   'Content-Type': 'application/json',
@@ -65831,10 +66037,10 @@ function (_React$Component3) {
               });
 
             case 3:
-              response = _context5.sent;
+              response = _context6.sent;
 
               if (response.error) {
-                console.log('Error', Object(__WEBPACK_IMPORTED_MODULE_37__utils___["a" /* handleResponse */])(response));
+                console.log('Error', Object(__WEBPACK_IMPORTED_MODULE_43__utils___["a" /* handleResponse */])(response));
               } else {
                 console.log('Key changes saved', response);
 
@@ -65855,10 +66061,10 @@ function (_React$Component3) {
 
             case 5:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
         }
-      }, _callee5, this);
+      }, _callee6, this);
     })));
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "deleteKey", function () {
@@ -65867,49 +66073,15 @@ function (_React$Component3) {
       _this5.showSnackbar('Can\'t delete key yet!!!');
     });
 
-    _this5.state = {};
-    return _this5;
-  }
-
-  _createClass(RenderedDetails, [{
-    key: "componentWillReceiveProps",
-    value: function componentWillReceiveProps(props) {
-      if (props.account) {
-        this.setState({
-          label: props.account.label,
-          id: props.account.id,
-          status: props.account.status,
-          balance: props.account.balance,
-          multi: props.account.multi,
-          userName: props.account.user.name,
-          email: props.account.user.email,
-          level: props.account.user.level,
-          created: props.account.user.created
-        });
-      }
-
-      if (props.snackbarHandler) {
-        this.showSnackbar = props.snackbarHandler;
-      }
-
-      if (props.accountUpdateHandler) {
-        this.accountUpdateHandler = props.accountUpdateHandler;
-      }
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var _this6 = this;
-
-      if (this.props.account) {
-        var account = this.props.account;
-        var user = account.user;
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "RenderedAccount", function (account) {
+      if (account && account.user) {
+        var _user = account.user;
         return React.createElement("div", null, React.createElement("h4", null, "Account Info"), React.createElement("span", {
           className: classes.detailsLabel
         }, "ID:"), " ", account.id, " ", React.createElement("span", {
           className: classes.detailsLabel
         }, "Status", React.createElement("button", {
-          className: this.state.status ? 'status-active' : 'status-deactive'
+          className: account.status ? 'status-active' : 'status-deactive'
         })), " ", React.createElement("br", null), React.createElement("span", {
           className: classes.detailsLabel
         }, "Balance:"), " ", account.balance, " ", React.createElement("br", null), React.createElement("span", {
@@ -65919,12 +66091,72 @@ function (_React$Component3) {
           label: "Label: ",
           className: classes.detailsLabelText,
           placeholder: "Key label",
-          value: this.state.label,
+          value: account.label,
           onChange: function onChange(e) {
-            return _this6.updateLabel(e);
+            return _this5.updateLabel(e);
           },
           margin: "normal"
         }), React.createElement("h4", null, "Owner"), React.createElement("span", {
+          className: classes.detailsLabel
+        }, "Name:"), " ", _user.name, " ", React.createElement("br", null), React.createElement("span", {
+          className: classes.detailsLabel
+        }, "Email:"), " ", _user.email, " ", React.createElement("br", null), React.createElement("span", {
+          className: classes.detailsLabel
+        }, "Level:"), " ", _user.level, " ", React.createElement("br", null), React.createElement("span", {
+          className: classes.detailsLabel
+        }, "Joined:"), " ", _user.created, " ", React.createElement("br", null), React.createElement("div", {
+          className: "buttons-div"
+        }, React.createElement(__WEBPACK_IMPORTED_MODULE_37__material_ui_core_Button___default.a, {
+          variant: "fab",
+          "aria-label": "Enable",
+          style: styles.enableButton,
+          className: classes.button,
+          onClick: _this5.enableKey
+        }, React.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_icons_Add___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_37__material_ui_core_Button___default.a, {
+          variant: "fab",
+          "aria-label": "Disable",
+          style: styles.disableButton,
+          className: classes.button,
+          onClick: _this5.disableKey
+        }, React.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_icons_Remove___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_37__material_ui_core_Button___default.a, {
+          variant: "fab",
+          "aria-label": "Save",
+          style: styles.saveButton,
+          className: classes.button,
+          onClick: _this5.saveChanges
+        }, React.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_icons_Save___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_37__material_ui_core_Button___default.a, {
+          variant: "fab",
+          "aria-label": "Delete",
+          style: styles.deleteButton,
+          className: classes.button,
+          onClick: _this5.deleteKey
+        }, React.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_icons_Delete___default.a, null))));
+      } else {
+        return null;
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "RenderedUser", function (user) {
+      if (user && user.name) {
+        return React.createElement("div", null, React.createElement("h4", null, "User Info"), React.createElement("span", {
+          className: classes.detailsLabel
+        }, "ID:"), " ", user.id, " ", React.createElement("span", {
+          className: classes.detailsLabel
+        }, "Status", React.createElement("button", {
+          className: user.status ? 'status-active' : 'status-deactive'
+        })), " ", React.createElement("br", null), React.createElement("span", {
+          className: classes.detailsLabel
+        }, "Balance:"), " ", user.balance, " ", React.createElement("br", null), React.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_TextField___default.a, {
+          id: "key-label",
+          label: "Name: ",
+          className: classes.detailsLabelText,
+          placeholder: "User name",
+          value: user.name,
+          onChange: function onChange(e) {
+            return _this5.updateName(e);
+          },
+          margin: "normal"
+        }), React.createElement("span", {
           className: classes.detailsLabel
         }, "Name:"), " ", user.name, " ", React.createElement("br", null), React.createElement("span", {
           className: classes.detailsLabel
@@ -65934,38 +66166,156 @@ function (_React$Component3) {
           className: classes.detailsLabel
         }, "Joined:"), " ", user.created, " ", React.createElement("br", null), React.createElement("div", {
           className: "buttons-div"
-        }, React.createElement(__WEBPACK_IMPORTED_MODULE_31__material_ui_core_Button___default.a, {
+        }, React.createElement(__WEBPACK_IMPORTED_MODULE_37__material_ui_core_Button___default.a, {
           variant: "fab",
           "aria-label": "Enable",
           style: styles.enableButton,
           className: classes.button,
-          onClick: this.enableKey
-        }, React.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_icons_Add___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_31__material_ui_core_Button___default.a, {
+          onClick: _this5.enableUser
+        }, React.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_icons_Add___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_37__material_ui_core_Button___default.a, {
           variant: "fab",
           "aria-label": "Disable",
           style: styles.disableButton,
           className: classes.button,
-          onClick: this.disableKey
-        }, React.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_icons_Remove___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_31__material_ui_core_Button___default.a, {
+          onClick: _this5.disableUser
+        }, React.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_icons_Remove___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_37__material_ui_core_Button___default.a, {
           variant: "fab",
           "aria-label": "Save",
           style: styles.saveButton,
           className: classes.button,
-          onClick: this.saveChanges
-        }, React.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_icons_Save___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_31__material_ui_core_Button___default.a, {
+          onClick: _this5.saveChanges
+        }, React.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_icons_Save___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_37__material_ui_core_Button___default.a, {
           variant: "fab",
           "aria-label": "Delete",
           style: styles.deleteButton,
           className: classes.button,
-          onClick: this.deleteKey
+          onClick: _this5.deleteUser
         }, React.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_icons_Delete___default.a, null))));
       } else {
-        return React.createElement("div", null, React.createElement("h4", null, "Please select an account"));
+        return null;
+      }
+    });
+
+    _this5.state = _this5.initialState();
+    return _this5;
+  }
+
+  _createClass(RenderedDetails, [{
+    key: "componentWillReceiveProps",
+    value: function componentWillReceiveProps(props) {
+      console.log('RenderedDetails receiving props', props);
+
+      if (props.type && props.type !== this.props.type) {
+        this.setState(this.initialState());
+      } else {
+        this.setState(_objectSpread({}, cleanProps(props)));
+      }
+
+      if (props.snackbarHandler) {
+        this.showSnackbar = props.snackbarHandler;
+      }
+
+      if (props.resourceUpdateHandler) {
+        this.resourceUpdateHandler = props.resourceUpdateHandler;
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      if (this.state.resource && this.state.resource !== 69) {
+        if (this.state.type === 'accounts') {
+          return this.RenderedAccount(this.state.resource);
+        } else if (this.state.type === 'users') {
+          return this.RenderedUser(this.state.resource);
+        } else if (this.state.type === 'bots') {
+          return this.RenderedBot(this.state.resource);
+        }
+      } else {
+        return React.createElement("div", null, React.createElement("h4", null, "Please select a resource"));
       }
     }
   }]);
 
   return RenderedDetails;
+}(React.Component);
+
+var ResourceSelector =
+/*#__PURE__*/
+function (_React$Component4) {
+  _inherits(ResourceSelector, _React$Component4);
+
+  function ResourceSelector(props) {
+    var _this6;
+
+    _classCallCheck(this, ResourceSelector);
+
+    _this6 = _possibleConstructorReturn(this, _getPrototypeOf(ResourceSelector).call(this, props));
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this6)), "selectHandler", function (e, value) {
+      console.log('changed to value', value);
+
+      _this6.setState({
+        selected: value
+      });
+
+      if (_this6.typeSelectHandler) {
+        _this6.typeSelectHandler(value);
+      }
+    });
+
+    _this6.state = {
+      selected: undefined
+    };
+    return _this6;
+  }
+
+  _createClass(ResourceSelector, [{
+    key: "componentWillReceiveProps",
+    value: function componentWillReceiveProps(props) {
+      if (props.typeSelectHandler) {
+        this.typeSelectHandler = props.typeSelectHandler;
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return React.createElement(__WEBPACK_IMPORTED_MODULE_33__material_ui_core_FormControl___default.a, {
+        component: "fieldset",
+        className: classes.formControl
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_34__material_ui_core_FormLabel___default.a, {
+        component: "legend"
+      }, "Resource"), React.createElement(__WEBPACK_IMPORTED_MODULE_30__material_ui_core_RadioGroup___default.a, {
+        "aria-label": "resource",
+        name: "resource",
+        value: this.state.selected,
+        row: true,
+        onChange: this.selectHandler
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_32__material_ui_core_FormControlLabel___default.a, {
+        value: "accounts",
+        control: React.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Radio___default.a, {
+          color: "primary"
+        }),
+        label: "Account",
+        labelPlacement: "start"
+      }), React.createElement(__WEBPACK_IMPORTED_MODULE_32__material_ui_core_FormControlLabel___default.a, {
+        value: "users",
+        control: React.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Radio___default.a, {
+          color: "primary"
+        }),
+        label: "User",
+        labelPlacement: "start"
+      }), React.createElement(__WEBPACK_IMPORTED_MODULE_32__material_ui_core_FormControlLabel___default.a, {
+        value: "bots",
+        control: React.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Radio___default.a, {
+          color: "primary"
+        }),
+        label: "Bot",
+        labelPlacement: "start"
+      })));
+    }
+  }]);
+
+  return ResourceSelector;
 }(React.Component);
 
 function getCSRFToken() {
@@ -65986,6 +66336,59 @@ function formatKey(key) {
   }
 
   return urlString;
+}
+
+function getResourceLabel(resource, type) {
+  switch (type) {
+    case 'bots':
+      return resource.id;
+
+    case 'users':
+      return user.name;
+
+    case 'accounts':
+      return resource.label;
+  }
+}
+
+function buildResourceDetails(state, resource, type) {
+  if (type === 'bots') {
+    return;
+  } else if (type === 'accounts') {
+    return {
+      label: resource.label,
+      id: resource.id,
+      status: resource.status,
+      balance: resource.balance,
+      multi: resource.multi,
+      userName: resource.user.name,
+      email: resource.user.email,
+      level: resource.user.level,
+      created: resource.user.created
+    };
+  } else if (type === 'users') {
+    return {
+      id: resource.id,
+      name: resource.name,
+      balance: resource.balance,
+      keys: resource.keys,
+      email: resource.email,
+      created: resource.created,
+      level: resource.level
+    };
+  }
+}
+
+function cleanProps(props) {
+  var propObject = {};
+
+  for (var prop in props) {
+    if (props[prop]) {
+      propObject[prop] = props[prop];
+    }
+  }
+
+  return propObject;
 }
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
@@ -73913,9 +74316,7 @@ function (_React$Component) {
     key: "render",
     value: function render() {
       var classes = this.props.classes;
-      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__material_ui_core_Button___default.a, {
-        onClick: this.handleClick
-      }, "Open simple snackbar"), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__material_ui_core_Snackbar___default.a, {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__material_ui_core_Snackbar___default.a, {
         anchorOrigin: {
           vertical: 'bottom',
           horizontal: 'left'
@@ -105496,6 +105897,12 @@ function last(array) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__material_ui_icons_Inbox___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_15__material_ui_icons_Inbox__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__material_ui_icons_Mail__ = __webpack_require__(1151);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__material_ui_icons_Mail___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_16__material_ui_icons_Mail__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Menu__ = __webpack_require__(1156);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Menu___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Menu__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon__ = __webpack_require__(999);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon__);
+var _this2 = this;
+
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -105534,7 +105941,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var trxLogo = function trxLogo() {
+
+
+var TRXLogo = function TRXLogo() {
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("img", {
     id: "trx-logo-img",
     height: "64px",
@@ -105542,6 +105951,11 @@ var trxLogo = function trxLogo() {
   }));
 };
 
+var classes = {
+  menuButton: 'menu-button',
+  logoIcon: 'trx-logo-icon',
+  logoButton: 'trx-logo-button'
+};
 var menuItems = // trx_env === 'LOCAL_DEVELOPMENT' ?
 [{
   url: '/user',
@@ -105603,44 +106017,53 @@ var buildSideMenuItems = function buildSideMenuItems(menuItems) {
       href: item.url
     })));
   }
-}; // const sideList = (
-//     <div className='side-list-example'>
-//       <List>
-//         {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-//           <ListItem button key={text}>
-//             <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-//             <ListItemText primary={text} />
-//           </ListItem>
-//         ))}
-//       </List>
-//       <Divider />
-//       <List>
-//         {['All mail', 'Trash', 'Spam'].map((text, index) => (
-//           <ListItem button key={text}>
-//             <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-//             <ListItemText primary={text} />
-//           </ListItem>
-//         ))}
-//       </List>
-//     </div>
-//   )
+};
 
-
-var TRXDrawer =
+var TrxNav =
 /*#__PURE__*/
 function (_React$Component) {
-  _inherits(TRXDrawer, _React$Component);
+  _inherits(TrxNav, _React$Component);
 
-  function TRXDrawer(props) {
+  function TrxNav(props) {
     var _this;
 
-    _classCallCheck(this, TRXDrawer);
+    _classCallCheck(this, TrxNav);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(TRXDrawer).call(this, props));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TrxNav).call(this, props));
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "toggleOpen", function () {
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "state", {
+      drawerActive: false,
+      drawerPinned: false,
+      sidebarPinned: false
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "toggleMenu", function () {
       _this.setState({
         open: !_this.state.open
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleRequestClose", function () {
+      _this.setState({
+        open: false
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "toggleDrawerActive", function () {
+      _this.setState({
+        drawerActive: !_this.state.drawerActive
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "toggleDrawerPinned", function () {
+      _this.setState({
+        drawerPinned: !_this.state.drawerPinned
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "toggleSidebar", function () {
+      _this.setState({
+        sidebarPinned: !_this.state.sidebarPinned
       });
     });
 
@@ -105650,147 +106073,79 @@ function (_React$Component) {
     return _this;
   }
 
-  _createClass(TRXDrawer, [{
-    key: "render",
-    value: function render() {
-      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("h1", null, "I'M RIGHT FUCKING HERE"), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__material_ui_core_Drawer___default.a, {
-        open: this.state.open,
-        onClose: this.toggleOpen
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
-        tabIndex: 0,
-        role: "button",
-        onClick: this.toggleOpen,
-        onKeyDown: this.toggleOpen
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_11__material_ui_core_List___default.a, null, buildSideMenuItems(menuItems)))));
-    }
-  }]);
-
-  return TRXDrawer;
-}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component); // const drawer = (
-//     <div>
-//       <div className={classes.toolbar} />
-//       <Divider />
-//       <List>
-//         {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-//           <ListItem button key={text}>
-//             <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-//             <ListItemText primary={text} />
-//           </ListItem>
-//         ))}
-//       </List>
-//       <Divider />
-//       <List>
-//         {['All mail', 'Trash', 'Spam'].map((text, index) => (
-//           <ListItem button key={text}>
-//             <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-//             <ListItemText primary={text} />
-//           </ListItem>
-//         ))}
-//       </List>
-//     </div>
-//   );
-
-
-var TrxNav =
-/*#__PURE__*/
-function (_React$Component2) {
-  _inherits(TrxNav, _React$Component2);
-
-  function TrxNav(props) {
-    var _this2;
-
-    _classCallCheck(this, TrxNav);
-
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TrxNav).call(this, props));
-
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "state", {
-      drawerActive: false,
-      drawerPinned: false,
-      sidebarPinned: false
-    });
-
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "toggleMenu", function () {
-      _this2.setState({
-        open: !_this2.state.open
-      });
-    });
-
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "handleRequestClose", function () {
-      _this2.setState({
-        open: false
-      });
-    });
-
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "toggleDrawerActive", function () {
-      _this2.setState({
-        drawerActive: !_this2.state.drawerActive
-      });
-    });
-
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "toggleDrawerPinned", function () {
-      _this2.setState({
-        drawerPinned: !_this2.state.drawerPinned
-      });
-    });
-
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "toggleSidebar", function () {
-      _this2.setState({
-        sidebarPinned: !_this2.state.sidebarPinned
-      });
-    });
-
-    _this2.state = {
-      open: false
-    };
-    return _this2;
-  }
-
   _createClass(TrxNav, [{
+    key: "componentWillReceiveProps",
+    value: function componentWillReceiveProps(props) {
+      if (props.drawerHandler) {
+        this.drawerHandler = props.drawerHandler;
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
-      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__material_ui_core_AppBar___default.a, {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__material_ui_core_AppBar___default.a, _defineProperty({
         position: "sticky",
         className: "appbar"
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__material_ui_core_Toolbar___default.a, {
+      }, "position", "static"), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__material_ui_core_Toolbar___default.a, {
         disableGutters: !this.state.open,
-        className: "toolbar"
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__material_ui_core_Avatar___default.a, {
-        src: "https://vignette.wikia.nocookie.net/fictspedia/images/2/23/Killer_frog.jpg"
-      }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
-        className: "trx-appbar-nav",
-        style: {
-          backgroundColor: '#333333'
-        }
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
-        className: "app-bar-icons"
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4_react_toolbox_lib_link___default.a, {
-        className: "app-bar-icon app-bar-trade",
-        href: "/transaction/tx-gui",
-        label: "",
-        icon: "inbox"
-      }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4_react_toolbox_lib_link___default.a, {
-        className: "app-bar-icon app-bar-user",
-        href: "/user",
-        active: true,
-        label: ""
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__material_ui_core_Avatar___default.a, {
-        src: "sites/default/files/2017-09/X58Q4cA.jpg"
-      })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Menu___default.a, {
-        open: this.state.open,
-        onClick: this.toggleMenu,
-        className: "app-bar-icon app-bar-user-menu",
-        href: "#"
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
-        className: "user-menu"
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4_react_toolbox_lib_link___default.a, {
-        className: "user-logout",
-        href: "/logout"
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_8__material_ui_core_MenuItem___default.a, null, "Log Out")))))))));
+        className: "toolbar",
+        title: TRXLogo()
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
+        className: classes.menuBotton
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Menu___default.a, {
+        onClick: this.drawerHandler
+      })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
+        className: classes.logoButton
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TRXLogo, {
+        className: classes.logoIcon
+      })))));
     }
   }]);
 
   return TrxNav;
 }(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
+
+var oldStuff = function oldStuff() {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__material_ui_core_Avatar___default.a, {
+    src: "https://vignette.wikia.nocookie.net/fictspedia/images/2/23/Killer_frog.jpg"
+  }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
+    className: "trx-appbar-nav",
+    style: {
+      backgroundColor: '#333333'
+    }
+  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
+    className: "app-bar-icons"
+  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4_react_toolbox_lib_link___default.a, {
+    className: "app-bar-icon app-bar-trade",
+    href: "/transaction/tx-gui",
+    label: "",
+    icon: "inbox"
+  }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4_react_toolbox_lib_link___default.a, {
+    className: "app-bar-icon app-bar-user",
+    href: "/user",
+    active: true,
+    label: ""
+  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__material_ui_core_Avatar___default.a, {
+    src: "sites/default/files/2017-09/X58Q4cA.jpg"
+  })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Menu___default.a, {
+    open: _this2.state.open,
+    onClick: _this2.toggleMenu,
+    className: "app-bar-icon app-bar-user-menu",
+    href: "#"
+  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
+    className: "user-menu"
+  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4_react_toolbox_lib_link___default.a, {
+    className: "user-logout",
+    href: "/logout"
+  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_8__material_ui_core_MenuItem___default.a, null, "Log Out")))))));
+};
+
+var logoIcon = function logoIcon() {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon___default.a, {
+    className: classes.logoIcon,
+    hidden: false
+  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TRXLogo, null));
+};
 
 /***/ }),
 /* 1150 */
@@ -106181,9 +106536,7 @@ function (_React$Component) {
           primary: text
         }));
       })));
-      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__material_ui_core_Button___default.a, {
-        onClick: this.toggleDrawer('left', true)
-      }, "Open Drawer"), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__material_ui_core_Drawer___default.a, {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__material_ui_core_Drawer___default.a, {
         open: this.state.left,
         onClose: this.toggleDrawer('left', false)
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
@@ -106305,6 +106658,33 @@ var _default = (0, _createSvgIcon.default)(_react.default.createElement(_react.d
 }), _react.default.createElement("path", {
   d: "M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
 })), 'People');
+
+exports.default = _default;
+
+/***/ }),
+/* 1156 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(0);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _createSvgIcon = _interopRequireDefault(__webpack_require__(54));
+
+var _default = (0, _createSvgIcon.default)(_react.default.createElement(_react.default.Fragment, null, _react.default.createElement("path", {
+  fill: "none",
+  d: "M0 0h24v24H0z"
+}), _react.default.createElement("path", {
+  d: "M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
+})), 'Menu');
 
 exports.default = _default;
 

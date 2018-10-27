@@ -1,5 +1,16 @@
+/**
+  AppBar and Drawer
+*/
+.trx-logo-button {
+  padding: 0!important;
+}
+
 .account-list-scroll {
   max-height: 38.13em;
+}
+
+.list-title {
+  padding: 5%;
 }
 /**
 * Account list item
