@@ -18,11 +18,21 @@ import ListItemText from '@material-ui/core/ListItemText'
 
 import InboxIcon from '@material-ui/icons/Inbox'
 import MailIcon from '@material-ui/icons/Mail'
+import MenuIcon from '@material-ui/icons/Menu'
+import BasicIcon from '@material-ui/core/Icon'
 
-const trxLogo = () => {
-    return <div>
-        <img id="trx-logo-img" height="64px" src="/static/images/logo.png"/>
-    </div>
+const TRXLogo = () => {
+    return (
+    <div>
+        <img id="trx-logo-img" height='64px' src="/static/images/logo.png"/>
+    </div>)
+}
+
+const classes = {
+    menuButton: 'menu-button',
+    logoIcon: 'trx-logo-icon',
+    logoButton: 'trx-logo-button'
+
 }
 
 const menuItems =
@@ -96,83 +106,18 @@ const buildSideMenuItems = (menuItems) => {
     }
 }
 
-// const sideList = (
-//     <div className='side-list-example'>
-//       <List>
-//         {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-//           <ListItem button key={text}>
-//             <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-//             <ListItemText primary={text} />
-//           </ListItem>
-//         ))}
-//       </List>
-//       <Divider />
-//       <List>
-//         {['All mail', 'Trash', 'Spam'].map((text, index) => (
-//           <ListItem button key={text}>
-//             <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-//             <ListItemText primary={text} />
-//           </ListItem>
-//         ))}
-//       </List>
-//     </div>
-//   )
-
-  class TRXDrawer extends React.Component {
-
-    constructor (props) {
-        super(props)
-        this.state = { open: false }
-    }
-
-    toggleOpen = () => {
-        this.setState({ open: !this.state.open })
-    }
-
-    render () {
-        return (<div>
-            <h1>I'M RIGHT FUCKING HERE</h1>
-            <Drawer open={this.state.open} onClose={this.toggleOpen}>
-                <div tabIndex={0} role="button" onClick={this.toggleOpen} onKeyDown={this.toggleOpen}>
-                    <List>
-                        {buildSideMenuItems(menuItems)}
-                    </List>
-                </div>
-            </Drawer>
-            </div>
-        )
-    }
-}
-// const drawer = (
-//     <div>
-//       <div className={classes.toolbar} />
-//       <Divider />
-//       <List>
-//         {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-//           <ListItem button key={text}>
-//             <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-//             <ListItemText primary={text} />
-//           </ListItem>
-//         ))}
-//       </List>
-//       <Divider />
-//       <List>
-//         {['All mail', 'Trash', 'Spam'].map((text, index) => (
-//           <ListItem button key={text}>
-//             <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-//             <ListItemText primary={text} />
-//           </ListItem>
-//         ))}
-//       </List>
-//     </div>
-//   );
-
 export class TrxNav extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             open: false,
         };
+    }
+
+    componentWillReceiveProps (props) {
+        if (props.drawerHandler) {
+            this.drawerHandler = props.drawerHandler
+        }
     }
 
     state = {
@@ -216,8 +161,25 @@ export class TrxNav extends React.Component {
 <div>
 <AppBar
     position="sticky"
-    className='appbar'>
-    <Toolbar disableGutters={!this.state.open} className='toolbar'>
+    className='appbar'
+    position='static'>
+    <Toolbar disableGutters={!this.state.open} className='toolbar' title={TRXLogo()}>
+        <IconButton className={classes.menuBotton}>
+            <MenuIcon onClick={this.drawerHandler}/>
+        </IconButton>
+        <IconButton className={classes.logoButton}>
+            <TRXLogo className={classes.logoIcon}/>
+        </IconButton>
+    </Toolbar>
+</AppBar>
+</div>
+        )
+    }
+}
+
+const oldStuff = () => {
+    return (
+<div>
     <Avatar src="https://vignette.wikia.nocookie.net/fictspedia/images/2/23/Killer_frog.jpg"/>
     <div className='trx-appbar-nav' style={{backgroundColor: '#333333'}}>
         <div className="app-bar-icons">
@@ -237,9 +199,14 @@ export class TrxNav extends React.Component {
             </Menu>
         </div>
     </div>
-    </Toolbar>
-</AppBar>
 </div>
-        )
-    }
+    )
+}
+
+const logoIcon = () => {
+    return (
+        <BasicIcon className={classes.logoIcon} hidden={false}>
+            <TRXLogo />
+        </BasicIcon>
+    )
 }
