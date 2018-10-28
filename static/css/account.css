@@ -66,3 +66,8 @@
   height: 1.2em;
   background-color: #ff0000;
 }
+.account-media {
+  height: 0;
+  padding-top: 56.25%;
+  background-size: contain;
+}
