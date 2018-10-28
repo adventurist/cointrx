@@ -21,6 +21,7 @@ import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import CardMedia from '@material-ui/core/CardMedia'
 import CardContent from '@material-ui/core/CardContent'
+import CardActionArea from '@material-ui/core/CardActionArea'
 import CardActions from '@material-ui/core/CardActions'
 import IconButton from '@material-ui/core/IconButton'
 import Snackbar from '../snackbar'
@@ -158,6 +159,22 @@ const styles = {
 const items = [{id: 'kjHLJHluiHHOuiHGkhvgGig&*y7ohj', balance: 300}, {id: 'ijuhy)*(YgugighityigfhkFKGFT', balance: 70}, {id: 'sdkjahsd89YUioysoda8yuij', balance: 600}]
 
 const urls = JSON.parse(accountUrls.replace(/'/g, '"'))
+const imageUrls = [
+  'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/24/2428729296f7be91b976493466f86ceb70b6128c_full.jpg',
+  'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/24/243869e39f6f4524d408c11d899114bf82a760f7_full.jpg',
+  'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/24/243e82e597f378037045edcf8a2691fd25a28cc9_full.jpg',
+  'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/24/244c944e0cc6428aeebbcd0850b5c68058fa27ef_full.jpg',
+  'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/24/2465182f282086737b773c0f74d99b1b7b170fa7_full.jpg',
+  'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/24/246830185a2f769a570f6c2f9689a5622e4e5bfe_full.jpg',
+  'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/24/244075f156e29e608b85240f5011210b924b0b61_full.jpg',
+  'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/24/2430eeb3bdc98836ad3cb80020a6cf8a52db8cd5_full.jpg',
+  'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/8f/8f8ab76af2a2aec2db7cedcfab967efa8212f61f_full.jpg',
+  'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/5c/5c61893394c0ee4e652d18f98a97b892beb5aa4e_full.jpg'
+]
+
+const BoldSpan = (props) => {
+  return <span className={classes.detailsLabel}>{props.value}</span>
+}
 
 function findResourceKey (keys) {
   if (keys.length < 3) {
@@ -629,7 +646,6 @@ export class RenderedDetails extends React.Component {
   }
 
   componentWillReceiveProps (props) {
-    console.log('RenderedDetails receiving props', props)
     if (props.type && props.type !== this.props.type) {
       this.setState(this.initialState())
     } else {
@@ -641,6 +657,13 @@ export class RenderedDetails extends React.Component {
     if (props.resourceUpdateHandler) {
       this.resourceUpdateHandler = props.resourceUpdateHandler
     }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.resource && nextProps.resource.id == this.props.resource.id) {
+      return false
+    }
+    return true
   }
 
   updateLabel = (e) => {
@@ -809,18 +832,29 @@ export class RenderedDetails extends React.Component {
                     */
   RenderedBot = (bot) => {
     if (bot) {
+      // {JSON.stringify(bot.session)}
       return (
         <div>
           <h4>Bot Info</h4>
-                    <span className={classes.detailsLabel}>ID:</span> {bot.id} <span className={classes.detailsLabel}>Status<button className={bot.is_logged_in ? 'status-active' : 'status-deactive'}></button></span> <br />
-                    <Card>
-                      <CardContent>
-                        <Typography>
-                          {JSON.stringify(bot.session)}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                    <span className={classes.detailsLabel}>Message:</span> {bot.message} <br />
+            <span className={classes.detailsLabel}>ID:</span> {bot.id} <span className={classes.detailsLabel}>Status<button className={bot.is_logged_in ? 'status-active' : 'status-deactive'}></button></span> <br />
+            <Card>
+              <CardMedia
+                className={'account-media'}
+                image={bot.session ? imageUrls[Math.floor(10 * Math.random())] : ''}
+              />
+              <CardContent>
+                <Typography>
+                  <BoldSpan value='UID: '/> {bot.session ? bot.session.uid : ''}
+                </Typography>
+                <Typography>
+                <BoldSpan value='Name: ' /> {bot.session ? bot.session.name : ''}
+                </Typography>
+                <Typography>
+                <BoldSpan value='Auth token: ' /> {bot.session ? bot.session.token : ''}
+                </Typography>
+              </CardContent>
+            </Card>
+            <span className={classes.detailsLabel}>Message:</span> {bot.message} <br />
         </div>
       )
     }
@@ -990,3 +1024,4 @@ function cleanProps (props) {
   }
   return propObject
 }
+
