@@ -20618,8 +20618,40 @@ function (_React$Component2) {
       }, _callee12, this);
     })));
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "msgHandler", function (_ref13) {
-      var message = _extends({}, _ref13);
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "loginBots",
+    /*#__PURE__*/
+    _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee13() {
+      return regeneratorRuntime.wrap(function _callee13$(_context13) {
+        while (1) {
+          switch (_context13.prev = _context13.next) {
+            case 0:
+              botConnections.forEach(function (bot) {
+                if (bot.users.length === 0) {
+                  var data = {
+                    data: {
+                      bot_id: bot.id
+                    },
+                    type: 'bot:login'
+                  };
+
+                  if (sendMessage(bot, data)) {
+                    _this2.logInfo("Bot ".concat(bot.number, " (").concat(bot.id, ") is attempting a login"));
+                  }
+                }
+              });
+
+            case 1:
+            case "end":
+              return _context13.stop();
+          }
+        }
+      }, _callee13, this);
+    })));
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "msgHandler", function (_ref14) {
+      var message = _extends({}, _ref14);
 
       if ('type' in message) {
         __WEBPACK_IMPORTED_MODULE_31_loglevel___default.a.info("WS Data Event Type", message.type);
@@ -20822,11 +20854,11 @@ function (_React$Component2) {
     value: function () {
       var _componentDidMount = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee13() {
+      regeneratorRuntime.mark(function _callee14() {
         var botMenuItems, fileMenuItems;
-        return regeneratorRuntime.wrap(function _callee13$(_context13) {
+        return regeneratorRuntime.wrap(function _callee14$(_context14) {
           while (1) {
-            switch (_context13.prev = _context13.next) {
+            switch (_context14.prev = _context14.next) {
               case 0:
                 botMenuItems = buildBotMenuItems(0);
                 fileMenuItems = buildFileMenuItems(0);
@@ -20834,15 +20866,15 @@ function (_React$Component2) {
                   botMenuItems: botMenuItems,
                   fileMenuItems: fileMenuItems
                 });
-                _context13.next = 5;
+                _context14.next = 5;
                 return this.init();
 
               case 5:
               case "end":
-                return _context13.stop();
+                return _context14.stop();
             }
           }
-        }, _callee13, this);
+        }, _callee14, this);
       }));
 
       return function componentDidMount() {
@@ -20901,11 +20933,11 @@ function (_React$Component2) {
     value: function () {
       var _killBots = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee14() {
+      regeneratorRuntime.mark(function _callee15() {
         var data;
-        return regeneratorRuntime.wrap(function _callee14$(_context14) {
+        return regeneratorRuntime.wrap(function _callee15$(_context15) {
           while (1) {
-            switch (_context14.prev = _context14.next) {
+            switch (_context15.prev = _context15.next) {
               case 0:
                 data = {
                   data: [],
@@ -20918,10 +20950,10 @@ function (_React$Component2) {
 
               case 2:
               case "end":
-                return _context14.stop();
+                return _context15.stop();
             }
           }
-        }, _callee14, this);
+        }, _callee15, this);
       }));
 
       return function killBots() {
@@ -21149,6 +21181,11 @@ function (_React$Component2) {
         label: "Login",
         labelPosition: "before",
         onClick: this.loginBot,
+        primary: false
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_FlatButton_FlatButton___default.a, {
+        label: "Login All",
+        labelPosition: "before",
+        onClick: this.loginBots,
         primary: false
       }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default.a, {
         label: "Analyze",

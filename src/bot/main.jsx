@@ -554,6 +554,9 @@ export class TrxLayout extends React.Component {
         }
     }
 
+    /**
+     * Helper function to login the currently selected bot
+     */
     loginBot = async () => {
         const bot = getSelectedBot(this.state)
         const data = {
@@ -563,6 +566,23 @@ export class TrxLayout extends React.Component {
         if (sendMessage(bot, data)) {
             this.logInfo(`Bot ${bot.number} (${bot.id}) is attempting a login`)
         }
+    }
+
+    /**
+     * Helper function to login all connected bots that are not already connected
+     */
+    loginBots = async () => {
+        botConnections.forEach(bot => {
+            if (bot.users.length === 0) {
+                const data = {
+                    data: { bot_id: bot.id},
+                    type: 'bot:login'
+                }
+                if (sendMessage(bot, data)) {
+                    this.logInfo(`Bot ${bot.number} (${bot.id}) is attempting a login`)
+                }
+            }
+        })
     }
 
     /**
@@ -849,6 +869,12 @@ export class TrxLayout extends React.Component {
                     label="Login"
                     labelPosition="before"
                     onClick={this.loginBot}
+                    primary={false}
+                />
+                <FlatButton
+                    label="Login All"
+                    labelPosition="before"
+                    onClick={this.loginBots}
                     primary={false}
                 />
                 <RaisedButton
