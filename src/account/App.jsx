@@ -550,7 +550,7 @@ class ResourceDetails extends React.Component {
       <MoreVertIcon />
     </IconButton>
   }
-  title="Account Details"
+  title="Details"
   subheader={this.state.resourceIndex}
 />
 <CardMedia

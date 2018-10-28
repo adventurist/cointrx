@@ -65829,7 +65829,7 @@ function (_React$Component) {
           className: classes.accountAvatar
         }, this.state.resourceIndex),
         action: React.createElement(__WEBPACK_IMPORTED_MODULE_14__material_ui_core_IconButton___default.a, null, React.createElement(__WEBPACK_IMPORTED_MODULE_42__material_ui_icons_MoreVert___default.a, null)),
-        title: "Account Details",
+        title: "Details",
         subheader: this.state.resourceIndex
       }), React.createElement(__WEBPACK_IMPORTED_MODULE_10__material_ui_core_CardMedia___default.a, {
         className: classes.accountMedia,
