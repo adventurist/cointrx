@@ -155,8 +155,7 @@ export class TrxNav extends React.Component {
                                 <Link className="app-bar-icon app-bar-user"
                                       href='/user' active label=''>
                                     <Avatar
-                                        src="https://cointrx.com/sites/default/files/2017-09/X58Q4cA.jpg"
-                                        size={30}/>
+                                        src="sites/default/files/2017-09/X58Q4cA.jpg"/>
                                 </Link>
                                 <Link className="app-bar-icon app-bar-user-menu"
                                       href="#">

@@ -65398,40 +65398,44 @@ function (_Component) {
     _asyncToGenerator(
     /*#__PURE__*/
     regeneratorRuntime.mark(function _callee() {
-      var url, data, resourceKey;
+      var url, params, data, resourceKey;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.t0 = _this.state.type;
-              _context.next = _context.t0 === 'bots' ? 3 : _context.t0 === 'accounts' ? 5 : _context.t0 === 'users' ? 7 : 9;
+              _context.next = _context.t0 === 'bots' ? 3 : _context.t0 === 'accounts' ? 6 : _context.t0 === 'users' ? 9 : 11;
               break;
 
             case 3:
               url = urls.bot_list;
-              return _context.abrupt("break", 10);
+              params = {
+                public_api: true
+              };
+              return _context.abrupt("break", 12);
 
-            case 5:
+            case 6:
               url = urls.account_list;
-              return _context.abrupt("break", 10);
-
-            case 7:
-              url = urls.user_list;
-              return _context.abrupt("break", 10);
+              params = {
+                active: true
+              };
+              return _context.abrupt("break", 12);
 
             case 9:
+              url = urls.user_list;
+              return _context.abrupt("break", 12);
+
+            case 11:
               return _context.abrupt("return");
 
-            case 10:
-              _context.next = 12;
+            case 12:
+              _context.next = 14;
               return Object(__WEBPACK_IMPORTED_MODULE_43__utils___["b" /* request */])({
                 url: url,
-                params: {
-                  active: true
-                }
+                params: params
               });
 
-            case 12:
+            case 14:
               data = _context.sent;
 
               if (data.error) {
@@ -65445,7 +65449,7 @@ function (_Component) {
                 });
               }
 
-            case 14:
+            case 16:
             case "end":
               return _context.stop();
           }
@@ -65689,7 +65693,7 @@ function (_Component2) {
       }, React.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_ListItemText___default.a, {
         key: i,
         style: styles.listItemText,
-        primary: bot.id + ': ' + bot.info || ''
+        primary: bot.number + ': ' + bot.id.substr(0, 8) || ''
       }));
     }
   }, {
@@ -66133,6 +66137,20 @@ function (_React$Component3) {
         }, React.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_icons_Delete___default.a, null))));
       } else {
         return null;
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "RenderedBot", function (bot) {
+      if (bot) {
+        return React.createElement("div", null, React.createElement("h4", null, "Bot Info"), React.createElement("span", {
+          className: classes.detailsLabel
+        }, "ID:"), " ", bot.id, " ", React.createElement("span", {
+          className: classes.detailsLabel
+        }, "Status", React.createElement("button", {
+          className: bot.is_logged_in ? 'status-active' : 'status-deactive'
+        })), " ", React.createElement("br", null), React.createElement(__WEBPACK_IMPORTED_MODULE_8__material_ui_core_Card___default.a, null, React.createElement(__WEBPACK_IMPORTED_MODULE_11__material_ui_core_CardContent___default.a, null, React.createElement(__WEBPACK_IMPORTED_MODULE_5__material_ui_core_Typography___default.a, null, JSON.stringify(bot.session)))), React.createElement("span", {
+          className: classes.detailsLabel
+        }, "Message:"), " ", bot.message, " ", React.createElement("br", null));
       }
     });
 

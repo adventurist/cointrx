@@ -308,14 +308,16 @@ export default class AccountLayout extends Component {
     }
 
     fetchResources = async () => {
-      let url
+      let url, params
       switch (this.state.type) {
         case 'bots':
           url = urls.bot_list
+          params = { public_api: true }
           break
 
         case 'accounts':
           url = urls.account_list
+          params = { active: true }
           break
 
         case 'users':
@@ -325,10 +327,8 @@ export default class AccountLayout extends Component {
           return
       }
       const data = await request({
-        url: url,
-        params: {
-          active: true
-        }
+        url,
+        params
       })
       if (data.error) {
         log.debug('Error fetching resources', data)
@@ -430,7 +430,7 @@ class ResourceList extends Component {
     return (
       <ListItem onClick={this.props.resourceSelectHandler} className={classes.accountItem} value={i} key={i}>
           <ListItemText key={i} style={styles.listItemText} primary={
-            bot.id + ': ' + bot.info || ''
+            bot.number + ': ' + bot.id.substr(0, 8) || ''
           }/>
         </ListItem>
     )
@@ -795,6 +795,36 @@ export class RenderedDetails extends React.Component {
       return null
     }
   }
+/*<div>
+                    <h4>Bot Info</h4>
+                    <span className={classes.detailsLabel}>ID:</span> {bot.id} <span className={classes.detailsLabel}>Status<button className={bot.is_logged ? 'status-active' : 'status-deactive'}></button></span> <br />
+                    <Card>
+                      <CardContent>
+                        <Typography>
+                          {JSON.stringify(bot.session)}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                    <span className={classes.detailsLabel}>Message:</span> {bot.message} <br />
+                    */
+  RenderedBot = (bot) => {
+    if (bot) {
+      return (
+        <div>
+          <h4>Bot Info</h4>
+                    <span className={classes.detailsLabel}>ID:</span> {bot.id} <span className={classes.detailsLabel}>Status<button className={bot.is_logged_in ? 'status-active' : 'status-deactive'}></button></span> <br />
+                    <Card>
+                      <CardContent>
+                        <Typography>
+                          {JSON.stringify(bot.session)}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                    <span className={classes.detailsLabel}>Message:</span> {bot.message} <br />
+        </div>
+      )
+    }
+  }
 
   RenderedUser = (user) => {
     if (user && user.name) {
@@ -836,6 +866,8 @@ export class RenderedDetails extends React.Component {
       return null
     }
   }
+
+
 }
 
 class ResourceSelector extends React.Component {

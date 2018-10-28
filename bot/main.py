@@ -433,9 +433,27 @@ class BotFetchHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
+    def set_default_headers(self):
+        print("setting headers!!!")
+        self.set_header("access-control-allow-origin", "http://localhost:6969")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'GET, PUT, DELETE, OPTIONS')
+        # HEADERS!
+        self.set_header("Access-Control-Allow-Headers", "access-control-allow-origin,authorization,content-type")
+
+
     async def get(self, *args, **kwargs):
-        bots = [{'message': x.identify(), 'id': str(x.id), 'number': x.number} for x in application.bots]
-        self.write(json.dumps(bots))
+        bots = [{
+            'message': x.identify(),
+            'id': str(x.id),
+            'number': x.number,
+            'is_logged_in': x.is_logged_in(),
+            'session': x.session
+        } for x in application.bots]
+        if self.get_argument('public_api', None) is None:
+            self.write(json.dumps(bots))
+        else:
+            self.write(json.dumps({'bots': bots, 'code': 200 if bots is not None and len(bots) > 0 else 400}))
 
 
 class BotTrcPatternAnalysisHandler(RequestHandler):
