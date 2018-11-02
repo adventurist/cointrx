@@ -6,19 +6,17 @@ from tornado.log import enable_pretty_logging
 import tornado.ioloop
 
 # Data Science
-from scipy import interpolate as intrpl
 import pandas as pd
 import numpy as np
-import math
 
 # Data Visualization
 from bokeh.plotting import figure, output_file, ColumnDataSource, save
-from bokeh.models import HoverTool, Plot, DataRange1d, LinearAxis, Grid
+from bokeh.models import HoverTool
 from bokeh.layouts import gridplot
 
 # TRX Utilities
 from utils.cointrx_client import Client
-from utils.wsclient import Bot, as_unixtime
+from utils.wsclient import Bot
 from utils.trc_utils import *
 from utils.btcd_utils import get_env_variables
 
