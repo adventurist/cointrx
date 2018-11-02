@@ -71,7 +71,9 @@ def account_urls(trx_env):
         'activate_key': 'https://app.cointrx.com/api/key/activate',
         'deactivate_key': 'https://app.cointrx.com/api/key/deactivate',
         'update_key': 'https://app.cointrx.com/api/key/0000/update',
-        'delete_key': 'https://app.cointrx.com/api/account'
+        'delete_key': 'https://app.cointrx.com/api/account',
+        'newpassword': 'https://app.cointrx.com/api/user/trxuser/newpassword',
+        'subscription': 'wss://app.cointrx.com/services/subscribe/ws'
 
     } if trx_env == 'SNOWFLAKE' else {
         'account_list': 'http://localhost:6969/api/account',
@@ -80,7 +82,9 @@ def account_urls(trx_env):
         'activate_key': 'http://localhost:6969/api/key/activate',
         'deactivate_key': 'http://localhost:6969/api/key/deactivate',
         'update_key': 'http://localhost:6969/api/key/0000/update',
-        'delete_key': 'http://localhost:6969/api/account'
+        'delete_key': 'http://localhost:6969/api/account',
+        'newpassword': 'http://localhost:6969/api/user/trxuser/newpassword',
+        'subscription': 'ws://localhost:6969/services/subscribe/ws'
     }
 
 
