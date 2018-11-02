@@ -14,6 +14,7 @@ import warnings
 from graphql.error import GraphQLError
 from graphql.error import format_error as format_graphql_error
 
+from time import time
 from functools import wraps
 from utils.btcd_utils import RegTest
 
@@ -21,7 +22,7 @@ from tornado import escape, httpserver
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.options import define
 from tornado.websocket import WebSocketHandler
-from tornado.web import Application, RequestHandler, StaticFileHandler, HTTPError, asynchronous
+from tornado.web import Application, RequestHandler, StaticFileHandler, HTTPError
 
 from config import config as TRXConfig
 from db import db
@@ -51,6 +52,14 @@ define("port", default=6969, help="Default port for the WebServer")
 #         if isinstance(obj, datetime.datetime):
 #             return str(obj)
 #         return super(MJSONEncoder, self).default(obj)
+
+def valid_json(data):
+    try:
+        json.loads(data)
+        return True
+    except:
+        return False
+
 
 def error_response(func):
     @wraps(func)
@@ -1305,6 +1314,64 @@ class TRXBotHandler(RequestHandler):
             'code': 200
         }))
 
+
+class TRUserNewPassHandler(RequestHandler):
+    pass
+
+    async def post(self, *args, **kwargs):
+        csrf, content_type = retrieve_api_request_headers(self.request.headers)
+        error = None
+        if db.User.verify_auth_token(csrf):
+            data = json.loads(self.request.body.decode('utf-8'))
+            password = data['password']
+            uid = data['uid']
+            if password:
+                if await db.password_override(uid, password):
+                    code = 200
+                    error = 'false'
+                else:
+                    code = 401
+                    error = 'true'
+            else:
+                code = 400
+                error = 'true'
+        else:
+            code = 401
+        self.set_status(code)
+        self.write(json.dumps({'code': code, 'error': error}))
+
+
+class WSHandler(WebSocketHandler):
+
+    def __init__(self, application, request, **kwargs):
+        super().__init__(application, request, **kwargs)
+        self.connections = []
+
+    def open(self):
+        self.connections.append(self)
+        logger.info('connection added')
+
+    def on_close(self):
+        print('superfluous information')
+        self.connections.remove(self)
+        logger.info('connection removed')
+
+
+class TRXSubscriptionHandler(WSHandler):
+    async def on_message(self, message):
+        from utils.ws_request_handler import handle_ws_request
+        logger.debug('Message received: %s' % str(message))
+        if valid_json(message):
+            message_data = json.loads(message)
+            if 'type' in message_data:
+                result = await handle_ws_request(message_data['type'], message_data['data'])
+                self.write_message(json.dumps(result))
+            elif 'init' in message_data:
+                self.write_message(json.dumps({'action': 'subscription:continue'}))
+        else:
+            self.write_message(json.dumps({'message': 'Message received at %s' % str(time()), 'keepAlive': 1}))
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -1351,10 +1418,15 @@ class TRXApplication(Application):
             (r"/keys/btc/regtest/generate", RegTestUserKeyGenerateHandler),
 
             # Regression CoinTRX GW
+
+            #Regression CoinTRX Subscription
+
+            (r"/services/subscribe/ws", TRXSubscriptionHandler),
             (r"/api/pay/user/(.*)", TRXPayUser),
             (r"/api/user/pay-all", TRXPayAllUsers),
             (r"/api/account", TRXAccountHandler),
             (r"/api/bot", TRXBotHandler),
+            (r"/api/user/(.*)/newpassword", TRUserNewPassHandler),
 
             # Regression CoinTRX GW: Keys
             (r"/api/key/activate", TRXKeyActivateHandler),
