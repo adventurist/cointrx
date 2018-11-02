@@ -80,12 +80,16 @@ import { Grid } from '@material-ui/core'
 
 /* utils */
 import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
+import adminCodes from '../utils/codes'
 import Bot from '../utils/bot'
 import log from 'loglevel'
-
+import { cloneDeep } from 'lodash/fp'
 import trx from '../redux'
 
 const trxState = trx()
+window.container = {
+  ws: undefined
+}
 // console.log(trxState)
 // The urls provided by the back end
 log.setLevel('debug')
@@ -224,8 +228,19 @@ export default class AccountLayout extends Component {
         sidebarPinned: false
     };
 
+    async init () {
+      if ('container' in window && window.container['ws'] === undefined) {
+        const trxSocket = await subscribeWs(msgHandler)
+        if (trxSocket) {
+          window.container.ws = trxSocket
+          window.container.ws.name('Subscriber')
+          checkSubscription()
+        }
+      }
+    }
+
     async componentDidMount() {
-      this.setState({ mounted: true })
+      await this.init() // Start a subscription
     }
 
     handleClick = () => {
@@ -288,17 +303,6 @@ export default class AccountLayout extends Component {
     resourceUpdateHandler = (resourceData) => {
       this.setState({ resource: resourceData })
     }
-    async init () {
-      const data = await request({
-        url: urls.account_list,
-        params: {
-          active: true
-        }
-      })
-      if ('body' in data) {
-        this.setState({ accounts: data.body.accounts })
-      }
-    }
 
     getResources = () => {
       return this.state.resources[this.state.type]
@@ -360,7 +364,22 @@ export default class AccountLayout extends Component {
     }
 
     typeSelectHandler = (value) => {
-      this.setState({ type: value })
+      const newResources = cloneDeep(this.state.resources[value]) || [] // clone the resources of type selected for next state
+      this.setState({
+        resources: {
+          ...this.state.resources,
+          [ value ]: undefined // set to undefined to force DOM update on next state change
+        }
+      }, () => { // provide callback function to set the resources of selected type
+        this.setState({
+          type: value,
+          resources: { ...this.state.resources,
+            [ value ]: [ ...newResources],
+          },
+          selectedResource: newResources.length > 0 ? 0 : undefined, // only allow for a selection if the resource is available
+          resource: newResources.length > 0 ? newResources : undefined
+        })
+      })
     }
 
     /**
@@ -647,7 +666,11 @@ export class RenderedDetails extends React.Component {
 
   componentWillReceiveProps (props) {
     if (props.type && props.type !== this.props.type) {
-      this.setState(this.initialState())
+      let specialDefaults = props.type === 'users' ? { password: undefined } : undefined
+      this.setState({
+        ...this.initialState(),
+        specialDefaults
+      })
     } else {
       this.setState({ ...cleanProps(props) })
     }
@@ -660,7 +683,7 @@ export class RenderedDetails extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.resource && nextProps.resource.id == this.props.resource.id) {
+    if (this.props.resource && nextProps.resource && nextProps.resource.id == this.props.resource.id) {
       return false
     }
     return true
@@ -668,7 +691,7 @@ export class RenderedDetails extends React.Component {
 
   updateLabel = (e) => {
     const text = e.target.value
-    this.setState({ resource: { ...this.state.resource, label: text} }, () => {
+    this.setState({ resource: { ...this.state.resource, label: text } }, () => {
       this.resourceUpdateHandler(this.state.resource)
     })
   }
@@ -755,6 +778,10 @@ export class RenderedDetails extends React.Component {
   deleteKey = () => {
     console.log('Delete key')
     this.showSnackbar('Can\'t delete key yet!!!')
+  }
+
+  handlePassword = (event) => {
+    this.setState({ password: event.currentTarget.value })
   }
 
   render () {
@@ -881,6 +908,15 @@ export class RenderedDetails extends React.Component {
                     <span className={classes.detailsLabel}>Level:</span> {user.level} <br />
                     <span className={classes.detailsLabel}>Joined:</span> {user.created} <br />
 
+                    <TextField
+                      id='password'
+                      label='Password: '
+                      className={classes.detailsLabelText}
+                      placeholder='set new password'
+                      type='password'
+                      onChange={this.handlePassword}
+                      margin="normal"
+                    />
                     <div className='buttons-div'>
                       <Button variant="fab" aria-label="Enable" style={styles.enableButton} className={classes.button} onClick={this.enableUser}>
                         <AddIcon />
@@ -888,7 +924,7 @@ export class RenderedDetails extends React.Component {
                       <Button variant="fab" aria-label="Disable" style={styles.disableButton} className={classes.button} onClick={this.disableUser}>
                         <RemoveIcon />
                       </Button>
-                      <Button variant="fab" aria-label="Save" style={styles.saveButton} className={classes.button} onClick={this.saveChanges}>
+                      <Button variant="fab" aria-label="Save Password" style={styles.saveButton} className={classes.button} onClick={this.savePassword}>
                         <SaveIcon />
                       </Button>
                       <Button variant="fab" aria-label="Delete" style={styles.deleteButton} className={classes.button} onClick={this.deleteUser}>
@@ -901,6 +937,24 @@ export class RenderedDetails extends React.Component {
     }
   }
 
+  savePassword = async () => {
+    const response = await request({
+      url: urls.newpassword.replace('trxuser', this.state.resource.name),
+      method: 'POST',
+      headers: { 'csrf-token': getCSRFToken()},
+      body: {
+        password: this.state.password,
+        uid: this.state.resource.id
+      }
+    })
+
+    if (response.error) {
+      console.log('Error', handleResponse(response))
+    } else {
+      console.log('Updated password for ' + this.state.resource.id)
+      this.setState({ password: '' })
+    }
+  }
 
 }
 
@@ -958,6 +1012,41 @@ class ResourceSelector extends React.Component {
             </RadioGroup>
           </FormControl>
     )
+  }
+}
+
+const msgHandler = ({ ...message }) => {
+  log.debug('Message Received: ', message)
+  if ('data' in message) {
+    switch (message.data.action) {
+      case 'subscription:retry':
+        log.debug('Must login again')
+        break
+      case 'subscription:continue':
+        log.debug('Subscription active')
+    }
+  }
+}
+
+function checkSubscription (delay = 60000) {
+  setInterval( () =>
+    sendMessage({
+      type: adminCodes.VERIFY_SUBSCRIPTION,
+      data: {'csrf-token': getCSRFToken()}
+    }), delay
+  )
+}
+
+function sendMessage(data) {
+  try {
+    if (window.container.ws) {
+      window.container.ws.send(JSON.stringify(data))
+      return true
+    }
+    return false
+  } catch (err) {
+      log.debug(err)
+      return false
   }
 }
 
@@ -1025,3 +1114,10 @@ function cleanProps (props) {
   return propObject
 }
 
+function subscribeWs (handler, data = 'test') {
+  return requestWs({
+      url: urls.subscription,
+      params: {data: data},
+      timeout: 0
+  }, handler)
+}
