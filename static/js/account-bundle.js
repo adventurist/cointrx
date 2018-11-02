@@ -65063,12 +65063,25 @@ exports.default = NavigationMoreVert;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_42__material_ui_icons_MoreVert___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_42__material_ui_icons_MoreVert__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_43__material_ui_core__ = __webpack_require__(924);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_44__utils___ = __webpack_require__(1077);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_45__utils_bot__ = __webpack_require__(1078);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_45__utils_bot___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_45__utils_bot__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_46_loglevel__ = __webpack_require__(405);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_46_loglevel___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_46_loglevel__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_47__redux__ = __webpack_require__(1080);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_45__utils_codes__ = __webpack_require__(1158);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_46__utils_bot__ = __webpack_require__(1078);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_46__utils_bot___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_46__utils_bot__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_47_loglevel__ = __webpack_require__(405);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_47_loglevel___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_47_loglevel__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_48_lodash_fp__ = __webpack_require__(247);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_48_lodash_fp___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_48_lodash_fp__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_49__redux__ = __webpack_require__(1080);
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
@@ -65178,10 +65191,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var trxState = Object(__WEBPACK_IMPORTED_MODULE_47__redux__["a" /* default */])(); // console.log(trxState)
-// The urls provided by the back end
 
-__WEBPACK_IMPORTED_MODULE_46_loglevel___default.a.setLevel('debug'); // All stylesheet values
+
+var trxState = Object(__WEBPACK_IMPORTED_MODULE_49__redux__["a" /* default */])();
+window.container = {
+  ws: undefined // console.log(trxState)
+  // The urls provided by the back end
+
+};
+__WEBPACK_IMPORTED_MODULE_47_loglevel___default.a.setLevel('debug'); // All stylesheet values
 
 var classes = {
   main: 'main',
@@ -65449,7 +65467,7 @@ function (_Component) {
               data = _context.sent;
 
               if (data.error) {
-                __WEBPACK_IMPORTED_MODULE_46_loglevel___default.a.debug('Error fetching resources', data);
+                __WEBPACK_IMPORTED_MODULE_47_loglevel___default.a.debug('Error fetching resources', data);
               } else if (data.body) {
                 resourceKey = findResourceKey(Object.keys(data.body));
                 console.log(resourceKey);
@@ -65468,8 +65486,19 @@ function (_Component) {
     })));
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "typeSelectHandler", function (value) {
+      var newResources = Object(__WEBPACK_IMPORTED_MODULE_48_lodash_fp__["cloneDeep"])(_this.state.resources[value]) || []; // clone the resources of type selected for next state
+
       _this.setState({
-        type: value
+        resources: _objectSpread({}, _this.state.resources, _defineProperty({}, value, undefined))
+      }, function () {
+        // provide callback function to set the resources of selected type
+        _this.setState({
+          type: value,
+          resources: _objectSpread({}, _this.state.resources, _defineProperty({}, value, _toConsumableArray(newResources))),
+          selectedResource: newResources.length > 0 ? 0 : undefined,
+          // only allow for a selection if the resource is available
+          resource: newResources.length > 0 ? newResources : undefined
+        });
       });
     });
 
@@ -65494,20 +65523,34 @@ function (_Component) {
   }
 
   _createClass(AccountLayout, [{
-    key: "componentDidMount",
+    key: "init",
     value: function () {
-      var _componentDidMount = _asyncToGenerator(
+      var _init = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee2() {
+        var trxSocket;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                this.setState({
-                  mounted: true
-                });
+                if (!('container' in window && window.container['ws'] === undefined)) {
+                  _context2.next = 5;
+                  break;
+                }
 
-              case 1:
+                _context2.next = 3;
+                return subscribeWs(msgHandler);
+
+              case 3:
+                trxSocket = _context2.sent;
+
+                if (trxSocket) {
+                  window.container.ws = trxSocket;
+                  window.container.ws.name('Subscriber');
+                  checkSubscription();
+                }
+
+              case 5:
               case "end":
                 return _context2.stop();
             }
@@ -65515,39 +65558,24 @@ function (_Component) {
         }, _callee2, this);
       }));
 
-      return function componentDidMount() {
-        return _componentDidMount.apply(this, arguments);
+      return function init() {
+        return _init.apply(this, arguments);
       };
     }()
   }, {
-    key: "init",
+    key: "componentDidMount",
     value: function () {
-      var _init = _asyncToGenerator(
+      var _componentDidMount = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee3() {
-        var data;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return Object(__WEBPACK_IMPORTED_MODULE_44__utils___["b" /* request */])({
-                  url: urls.account_list,
-                  params: {
-                    active: true
-                  }
-                });
+                return this.init();
 
               case 2:
-                data = _context3.sent;
-
-                if ('body' in data) {
-                  this.setState({
-                    accounts: data.body.accounts
-                  });
-                }
-
-              case 4:
               case "end":
                 return _context3.stop();
             }
@@ -65555,8 +65583,8 @@ function (_Component) {
         }, _callee3, this);
       }));
 
-      return function init() {
-        return _init.apply(this, arguments);
+      return function componentDidMount() {
+        return _componentDidMount.apply(this, arguments);
       };
     }()
   }, {
@@ -66087,6 +66115,12 @@ function (_React$Component3) {
       _this5.showSnackbar('Can\'t delete key yet!!!');
     });
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "handlePassword", function (event) {
+      _this5.setState({
+        password: event.currentTarget.value
+      });
+    });
+
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "RenderedAccount", function (account) {
       if (account && account.user) {
         var _user = account.user;
@@ -66202,7 +66236,15 @@ function (_React$Component3) {
           className: classes.detailsLabel
         }, "Level:"), " ", user.level, " ", React.createElement("br", null), React.createElement("span", {
           className: classes.detailsLabel
-        }, "Joined:"), " ", user.created, " ", React.createElement("br", null), React.createElement("div", {
+        }, "Joined:"), " ", user.created, " ", React.createElement("br", null), React.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_TextField___default.a, {
+          id: "password",
+          label: "Password: ",
+          className: classes.detailsLabelText,
+          placeholder: "set new password",
+          type: "password",
+          onChange: _this5.handlePassword,
+          margin: "normal"
+        }), React.createElement("div", {
           className: "buttons-div"
         }, React.createElement(__WEBPACK_IMPORTED_MODULE_38__material_ui_core_Button___default.a, {
           variant: "fab",
@@ -66218,10 +66260,10 @@ function (_React$Component3) {
           onClick: _this5.disableUser
         }, React.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_icons_Remove___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_38__material_ui_core_Button___default.a, {
           variant: "fab",
-          "aria-label": "Save",
+          "aria-label": "Save Password",
           style: styles.saveButton,
           className: classes.button,
-          onClick: _this5.saveChanges
+          onClick: _this5.savePassword
         }, React.createElement(__WEBPACK_IMPORTED_MODULE_26__material_ui_icons_Save___default.a, null)), React.createElement(__WEBPACK_IMPORTED_MODULE_38__material_ui_core_Button___default.a, {
           variant: "fab",
           "aria-label": "Delete",
@@ -66234,6 +66276,50 @@ function (_React$Component3) {
       }
     });
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this5)), "savePassword",
+    /*#__PURE__*/
+    _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee7() {
+      var response;
+      return regeneratorRuntime.wrap(function _callee7$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              _context7.next = 2;
+              return Object(__WEBPACK_IMPORTED_MODULE_44__utils___["b" /* request */])({
+                url: urls.newpassword.replace('trxuser', _this5.state.resource.name),
+                method: 'POST',
+                headers: {
+                  'csrf-token': getCSRFToken()
+                },
+                body: {
+                  password: _this5.state.password,
+                  uid: _this5.state.resource.id
+                }
+              });
+
+            case 2:
+              response = _context7.sent;
+
+              if (response.error) {
+                console.log('Error', Object(__WEBPACK_IMPORTED_MODULE_44__utils___["a" /* handleResponse */])(response));
+              } else {
+                console.log('Updated password for ' + _this5.state.resource.id);
+
+                _this5.setState({
+                  password: ''
+                });
+              }
+
+            case 4:
+            case "end":
+              return _context7.stop();
+          }
+        }
+      }, _callee7, this);
+    })));
+
     _this5.state = _this5.initialState();
     return _this5;
   }
@@ -66242,7 +66328,12 @@ function (_React$Component3) {
     key: "componentWillReceiveProps",
     value: function componentWillReceiveProps(props) {
       if (props.type && props.type !== this.props.type) {
-        this.setState(this.initialState());
+        var specialDefaults = props.type === 'users' ? {
+          password: undefined
+        } : undefined;
+        this.setState(_objectSpread({}, this.initialState(), {
+          specialDefaults: specialDefaults
+        }));
       } else {
         this.setState(_objectSpread({}, cleanProps(props)));
       }
@@ -66258,7 +66349,7 @@ function (_React$Component3) {
   }, {
     key: "shouldComponentUpdate",
     value: function shouldComponentUpdate(nextProps, nextState) {
-      if (nextProps.resource && nextProps.resource.id == this.props.resource.id) {
+      if (this.props.resource && nextProps.resource && nextProps.resource.id == this.props.resource.id) {
         return false;
       }
 
@@ -66363,6 +66454,49 @@ function (_React$Component4) {
   return ResourceSelector;
 }(React.Component);
 
+var msgHandler = function msgHandler(_ref6) {
+  var message = _extends({}, _ref6);
+
+  __WEBPACK_IMPORTED_MODULE_47_loglevel___default.a.debug('Message Received: ', message);
+
+  if ('data' in message) {
+    switch (message.data.action) {
+      case 'subscription:retry':
+        __WEBPACK_IMPORTED_MODULE_47_loglevel___default.a.debug('Must login again');
+        break;
+
+      case 'subscription:continue':
+        __WEBPACK_IMPORTED_MODULE_47_loglevel___default.a.debug('Subscription active');
+    }
+  }
+};
+
+function checkSubscription() {
+  var delay = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 60000;
+  setInterval(function () {
+    return sendMessage({
+      type: __WEBPACK_IMPORTED_MODULE_45__utils_codes__["a" /* default */].VERIFY_SUBSCRIPTION,
+      data: {
+        'csrf-token': getCSRFToken()
+      }
+    });
+  }, delay);
+}
+
+function sendMessage(data) {
+  try {
+    if (window.container.ws) {
+      window.container.ws.send(JSON.stringify(data));
+      return true;
+    }
+
+    return false;
+  } catch (err) {
+    __WEBPACK_IMPORTED_MODULE_47_loglevel___default.a.debug(err);
+    return false;
+  }
+}
+
 function getCSRFToken() {
   var cookie = document.cookie.split(';').filter(function (cookie) {
     return cookie.trim().substr(0, 4) === 'csrf';
@@ -66434,6 +66568,17 @@ function cleanProps(props) {
   }
 
   return propObject;
+}
+
+function subscribeWs(handler) {
+  var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'test';
+  return Object(__WEBPACK_IMPORTED_MODULE_44__utils___["c" /* requestWs */])({
+    url: urls.subscription,
+    params: {
+      data: data
+    },
+    timeout: 0
+  }, handler);
 }
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
@@ -101770,8 +101915,9 @@ exports.default = _default;
 /* unused harmony export SOCKET_CLOSED */
 /* harmony export (immutable) */ __webpack_exports__["b"] = request;
 /* harmony export (immutable) */ __webpack_exports__["a"] = handleResponse;
-/* unused harmony export requestWs */
+/* harmony export (immutable) */ __webpack_exports__["c"] = requestWs;
 /* unused harmony export isJson */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__TRXSocket__ = __webpack_require__(1157);
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -101780,10 +101926,12 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+
 /**
  *
  * @type {number}
  */
+
 var SOCKET_CONNECTING = 0;
 var SOCKET_OPEN = 1;
 var SOCKET_CLOSING = 2;
@@ -101911,11 +102059,7 @@ function requestWs(options) {
       params = _options.params;
 
   var urlString = params ? url + paramsToQuery(params) : url;
-  var ws = new WebSocket(urlString);
-  Object.defineProperty(ws, 'timer', {
-    writable: true,
-    value: undefined
-  });
+  var ws = new __WEBPACK_IMPORTED_MODULE_0__TRXSocket__["a" /* default */](urlString);
 
   ws.onopen = function (event) {
     ws.send('Socket Connection Initialized');
@@ -106732,6 +106876,81 @@ var _default = (0, _createSvgIcon.default)(_react.default.createElement(_react.d
 })), 'Menu');
 
 exports.default = _default;
+
+/***/ }),
+/* 1157 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _wrapNativeSuper(Class) { var _cache = typeof Map === "function" ? new Map() : undefined; _wrapNativeSuper = function _wrapNativeSuper(Class) { if (Class === null || !_isNativeFunction(Class)) return Class; if (typeof Class !== "function") { throw new TypeError("Super expression must either be null or a function"); } if (typeof _cache !== "undefined") { if (_cache.has(Class)) return _cache.get(Class); _cache.set(Class, Wrapper); } function Wrapper() { return _construct(Class, arguments, _getPrototypeOf(this).constructor); } Wrapper.prototype = Object.create(Class.prototype, { constructor: { value: Wrapper, enumerable: false, writable: true, configurable: true } }); return _setPrototypeOf(Wrapper, Class); }; return _wrapNativeSuper(Class); }
+
+function isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _construct(Parent, args, Class) { if (isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
+
+function _isNativeFunction(fn) { return Function.toString.call(fn).indexOf("[native code]") !== -1; }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var TRXSocket =
+/*#__PURE__*/
+function (_WebSocket) {
+  _inherits(TRXSocket, _WebSocket);
+
+  function TRXSocket(url) {
+    var _this;
+
+    _classCallCheck(this, TRXSocket);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TRXSocket).call(this, url));
+    _this.instanceName = undefined;
+    _this.timer = undefined;
+    return _this;
+  }
+
+  _createClass(TRXSocket, [{
+    key: "name",
+    value: function name(_name) {
+      if (_name === undefined && this.instanceName) {
+        return this.instanceName;
+      } else if (_name !== this.instanceName) {
+        this.instanceName = _name;
+      }
+
+      return this.instanceName;
+    }
+  }]);
+
+  return TRXSocket;
+}(_wrapNativeSuper(WebSocket));
+
+/* harmony default export */ __webpack_exports__["a"] = (TRXSocket);
+
+/***/ }),
+/* 1158 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var adminCodes = {
+  VERIFY_SUBSCRIPTION: 'subscription:verify'
+};
+/* harmony default export */ __webpack_exports__["a"] = (adminCodes);
 
 /***/ })
 /******/ ]);
