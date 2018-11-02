@@ -1,3 +1,5 @@
+import TRXSocket from './TRXSocket'
+
 /**
  *
  * @type {number}
@@ -105,9 +107,7 @@ export function requestWs(options, msgHandler = undefined) {
 
     const urlString = params ? url + paramsToQuery(params) : url
 
-    const ws = new WebSocket(urlString)
-
-    Object.defineProperty(ws, 'timer', {writable: true, value: undefined})
+    const ws = new TRXSocket(urlString)
 
     ws.onopen = (event) => {
         ws.send('Socket Connection Initialized')
