@@ -187,7 +187,7 @@ class User(Base):
 
     @staticmethod
     def generate_hash(password):
-        return pwd_context.encrypt(password)
+        return pwd_context.hash(password)
 
     @staticmethod
     def verify_auth_token(token):
@@ -725,8 +725,7 @@ def check_auth_by_name(user, password):
     query_user = session.query(User).filter(User.name == user).first()
     if query_user is not None:
         if not User.verify_password_by_name(user, password):
-            return "Login is no good"
-
+            return None
         return query_user
     else:
         pass_hash = User.generate_hash(password)
@@ -1431,8 +1430,8 @@ def is_dust_amount(amount):
 
 
 async def password_override(uid, password):
-    user = session.query(User.id == uid).one_or_none()
+    user = session.query(User).filter(User.id == uid).one_or_none()
     if user:
-        hashed_password = user.hash_password(password)
-        user.password = hashed_password
+        user.hash_password(password)
         return await update_resource(user)
+
