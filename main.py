@@ -227,6 +227,7 @@ class LoginHandler(RequestHandler):
                     return self.write(escape.json_encode(
                         {'statuscode': 200, 'token': str(application.session.user['csrf'], 'utf-8'),
                          'trx_cookie': str(self.get_secure_cookie('trx_cookie')), 'uid': user_verify.id,
+                         'refresh': user_verify.generate_refresh_token(),
                          'name': user_verify.name}))
 
             elif user_verify < -1:
@@ -252,6 +253,8 @@ class LoginHandler(RequestHandler):
                                                csrf=csrf)
                     self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
                     self.set_cookie(name='csrf', value=csrf)
+                    self.set_cookie(name='refresh', value=user_verified.generate_refresh_token())
+                    self.set_cookie(name='username', value=user_verified.name)
                     if self.get_secure_cookie('redirect_target') is not None:
                         redirect_target = self.get_secure_cookie('redirect_target')
                         self.clear_cookie('redirect_target')
@@ -666,7 +669,7 @@ class RegTestTxHistory(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        tx_history = await RegTest.get_tx_history()
+        pass
 
 
 class TrxRollbackHandler(RequestHandler):
@@ -1372,6 +1375,23 @@ class TRXSubscriptionHandler(WSHandler):
             self.write_message(json.dumps({'message': 'Message received at %s' % str(time()), 'keepAlive': 1}))
 
 
+class TRXTokenVerifyHandler(RequestHandler):
+    pass
+
+    async def get(self, *args, **kwargs):
+        token = self.get_argument('access_token', None)
+        if token:
+            if db.User.verify_auth_token(token):
+                response = 200
+                result = 'valid'
+            else:
+                response = 401
+                result = 'unauthorized'
+            self.write(json.dumps({'response': response, 'result': result}))
+        else:
+            self.set_status(400)
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -1419,7 +1439,7 @@ class TRXApplication(Application):
 
             # Regression CoinTRX GW
 
-            #Regression CoinTRX Subscription
+            # Regression CoinTRX Subscription
 
             (r"/services/subscribe/ws", TRXSubscriptionHandler),
             (r"/api/pay/user/(.*)", TRXPayUser),
@@ -1431,6 +1451,9 @@ class TRXApplication(Application):
             # Regression CoinTRX GW: Keys
             (r"/api/key/activate", TRXKeyActivateHandler),
             (r"/api/key/deactivate", TRXKeyDeactivateHandler),
+
+            # Regression CoinTRX GW: Tokens
+            (r"/api/token/verify", TRXTokenVerifyHandler),
             # Regression Mock Chain
             (r"/trc/price/update", TRCPriceUpdateHandler),
 
