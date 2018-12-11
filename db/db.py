@@ -134,11 +134,11 @@ class User(Base):
 
     # TODO
     def hash_password(self, password):
-        self.hash = pwd_context.encrypt(password)
+        self.hash = pwd_context.hash(password)
 
     @staticmethod
     def see_hash(password):
-        print(str(pwd_context.encrypt(password)))
+        print(str(pwd_context.hash(password)))
 
     def compare_hash(self, password):
         print(str(pwd_context.verify(password, self.hash)))
@@ -148,6 +148,10 @@ class User(Base):
 
     def generate_auth_token(self, expiration=600):
         s = Serializer(trxapp.config['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({'id': self.id})
+
+    def generate_refresh_token(self):
+        s = Serializer(trxapp.config['SECRET_KEY'], expires_in=99999999)
         return s.dumps({'id': self.id})
 
     def serialize(self) -> dict:
