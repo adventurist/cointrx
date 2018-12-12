@@ -10,6 +10,12 @@ const classes = {
   accountItem: 'account-item',
 }
 
+const styles = {
+  listItemText: {
+    fontSize: '0.35em',
+  }
+}
+
 export default class ResourceList extends Component {
   constructor (props) {
     super(props)

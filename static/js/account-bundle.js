@@ -107321,6 +107321,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var classes = {
   accountItem: 'account-item'
 };
+var styles = {
+  listItemText: {
+    fontSize: '0.35em'
+  }
+};
 
 var ResourceList =
 /*#__PURE__*/
