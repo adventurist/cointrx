@@ -498,15 +498,19 @@ export class TrxLayout extends React.Component {
 
     fetchBalance = async () => {
         const bot = getSelectedBot(this.state)
-        const data = {
-            data: {
-                bot_id: bot.analysisBot.id,
-                recipient: 'recipient',
-            },
-            type: 'fetch:balance'
-        }
-        if (sendMessage(bot, data)) {
-            this.logInfo(`Bot ${bot.number} (${bot.id}) is attempting to fetch balance`)
+        if ('analysisBot' in bot) {
+            const data = {
+                data: {
+                    bot_id: bot.analysisBot.id,
+                    recipient: 'recipient',
+                },
+                type: 'fetch:balance'
+            }
+            if (sendMessage(bot, data)) {
+                this.logInfo(`Bot ${bot.number} (${bot.id}) is attempting to fetch balance`)
+            }
+        } else {
+            this.logInfo(`${bot.id}: Analysis bot not instantiated yet.`)
         }
     }
 
@@ -524,6 +528,25 @@ export class TrxLayout extends React.Component {
         }, 1000)
 
         setTimeout( () => this.fetchBalance(), 500)
+    }
+
+    /**
+     * prepareBot
+     *
+     * Helper function to prepare the selected bot for trading
+     */
+    prepareBots = async () => {
+        for (let i = 0; i < botConnections.length; i++) {
+            const bot = botConnections[i]
+            this.setState({ selectedBot: i }, async () => {
+                this.loadMarketData()
+                if (bot.users.length === 0 || (bot.users[0] && ! 'uid' in bot.users[0])) {
+                    await this.loginBot()
+                }
+                setTimeout( () => this.findPatterns(), 1000)
+                setTimeout( () => this.fetchBalance(), 500)
+            })
+        }
     }
 
     /**
@@ -885,9 +908,16 @@ export class TrxLayout extends React.Component {
                     icon={<PlayCircle />}
                 />
                 <RaisedButton
-                    label="Prepare Bots"
+                    label="Prepare Bot"
                     labelPosition="before"
                     onClick={this.prepareBot}
+                    primary={false}
+                    icon={<PlayCircle />}
+                />
+                <RaisedButton
+                    label="Prepare Bots"
+                    labelPosition="before"
+                    onClick={this.prepareBots}
                     primary={false}
                     icon={<PlayCircle />}
                 />

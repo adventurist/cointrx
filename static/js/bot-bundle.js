@@ -19836,9 +19836,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_28_material_ui_Chip__ = __webpack_require__(875);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_28_material_ui_Chip___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_28_material_ui_Chip__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__utils___ = __webpack_require__(878);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__utils_bot__ = __webpack_require__(879);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__utils_bot__ = __webpack_require__(880);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__utils_bot___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_30__utils_bot__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31_loglevel__ = __webpack_require__(881);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31_loglevel__ = __webpack_require__(882);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_31_loglevel___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_31_loglevel__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -20497,19 +20497,24 @@ function (_React$Component2) {
           switch (_context9.prev = _context9.next) {
             case 0:
               bot = getSelectedBot(_this2.state);
-              data = {
-                data: {
-                  bot_id: bot.analysisBot.id,
-                  recipient: 'recipient'
-                },
-                type: 'fetch:balance'
-              };
 
-              if (sendMessage(bot, data)) {
-                _this2.logInfo("Bot ".concat(bot.number, " (").concat(bot.id, ") is attempting to fetch balance"));
+              if ('analysisBot' in bot) {
+                data = {
+                  data: {
+                    bot_id: bot.analysisBot.id,
+                    recipient: 'recipient'
+                  },
+                  type: 'fetch:balance'
+                };
+
+                if (sendMessage(bot, data)) {
+                  _this2.logInfo("Bot ".concat(bot.number, " (").concat(bot.id, ") is attempting to fetch balance"));
+                }
+              } else {
+                _this2.logInfo("".concat(bot.id, ": Analysis bot not instantiated yet."));
               }
 
-            case 3:
+            case 2:
             case "end":
               return _context9.stop();
           }
@@ -20545,15 +20550,79 @@ function (_React$Component2) {
       }, _callee10, this);
     })));
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "prepareBots",
+    /*#__PURE__*/
+    _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee12() {
+      var _loop, i;
+
+      return regeneratorRuntime.wrap(function _callee12$(_context12) {
+        while (1) {
+          switch (_context12.prev = _context12.next) {
+            case 0:
+              _loop = function _loop(i) {
+                var bot = botConnections[i];
+
+                _this2.setState({
+                  selectedBot: i
+                },
+                /*#__PURE__*/
+                _asyncToGenerator(
+                /*#__PURE__*/
+                regeneratorRuntime.mark(function _callee11() {
+                  return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                    while (1) {
+                      switch (_context11.prev = _context11.next) {
+                        case 0:
+                          _this2.loadMarketData();
+
+                          if (!(bot.users.length === 0 || bot.users[0] && !'uid' in bot.users[0])) {
+                            _context11.next = 4;
+                            break;
+                          }
+
+                          _context11.next = 4;
+                          return _this2.loginBot();
+
+                        case 4:
+                          setTimeout(function () {
+                            return _this2.findPatterns();
+                          }, 1000);
+                          setTimeout(function () {
+                            return _this2.fetchBalance();
+                          }, 500);
+
+                        case 6:
+                        case "end":
+                          return _context11.stop();
+                      }
+                    }
+                  }, _callee11, this);
+                })));
+              };
+
+              for (i = 0; i < botConnections.length; i++) {
+                _loop(i);
+              }
+
+            case 2:
+            case "end":
+              return _context12.stop();
+          }
+        }
+      }, _callee12, this);
+    })));
+
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "performTrade",
     /*#__PURE__*/
     _asyncToGenerator(
     /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee11() {
+    regeneratorRuntime.mark(function _callee13() {
       var bot, analysisResult, recipient;
-      return regeneratorRuntime.wrap(function _callee11$(_context11) {
+      return regeneratorRuntime.wrap(function _callee13$(_context13) {
         while (1) {
-          switch (_context11.prev = _context11.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
               bot = getSelectedBot(_this2.state);
 
@@ -20582,21 +20651,21 @@ function (_React$Component2) {
 
             case 2:
             case "end":
-              return _context11.stop();
+              return _context13.stop();
           }
         }
-      }, _callee11, this);
+      }, _callee13, this);
     })));
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "loginBot",
     /*#__PURE__*/
     _asyncToGenerator(
     /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee12() {
+    regeneratorRuntime.mark(function _callee14() {
       var bot, data;
-      return regeneratorRuntime.wrap(function _callee12$(_context12) {
+      return regeneratorRuntime.wrap(function _callee14$(_context14) {
         while (1) {
-          switch (_context12.prev = _context12.next) {
+          switch (_context14.prev = _context14.next) {
             case 0:
               bot = getSelectedBot(_this2.state);
               data = {
@@ -20612,20 +20681,20 @@ function (_React$Component2) {
 
             case 3:
             case "end":
-              return _context12.stop();
+              return _context14.stop();
           }
         }
-      }, _callee12, this);
+      }, _callee14, this);
     })));
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "loginBots",
     /*#__PURE__*/
     _asyncToGenerator(
     /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee13() {
-      return regeneratorRuntime.wrap(function _callee13$(_context13) {
+    regeneratorRuntime.mark(function _callee15() {
+      return regeneratorRuntime.wrap(function _callee15$(_context15) {
         while (1) {
-          switch (_context13.prev = _context13.next) {
+          switch (_context15.prev = _context15.next) {
             case 0:
               botConnections.forEach(function (bot) {
                 if (bot.users.length === 0) {
@@ -20644,14 +20713,14 @@ function (_React$Component2) {
 
             case 1:
             case "end":
-              return _context13.stop();
+              return _context15.stop();
           }
         }
-      }, _callee13, this);
+      }, _callee15, this);
     })));
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "msgHandler", function (_ref14) {
-      var message = _extends({}, _ref14);
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "msgHandler", function (_ref16) {
+      var message = _extends({}, _ref16);
 
       if ('type' in message) {
         __WEBPACK_IMPORTED_MODULE_31_loglevel___default.a.info("WS Data Event Type", message.type);
@@ -20854,11 +20923,11 @@ function (_React$Component2) {
     value: function () {
       var _componentDidMount = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee14() {
+      regeneratorRuntime.mark(function _callee16() {
         var botMenuItems, fileMenuItems;
-        return regeneratorRuntime.wrap(function _callee14$(_context14) {
+        return regeneratorRuntime.wrap(function _callee16$(_context16) {
           while (1) {
-            switch (_context14.prev = _context14.next) {
+            switch (_context16.prev = _context16.next) {
               case 0:
                 botMenuItems = buildBotMenuItems(0);
                 fileMenuItems = buildFileMenuItems(0);
@@ -20866,15 +20935,15 @@ function (_React$Component2) {
                   botMenuItems: botMenuItems,
                   fileMenuItems: fileMenuItems
                 });
-                _context14.next = 5;
+                _context16.next = 5;
                 return this.init();
 
               case 5:
               case "end":
-                return _context14.stop();
+                return _context16.stop();
             }
           }
-        }, _callee14, this);
+        }, _callee16, this);
       }));
 
       return function componentDidMount() {
@@ -20933,11 +21002,11 @@ function (_React$Component2) {
     value: function () {
       var _killBots = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee15() {
+      regeneratorRuntime.mark(function _callee17() {
         var data;
-        return regeneratorRuntime.wrap(function _callee15$(_context15) {
+        return regeneratorRuntime.wrap(function _callee17$(_context17) {
           while (1) {
-            switch (_context15.prev = _context15.next) {
+            switch (_context17.prev = _context17.next) {
               case 0:
                 data = {
                   data: [],
@@ -20950,10 +21019,10 @@ function (_React$Component2) {
 
               case 2:
               case "end":
-                return _context15.stop();
+                return _context17.stop();
             }
           }
-        }, _callee15, this);
+        }, _callee17, this);
       }));
 
       return function killBots() {
@@ -21194,9 +21263,15 @@ function (_React$Component2) {
         primary: false,
         icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_14_material_ui_svg_icons_av_play_circle_filled___default.a, null)
       }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default.a, {
-        label: "Prepare Bots",
+        label: "Prepare Bot",
         labelPosition: "before",
         onClick: this.prepareBot,
+        primary: false,
+        icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_14_material_ui_svg_icons_av_play_circle_filled___default.a, null)
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default.a, {
+        label: "Prepare Bots",
+        labelPosition: "before",
+        onClick: this.prepareBots,
         primary: false,
         icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_14_material_ui_svg_icons_av_play_circle_filled___default.a, null)
       }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"]("div", {
@@ -77614,7 +77689,7 @@ exports.default = NavigationCancel;
 /* harmony export (immutable) */ __webpack_exports__["a"] = handleResponse;
 /* harmony export (immutable) */ __webpack_exports__["c"] = requestWs;
 /* unused harmony export isJson */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__TRXSocket__ = __webpack_require__(1068);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__TRXSocket__ = __webpack_require__(879);
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -77859,6 +77934,71 @@ function isJson(str) {
 
 /***/ }),
 /* 879 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _wrapNativeSuper(Class) { var _cache = typeof Map === "function" ? new Map() : undefined; _wrapNativeSuper = function _wrapNativeSuper(Class) { if (Class === null || !_isNativeFunction(Class)) return Class; if (typeof Class !== "function") { throw new TypeError("Super expression must either be null or a function"); } if (typeof _cache !== "undefined") { if (_cache.has(Class)) return _cache.get(Class); _cache.set(Class, Wrapper); } function Wrapper() { return _construct(Class, arguments, _getPrototypeOf(this).constructor); } Wrapper.prototype = Object.create(Class.prototype, { constructor: { value: Wrapper, enumerable: false, writable: true, configurable: true } }); return _setPrototypeOf(Wrapper, Class); }; return _wrapNativeSuper(Class); }
+
+function isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _construct(Parent, args, Class) { if (isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
+
+function _isNativeFunction(fn) { return Function.toString.call(fn).indexOf("[native code]") !== -1; }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var TRXSocket =
+/*#__PURE__*/
+function (_WebSocket) {
+  _inherits(TRXSocket, _WebSocket);
+
+  function TRXSocket(url) {
+    var _this;
+
+    _classCallCheck(this, TRXSocket);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TRXSocket).call(this, url));
+    _this.instanceName = undefined;
+    _this.timer = undefined;
+    return _this;
+  }
+
+  _createClass(TRXSocket, [{
+    key: "name",
+    value: function name(_name) {
+      if (_name === undefined && this.instanceName) {
+        return this.instanceName;
+      } else if (_name !== this.instanceName) {
+        this.instanceName = _name;
+      }
+
+      return this.instanceName;
+    }
+  }]);
+
+  return TRXSocket;
+}(_wrapNativeSuper(WebSocket));
+
+/* harmony default export */ __webpack_exports__["a"] = (TRXSocket);
+
+/***/ }),
+/* 880 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77874,7 +78014,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var PatternAnalyzer_1 = __webpack_require__(880);
+var PatternAnalyzer_1 = __webpack_require__(881);
 
 var Bot =
 /*#__PURE__*/
@@ -77960,7 +78100,7 @@ function () {
 exports.default = Bot;
 
 /***/ }),
-/* 880 */
+/* 881 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -78041,7 +78181,7 @@ function isCup(arg) {
 }
 
 /***/ }),
-/* 881 */
+/* 882 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -78299,257 +78439,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
     return defaultLogger;
 }));
 
-
-/***/ }),
-/* 882 */,
-/* 883 */,
-/* 884 */,
-/* 885 */,
-/* 886 */,
-/* 887 */,
-/* 888 */,
-/* 889 */,
-/* 890 */,
-/* 891 */,
-/* 892 */,
-/* 893 */,
-/* 894 */,
-/* 895 */,
-/* 896 */,
-/* 897 */,
-/* 898 */,
-/* 899 */,
-/* 900 */,
-/* 901 */,
-/* 902 */,
-/* 903 */,
-/* 904 */,
-/* 905 */,
-/* 906 */,
-/* 907 */,
-/* 908 */,
-/* 909 */,
-/* 910 */,
-/* 911 */,
-/* 912 */,
-/* 913 */,
-/* 914 */,
-/* 915 */,
-/* 916 */,
-/* 917 */,
-/* 918 */,
-/* 919 */,
-/* 920 */,
-/* 921 */,
-/* 922 */,
-/* 923 */,
-/* 924 */,
-/* 925 */,
-/* 926 */,
-/* 927 */,
-/* 928 */,
-/* 929 */,
-/* 930 */,
-/* 931 */,
-/* 932 */,
-/* 933 */,
-/* 934 */,
-/* 935 */,
-/* 936 */,
-/* 937 */,
-/* 938 */,
-/* 939 */,
-/* 940 */,
-/* 941 */,
-/* 942 */,
-/* 943 */,
-/* 944 */,
-/* 945 */,
-/* 946 */,
-/* 947 */,
-/* 948 */,
-/* 949 */,
-/* 950 */,
-/* 951 */,
-/* 952 */,
-/* 953 */,
-/* 954 */,
-/* 955 */,
-/* 956 */,
-/* 957 */,
-/* 958 */,
-/* 959 */,
-/* 960 */,
-/* 961 */,
-/* 962 */,
-/* 963 */,
-/* 964 */,
-/* 965 */,
-/* 966 */,
-/* 967 */,
-/* 968 */,
-/* 969 */,
-/* 970 */,
-/* 971 */,
-/* 972 */,
-/* 973 */,
-/* 974 */,
-/* 975 */,
-/* 976 */,
-/* 977 */,
-/* 978 */,
-/* 979 */,
-/* 980 */,
-/* 981 */,
-/* 982 */,
-/* 983 */,
-/* 984 */,
-/* 985 */,
-/* 986 */,
-/* 987 */,
-/* 988 */,
-/* 989 */,
-/* 990 */,
-/* 991 */,
-/* 992 */,
-/* 993 */,
-/* 994 */,
-/* 995 */,
-/* 996 */,
-/* 997 */,
-/* 998 */,
-/* 999 */,
-/* 1000 */,
-/* 1001 */,
-/* 1002 */,
-/* 1003 */,
-/* 1004 */,
-/* 1005 */,
-/* 1006 */,
-/* 1007 */,
-/* 1008 */,
-/* 1009 */,
-/* 1010 */,
-/* 1011 */,
-/* 1012 */,
-/* 1013 */,
-/* 1014 */,
-/* 1015 */,
-/* 1016 */,
-/* 1017 */,
-/* 1018 */,
-/* 1019 */,
-/* 1020 */,
-/* 1021 */,
-/* 1022 */,
-/* 1023 */,
-/* 1024 */,
-/* 1025 */,
-/* 1026 */,
-/* 1027 */,
-/* 1028 */,
-/* 1029 */,
-/* 1030 */,
-/* 1031 */,
-/* 1032 */,
-/* 1033 */,
-/* 1034 */,
-/* 1035 */,
-/* 1036 */,
-/* 1037 */,
-/* 1038 */,
-/* 1039 */,
-/* 1040 */,
-/* 1041 */,
-/* 1042 */,
-/* 1043 */,
-/* 1044 */,
-/* 1045 */,
-/* 1046 */,
-/* 1047 */,
-/* 1048 */,
-/* 1049 */,
-/* 1050 */,
-/* 1051 */,
-/* 1052 */,
-/* 1053 */,
-/* 1054 */,
-/* 1055 */,
-/* 1056 */,
-/* 1057 */,
-/* 1058 */,
-/* 1059 */,
-/* 1060 */,
-/* 1061 */,
-/* 1062 */,
-/* 1063 */,
-/* 1064 */,
-/* 1065 */,
-/* 1066 */,
-/* 1067 */,
-/* 1068 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _wrapNativeSuper(Class) { var _cache = typeof Map === "function" ? new Map() : undefined; _wrapNativeSuper = function _wrapNativeSuper(Class) { if (Class === null || !_isNativeFunction(Class)) return Class; if (typeof Class !== "function") { throw new TypeError("Super expression must either be null or a function"); } if (typeof _cache !== "undefined") { if (_cache.has(Class)) return _cache.get(Class); _cache.set(Class, Wrapper); } function Wrapper() { return _construct(Class, arguments, _getPrototypeOf(this).constructor); } Wrapper.prototype = Object.create(Class.prototype, { constructor: { value: Wrapper, enumerable: false, writable: true, configurable: true } }); return _setPrototypeOf(Wrapper, Class); }; return _wrapNativeSuper(Class); }
-
-function isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
-function _construct(Parent, args, Class) { if (isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
-
-function _isNativeFunction(fn) { return Function.toString.call(fn).indexOf("[native code]") !== -1; }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-var TRXSocket =
-/*#__PURE__*/
-function (_WebSocket) {
-  _inherits(TRXSocket, _WebSocket);
-
-  function TRXSocket(url) {
-    var _this;
-
-    _classCallCheck(this, TRXSocket);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(TRXSocket).call(this, url));
-    _this.instanceName = undefined;
-    _this.timer = undefined;
-    return _this;
-  }
-
-  _createClass(TRXSocket, [{
-    key: "name",
-    value: function name(_name) {
-      if (_name === undefined && this.instanceName) {
-        return this.instanceName;
-      } else if (_name !== this.instanceName) {
-        this.instanceName = _name;
-      }
-
-      return this.instanceName;
-    }
-  }]);
-
-  return TRXSocket;
-}(_wrapNativeSuper(WebSocket));
-
-/* harmony default export */ __webpack_exports__["a"] = (TRXSocket);
 
 /***/ })
 /******/ ]);
