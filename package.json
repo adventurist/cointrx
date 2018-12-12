@@ -56,6 +56,7 @@
     "gulp": "^3.9.1",
     "gulp-typescript": "^5.0.0-alpha.3",
     "jquery": "^3.3.1",
+    "js-cookie": "^2.2.0",
     "lodash": "^4.17.5",
     "lodash-fp": "^0.10.4",
     "loglevel": "^1.6.1",
