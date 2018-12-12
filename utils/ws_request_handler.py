@@ -42,7 +42,7 @@ async def handle_ws_request(request_type, data):
             refresh_token = user.generate_refresh_token()
             result = 'subscription:renewed'
             action = 'subscription:refresh'
-            payload = {'csrf': new_csrf, 'refresh': refresh_token}
+            payload = {'csrf': new_csrf.decode('utf-8'), 'refresh': refresh_token.decode('utf-8')}
             error = False
         else:
             result = 'subscription:failed'
