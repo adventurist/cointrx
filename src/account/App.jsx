@@ -77,6 +77,9 @@ import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 import { Grid } from '@material-ui/core'
 
+// Components
+import ResourceList from './components/resourceList.jsx'
+
 
 /* utils */
 import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
@@ -84,11 +87,18 @@ import adminCodes from '../utils/codes'
 import Bot from '../utils/bot'
 import log from 'loglevel'
 import { cloneDeep } from 'lodash/fp'
+import Cookies from 'js-cookie'
 import trx from '../redux'
 
-const trxState = trx()
+
 window.container = {
-  ws: undefined
+  ws: undefined,
+  state: trx(),
+  subscription: {
+    csrf: undefined,
+    trxCookie: undefined,
+    session: undefined
+  }
 }
 // console.log(trxState)
 // The urls provided by the back end
@@ -427,108 +437,108 @@ export default class AccountLayout extends Component {
 }
 
 
-class ResourceList extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      selectedAccount: undefined,
-      accountMenuItems: this.getMenuItems(),
-      menuItems: this.getMenuItems(),
-      open: false,
-      expandOpen: false,
-      type: undefined
-    }
-  }
+// class ResourceList extends Component {
+//   constructor (props) {
+//     super(props)
+//     this.state = {
+//       selectedAccount: undefined,
+//       accountMenuItems: this.getMenuItems(),
+//       menuItems: this.getMenuItems(),
+//       open: false,
+//       expandOpen: false,
+//       type: undefined
+//     }
+//   }
 
-  componentDidMount () {
-    this.setState({menuItems: this.getMenuItems()})
-  }
+//   componentDidMount () {
+//     this.setState({menuItems: this.getMenuItems()})
+//   }
 
-  componentWillReceiveProps (props) {
-    // this.setState({accountMenuItems: this.getMenuItems(props.accounts)})
-    this.setState({
-      type: props.type,
-      menuItems: this.getMenuItems(props.resources)
-    })
-  }
+//   componentWillReceiveProps (props) {
+//     // this.setState({accountMenuItems: this.getMenuItems(props.accounts)})
+//     this.setState({
+//       type: props.type,
+//       menuItems: this.getMenuItems(props.resources)
+//     })
+//   }
 
-  buildAccountItem (account, i) {
-    return (
-      <ListItem onClick={this.props.resourceSelectHandler} className={classes.accountItem} value={i} key={i}>
-          <ListItemText key={i} style={styles.listItemText} primary={
-            account.id + ': ' + account.label || ''
-          }/>
-        </ListItem>
-    )
-  }
+//   buildAccountItem (account, i) {
+//     return (
+//       <ListItem onClick={this.props.resourceSelectHandler} className={classes.accountItem} value={i} key={i}>
+//           <ListItemText key={i} style={styles.listItemText} primary={
+//             account.id + ': ' + account.label || ''
+//           }/>
+//         </ListItem>
+//     )
+//   }
 
-  buildBotItem (bot, i) {
-    return (
-      <ListItem onClick={this.props.resourceSelectHandler} className={classes.accountItem} value={i} key={i}>
-          <ListItemText key={i} style={styles.listItemText} primary={
-            bot.number + ': ' + bot.id.substr(0, 8) || ''
-          }/>
-        </ListItem>
-    )
-  }
+//   buildBotItem (bot, i) {
+//     return (
+//       <ListItem onClick={this.props.resourceSelectHandler} className={classes.accountItem} value={i} key={i}>
+//           <ListItemText key={i} style={styles.listItemText} primary={
+//             bot.number + ': ' + bot.id.substr(0, 8) || ''
+//           }/>
+//         </ListItem>
+//     )
+//   }
 
-  buildUserItem (user, i) {
-    return (
-      <ListItem onClick={this.props.resourceSelectHandler} className={classes.accountItem} value={i} key={i}>
-          <ListItemText key={i} style={styles.listItemText} primary={
-            user.id + ': ' + user.name || ''
-          }/>
-        </ListItem>
-    )
-  }
+//   buildUserItem (user, i) {
+//     return (
+//       <ListItem onClick={this.props.resourceSelectHandler} className={classes.accountItem} value={i} key={i}>
+//           <ListItemText key={i} style={styles.listItemText} primary={
+//             user.id + ': ' + user.name || ''
+//           }/>
+//         </ListItem>
+//     )
+//   }
 
-  getMenuItems (resources) {
-    if (resources) {
-      const items = []
+//   getMenuItems (resources) {
+//     if (resources) {
+//       const items = []
 
-      switch (this.state.type) {
-        case 'accounts':
-          for (let i = 0; i < resources.length; i++) {
-            items.push(this.buildAccountItem(resources[i], i))
-          }
-          break
+//       switch (this.state.type) {
+//         case 'accounts':
+//           for (let i = 0; i < resources.length; i++) {
+//             items.push(this.buildAccountItem(resources[i], i))
+//           }
+//           break
 
-          case 'users':
-          for (let i = 0; i < resources.length; i++) {
-            items.push(this.buildUserItem(resources[i], i))
-          }
-          break
+//           case 'users':
+//           for (let i = 0; i < resources.length; i++) {
+//             items.push(this.buildUserItem(resources[i], i))
+//           }
+//           break
 
-          case 'bots':
-          for (let i = 0; i < resources.length; i++) {
-            items.push(this.buildBotItem(resources[i], i))
-          }
-          break
-      }
-      return items
-    }
-  }
+//           case 'bots':
+//           for (let i = 0; i < resources.length; i++) {
+//             items.push(this.buildBotItem(resources[i], i))
+//           }
+//           break
+//       }
+//       return items
+//     }
+//   }
 
-  accountClick = (e) => {
-    this.setState({selectedAccount: e.currentTarget.value})
-  }
+//   accountClick = (e) => {
+//     this.setState({selectedAccount: e.currentTarget.value})
+//   }
 
-  toggleCollapse = () => this.setState({open: !this.state.open})
+//   toggleCollapse = () => this.setState({open: !this.state.open})
 
-  render () {
-    return (
-      <List id="account-select" value={this.state.selectedAccount}>
-      <ListItem className={classes.accountItem} value={undefined} key={undefined}>
-        <AccountIcon />
-        <ListItemText primary='Select' onClick={this.toggleCollapse}/>
-      </ListItem>
-        <Collapse in={this.state.open}>
-          {this.state.menuItems}
-        </Collapse>
-      </List>
-    )
-  }
-}
+//   render () {
+//     return (
+//       <List id="account-select" value={this.state.selectedAccount}>
+//       <ListItem className={classes.accountItem} value={undefined} key={undefined}>
+//         <AccountIcon />
+//         <ListItemText primary='Select' onClick={this.toggleCollapse}/>
+//       </ListItem>
+//         <Collapse in={this.state.open}>
+//           {this.state.menuItems}
+//         </Collapse>
+//       </List>
+//     )
+//   }
+// }
 
 class ResourceDetails extends React.Component {
   constructor (props) {
@@ -1015,21 +1025,47 @@ class ResourceSelector extends React.Component {
   }
 }
 
-const msgHandler = ({ ...message }) => {
+const msgHandler = async ({ ...message }) => {
   log.debug('Message Received: ', message)
-  if ('data' in message) {
-    switch (message.data.action) {
+  if ('action' in message) {
+    switch (message.action) {
       case 'subscription:retry':
         log.debug('Must login again')
+        // if (clearCookies()) {
+          // window.location.reload()
+        // } else {
+        //   log.debug('Trouble removing cookies. You must still login again manually')
+        // }
+        reSubscribe()
         break
       case 'subscription:continue':
         log.debug('Subscription active')
+        break
+      case 'subscription:update':
+        log.debug('Updating subscription details')
+        const { csrf, trx_cookie, session } = message.payload
+        window.container.credentials = {
+          ...window.container.credentials,
+          csrf,
+          trxCookie: trx_cookie,
+          session: session
+        }
+        break
+      case 'subscription:refresh':
+        log.debug('Resubscription successful')
+        window.container.credentials = {
+          ...window.container.credentials,
+          csrf: message.payload.csrf,
+          refresh: message.payload.refresh
+        }
+        Cookies.set('csrf', message.payload.csrf)
+        Cookies.set('refresh', message.payload.refresh)
     }
   }
 }
 
 function checkSubscription (delay = 60000) {
-  setInterval( () =>
+  runAndSetInterval( () =>
     sendMessage({
       type: adminCodes.VERIFY_SUBSCRIPTION,
       data: {'csrf-token': getCSRFToken()}
@@ -1037,9 +1073,19 @@ function checkSubscription (delay = 60000) {
   )
 }
 
-function sendMessage(data) {
+async function reSubscribe () {
+  sendMessage({
+    type: adminCodes.RENEW_SUBSCRIPTION,
+    data: { 'refresh-token': getRefreshToken() }
+  })
+}
+
+async function sendMessage(data) {
   try {
     if (window.container.ws) {
+      while (window.container.ws.readyState !== SOCKET_OPEN) {
+        await new Promise( resolve => setTimeout( resolve, 400 ))
+      }
       window.container.ws.send(JSON.stringify(data))
       return true
     }
@@ -1054,6 +1100,13 @@ function getCSRFToken() {
   const cookie = document.cookie.split(';').filter(cookie => cookie.trim().substr(0, 4) === 'csrf')
   if (cookie && cookie.length > 0) {
       return cookie[0].trim().substr(5)
+  }
+}
+
+function getRefreshToken() {
+  const cookie = document.cookie.split(';').filter(cookie => cookie.trim().substr(0, 7) === 'refresh')
+  if (cookie && cookie.length > 0) {
+      return cookie[0].trim().substr(8)
   }
 }
 
@@ -1120,4 +1173,25 @@ function subscribeWs (handler, data = 'test') {
       params: {data: data},
       timeout: 0
   }, handler)
+}
+
+function runAndSetInterval (fn, interval) {
+  fn()
+  return setInterval(fn, interval)
+}
+
+function clearCookies () {
+  try {
+    removeCookies()
+    return true
+  } catch (e) {
+    log.error(e.message)
+    return false
+  }
+}
+
+function removeCookies() {
+  // TODO: not working yet
+  // const cookieString = ['csrf', 'trx_cookie'].map(cookie => `${cookie}= ; expires = Thu, 01 Jan 1970 00:00:00 GMT`).join(';')
+  // document.cookie = cookieString
 }
