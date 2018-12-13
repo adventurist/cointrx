@@ -222,12 +222,13 @@ class LoginHandler(RequestHandler):
                 csrf = user_verify.generate_auth_token(expiration=1200)
                 application.create_session(user=create_user_session_data(name, password, user_verify, csrf))
                 if application.session is not None and isinstance(application.session, session.Session):
-                    self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                    trx_cookie = session.Session.generate_cookie()
+                    self.set_secure_cookie(name="trx_cookie", value=trx_cookie)
 
                     return self.write(escape.json_encode(
                         {'statuscode': 200, 'token': str(application.session.user['csrf'], 'utf-8'),
-                         'trx_cookie': str(self.get_secure_cookie('trx_cookie')), 'uid': user_verify.id,
-                         'refresh': user_verify.generate_refresh_token(),
+                         'trx_cookie': trx_cookie.decode('utf-8'), 'uid': user_verify.id,
+                         'refresh': user_verify.generate_refresh_token().decode('utf-8'),
                          'name': user_verify.name}))
 
             elif user_verify < -1:
