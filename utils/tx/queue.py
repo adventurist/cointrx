@@ -28,8 +28,12 @@ class Queue:
             self.tail = self.tail.next
 
     def dequeue(self):
-        if self.head is None:
+        if self.is_empty():
             return None
+        elif self.head == self.tail:
+            outgoing = self.head.data
+            self.head = self.tail = None
+            return outgoing
         else:
             outgoing = self.head.data
             self.head = self.head.next
