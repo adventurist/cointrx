@@ -1602,7 +1602,9 @@ async def handle_transaction_queue():
                 application.queue.enqueue(transaction)
                 if transaction.sender == coinmaster():
                     coinmaster_available = False
-            if transaction == application.queue.tail.data and not intra_user_pending and not coinmaster_available:
+            if application.queue.is_empty():
+                break
+            elif transaction == application.queue.tail.data and not intra_user_pending and not coinmaster_available:
                 paused = True
         else:
             break
