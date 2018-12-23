@@ -501,7 +501,7 @@ export class TrxLayout extends React.Component {
         if ('analysisBot' in bot) {
             const data = {
                 data: {
-                    bot_id: bot.analysisBot.id,
+                    bot_id: bot.id,
                     recipient: 'recipient',
                 },
                 type: 'fetch:balance'

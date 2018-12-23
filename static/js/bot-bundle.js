@@ -20501,7 +20501,7 @@ function (_React$Component2) {
               if ('analysisBot' in bot) {
                 data = {
                   data: {
-                    bot_id: bot.analysisBot.id,
+                    bot_id: bot.id,
                     recipient: 'recipient'
                   },
                   type: 'fetch:balance'
