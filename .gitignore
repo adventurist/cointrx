@@ -13,6 +13,7 @@ Coin\ X.iml
 *.sql
 bot.log
 trx.log
+social.log
 */*.log
 bot/benv
 bot/users.json
@@ -27,3 +28,6 @@ documentation
 fetch_db.sh
 sync_db.sh
 build_rest.sh
+yarn-error.log
+fetch_prices.sh
+
