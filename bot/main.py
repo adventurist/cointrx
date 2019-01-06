@@ -40,7 +40,8 @@ class WSHandler(WebSocketHandler):
 
     def on_close(self):
         print('superfluous information')
-        application.connections.remove(self)
+        if self in application.connections:
+            application.connections.remove(self)
         log.info('connection removed')
 
 
@@ -348,6 +349,8 @@ async def handle_ws_request(type, data):
         bot_id = data['bot_id']
         bot = application.retrieve_bot_by_id(bot_id)
         print(bot)
+        if bot is None:
+            log.info('Bot not being called properly')
         if not bot.is_logged_in():
             await bot.login(application.users_available)
         if bot.is_logged_in():
@@ -656,7 +659,8 @@ def build_graph(price_data, bot_number, patterns=None):
     p1.legend.location = "bottom_right"
     filetype = '%s' % 'general' if patterns is None else 'pattern'
     filename = "analysis" + str(bot_number) + "-%s.html" % filetype
-    output_file('analysis/%s' % filename,
+    full_path_for_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../analysis/') + filename
+    output_file(full_path_for_file,
                 title="analysis" + str(bot_number) + ".py BTC Price Analysis", mode="inline")
     if cup_line is not None:
         save(gridplot([[p1]], plot_width=1600, plot_height=960))
