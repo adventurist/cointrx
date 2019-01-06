@@ -1,6 +1,7 @@
 from decimal import Decimal
 from random import uniform
 import json
+import os
 from utils.btcd_utils import get_env_variables
 from subprocess import call, PIPE
 
@@ -12,8 +13,8 @@ def create_mock_price(price_min, price_max):
 
 
 def expose_analysis_files():
-    env = get_env_variables()['TRX_ENV']
-    command = 'mv /var/www/cointrx/bot/analysis/*.html /var/www/cointrx/static/analysis/' if env == 'SNOWFLAKE' else 'mv /var/www/coinx/analysis/*.html /var/www/coinx/static/analysis/'
+    app_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../')
+    command = 'mv ' + app_root + 'analysis/*.html ' + app_root + 'static/analysis/'
     move_result = call(command, shell=True, stdout=PIPE)
     if move_result is not None and hasattr(move_result, 'stdout'):
         return move_result.stdout
