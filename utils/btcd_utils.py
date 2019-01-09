@@ -2,7 +2,7 @@ from subprocess import *
 
 import binascii
 import hashlib
-from blockcypher import get_address_details
+# from blockcypher import get_address_details
 from os import environ
 from tornado.escape import json_decode
 from pycoin.key import Key
@@ -166,19 +166,20 @@ class RegTest:
 
 
 def get_tx_history(addr: str):
-    if not isinstance(addr, str):
-        addr = str(addr)
-    tx_history = get_address_details(address=addr, coin_symbol='btc-testnet', unspent_only=True)
-    transactions = []
-    tx_hashes = []
-    if tx_history is not None and len(tx_history['txrefs']) > 0:
-        for x in tx_history['txrefs']:
-            if x['confirmations'] > 25 and x['tx_hash'] not in tx_hashes:
-                tx_hashes.append(x['tx_hash'])
-                transactions.append({'txid': x['tx_hash'], 'idx': x['tx_output_n'], 'value': x['value']})
-        return transactions
-    else:
-        return [{'NOHASH', 'NOVALUE'}]
+    pass
+    # if not isinstance(addr, str):
+    #     addr = str(addr)
+    # tx_history = get_address_details(address=addr, coin_symbol='btc-testnet', unspent_only=True)
+    # transactions = []
+    # tx_hashes = []
+    # if tx_history is not None and len(tx_history['txrefs']) > 0:
+    #     for x in tx_history['txrefs']:
+    #         if x['confirmations'] > 25 and x['tx_hash'] not in tx_hashes:
+    #             tx_hashes.append(x['tx_hash'])
+    #             transactions.append({'txid': x['tx_hash'], 'idx': x['tx_output_n'], 'value': x['value']})
+    #     return transactions
+    # else:
+    #     return [{'NOHASH', 'NOVALUE'}]
 
 
 def wif_to_address(wif: str):
