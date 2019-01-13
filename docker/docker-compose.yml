@@ -1,0 +1,47 @@
+version: '3'
+services:
+    postgres:
+        image: "postgres:latest"
+        hostname: "postgres"
+        ports:
+            - "5432:5432"
+        environment:
+            - POSTGRES_USER=postgres
+            - TRX_DB_USER=coinxadmin
+            - TRX_DB_PASSWORD=coinxadmin
+            - TRX_DB_DATABASE=coinxdb
+            - POSTGRES_PASSWORD=postgres
+              #        build: './init'
+        networks:
+            infranet:
+                aliases:
+                  - 'postgres'
+        volumes:
+                - ./coinxlatest.sql:/docker-entrypoint-initdb.d/init.sql
+    trx:
+        build: .
+        ports:
+            - "6969:6969"
+            - "9977:9977"
+            - "9696:9696"
+        environment:
+            TRX_ENV: LOCAL_DEVELOPMENT
+            PYTHONPATH: /var/www/coinx
+        links:
+            - "postgres"
+        depends_on:
+            - "postgres"
+        stdin_open: true
+        networks:
+            - infranet
+        command: >
+                sh -c " cd /var/www/coinx
+                        python3 main.py &&
+                        python3 bot/main.py &&
+                        python3 social/app.py &&
+                        cd /var/www/coinx/btsjs
+                        yarn && yarn start" 
+
+networks:
+    infranet:
+
