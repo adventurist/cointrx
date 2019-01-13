@@ -1,6 +1,6 @@
 DATABASE = {
     'drivername': 'postgres',
-    'host': '127.0.0.1',
+    'host': 'postgres',
     'port': '5432',
     'username': 'coinxadmin',
     'password': 'coinxadmin',
@@ -14,4 +14,13 @@ SOCIALBASE = {
     'username': 'trxdrupadmin',
     'password': 'trxdrupadmin',
     'database': 'trxdrup'
+}
+
+SOCIAL = {
+    'drivername': 'postgres',
+    'host': '127.0.0.1',
+    'port': '5432',
+    'username': 'socialadmin',
+    'password': 'socialadmin',
+    'database': 'trxsocial'
 }
