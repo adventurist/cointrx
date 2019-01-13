@@ -11,6 +11,7 @@ themes
 Coin\ X.iml
 *.iml
 *.sql
+docker/coinxlatest.sql
 bot.log
 trx.log
 social.log
