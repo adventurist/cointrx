@@ -1007,3 +1007,13 @@ async def password_override(uid, password):
     if user:
         user.hash_password(password)
         return await update_resource(user)
+
+
+async def connect_to_db():
+    try:
+        Base.metadata.create_all(bind=engine)
+        return True
+    except exc.DatabaseError as e:
+        logger.info(e)
+        time.sleep(15)
+        await connect_to_db()

@@ -11,8 +11,8 @@ import os
 import random
 import warnings
 
-from graphql.error import GraphQLError
-from graphql.error import format_error as format_graphql_error
+# from graphql.error import GraphQLError
+# from graphql.error import format_error as format_graphql_error
 
 from time import time
 from functools import wraps
@@ -61,23 +61,23 @@ def valid_json(data):
         return False
 
 
-def error_response(func):
-    @wraps(func)
-    def wrapper(self, *args, **kwargs):
-        try:
-            result = func(self, *args, **kwargs)
-        except Exception as ex:
-            if not isinstance(ex, (HTTPError, ExecutionError, GraphQLError)):
-                tb = ''.join(traceback.format_exception(*sys.exc_info()))
-                logging.error('Error: {0} {1}'.format(ex, tb))
-            self.set_status(error_status(ex))
-            error_json = escape.json_encode({'errors': error_format(ex)})
-            logging.debug('error_json: %s', error_json)
-            self.write(error_json)
-        else:
-            return result
-
-    return wrapper
+# def error_response(func):
+#     @wraps(func)
+#     def wrapper(self, *args, **kwargs):
+#         try:
+#             result = func(self, *args, **kwargs)
+#         except Exception as ex:
+#             if not isinstance(ex, (HTTPError, ExecutionError, GraphQLError)):
+#                 tb = ''.join(traceback.format_exception(*sys.exc_info()))
+#                 logging.error('Error: {0} {1}'.format(ex, tb))
+#             self.set_status(error_status(ex))
+#             error_json = escape.json_encode({'errors': error_format(ex)})
+#             logging.debug('error_json: %s', error_json)
+#             self.write(error_json)
+#         else:
+#             return result
+#
+#     return wrapper
 
 
 class ExecutionError(Exception):
@@ -90,25 +90,25 @@ class ExecutionError(Exception):
         self.message = '\n'.join(self.errors)
 
 
-def error_status(exception):
-    if isinstance(exception, HTTPError):
-        return exception.status_code
-    elif isinstance(exception, (ExecutionError, GraphQLError)):
-        return 400
-    else:
-        return 500
-
-
-def error_format(exception):
-    if isinstance(exception, ExecutionError):
-        return [{'message': e} for e in exception.errors]
-    elif isinstance(exception, GraphQLError):
-        return [format_graphql_error(exception)]
-    elif isinstance(exception, HTTPError):
-        return [{'message': exception.log_message,
-                 'reason': exception.reason}]
-    else:
-        return [{'message': 'Unknown server error'}]
+# def error_status(exception):
+#     if isinstance(exception, HTTPError):
+#         return exception.status_code
+#     elif isinstance(exception, (ExecutionError, GraphQLError)):
+#         return 400
+#     else:
+#         return 500
+#
+#
+# def error_format(exception):
+#     if isinstance(exception, ExecutionError):
+#         return [{'message': e} for e in exception.errors]
+#     elif isinstance(exception, GraphQLError):
+#         return [format_graphql_error(exception)]
+#     elif isinstance(exception, HTTPError):
+#         return [{'message': exception.log_message,
+#                  'reason': exception.reason}]
+#     else:
+#         return [{'message': 'Unknown server error'}]
 
 
 def check_attribute(obj, att):
@@ -1622,6 +1622,10 @@ def set_trx_cookie(handler: RequestHandler):
     handler.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
 
 
+async def connect_to_database():
+    await db.connect_to_db()
+
+
 if __name__ == "__main__":
     env_setup()
     logger = logging.getLogger('MAIN')
@@ -1647,7 +1651,9 @@ if __name__ == "__main__":
     logger.debug('Environment set')
     logger.debug(json.dumps(application.settings['env']))
 
-    db.Base.metadata.create_all(bind=db.engine)
+    looper.run_until_complete(connect_to_database())
+
     loop_instance = IOLoop.instance()
+
     PeriodicCallback(manage_blockchain, 30000).start()
     loop_instance.start()
