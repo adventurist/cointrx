@@ -3,16 +3,17 @@ FROM ubuntu:16.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update
-RUN apt install -y gnupg curl git
+RUN apt install -y gnupg curl git software-properties-common
+RUN add-apt-repository --yes ppa:bitcoin/bitcoin
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 RUN apt install -y nodejs
 RUN npm install -g n
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - 
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 RUN apt update
-RUN apt install -y yarn
-RUN apt install -y python-pip
+RUN apt install -y yarn python-pip bitcoind
 RUN apt install -y python3-pip
+COPY bitcoin.conf ~/.bitcoin/bitcoin.conf
 
 USER root
 WORKDIR /var/www

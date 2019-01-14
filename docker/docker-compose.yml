@@ -40,7 +40,7 @@ services:
                         python3 bot/main.py &&
                         python3 social/app.py &&
                         cd /var/www/coinx/btsjs
-                        yarn && yarn start" 
+                        yarn && yarn start"
 
 networks:
     infranet:
