@@ -32,4 +32,4 @@ ENV TRX_ENV LOCAL_DEVELOPMENT
 EXPOSE 6969
 EXPOSE 9977
 EXPOSE 9696
-
+COPY users.json /var/www/coinx/bot/users.json
