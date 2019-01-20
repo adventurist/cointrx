@@ -35,10 +35,11 @@ services:
         networks:
             - infranet
         command: >
-                sh -c " cd /var/www/coinx
-                        python3 main.py &&
-                        python3 bot/main.py &&
-                        python3 social/app.py &&
+                bash  -c "bitcoind --daemon --regtest&
+                        cd /var/www/coinx&
+                        python3 main.py&
+                        python3 bot/main.py&
+                        python3 social/app.py&
                         cd /var/www/coinx/btsjs
                         yarn && yarn start"
 
