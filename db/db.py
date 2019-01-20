@@ -854,11 +854,11 @@ def trx_block_is_pending():
     try:
         trx_state = session.query(TRX).first()
         if trx_state is None:
-            new_state = TRX(pending=false)
+            new_state = TRX(pending=false())
             session.add(new_state)
             session.commit()
             return False
-        return trx_state
+        return trx_state.pending
     except exc.SQLAlchemyError as e:
         logger.debug(e)
 
