@@ -161,13 +161,7 @@ async def latest_price_history_async(currency: str):
 
 
 def get_users():
-    result = session.query(User).filter(User.id != COINMASTER_USER_ID).all()
-    data = {}
-    for r in result:
-        if isinstance(r, User):
-            data.update(r.serialize())
-    print(data)
-    return result
+    return session.query(User).filter(User.id != COINMASTER_USER_ID).all()
 
 
 async def fetch_users_by_name(match_pattern):
@@ -539,7 +533,7 @@ async def update_key(kid: int, label: str) -> dict:
 
 
 async def regtest_make_user_addresses() -> list:
-    users = session.query(User).all()
+    users = get_users()
     result = []
     for user in users:
         new_address = btcd_utils.RegTest.get_new_address()
