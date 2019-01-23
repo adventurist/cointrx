@@ -4,7 +4,7 @@ DATABASE = {
     'port': '5432',
     'username': 'coinxadmin',
     'password': 'coinxadmin',
-    'database': 'coinxdb'
+    'database': 'postgres'
 }
 
 SOCIALBASE = {
