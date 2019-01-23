@@ -644,8 +644,8 @@ class RegTestAddressAllHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        blockcypher_data = await db.regtest_make_user_addresses()
-        self.write(escape.json_encode(blockcypher_data))
+        new_address_confirmations = await db.regtest_make_user_addresses()
+        self.write(escape.json_encode(new_address_confirmations))
 
 
 class RegTestAllUsers(RequestHandler):
