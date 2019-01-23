@@ -20,10 +20,15 @@ services:
                 - ./coinxlatest.sql:/docker-entrypoint-initdb.d/init.sql
     trx:
         build: .
+        hostname: "trx"
         ports:
             - "6969:6969"
             - "9977:9977"
             - "9696:9696"
+            - "18400:18443"
+            - "18500:18444"
+        expose: 
+            - "18444"
         environment:
             TRX_ENV: LOCAL_DEVELOPMENT
             PYTHONPATH: /var/www/coinx
@@ -35,13 +40,33 @@ services:
         networks:
             - infranet
         command: >
-                bash  -c "bitcoind --daemon --regtest&
+                bash  -c "bitcoind --daemon --regtest --printtoconsole --addnode=node1:18444 --addnode=node2:18444&
                         cd /var/www/coinx&
                         python3 main.py&
                         python3 bot/main.py&
                         python3 social/app.py&
                         cd /var/www/coinx/btsjs
                         yarn && yarn start"
+    node1:
+        build: bitcoin/
+        hostname: "node1"
+        ports:
+          - "18401:18443"
+          - "18501:18444"
+        expose: 
+          - "18444"
+        stdin_open: true
+        command: bash -c "cd /bitcoin-0.17.1/bin; ./bitcoind --regtest --printtoconsole --addnode=trx:18444 --addnode=node2:18444"
+    node2:
+        build: bitcoin/
+        hostname: "node2"
+        ports:
+          - "18402:18443"
+          - "18502:18444"
+        expose: 
+          - "18444"
+        stdin_open: true
+        command: bash -c "cd /bitcoin-0.17.1/bin; ./bitcoind --regtest --printtoconsole --addnode=trx:18444 --addnode=node1:18444"
 
 networks:
     infranet:
