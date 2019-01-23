@@ -4,7 +4,9 @@ from sqlalchemy import ForeignKey, CheckConstraint
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, Text, DECIMAL, Boolean, MetaData, DateTime
 from sqlalchemy.engine.url import URL
+from sqlalchemy.sql.expression import true
 from sqlalchemy.orm import sessionmaker, relationship, backref
+from sqlalchemy.sql import func
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, as_declarative, declared_attr
 
@@ -12,6 +14,7 @@ from types import SimpleNamespace
 from db import db_config
 
 import re
+import json
 
 Base = declarative_base()
 metadata = MetaData()
@@ -27,17 +30,31 @@ session = Session()
 trxapp = SimpleNamespace()
 trxapp.config = {'SECRET_KEY': "jigga does as jigga does"}
 
+from sqlalchemy.ext.declarative import declared_attr
+
 
 class Post(Base):
     __tablename__ = 'post'
     id = Column(Integer, primary_key=True, autoincrement=True)
     uid = Column(Integer, ForeignKey('users.id'))
-    date = Column(DateTime)
-    status = Column(Integer)
+    date = Column(DateTime, server_default=func.now())
+    status = Column(Integer, server_default=true())
     title = Column(String(128))
     body = Column(Text)
     link = relationship("Link", backref="post", uselist=True, order_by="Link.id")
     file = relationship("File", backref='post', uselist=True, order_by='File.id')
+
+    def serialize(self):
+        return {
+            'id': str(self.id),
+            'uid': str(self.uid),
+            'date': '{}-{}-{} {}:{}:{}'.format(self.date.year, self.date.month, self.date.day, self.date.hour, self.date.minute, self.date.second),
+            'status': str(self.status),
+            'title': self.title,
+            'body': self.body,
+            'links': [{'url': x.url, 'title': x.title} for x in self.link if len(self.link) > 0],
+            'files': [x.uri for x in self.file if len(self.file) > 0]
+        }
 
 
 class Link(Base):
@@ -56,7 +73,7 @@ class File(Base):
     mime = Column(String(64))
     uid = Column(Integer, ForeignKey('users.id'))
     pid = Column(Integer, ForeignKey('post.id'))
-    status = Column(Integer)
+    status = Column(Integer, server_default=true())
 
 
 class Share(Base):
@@ -65,8 +82,8 @@ class Share(Base):
     uid = Column(Integer, ForeignKey('users.id'))
     cid = Column(Integer, ForeignKey('users.id'))
     pid = Column(Integer, ForeignKey('post.id'))
-    status = Column(Integer)
-    date = Column(DateTime)
+    status = Column(Integer, server_default=true())
+    date = Column(DateTime, server_default=func.now())
 
 
 class TrxKey(Base):
