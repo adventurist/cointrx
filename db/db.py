@@ -208,6 +208,12 @@ async def parse_price_data(data):
         cur_time = time.time()
         if result is None:
             result = CXPrice(currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time)
+        else:
+            result.currency = k
+            result.sell = v['sell']
+            result.last = v['last']
+            result.buy = v['buy']
+            result.modified = cur_time
 
         try:
             session.add(result)
@@ -744,20 +750,20 @@ async def update_user(uid: str, data: dict):
             return False
 
 
-async def regtest_graph_data(time):
-    minmax_dataset = await btc_hour_minmax_price(time)
+async def regtest_graph_data(time, days):
+    minmax_dataset = await btc_hour_minmax_price(time, days)
     hourly_minmax = []
     for row in minmax_dataset:
         hourly_minmax.append({'date': row[0].strftime("%Y-%m-%d %H:%M:%S"), 'low': str(row[1]), 'high': str(row[2])})
     return json.dumps(hourly_minmax)
 
 
-async def btc_hour_minmax_price(time='60'):
+async def btc_hour_minmax_price(time: str, days: str):
     return engine.execute("SELECT date_trunc('minute', to_timestamp(modified)) - "
-                          "(EXTRACT('minute' FROM to_timestamp(modified))::integer %% 60) * interval '15 minutes' as date, min(last), max(last) "
+                          "(EXTRACT('minute' FROM to_timestamp(modified))::integer %% " + time + ") * interval '15 minutes' as date, min(last), max(last) "
                           "FROM cx_price_revision "
                           "WHERE currency='CAD' "
-                          "AND to_timestamp(modified) < CURRENT_TIMESTAMP AND to_timestamp(modified) > (CURRENT_TIMESTAMP - INTERVAL '3 days')"
+                          "AND to_timestamp(modified) < CURRENT_TIMESTAMP AND to_timestamp(modified) > (CURRENT_TIMESTAMP - INTERVAL '" + days + " days')"
                           "GROUP BY 1 ORDER BY date;")
 
 
