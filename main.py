@@ -998,8 +998,9 @@ class BtcMinMaxHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        time = self.get_argument('time')
-        minmax_data = await db.regtest_graph_data(time)
+        time = self.get_argument('time', '60')
+        days = self.get_argument('days', '3')
+        minmax_data = await db.regtest_graph_data(time, days)
         self.write(minmax_data)
 
 
