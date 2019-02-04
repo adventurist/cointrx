@@ -21,7 +21,7 @@ import datetime
 import json
 import logging
 
-from db.models import TrxKey, TRX, SKey, MKey, KeyLabel, TRCHistory, User, ETHPrice, ETHPriceRevision, CXPrice, CXPriceRevision, Heartbeat, HeartbeatComment, HeartbeatCommentBase, HeartbeatUser, engine, Base, Session, session
+from db.models import TrxKey, TRX, SKey, MKey, KeyLabel, Offer, Bid, TRCHistory, User, ETHPrice, ETHPriceRevision, CXPrice, CXPriceRevision, Heartbeat, HeartbeatComment, HeartbeatCommentBase, HeartbeatUser, engine, Base, Session, session
 
 trxapp = SimpleNamespace()
 trxapp.config = {'SECRET_KEY': "jigga does as jigga does"}
@@ -165,7 +165,7 @@ def get_users():
 
 
 async def fetch_users_by_name(match_pattern):
-    result = session.query(User).filter(User.name.like(match_pattern)).one_or_none()
+    result = session.query(User).filter(User.name.ilike(match_pattern)).one_or_none()
     if result is not None:
         return result
     else:
@@ -694,8 +694,9 @@ async def regtest_user_estimated_value(uid: str, balance: any=None):
     if user and user.trxkey is not None:
         price = await latest_price_data(DEFAULT_LANGUAGE)
         if price and price.last is not None:
-            satoshis = Decimal(await btcd_utils.RegTest.get_user_balance(user.trxkey)) if balance is None else Decimal(balance)
-            estimated_value = satoshis / COIN * price.last
+            btc = Decimal(await btcd_utils.RegTest.get_user_balance(user.trxkey)) if balance is None else Decimal(balance)
+            estimated_value = btc * price.last
+            logger.info('Price before quantization: %s' % str(estimated_value))
             return str(estimated_value.quantize(Decimal(".01"), rounding=ROUND_HALF_UP))
 
 
@@ -1025,3 +1026,37 @@ async def connect_to_db():
         logger.info(e)
         time.sleep(15)
         await connect_to_db()
+
+
+async def create_offer(uid, rate, amount, date, currency):
+    new_offer = Offer(uid=uid, rate=rate, amount=amount, end_date=date, currency=currency)
+    try:
+        session.add(new_offer)
+        session.commit()
+        session.flush()
+        return True
+    except exc.SQLAlchemyError as e:
+        logger.info(e)
+        return False
+
+
+async def create_bid(uid, rate, amount, date, currency):
+    new_bid = Bid(uid=uid, rate=rate, amount=amount, end_date=date, currency=currency)
+    try:
+        session.add(new_bid)
+        session.commit()
+        session.flush()
+        return True
+    except exc.SQLAlchemyError as e:
+        logger.info(e)
+        return False
+
+
+async def get_offers():
+    offers = session.query(Offer).all()
+    return [x.serialize() for x in offers]
+
+
+async def get_bids():
+    bids = session.query(Bid).all()
+    return [x.serialize() for x in bids]
