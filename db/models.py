@@ -120,6 +120,46 @@ class TxQueue(Base):
     complete = Column(Boolean, server_default='false')
 
 
+class Offer(Base):
+    __tablename__  = 'offer'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    uid = Column(Integer, ForeignKey('users.id'))
+    amount = Column(Integer)
+    rate = Column(DECIMAL(12, 2))
+    currency = Column(String(4))
+    end_date = Column(DateTime(timezone=True))
+
+    def serialize(self):
+        return {
+            'id': str(self.id),
+            'uid': str(self.uid),
+            'end_date': '{}-{}-{} {}:{}:{}'.format(self.end_date.year, self.end_date.month, self.end_date.day, self.end_date.hour, self.end_date.minute, self.end_date.second),
+            'rate': str(self.rate),
+            'amount': str(self.amount),
+            'currency': self.currency,
+        }
+
+
+class Bid(Base):
+    __tablename__  = 'bid'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    uid = Column(Integer, ForeignKey('users.id'))
+    amount = Column(Integer)
+    rate = Column(DECIMAL(12, 2))
+    currency = Column(String(4))
+    end_date = Column(DateTime(timezone=True))
+
+    def serialize(self):
+        return {
+            'id': str(self.id),
+            'uid': str(self.uid),
+            'end_date': '{}-{}-{} {}:{}:{}'.format(self.end_date.year, self.end_date.month, self.end_date.day, self.end_date.hour, self.end_date.minute, self.end_date.second),
+            'rate': str(self.rate),
+            'amount': str(self.amount),
+            'currency': self.currency,
+        }
+
+
 class SKey(Base):
     __tablename__ = 'skey'
     id = Column(Integer, primary_key=True)
