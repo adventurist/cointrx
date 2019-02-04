@@ -1,15 +1,15 @@
-import React, {PropTypes} from 'react';
+import React, {PropTypes} from 'react'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Drawer from '@material-ui/core/Drawer'
 
-import Link from 'react-toolbox/lib/link';
-import Avatar from '@material-ui/core/Avatar';
-import IconMenu from 'material-ui/IconMenu';
+import Link from 'react-toolbox/lib/link'
+import Avatar from '@material-ui/core/Avatar'
+import IconMenu from 'material-ui/IconMenu'
 import Menu from '@material-ui/core/Menu'
-import MenuItem from '@material-ui/core/MenuItem';
+import MenuItem from '@material-ui/core/MenuItem'
 import IconButton from '@material-ui/core/IconButton'
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert'
 
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -30,14 +30,14 @@ const TRXLogo = () => {
 
 const classes = {
     menuButton: 'menu-button',
+    menuIcon: 'menu-icon',
     logoIcon: 'trx-logo-icon',
     logoButton: 'trx-logo-button'
 
 }
 
-const menuItems =
-// trx_env === 'LOCAL_DEVELOPMENT' ?
-[{
+const menuItems = [
+{
     url: '/user',
     label: 'User Profile',
     icon: 'person'
@@ -106,7 +106,7 @@ const buildSideMenuItems = (menuItems) => {
     }
 }
 
-export class TrxNav extends React.Component {
+export default class TrxNav extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -120,42 +120,6 @@ export class TrxNav extends React.Component {
         }
     }
 
-    state = {
-        drawerActive: false,
-        drawerPinned: false,
-        sidebarPinned: false
-    }
-
-    toggleMenu = () => {
-        this.setState({
-            open: !this.state.open,
-        });
-    };
-
-    handleRequestClose = () => {
-        this.setState({
-            open: false,
-        });
-    };
-
-    toggleDrawerActive = () => {
-        this.setState({
-            drawerActive: !this.state.drawerActive
-        });
-    };
-
-    toggleDrawerPinned = () => {
-        this.setState({
-            drawerPinned: !this.state.drawerPinned
-        });
-    }
-
-    toggleSidebar = () => {
-        this.setState({
-            sidebarPinned: !this.state.sidebarPinned
-        });
-    };
-
     render() {
         return (
 <div>
@@ -164,8 +128,8 @@ export class TrxNav extends React.Component {
     className='appbar'
     position='static'>
     <Toolbar disableGutters={!this.state.open} className='toolbar' title={TRXLogo()}>
-        <IconButton className={classes.menuBotton}>
-            <MenuIcon onClick={this.drawerHandler}/>
+        <IconButton className={classes.menuBotton} onClick={this.props.drawerHandler}>
+            <MenuIcon className={classes.menuIcon} />
         </IconButton>
         <IconButton className={classes.logoButton}>
             <TRXLogo className={classes.logoIcon}/>
@@ -175,32 +139,6 @@ export class TrxNav extends React.Component {
 </div>
         )
     }
-}
-
-const oldStuff = () => {
-    return (
-<div>
-    <Avatar src="https://vignette.wikia.nocookie.net/fictspedia/images/2/23/Killer_frog.jpg"/>
-    <div className='trx-appbar-nav' style={{backgroundColor: '#333333'}}>
-        <div className="app-bar-icons">
-            <Link className="app-bar-icon app-bar-trade"
-                    href='/transaction/tx-gui' label='' icon='inbox'/>
-            <Link className="app-bar-icon app-bar-user"
-                    href='/user' active label=''>
-                <Avatar
-                    src="sites/default/files/2017-09/X58Q4cA.jpg"/>
-            </Link>
-            <Menu open={this.state.open} onClick={this.toggleMenu} className="app-bar-icon app-bar-user-menu" href="#">
-                <div className="user-menu">
-                    <Link className="user-logout" href="/logout">
-                        <MenuItem>Log Out</MenuItem>
-                    </Link>
-                </div>
-            </Menu>
-        </div>
-    </div>
-</div>
-    )
 }
 
 const logoIcon = () => {

@@ -85,7 +85,7 @@ const buildSideMenuItems = (menuItems) => {
     })
 }
 
-export class TrxNav extends React.Component {
+export default class TrxNav extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
