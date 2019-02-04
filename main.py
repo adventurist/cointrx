@@ -115,27 +115,23 @@ def check_attribute(obj, att):
     return getattr(obj, att, None) is not None
 
 
-class MainHandler(RequestHandler):
+class TrxRequestHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
+
+class MainHandler(TrxRequestHandler):
     def get(self):
         self.write("Hi Jigga, Welcome to Tornado Web Framework.")
 
 
-class WunderHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class WunderHandler(TrxRequestHandler):
     def get(self):
         response = {'jigga1': 'always jigga'}
         self.write(response)
 
 
-class LoginHandler(RequestHandler):
-    def data_received(self, chunk):
-        print('Receiving data')
-
+class LoginHandler(TrxRequestHandler):
     async def post(self, *args, **kwargs) -> str:
         """
 
@@ -281,29 +277,20 @@ class LoginHandler(RequestHandler):
         self.render("templates/login.html", title="Jiggas Login Handler", message=message)
 
 
-class SendMailHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class SendMailHandler(TrxRequestHandler):
     def post(self):
         sender = mail_sender()
         if self.request.headers.get("Content-Type") == 'application/json':
             sender.send_mail("adventurist@gmail.com")
 
 
-class FakeNewsHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class FakeNewsHandler(TrxRequestHandler):
     def get(self):
         response = {'News': 'VERY fake news'}
         self.write(response)
 
 
-class UpdatePriceHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class UpdatePriceHandler(TrxRequestHandler):
     # async def get(self):
     #     await http_client.get_prices()
     #
@@ -315,10 +302,7 @@ class UpdatePriceHandler(RequestHandler):
         self.write('Sent request')
 
 
-class ETHPriceUpdateHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class ETHPriceUpdateHandler(TrxRequestHandler):
     async def get(self):
         """
         @api
@@ -332,19 +316,13 @@ class ETHPriceUpdateHandler(RequestHandler):
             self.write(json.dumps({'response': 201, 'data': 'placeholder CHANGE THIS'}))
 
 
-class LatestPriceHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class LatestPriceHandler(TrxRequestHandler):
     async def get(self):
         result = db.latest_prices()
         self.write(escape.json_encode({'TRX': result}))
 
 
-class UserListHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class UserListHandler(TrxRequestHandler):
     def get(self):
         result = (db.get_users())
         data = {}
@@ -354,10 +332,7 @@ class UserListHandler(RequestHandler):
         self.write(escape.json_encode({'USERS': [data]}))
 
 
-class CurrencyHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class CurrencyHandler(TrxRequestHandler):
     def get(self):
         # for k,v in arguments.items():
         if 'currency' in self.request.arguments:
@@ -370,10 +345,7 @@ class CurrencyHandler(RequestHandler):
             print('Whatchoo think this is, jigga!?')
 
 
-class CurrencyRevisionHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class CurrencyRevisionHandler(TrxRequestHandler):
     def get(self):
         if 'currency' in self.request.arguments:
             currency = self.get_argument('currency')
@@ -387,10 +359,7 @@ class CurrencyRevisionHandler(RequestHandler):
             print('Whatchoo think this is, jigga!?')
 
 
-class RegisterHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegisterHandler(TrxRequestHandler):
     def get(self):
         message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut",
                                  "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time",
@@ -427,10 +396,7 @@ class RegisterHandler(RequestHandler):
                                                       'cookie': str(self.get_secure_cookie('trx_cookie'))}))
 
 
-class PasswordHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class PasswordHandler(TrxRequestHandler):
     def get(self):
         message = random.choice(
             ["We gonna DOX you, slut", "A hackathon on yo ass, bitch", "You never gonna be able to log into SHIT",
@@ -438,10 +404,7 @@ class PasswordHandler(RequestHandler):
         self.render("templates/password.html", title="Jiggas Password Handler", message=message)
 
 
-class GraphHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class GraphHandler(TrxRequestHandler):
     async def get(self):
         result = await db.latest_prices_async()
 
@@ -450,10 +413,7 @@ class GraphHandler(RequestHandler):
             self.render("templates/graph.html", title="Price Trends", data=result)
 
 
-class GraphJsonHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class GraphJsonHandler(TrxRequestHandler):
     async def get(self):
         result = await db.latest_prices_async()
 
@@ -462,15 +422,7 @@ class GraphJsonHandler(RequestHandler):
             self.write(escape.json_encode(result))
 
 
-class GraphFilterHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
-
-class TestTransactionHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class TestTransactionHandler(TrxRequestHandler):
     async def get(self):
         transaction = trx__tx_out.Transaction(application.session)
         # attempt = transaction.run()
@@ -481,10 +433,7 @@ class TestTransactionHandler(RequestHandler):
         return self.write({'Try': attempt})
 
 
-class ReactTestHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class ReactTestHandler(TrxRequestHandler):
     def get(self):
         self.render("templates/test.html", title="React Test")
 
@@ -511,21 +460,7 @@ class ReactTestHandler(RequestHandler):
 # </html>
 # """)
 
-
-class SendTrawTransactionHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
-        # def get(self, *args, **kwargs):
-        # if 'txid_out' in self.request.arguments:
-        #     txid_out = self.get_argument('txid_out')
-        #     if len(txid_out) > 0:
-
-
-class HeartbeatHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class HeartbeatHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
         found_cookie = self.get_secure_cookie("trx_cookie")
         if found_cookie is not None:
@@ -534,20 +469,14 @@ class HeartbeatHandler(RequestHandler):
             self.render("templates/heartbeat.html", title="Heartbeat", heartbeats=result)
 
 
-class HeartbeatCreateHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class HeartbeatCreateHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
         db.create_all_heartbeat()
 
         self.write('Good boy')
 
 
-class HeartbeatShareHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class HeartbeatShareHandler(TrxRequestHandler):
     def post(self, *args, **kwargs):
         self_cookie = self.get_secure_cookie("dcsrf")
         client_cookie = self.get_argument("dcsrf")
@@ -556,9 +485,6 @@ class HeartbeatShareHandler(RequestHandler):
 
 
 class HeartbeatSocketShareHandler(WebSocketHandler):
-    def data_received(self, chunk):
-        pass
-
     # TODO - Sort this shit out
     async def on_message(self, message):
         print(message)
@@ -591,10 +517,7 @@ class HeartbeatSocketShareHandler(WebSocketHandler):
             self.close(403, 'You should know not to, punk')
 
 
-class TxGuiHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class TxGuiHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         found_cookie = self.get_secure_cookie("trx_cookie")
         trx_urls = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])
@@ -618,10 +541,7 @@ class TxGuiHandler(RequestHandler):
         pass
 
 
-class TxRequestHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class TxRequestHandler(TrxRequestHandler):
     async def post(self, *args, **kwargs):
         tx_request_data = escape.json_decode(self.request.body)
 
@@ -639,19 +559,13 @@ class TxRequestHandler(RequestHandler):
                 self.write(escape.json_encode({'response': 500}))
 
 
-class RegTestAddressAllHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestAddressAllHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         new_address_confirmations = await db.regtest_make_user_addresses()
         self.write(escape.json_encode(new_address_confirmations))
 
 
-class RegTestAllUsers(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestAllUsers(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         trx_urls = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])
         tx_url = trx_urls['tx_request']
@@ -665,18 +579,12 @@ class RegTestAllUsers(RequestHandler):
                     userbalance_url=userbalance_url)
 
 
-class RegTestTxHistory(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestTxHistory(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         pass
 
 
-class TrxRollbackHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class TrxRollbackHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
         result = db.rollback_transaction()
 
@@ -684,18 +592,12 @@ class TrxRollbackHandler(RequestHandler):
             self.write('Successfully rolled back')
 
 
-class RegTestBlockGenerateHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestBlockGenerateHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         self.write(RegTest.create_new_block())
 
 
-class RegTestUserTotalBalanceHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestUserTotalBalanceHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         sid = self.get_argument('sid')
         rid = self.get_argument('rid')
@@ -707,10 +609,7 @@ class RegTestUserTotalBalanceHandler(RequestHandler):
             'response': 404}))
 
 
-class TransactionTestHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class TransactionTestHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         sid = self.get_argument('sid')
         rid = self.get_argument('rid')
@@ -754,9 +653,7 @@ class TransactionTestHandler(RequestHandler):
                 return False
 
 
-class RegTestPayUserHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
+class RegTestPayUserHandler(TrxRequestHandler):
 
     async def get(self, *args, **kwargs):
         uid = self.get_argument('uid')
@@ -767,20 +664,14 @@ class RegTestPayUserHandler(RequestHandler):
             self.write(str(user_pay_result))
 
 
-class RegTestPayAllUserHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestPayAllUserHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         amount = self.get_argument('amount')
         user_pay_result = await db.regtest_pay_users(amount)
         self.write(str(user_pay_result))
 
 
-class RegTestPayKeyHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestPayKeyHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         wif = self.get_argument('wif')
         amount = self.get_argument('amount')
@@ -790,18 +681,12 @@ class RegTestPayKeyHandler(RequestHandler):
             self.write(str(key_pay_result))
 
 
-class UiReactHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class UiReactHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
         self.render("templates/ui-main.html", title="TRX UI MAIN")
 
 
-class UserProfileHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class UserProfileHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         if check_attribute(application.session, 'user'):
             user_data, prices = await retrieve_user_data()
@@ -831,10 +716,7 @@ def retrieve_user_urls():
     return tx_url, blockgen_url, userbalance_url, btckeygen_url
 
 
-class KeyWTPHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class KeyWTPHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         """
         @API
@@ -850,10 +732,7 @@ class KeyWTPHandler(RequestHandler):
             self.write(wif_to_address(wif))
 
 
-class RegTestUserKeyGenerateHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestUserKeyGenerateHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         found_cookie = self.get_secure_cookie("trx_cookie")
 
@@ -882,10 +761,7 @@ def get_csrf(handler: RequestHandler):
     return handler.request.headers.get('csrf-token')
 
 
-class RegTestKillKeyHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestKillKeyHandler(TrxRequestHandler):
     async def post(self, *args, **kwargs):
         if check_content_types(self) == 'application/json':
             csrf = self.request.headers.get('csrf-token')
@@ -893,10 +769,7 @@ class RegTestKillKeyHandler(RequestHandler):
                 key_id = self.request.headers.get('key')  # TODO make this work
 
 
-class LogoutHandler(RequestHandler):
-    def data_received(self, chunk):
-        print(chunk)
-
+class LogoutHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
         self.clear_all_cookies()
         application.session = None
@@ -911,10 +784,7 @@ class LogoutHandler(RequestHandler):
             user_verify = db.User.verify_auth_token(token)
 
 
-class TestKeyHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class TestKeyHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
         jigga = self.get_argument('jigga')
         print(jigga)
@@ -946,10 +816,7 @@ class TestKeyHandler(RequestHandler):
                 login_redirect(self, self.request.path)
 
 
-class UserUpdateHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class UserUpdateHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
         jigga = self.get_argument('jigga')
         print(jigga)
@@ -981,10 +848,7 @@ class UserUpdateHandler(RequestHandler):
                 login_redirect(self, self.request.path)
 
 
-class RegTestPayAllKeyHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestPayAllKeyHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         keys_paid = await db.regtest_pay_keys('10')
         self.write(json.dumps({'response': 200, 'error': False,
@@ -993,10 +857,7 @@ class RegTestPayAllKeyHandler(RequestHandler):
                                                                       'message': 'Unable to pay any keys'}))
 
 
-class BtcMinMaxHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class BtcMinMaxHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         time = self.get_argument('time', '60')
         days = self.get_argument('days', '3')
@@ -1004,7 +865,7 @@ class BtcMinMaxHandler(RequestHandler):
         self.write(minmax_data)
 
 
-# class GraphQLHandler(RequestHandler):
+# class GraphQLHandler(TrxRequestHandler):
 #     def data_received(self, chunk):
 #         pass
 #
@@ -1066,10 +927,7 @@ class BtcMinMaxHandler(RequestHandler):
 #         self._schema = value
 
 
-class TRCPriceUpdateHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class TRCPriceUpdateHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         current_trx_prices = await db.btc_hour_minmax_price()
         latest_trc_price = await db.trc_latest_price()
@@ -1080,10 +938,7 @@ class TRCPriceUpdateHandler(RequestHandler):
                 logger.debug('Insert result is: ' + str(trc_insert_result))
 
 
-class BotGuiHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class BotGuiHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         if check_attribute(application.session, 'user'):
             bot_gui_data = {}
@@ -1099,10 +954,7 @@ class BotGuiHandler(RequestHandler):
             self.redirect('/login')
 
 
-class BotStartHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class BotStartHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         cookie = self.get_secure_cookie('trx_cookie')
         number = self.get_argument('number')
@@ -1118,10 +970,7 @@ class BotStartHandler(RequestHandler):
             self.write(json.dumps({'response': 500, 'text': 'Error starting bots'}))
 
 
-class BotTrcPriceRetrieveHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class BotTrcPriceRetrieveHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         cookie = self.get_secure_cookie('trx_cookie')
         time_length = self.get_argument('time')
@@ -1135,10 +984,7 @@ class BotTrcPriceRetrieveHandler(RequestHandler):
         self.write(response_data)
 
 
-class UserHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class UserHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         match_pattern = escape.url_unescape(self.request.path.split('/api/user/')[1])
         user = await db.fetch_users_by_name(match_pattern)
@@ -1154,19 +1000,13 @@ class UserHandler(RequestHandler):
                 self.write(json.dumps(update_result.serialize()))
 
 
-class RestGuiHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RestGuiHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
         routes = application.get_routes()
         self.render("templates/rest-test-gui.html", title="REST Test GUI", routes=routes)
 
 
-class UserBalanceHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class UserBalanceHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         uid = self.get_argument('uid')
         balance = await db.regtest_user_balance(uid=uid)
@@ -1176,51 +1016,33 @@ class UserBalanceHandler(RequestHandler):
         self.write(json.dumps(response_body))
 
 
-class RegTestClearKeysHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestClearKeysHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         self.write(json.dumps(await db.regtest_users_clear_keys()))
 
 
-class RegTestTotalBalanceHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestTotalBalanceHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         self.write(json.dumps({'balance': await(db.regtest_total_balance())}))
 
 
-class RegTestBalanceByUserHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestBalanceByUserHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         self.write(json.dumps({'users': await db.regtest_balance_by_user()}))
 
 
-class RegTestActiveBalanceByUserHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegTestActiveBalanceByUserHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         self.write(json.dumps({'users': await db.regtest_active_balance_by_user(), 'code': 200}))
 
 
-class RegtestUserBalanceHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class RegtestUserBalanceHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         match_pattern = escape.url_unescape(self.request.path.split('/api/user/')[1]).split('/balance/regtest')[0]
         self.write(json.dumps({'users': await db.regtest_user_balance_by_key(match_pattern)}))
 
 
-class TrxRouteAllHandler(RequestHandler):
-    def data_received(self, chunk):
-        pass
-
+class TrxRouteAllHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         routes = application.get_routes()
         self.write(json.dumps(routes))
@@ -1230,7 +1052,7 @@ def coinmaster():
     return 16
 
 
-class TRXAccountHandler(RequestHandler):
+class TRXAccountHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         self.write(json.dumps({
             'accounts': await db.regtest_balance_by_account(
@@ -1240,7 +1062,7 @@ class TRXAccountHandler(RequestHandler):
         }))
 
 
-class TRXPayUser(RequestHandler):
+class TRXPayUser(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         amount = self.get_argument('amount')
         name = self.request.path.split('/api/pay/user/')[1]
@@ -1253,7 +1075,7 @@ class TRXPayUser(RequestHandler):
             self.write(str(user_pay_result))
 
 
-class TRXPayAllUsers(RequestHandler):
+class TRXPayAllUsers(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         amount = self.get_argument('amount')
         pay_all_result = await db.trx_pay_users(amount)
@@ -1262,9 +1084,7 @@ class TRXPayAllUsers(RequestHandler):
                 application.queue.enqueue(TRXTransaction(coinmaster(), recipient, amount))
 
 
-class AccountGuiHandler(RequestHandler):
-    pass
-
+class AccountGuiHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
 
         if check_attribute(application.session, 'user'):
@@ -1275,16 +1095,12 @@ class AccountGuiHandler(RequestHandler):
             login_redirect(self, '/admin/account')
 
 
-class TRXQueueHandler(RequestHandler):
-
-    def data_received(self, chunk):
-        pass
-
+class TRXQueueHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
         self.write(json.dumps(application.get_queue()))
 
 
-class TRXKeyActivateHandler(RequestHandler):
+class TRXKeyActivateHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         key_id = self.get_argument('key_id', None)
         if key_id:
@@ -1296,7 +1112,7 @@ class TRXKeyActivateHandler(RequestHandler):
             self.write(json.dumps({'code': 400, 'message': 'No key ID given'}))
 
 
-class TRXKeyDeactivateHandler(RequestHandler):
+class TRXKeyDeactivateHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         key_id = self.get_argument('key_id', None)
         if key_id:
@@ -1308,9 +1124,7 @@ class TRXKeyDeactivateHandler(RequestHandler):
             self.write(json.dumps({'code': 400, 'message': 'No key ID given'}))
 
 
-class TRXBotHandler(RequestHandler):
-    pass
-
+class TRXBotHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         self.write(json.dumps({
             'accounts': await db.regtest_balance_by_account(
@@ -1320,9 +1134,7 @@ class TRXBotHandler(RequestHandler):
         }))
 
 
-class TRUserNewPassHandler(RequestHandler):
-    pass
-
+class TRUserNewPassHandler(TrxRequestHandler):
     async def post(self, *args, **kwargs):
         csrf, content_type = retrieve_api_request_headers(self.request.headers)
         error = None
@@ -1347,7 +1159,6 @@ class TRUserNewPassHandler(RequestHandler):
 
 
 class WSHandler(WebSocketHandler):
-
     def __init__(self, application, request, **kwargs):
         super().__init__(application, request, **kwargs)
         self.connections = []
@@ -1377,9 +1188,7 @@ class TRXSubscriptionHandler(WSHandler):
             self.write_message(json.dumps({'message': 'Message received at %s' % str(time()), 'keepAlive': 1}))
 
 
-class TRXTokenVerifyHandler(RequestHandler):
-    pass
-
+class TRXTokenVerifyHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         token = self.get_argument('access_token', None)
         if token:
@@ -1392,6 +1201,43 @@ class TRXTokenVerifyHandler(RequestHandler):
             self.write(json.dumps({'response': response, 'result': result}))
         else:
             self.set_status(400)
+
+
+class TradeGuiHandler(TrxRequestHandler):
+    async def get(self, *args, **kwargs):
+        if check_attribute(application.session, 'user'):
+            user_data, prices = await retrieve_user_data()
+            bids, offers = await db.get_bids(), await db.get_offers()
+            self.render("templates/trade.html", title="TRX Trade Control", trx_prices=prices, user_data=user_data, bids=bids, offers=offers)
+        else:
+            self.set_secure_cookie('redirect_target', '/user')
+            self.redirect('/login')
+
+
+class BidHandler(TrxRequestHandler):
+
+    async def get(self, *args, **kwargs):
+        self.write(json.dumps(await db.get_bids()))
+
+    async def post(self, *args, **kwargs):
+        body = json.loads(self.request.body.decode('utf-8'))
+        uid, rate, amount, date, currency = body['uid'], body['rate'], body['amount'], body['date'], body['currency']
+        if uid is not None and rate is not None and amount is not None and date is not None and currency is not None:
+            result = await db.create_bid(uid, rate, amount, date, currency)
+            self.write(json.dumps(result))
+
+
+class OfferHandler(TrxRequestHandler):
+
+    async def get(self, *args, **kwargs):
+        self.write(json.dumps(await db.get_offers()))
+
+    async def post(self, *args, **kwargs):
+        body = json.loads(self.request.body.decode('utf-8'))
+        uid, rate, amount, date, currency = body['uid'], body['rate'], body['amount'], body['date'], body['currency']
+        if uid is not None and rate is not None and amount is not None and date is not None and currency is not None:
+            result = await db.create_offer(uid, rate, amount, date, currency)
+            self.write(json.dumps(result))
 
 
 class TRXApplication(Application):
@@ -1410,6 +1256,7 @@ class TRXApplication(Application):
             (r"/login", LoginHandler),
             (r"/logout", LogoutHandler),
             (r"/register", RegisterHandler),
+            (r"/trade", TradeGuiHandler),
             (r"/transaction/tx-gui", TxGuiHandler),
             (r"/heartbeat/feed", HeartbeatHandler),
 
@@ -1478,7 +1325,6 @@ class TRXApplication(Application):
             # - Transactions
             (r"/transaction/request", TxRequestHandler),
             (r"/transaction/test", TransactionTestHandler),
-            (r"/transaction/sendraw", SendTrawTransactionHandler),
             (r"/transaction/secret/rollback", TrxRollbackHandler),
 
             # USERS
@@ -1492,6 +1338,11 @@ class TRXApplication(Application):
 
             (r"/key/convert/wiftoprivate", KeyWTPHandler),
             (r"/api/key/[0-9][0-9][0-9][0-9]/update", TestKeyHandler),
+
+            # BIDS & OFFERS
+
+            (r"/bid", BidHandler),
+            (r"/offer", OfferHandler),
 
             # - Prices
             # -- Graph
