@@ -51,8 +51,8 @@ export default function(delimiter) {
             return {
                 low: row.low,
                 high: row.high,
-                open:  flipCoin() ? <added></added> : subTracted,
-                close: flipCoin() ? added : subTracted,
+                open:  flipCoin() ? added.toString() : subTracted.toString(),
+                close: flipCoin() ? added.toString() : subTracted.toString(),
                 date: new Date(row.date)}
             })
         newRows.columns = [];

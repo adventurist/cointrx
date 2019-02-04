@@ -45,8 +45,9 @@ const jsonParser = jsonParse("\t")
 //     return promiseMSFT;
 // }
 
+console.log('git dat json')
 export function getJson() {
-    const promiseJSON = fetch('/api/prices/regtest/btc/cad/minmax/json')
+    const promiseJSON = fetch('/api/prices/regtest/btc/cad/minmax/json?time=120&days=365')
         .then(response => response.text())
         .then(data => jsonParser.parse(JSON.parse(data)))
     return promiseJSON

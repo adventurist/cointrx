@@ -6,7 +6,7 @@ import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { TrxGrid, TradeForm } from './App.jsx';
-import { TrxNav } from '../TrxAppBar.jsx'
+import TrxNavigation from '../TrxNavigation.jsx'
 
 class ChartComponent extends React.Component {
     componentDidMount() {
@@ -30,7 +30,7 @@ class ChartComponent extends React.Component {
 render(
     <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
         <div id="container">
-            <TrxNav />
+            <TrxNavigation />
             <div id="trade-left">
                 <TrxGrid />
                 <TradeForm/>
