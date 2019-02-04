@@ -13,7 +13,7 @@ import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import { Layout, Panel } from 'react-toolbox'
-import { TrxNav } from '../TrxAppBar.jsx'
+import TrxNavigation from '../TrxNavigation.jsx'
 
 /* Colour and Icon */
 import TrendingUp from 'material-ui/svg-icons/action/trending-up'
@@ -821,7 +821,7 @@ export class TrxLayout extends React.Component {
     render() {
         return (
 <div id="main-wrap">
-<TrxNav id="trx-nav" />
+<TrxNavigation id="trx-nav" />
     <Layout id="main-layout" style={styles.mainLayout}>
         <Panel id="console" className="console" style={styles.console}>
             <TextField
