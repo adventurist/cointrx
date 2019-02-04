@@ -17,6 +17,7 @@
     "alarmist:bot": "node_modules/.bin/alarmist-webpack -n build -f webpack-bot.config.js",
     "alarmist:account": "node_modules/.bin/alarmist-webpack -n build -f webpack-account.config.js",
     "alarmist:rest": "node_modules/.bin/alarmist-webpack -n build -f webpack-rest.config.js",
+    "alarmist:tx": "node_modules/.bin/alarmist-webpack -n build -f webpack.ui-tx.js",
     "dev": "node_modules/.bin/alarmist-monitor npm-run-all -p alarmist:* ts:build",
     "ts:build": "gulp scripts"
   },
