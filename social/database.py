@@ -6,6 +6,7 @@ from sqlalchemy import ForeignKey, CheckConstraint
 from sqlalchemy import create_engine, exc
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker, relationship, backref
+from sqlalchemy.sql import func
 from sqlalchemy.ext.declarative import declarative_base, as_declarative, declared_attr
 # DB Models
 from db.models import Post, Share, Link, File, User
@@ -27,10 +28,9 @@ session = Session()
 async def create_post(user: User, content: dict) -> Post:
     # This simple example does not handle files
     # Date does not have to be set, as the database sets it to a default value of now()
-    session.rollback()
-    session.flush()
     new_post = Post(uid=user.id, title=content['title'], body=content['body'])
     session.add(new_post)
+    session.flush()
 
     # Handle links
     if 'links' in content:
@@ -46,3 +46,7 @@ async def create_post(user: User, content: dict) -> Post:
     except exc.SQLAlchemyError as err:
         log.info('Error committing data to database')
         log.error(str(err))
+
+
+async def get_posts():
+    return session.query(Post).all()

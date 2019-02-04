@@ -27,7 +27,9 @@ class MediaRequestHandler(RequestHandler):
 class PostHandler(MediaRequestHandler):
     async def get(self, *args, **kwargs):
         # get all posts
-        pass
+        posts = await database.get_posts()
+        if posts is not None:
+            self.write(json.dumps([x.serialize() for x in posts]))
 
     async def post(self, *args, **kwargs):
         # create a test post

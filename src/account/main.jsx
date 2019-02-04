@@ -11,17 +11,6 @@ import AccountLayout from './App.jsx'
 // const trxInstance = trx()
 
 
-
-// render(
-//     <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-//         <div id="container">
-//             <TrxNav />
-//             <AccountLayout />
-//         </div>
-
-//     </MuiThemeProvider>
-//     , document.getElementById('root')
-// )
 render(
     <div id="container">
         <AccountLayout />

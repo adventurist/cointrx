@@ -11,7 +11,6 @@ import { Fragment, Component } from 'react'
 // import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 // import getMuiTheme from 'material-ui/styles/getMuiTheme'
 // import { Layout, Panel } from 'react-toolbox'
-import { TrxNav } from '../TrxAppBar2.jsx'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
@@ -26,7 +25,7 @@ import CardActions from '@material-ui/core/CardActions'
 import IconButton from '@material-ui/core/IconButton'
 import Snackbar from '../snackbar'
 import ReactScrollbar from 'react-scrollbar'
-import TrxDrawer2 from '../TrxDrawer'
+import TrxNavigation from '../TrxNavigation.jsx'
 
 /* Colour and Icon */
 // import TrendingUp from 'material-ui/svg-icons/action/trending-up'
@@ -399,9 +398,7 @@ export default class AccountLayout extends Component {
         return (
     <Fragment>
       <div id="main-wrap" onMouseMove={this.mouseMove}>
-        <TrxNav drawerHandler={this.drawerToggle} />
-        <TrxDrawer2 open={this.state.drawerOpen} drawerStateHandler={this.drawerStateHandler} />
-
+        <TrxNavigation />
         <Grid container spacing={24}>
           <Grid item xs={8} sm={4}>
               <Paper className={classes.paper} elevation={1}>
