@@ -15,9 +15,11 @@ docker/coinxlatest.sql
 bot.log
 trx.log
 social.log
+*.log
 */*.log
 bot/benv
 bot/users.json
+*/users.json
 .vscode
 */.vscode
 *.map
