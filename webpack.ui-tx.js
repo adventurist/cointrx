@@ -2,11 +2,14 @@ const webpack = require('webpack')
 const path = require('path');
 
 let config = {
-    entry: path.resolve(__dirname, 'src/tx/main.jsx'),
+    entry: {
+        tx: path.resolve(__dirname, 'src/tx/main.jsx'),
+        trade: path.resolve(__dirname, 'src/trade/index.jsx')
+    },
     output: {
         path: path.resolve(__dirname, 'static'),
         publicPath: "/static/",
-        filename: 'js/tx-ui-bundle.js'
+        filename: 'js/[name]-ui-bundle.js'
     },
     module: {
         loaders: [{
@@ -18,7 +21,7 @@ let config = {
                 loader: 'babel-loader',
                 include: [path.resolve(__dirname, './src')],
                 query: {
-                    presets: ['env', 'stage-0', 'react']
+                    presets: ['@babel/preset-env', '@babel/react']
                 }
             }]
     },
@@ -26,9 +29,8 @@ let config = {
         new webpack.ProvidePlugin({
             "React": "react",
         }),
-    //     ["transform-object-rest-spread", { "useBuiltIns": true }]
-    //
-    ]
+    ],
+    devtool: "source-map"
 };
 
 module.exports = config;
