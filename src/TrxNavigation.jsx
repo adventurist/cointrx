@@ -1,0 +1,23 @@
+import { Component } from 'react'
+import TrxAppBar from './TrxAppBar2.jsx'
+import TrxDrawer from './TrxDrawer'
+
+export default class TrxNavigation extends Component {
+  state = {
+    open: false
+  }
+
+  drawerHandler = () => {
+    console.log('Clicked')
+    this.setState({ open: !this.state.open })
+  }
+
+  render () {
+    return (
+      <div>
+        <TrxAppBar drawerHandler={this.drawerHandler} />
+        <TrxDrawer drawerHandler={this.drawerHandler} open={this.state.open} />
+      </div>
+    )
+  }
+}
