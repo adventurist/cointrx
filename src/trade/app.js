@@ -12,6 +12,11 @@ import TrxChart from './chart/TrxChart'
 /* Form */
 import { OfferForm, BidForm, TrxGrid } from './TradeForm'
 
+/* TradeDialog component */
+import TradeDialog from './components/TradeDialog'
+/* TradeManager */
+import TradeManager from '../utils/trade'
+
 const styles = {
   center: {
     textAlign: 'center'
@@ -41,33 +46,39 @@ const offers = JSON.parse(activeOffers.replace(/'/g, '"')).map(offer => {
     end_date: new Date(offer.end_date).getTime()
   }
 })
-console.log(bids)
-console.log(offers)
-console.log(userDataObject)
+// console.log(bids)
+// console.log(offers)
+// console.log(userDataObject)
 
-bids.forEach(bid => {
-  if (parseInt(bid.uid) === parseInt(userDataObject.id)) {
-    console.log('Iterating bid', bid)
-    offers.forEach(offer => {
-      console.log('Nested offer', offer)
-      if (offer.rate <= bid.rate) {
-        console.log('We have a matched offer to your bid', offer, bid)
-      }
-    })
-  }
-})
+// bids.forEach(bid => {
+//   if (parseInt(bid.uid) === parseInt(userDataObject.id)) {
+//     console.log('Iterating bid', bid)
+//     offers.forEach(offer => {
+//       console.log('Nested offer', offer)
+//       if (offer.rate <= bid.rate && offer.uid !== bid.uid) {
+//         console.log('We have a matched offer to your bid', offer, bid)
+//       }
+//     })
+//   }
+// })
 
-offers.forEach(offer => {
-  if (parseInt(offer.uid) === parseInt(userDataObject.id)) {
-    console.log('Iterating offer', offer)
-    bids.forEach(bid => {
-      console.log('Nested bid', bid)
-      if (bid.rate >= offer.rate) {
-        console.log('We have a matched bid to your offer', bid, offer)
-      }
-    })
-  }
-})
+// offers.forEach(offer => {
+//   if (parseInt(offer.uid) === parseInt(userDataObject.id)) {
+//     console.log('Iterating offer', offer)
+//     bids.forEach(bid => {
+//       console.log('Nested bid', bid)
+//       if (bid.rate >= offer.rate && bid.uid !== offer.uid) {
+//         console.log('We have a matched bid to your offer', bid, offer)
+//       }
+//     })
+//   }
+// })
+
+const tradeManager = new TradeManager(userDataObject, { bids, offers })
+
+tradeManager.start()
+console.log('Matched offers', tradeManager.getMatchedOffers())
+console.log('Matched bids', tradeManager.getMatchedBids())
 
 const date = Date.now()
 
@@ -75,7 +86,7 @@ console.log(date)
 
 
 
-console.log(userDataObject)
+console.log(bids)
 
 export default class App extends Component {
   /**
@@ -85,7 +96,7 @@ export default class App extends Component {
       return (
 
     <div id="main-wrap" >
-
+      <TradeDialog bid={bids[0]}/>
       <Grid container spacing={8} style={styles.root}>
         <Grid item xs={8} sm={4}>
           <TrxGrid />

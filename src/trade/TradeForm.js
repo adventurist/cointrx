@@ -23,7 +23,8 @@ const rowData = JSON.parse(trxPrices.replace(/'/g, '"'))
 const styles = {
     container: {
         flexGrow: 1,
-        textAlign: 'center'
+        textAlign: 'center',
+        backgroundColor: '#333333'
     },
     textField: {
         width: '100%'
@@ -136,6 +137,7 @@ export class OfferForm extends React.Component {
                         type='date'
                         label='Offer end date'
                         value={this.state.offerDate}
+                        InputLabelProps={{ shrink: true }}
                         onChange={this.handleChange('offerDate')}
                     />
                     <Button
@@ -225,6 +227,7 @@ export class BidForm extends React.Component {
                         type='date'
                         label='Offer end date'
                         value={this.state.bidDate}
+                        InputLabelProps={{ shrink: true }}
                         onChange={this.handleChange('bidDate')}
                     />
                     <Button
