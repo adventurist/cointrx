@@ -220,7 +220,9 @@ async def parse_price_data(data):
             session.flush()
 
         except exc.SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
+            logger.debug('Rolling back after failed CXPrice update')
+            session.rollback()
             return False
 
         result2 = session.query(CXPriceRevision).filter(CXPriceRevision.currency == k).group_by(
@@ -236,7 +238,8 @@ async def parse_price_data(data):
             session.flush()
 
         except exc.SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
+            logger.debug('Rolling back after failed CXPriceRevision update')
             return False
 
     return True
