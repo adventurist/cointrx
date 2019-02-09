@@ -2,11 +2,6 @@
 import { put } from 'redux-saga/effects'
 // Events
 import eventsMap from './events/user/events.js'
-// import { mapEvents } from '../../events/interface/actions'
-// Config
-// import { update as updateConfig } from '../../config/interface/actions'
-// Helpers
-// import { defaults } from 'lodash/fp'
 // Sagas
 import { userSaga } from './middleware/user/sagas'
 // User module
@@ -39,18 +34,3 @@ export default function trxUser (options = {}) {
         // mixins: pluginInterface.mixins
     }
 }
-
-// import api from './api/user.js'
-// import reducer from './reducers/user'
-// import userMiddleware from './middleware/user'
-
-// const name = 'user'
-
-// export default function userLink (options = {}) {
-//     return {
-//         name: name,
-//         api: api,
-//         reducer: reducer,
-//         middleware: userMiddleware
-//     }
-// }

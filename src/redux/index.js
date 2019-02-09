@@ -1,8 +1,10 @@
 import initialize from './init'
 import user from './user'
+import auth from './auth'
 
 const trxPlugins = [
-    { name: 'user', fn: user }
+    { name: 'auth', fn: auth },
+    { name: 'user', fn: user },
 ]
 
 export default function trx(options = {}, plugins = []) {
