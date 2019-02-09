@@ -247,7 +247,7 @@ async def parse_price_data(data):
                 logger.debug('Rolling back after failed CXPriceRevision update')
                 return False
 
-        return True
+    return True
 
 
 async def parse_eth_price_data(data, currency='cad'):
