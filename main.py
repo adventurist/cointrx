@@ -33,6 +33,8 @@ from utils import drupal_utils, session, trc_utils, eth_utils
 from utils.cointrx_client import Client
 from utils.mail_helper import Sender as mail_sender
 
+from bitcoin.core import COIN
+
 from utils.login_helpers import retrieve_api_request_headers, retrieve_json_login_headers, \
     retrieve_json_login_credentials, create_user_session_data, retrieve_login_credentials
 
@@ -616,15 +618,24 @@ class TransactionTestHandler(TrxRequestHandler):
         amount = self.get_argument('amount')
         sender = await db.get_user(sid)
         recipient = await db.get_user(rid)
-        if sender and recipient:
-            if hasattr(sender, 'trxkey') and hasattr(recipient, 'trxkey'):
-                print(sender.trxkey)
-                if await self.create_transaction(sender, recipient, amount):
-                    await db.trx_block_pending()
-                    self.write('Success')
-                else:
-                    application.queue.enqueue(TRXTransaction(sid, rid, amount))
-                    self.set_status(400)
+        if db.sender_recipient_ready(sender, recipient):
+            logger.info(
+                'Attempting transaction between ' + str(sid) + ' and ' + str(rid) + ' in the amount of ' + str(
+                    amount))
+            if await TransactionTestHandler.handle_transaction(sender, recipient, amount):
+                self.write('Success')
+            else:
+                application.queue.enqueue(TRXTransaction(sid, rid, amount))
+                self.set_status(202)
+                self.write(json.dumps({'code': 202, 'result': 'Queued',
+                                       'message': 'The request was accepted, but has been queued for processing at a later time.'}))
+
+    @staticmethod
+    async def handle_transaction(sender, recipient, amount):
+        if await TransactionTestHandler.create_transaction(sender, recipient, amount):
+            await db.trx_block_pending()
+            return True
+        return False
 
     @staticmethod
     async def create_transaction(sender, recipient, amount):
@@ -801,8 +812,7 @@ class TestKeyHandler(TrxRequestHandler):
                     key_data = json.loads(self.request.body.decode())
                     if 'label' in key_data:
                         if await db.update_key(key_id, key_data['label']):
-                            self.set_status(204)
-                            self.write(escape.json_encode([{'Update': 'Successful', 'code': 204}]))
+                            self.write(escape.json_encode([{'Update': 'Successful', 'code': 200}]))
                         else:
                             self.set_status(404)
                             self.write(escape.json_encode([{'error': 'Key not found', 'code': 404}]))
@@ -813,7 +823,7 @@ class TestKeyHandler(TrxRequestHandler):
                     self.set_status(401)
                     self.write(escape.json_encode([{'error': 'Not authorized', 'code': 401}]))
             else:
-                login_redirect(self, self.request.path)
+                login_redirect(self)
 
 
 class UserUpdateHandler(TrxRequestHandler):
@@ -845,7 +855,7 @@ class UserUpdateHandler(TrxRequestHandler):
                     self.write(escape.json_encode([{'error': 'Not authorized', 'code': 401}]))
                     self.set_status(401)
             else:
-                login_redirect(self, self.request.path)
+                login_redirect(self)
 
 
 class RegTestPayAllKeyHandler(TrxRequestHandler):
@@ -1092,7 +1102,7 @@ class AccountGuiHandler(TrxRequestHandler):
             account_urls = TRXConfig.account_urls(application.get_env()['TRX_ENV'])
             self.render("templates/account.html", title="TRX Accounts", account_urls=account_urls)
         else:
-            login_redirect(self, '/admin/account')
+            login_redirect(self)
 
 
 class TRXQueueHandler(TrxRequestHandler):
@@ -1208,10 +1218,10 @@ class TradeGuiHandler(TrxRequestHandler):
         if check_attribute(application.session, 'user'):
             user_data, prices = await retrieve_user_data()
             bids, offers = await db.get_bids(), await db.get_offers()
-            self.render("templates/trade.html", title="TRX Trade Control", trx_prices=prices, user_data=user_data, bids=bids, offers=offers)
+            self.render("templates/trade.html", title="TRX Trade Control", trx_prices=prices, user_data=user_data,
+                        bids=bids, offers=offers)
         else:
-            self.set_secure_cookie('redirect_target', '/user')
-            self.redirect('/login')
+            login_redirect(self)
 
 
 class BidHandler(TrxRequestHandler):
@@ -1238,6 +1248,48 @@ class OfferHandler(TrxRequestHandler):
         if uid is not None and rate is not None and amount is not None and date is not None and currency is not None:
             result = await db.create_offer(uid, rate, amount, date, currency)
             self.write(json.dumps(result))
+
+
+class TradeRequestHandler(TrxRequestHandler):
+    """
+    Handles all trades originating from bids or offers
+    """
+    async def post(self, *args, **kwargs):
+        body = json.loads(self.request.body.decode('utf-8'))
+        trade, trade_type, acceptor = body['trade'], body['trade']['type'], body['uid']
+        trade_response, trade_object = None, None
+        if trade and trade_type and acceptor:
+            if trade_type == 'offer':
+                trade_object = await db.get_offer(trade['id'])
+                trade_response = await request_trade(trade_object.uid, acceptor, trade_object.amount, trade_object.rate, trade_object.currency)
+            elif trade_type == 'bid':
+                trade_object = await db.get_bid(trade['id'])
+                trade_response = await request_trade(acceptor, trade_object.uid, trade_object.amount, trade_object.rate, trade_object.currency)
+            else:
+                self.set_status(400)
+                self.write(json.dumps({'code': 400, 'message': 'Invalid trade type'}))
+            trade_response['completed']: await db.trade_finish(trade_object)
+            self.write(json.dumps(trade_response))
+
+
+async def request_trade(sid, rid, amount, rate, currency):
+    sender = await db.get_user(sid)
+    recipient = await db.get_user(rid)
+    if db.sender_recipient_ready(sender, recipient):
+        logger.info(
+            'Attempting trade between ' + str(sid) + ' and ' + str(rid) + ' in the amount of ' + str(
+                amount) + ' at a rate of ' + str(rate) + 'rate ' + str(currency) + ' for a total of: ' + str(
+                rate * amount))
+        try:
+            if await TransactionTestHandler.handle_transaction(sender, recipient, COIN * amount):
+                #  Transfer funds
+                return {'result': True, 'transaction': True, 'code': 200}
+            else:
+                application.queue.enqueue(TRXTransaction(sid, rid, COIN * amount))
+                return {'result': True, 'transaction': False, 'code': 202,
+                        'message': 'The request was accepted, but has been queued for processing at a later time.'}
+        except Exception as e:
+            return {'result': False, 'transaction': False, 'code': 400, 'message': str(e)}
 
 
 class TRXApplication(Application):
@@ -1300,6 +1352,9 @@ class TRXApplication(Application):
             # Regression CoinTRX GW: Keys
             (r"/api/key/activate", TRXKeyActivateHandler),
             (r"/api/key/deactivate", TRXKeyDeactivateHandler),
+
+            # Regression CoinTRX GW: Transactions
+            (r"/api/trade/request", TradeRequestHandler),
 
             # Regression CoinTRX GW: Tokens
             (r"/api/token/verify", TRXTokenVerifyHandler),
@@ -1427,8 +1482,8 @@ def env_setup():
     os.path.join(os.path.dirname(__file__), "static")
 
 
-def login_redirect(handler: RequestHandler, origin: str):
-    handler.set_secure_cookie('redirect_target', origin)
+def login_redirect(handler: RequestHandler):
+    handler.set_secure_cookie('redirect_target', handler.request.path)
     handler.redirect('/login')
 
 
