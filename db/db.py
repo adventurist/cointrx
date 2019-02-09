@@ -110,10 +110,10 @@ async def latest_prices():
 
 async def latest_prices_async():
     try:
-        result = session.query(CXPrice).all()
+        result = session.query(CXPriceRevision).order_by(CXPriceRevision.rid.desc()).limit(16).all()
         data = []
         for r in result:
-            if isinstance(r, CXPrice):
+            if isinstance(r, CXPriceRevision):
                 data.append(r.serialize())
         return data
     except exc.SQLAlchemyError as err:
