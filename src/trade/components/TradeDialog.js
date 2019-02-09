@@ -6,6 +6,23 @@ import IconButton from '@material-ui/core/IconButton'
 import DoneIcon from '@material-ui/icons/Done'
 import CancelIcon from '@material-ui/icons/Cancel'
 
+import TradeTable from '../components/TradeTable'
+
+const classes = {
+  table: {
+    root: 'table-main',
+    tableWrapper: 'table-wrap',
+    table: 'table',
+    highlight: 'highlight',
+    title: 'table-title',
+    actions: 'table-actions',
+    spacer: 'table-spacer'
+  }
+}
+
+const styles = {
+  maxWidth: '100%'
+}
 export default class TradeDialog extends Component {
 
   constructor(props) {
@@ -13,12 +30,25 @@ export default class TradeDialog extends Component {
     console.log(props)
     this.state = {
       open: true,
-      bid: props.bid
+      bids: props.bids,
+      selectedTrades: undefined
     }
   }
 
   handleClose = () => {
     this.setState({ open: false })
+  }
+
+  handleTrade = () => {
+    console.log(this.state.selectedTrades)
+    this.props.tradeHandler(this.state.selectedTrades)
+  }
+
+  selectedTradesHandler = trades => {
+    const selectedTrades = []
+    trades.forEach(trade => selectedTrades.push(this.state.bids.find(bid => bid.id === trade)))
+    console.log(selectedTrades)
+    this.setState({ selectedTrades })
   }
 
   renderBid = () => {
@@ -33,37 +63,40 @@ export default class TradeDialog extends Component {
   }
   render () {
     return (
-      <div>
         <Dialog
           open={this.state.open}
           title='Trade Dialog'
           fullWidth={true}
+          maxWidth={false}
+
           >
           <DialogTitle>Trade</DialogTitle>
             <DialogContent>
               <DialogContentText>
-              {this.renderBid()}
               </DialogContentText>
               <DialogContentText>
                 <h3>Do you accept?</h3>
               </DialogContentText>
             </DialogContent>
+            <DialogContent>
+              <TradeTable classes={classes.table} bids={this.state.bids} selectedTradesHandler={this.selectedTradesHandler} />
+            </DialogContent>
             <DialogActions>
               <IconButton color='primary'
-              onClick={this.handleClose}>
-                Yes
+              onClick={this.handleTrade}>
+                Trade
                 <DoneIcon />
               </IconButton>
             </DialogActions>
             <DialogActions>
               <IconButton color='secondary'
+              onClick={this.handleClose}
             >
-              No
+              Close
               <CancelIcon />
             </IconButton>
             </DialogActions>
           </Dialog>
-      </div>
     )
   }
 }
