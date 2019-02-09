@@ -85,7 +85,6 @@ async def handle_eth_update_data(data):
     distilled_data = await parse_eth_price_data(data)
 
 
-
 async def update_prices(data):
     return await parse_price_data(data)
 
@@ -201,8 +200,9 @@ def fetch_label_text(id):
 
 
 async def parse_price_data(data):
+    logger.debug('Parsing data:' + str(data))
     for k, v in data.items():
-
+        logger.debug('Iterating key: ' + str(k))
         result = session.query(CXPrice).filter(CXPrice.currency == k).one_or_none()
         cur_time = time.time()
         if result is None:
