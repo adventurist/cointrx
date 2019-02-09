@@ -7,7 +7,6 @@ from sqlalchemy import func
 from sqlalchemy.sql.expression import true, false
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
 from bitcoin.core import COIN
 from db import db_config
 from types import SimpleNamespace
@@ -751,6 +750,10 @@ async def update_user(uid: str, data: dict):
             return False
 
 
+def sender_recipient_ready(sender: User, recipient: User) -> bool:
+    return sender and recipient and hasattr(sender, 'trxkey') and hasattr(recipient, 'trxkey')
+
+
 async def regtest_graph_data(time, days):
     minmax_dataset = await btc_hour_minmax_price(time, days)
     hourly_minmax = []
@@ -1053,10 +1056,34 @@ async def create_bid(uid, rate, amount, date, currency):
 
 
 async def get_offers():
-    offers = session.query(Offer).all()
+    offers = session.query(Offer).filter(Offer.completed == false()).all()
     return [x.serialize() for x in offers]
 
 
 async def get_bids():
-    bids = session.query(Bid).all()
+    bids = session.query(Bid).filter(Bid.completed == false()).all()
     return [x.serialize() for x in bids]
+
+
+async def get_offer(oid):
+    offer = session.query(Offer).filter(Offer.id == oid).one_or_none()
+    if offer:
+        return offer
+
+
+async def get_bid(bid):
+    bid = session.query(Bid).filter(Bid.id == bid).one_or_none()
+    if bid:
+        return bid
+
+
+async def trade_finish(trade: Union[Bid, Offer]):
+    trade.completed = true()
+    try:
+        session.add(trade)
+        session.commit()
+        session.flush()
+        return True
+    except exc.SQLAlchemyError as e:
+        logger.info(e)
+        return False
