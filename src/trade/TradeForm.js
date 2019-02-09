@@ -7,12 +7,15 @@ import 'react-virtualized/styles.css'
 // Import React Table
 import "react-table/react-table.css";
 import ReactDataGrid from 'react-data-grid'
+import Grid from '@material-ui/core/Grid'
 import TextField from '@material-ui/core/TextField'
 import Input from '@material-ui/core/Input'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import FundField from './components/FundField'
 import MenuItem from '@material-ui/core/MenuItem'
 import Button from '@material-ui/core/IconButton'
+import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers'
+import DateFnsUtils from '@date-io/date-fns'
 
 import AddIcon from '@material-ui/icons/Add'
 
@@ -55,11 +58,8 @@ export class OfferForm extends React.Component {
 
         this.state = {
             offerDate: undefined,
-            bidDate: undefined,
             offerAmount: undefined,
             offerPrice: undefined,
-            bidAmount: undefined,
-            bidPrice: undefined,
             currency: '$'
         }
     }
@@ -68,6 +68,10 @@ export class OfferForm extends React.Component {
         this.setState({
             [name]: event.target.value
         })
+    }
+
+    handleDateChange = date => {
+        this.setState({ offerDate: date })
     }
 
     amountHandler = (amount) => {
@@ -116,15 +120,6 @@ export class OfferForm extends React.Component {
                         currency={'BTC'}
                         handler={this.amountHandler}
                     />
-                    {/* <TextField
-                        value={this.state.offerAmount || 0}
-                        type='number'
-                        max={parseFloat(userDataObject.estimated)}
-                        label='Amount to offer'
-                        prefix={this.state.currency}
-                        // startAdornment={<InputAdornment position='start'>{this.state.currency}</InputAdornment>}
-                        onChange={this.handleChange('offerAmount')}
-                    /> */}
                     <TextField
                         className={classes.textField}
                         type='number'
@@ -132,18 +127,23 @@ export class OfferForm extends React.Component {
                         value={this.state.offerPrice}
                         onChange={this.handleChange('offerPrice')}
                     />
-                    <TextField
-                        className={classes.textField}
-                        type='date'
-                        label='Offer end date'
-                        value={this.state.offerDate}
-                        InputLabelProps={{ shrink: true }}
-                        onChange={this.handleChange('offerDate')}
-                    />
+
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <Grid container className='date-grid' justify="space-around">
+                        <DatePicker
+                            margin="normal"
+                            label='Offer end date'
+                            value={this.state.offerDate}
+                            onChange={this.handleDateChange}
+                        />
+                        </Grid>
+                    </MuiPickersUtilsProvider>
                     <Button
                         label='Create Offer'
                         onClick={this.onSubmit}
+                        variant="contained" color="primary"
                     >
+                        Offer
                         <AddIcon />
                     </Button>
                 </form>
@@ -168,6 +168,10 @@ export class BidForm extends React.Component {
         this.setState({
             [name]: event.target.value
         })
+    }
+
+    handleDateChange = date => {
+        this.setState({ bidDate: date })
     }
 
     amountHandler = (amount) => {
@@ -222,18 +226,22 @@ export class BidForm extends React.Component {
                         value={this.state.offerPrice}
                         onChange={this.handleChange('bidPrice')}
                     />
-                    <TextField
-                        className={classes.textField}
-                        type='date'
-                        label='Offer end date'
-                        value={this.state.bidDate}
-                        InputLabelProps={{ shrink: true }}
-                        onChange={this.handleChange('bidDate')}
-                    />
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <Grid container className='date-grid' justify="space-around">
+                        <DatePicker
+                            margin="normal"
+                            label='Bid end date'
+                            value={this.state.bidDate}
+                            onChange={this.handleDateChange}
+                        />
+                        </Grid>
+                    </MuiPickersUtilsProvider>
                     <Button
                         label='Create Bid'
                         onClick={this.onSubmit}
+                        variant="contained" color="primary"
                     >
+                        Bid
                         <AddIcon />
                     </Button>
                 </form>
