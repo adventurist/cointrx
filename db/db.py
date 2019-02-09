@@ -581,7 +581,7 @@ async def regtest_all_user_data():
 
 async def regtest_user_data(uid: str):
     user_data = []
-    user = session.query(User).filter(User.id == uid).one_or_none()
+    user = session.query(User).filter(User.id == uid).one()
     if user is not None:
         data = {
             'id': user.id,
