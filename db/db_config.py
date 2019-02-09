@@ -1,10 +1,10 @@
 DATABASE = {
     'drivername': 'postgres',
-    'host': 'postgres',
+    'host': 'localhost',
     'port': '5432',
     'username': 'coinxadmin',
     'password': 'coinxadmin',
-    'database': 'postgres'
+    'database': 'coinxdb'
 }
 
 SOCIALBASE = {
