@@ -1268,7 +1268,7 @@ class TradeRequestHandler(TrxRequestHandler):
             else:
                 self.set_status(400)
                 self.write(json.dumps({'code': 400, 'message': 'Invalid trade type'}))
-            trade_response['completed']: await db.trade_finish(trade_object)
+            trade_response['completed'] = await db.trade_finish(trade_object)
             self.write(json.dumps(trade_response))
 
 
