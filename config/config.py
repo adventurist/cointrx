@@ -92,4 +92,29 @@ def eth_by_currency(currency):
     return 'https://api.kraken.com/0/public/Ticker?pair=ETH%s' % currency
 
 
+currency_index = {
+    "AUD": 7,
+    "BRL": 4,
+    "CAD": 8,
+    "CHF": 5,
+    "CLP": 22,
+    "CNY": 9,
+    "DKK": 2,
+    "EUR": 3,
+    "GBP": 6,
+    "HKD": 20,
+    "INR": 1,
+    "ISK": 12,
+    "JPY": 18,
+    "KRW": 17,
+    "NZD": 10,
+    "PLN": 14,
+    "RUB": 21,
+    "SEK": 13,
+    "SGD": 15,
+    "THB": 11,
+    "TWD": 19,
+    "USD": 16
+}
+
 DEFAULT_LANGUAGE = 'CAD'
