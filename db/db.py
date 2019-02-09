@@ -210,25 +210,25 @@ async def parse_price_data(data):
             logger.debug('Results found: ' + str([{'id': x.id, 'currency': x.currency} for x in results]))
             result = results[0]
             cur_time = time.time()
-            if result is None:
-                result = CXPrice(currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time)
-            else:
-                result.currency = k
-                result.sell = v['sell']
-                result.last = v['last']
-                result.buy = v['buy']
-                result.modified = cur_time
-
-            try:
-                session.add(result)
-                session.commit()
-                session.flush()
-
-            except exc.SQLAlchemyError as e:
-                logger.error(e)
-                logger.debug('Rolling back after failed CXPrice update')
-                session.rollback()
-                return False
+            # if result is None:
+            #     result = CXPrice(currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time)
+            # else:
+            #     result.currency = k
+            #     result.sell = v['sell']
+            #     result.last = v['last']
+            #     result.buy = v['buy']
+            #     result.modified = cur_time
+            #
+            # try:
+            #     session.add(result)
+            #     session.commit()
+            #     session.flush()
+            #
+            # except exc.SQLAlchemyError as e:
+            #     logger.error(e)
+            #     logger.debug('Rolling back after failed CXPrice update')
+            #     session.rollback()
+            #     return False
 
             result2 = session.query(CXPriceRevision).filter(CXPriceRevision.currency == k).group_by(
                 CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid))).first()
@@ -236,7 +236,7 @@ async def parse_price_data(data):
             rid = rid + 1 if rid is not None else 1
 
             revision_insert = CXPriceRevision(rid=rid, currency=k, sell=v['sell'], last=v['last'], buy=v['buy'],
-                                              modified=cur_time, currency_id=result.id)
+                                              modified=cur_time, currency_id=cx_price_id)
             try:
                 session.add(revision_insert)
                 session.commit()
