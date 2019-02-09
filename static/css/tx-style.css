@@ -36,3 +36,7 @@
 .react-stockchart text {
     fill: #ffffff!important;
 }
+
+#trade-dialog {
+    max-width: 100%;
+}
