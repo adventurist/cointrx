@@ -4,11 +4,11 @@ from sqlalchemy import ForeignKey, CheckConstraint
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, Text, DECIMAL, Boolean, MetaData, DateTime
 from sqlalchemy.engine.url import URL
-from sqlalchemy.sql.expression import true
+from sqlalchemy.sql.expression import true, false
 from sqlalchemy.orm import sessionmaker, relationship, backref
 from sqlalchemy.sql import func
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.declarative import declarative_base, as_declarative, declared_attr
+from sqlalchemy.ext.declarative import declarative_base, as_declarative
 
 from types import SimpleNamespace
 from db import db_config
@@ -128,6 +128,7 @@ class Offer(Base):
     rate = Column(DECIMAL(12, 2))
     currency = Column(String(4))
     end_date = Column(DateTime(timezone=True))
+    completed = Column(Boolean, server_default=false())
 
     def serialize(self):
         return {
@@ -137,6 +138,8 @@ class Offer(Base):
             'rate': str(self.rate),
             'amount': str(self.amount),
             'currency': self.currency,
+            'completed': str(self.completed),
+            'type': 'offer'  # This value is not in the database
         }
 
 
@@ -148,6 +151,7 @@ class Bid(Base):
     rate = Column(DECIMAL(12, 2))
     currency = Column(String(4))
     end_date = Column(DateTime(timezone=True))
+    completed = Column(Boolean, server_default=false())
 
     def serialize(self):
         return {
@@ -157,6 +161,8 @@ class Bid(Base):
             'rate': str(self.rate),
             'amount': str(self.amount),
             'currency': self.currency,
+            'completed': str(self.completed),
+            'type': 'bid'  # This value is not in the database
         }
 
 
