@@ -203,7 +203,7 @@ async def parse_price_data(data):
     logger.debug('Parsing data:' + str(data))
     for k, v in data.items():
         logger.debug('Iterating key: ' + str(k))
-        result = session.query(CXPrice).filter(CXPrice.currency == k).one_or_none()
+        result = session.query(CXPrice).filter(CXPrice.currency == k).one()
         cur_time = time.time()
         if result is None:
             result = CXPrice(currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time)
