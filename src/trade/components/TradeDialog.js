@@ -33,6 +33,12 @@ export default class TradeDialog extends Component {
       bids: props.bids,
       selectedTrades: undefined
     }
+
+    window.addEventListener('keyup', e => {
+      if (e.keyCode === 27) {
+        this.handleClose()
+      }
+    })
   }
 
   handleClose = () => {
@@ -43,6 +49,8 @@ export default class TradeDialog extends Component {
     console.log(this.state.selectedTrades)
     this.props.tradeHandler(this.state.selectedTrades)
   }
+
+
 
   selectedTradesHandler = trades => {
     const selectedTrades = []
@@ -68,7 +76,6 @@ export default class TradeDialog extends Component {
           title='Trade Dialog'
           fullWidth={true}
           maxWidth={false}
-
           >
           <DialogTitle>Trade</DialogTitle>
             <DialogContent>

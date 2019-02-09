@@ -19,6 +19,8 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import FilterListIcon from '@material-ui/icons/FilterList'
 import { lighten } from '@material-ui/core/styles/colorManipulator'
 
+import format from 'date-fns/format'
+
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1
@@ -151,7 +153,7 @@ let EnhancedTableToolbar = props => {
           </Typography>
         ) : (
           <Typography variant="h6" id="tableTitle">
-            Nutrition
+            Trades
           </Typography>
         )}
       </div>
@@ -306,7 +308,7 @@ class EnhancedTable extends React.Component {
                       </TableCell>
                       <TableCell align="right">{n.amount}</TableCell>
                       <TableCell align="right">{n.currency}</TableCell>
-                      <TableCell align="right">{n.end_date}</TableCell>
+                      <TableCell align="right">{format(new Date(n.end_date), 'MMMM dd, YYYY - H:mm')} UTC</TableCell>
                       <TableCell align="right">{n.uid}</TableCell>
                       <TableCell align="right">{n.type}</TableCell>
                     </TableRow>
