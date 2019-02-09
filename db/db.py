@@ -206,7 +206,9 @@ async def parse_price_data(data):
         cx_price_id = currency_index[k]
         if cx_price_id is not None:
 
-            result = session.query(CXPrice).filter(CXPrice.id == cx_price_id).one_or_none()
+            results = session.query(CXPrice).filter(CXPrice.id == cx_price_id).all()
+            logger.debug('Results found: ' + str([{'id': x.id, 'currency': x.currency} for x in results]))
+            result = results[0]
             cur_time = time.time()
             if result is None:
                 result = CXPrice(currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time)
