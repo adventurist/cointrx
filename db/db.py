@@ -205,27 +205,27 @@ async def parse_price_data(data):
         logger.debug('Iterating key: ' + str(k))
         if currency_index[k] is not None:
 
-            result = session.query(CXPrice).filter(CXPrice.id == currency_index[k]).one()
+            # result = session.query(CXPrice).filter(CXPrice.id == currency_index[k]).one()
             cur_time = time.time()
-            if result is None:
-                result = CXPrice(currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time)
-            else:
-                result.currency = k
-                result.sell = v['sell']
-                result.last = v['last']
-                result.buy = v['buy']
-                result.modified = cur_time
-
-            try:
-                session.add(result)
-                session.commit()
-                session.flush()
-
-            except exc.SQLAlchemyError as e:
-                logger.error(e)
-                logger.debug('Rolling back after failed CXPrice update')
-                session.rollback()
-                return False
+            # if result is None:
+            #     result = CXPrice(currency=k, sell=v['sell'], last=v['last'], buy=v['buy'], modified=cur_time)
+            # else:
+            #     result.currency = k
+            #     result.sell = v['sell']
+            #     result.last = v['last']
+            #     result.buy = v['buy']
+            #     result.modified = cur_time
+            #
+            # try:
+            #     session.add(result)
+            #     session.commit()
+            #     session.flush()
+            #
+            # except exc.SQLAlchemyError as e:
+            #     logger.error(e)
+            #     logger.debug('Rolling back after failed CXPrice update')
+            #     session.rollback()
+            #     return False
 
             result2 = session.query(CXPriceRevision).filter(CXPriceRevision.currency == k).group_by(
                 CXPriceRevision.id).order_by(desc(func.max(CXPriceRevision.rid))).first()
