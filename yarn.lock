@@ -6471,10 +6471,10 @@ react-css-themr@^2.0.0, react-css-themr@^2.1.2:
     hoist-non-react-statics "^1.2.0"
     invariant "^2.2.1"
 
-react-data-grid@^3.0.11:
-  version "3.0.11"
-  resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-3.0.11.tgz#06329d1548a29de43b314dc51016f972ca34750a"
-  integrity sha1-BjKdFUiineQ7MU3FEBb5cso0dQo=
+react-data-grid@^5.0.4:
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-5.0.5.tgz#529f5acd4750ae0461e9da66f9f30d6f597eed76"
+  integrity sha512-OR4LDoOpN4yj3NexaxYFS2OEIYFUk2V5lascPTHgtTMwwkb163tEPqQSertkv2YAJu+YBzIm8epW8+UMip1LPw==
 
 react-dom@^15.6.1:
   version "15.6.2"
@@ -6630,10 +6630,10 @@ react-select@^1.0.0-rc.6:
     prop-types "^15.5.8"
     react-input-autosize "^2.1.2"
 
-react-stockcharts@^0.7.0-beta.19:
-  version "0.7.0-beta.26"
-  resolved "https://registry.yarnpkg.com/react-stockcharts/-/react-stockcharts-0.7.0-beta.26.tgz#5172b54bc0f039d8b334718d6dda6e6fae9792cc"
-  integrity sha512-1SxeLRctQyIF9sKETnxbmTAz0TzuyKIOZcKx9VofARi6y0cbotOmwfkAtsi9nED8uL3h0Td8TkFVj+5Lf8mwLw==
+react-stockcharts@^0.7.8:
+  version "0.7.8"
+  resolved "https://registry.yarnpkg.com/react-stockcharts/-/react-stockcharts-0.7.8.tgz#d127a113479835be1a0ef7c37e5b5808740b9803"
+  integrity sha512-swtnTFrp8+82dDGhuI3gg2qvO7irU/dz210k3KtmRiZGMwrmdWBsfYGRrctKRK2OSm+C7G4WgbhKo0pdfFlwyQ==
   dependencies:
     d3-array "^1.2.1"
     d3-collection "^1.0.4"
@@ -6649,7 +6649,7 @@ react-stockcharts@^0.7.0-beta.19:
     debug "^3.1.0"
     lodash.flattendeep "^4.4.0"
     prop-types "^15.6.0"
-    save-svg-as-png "^1.2.0"
+    save-svg-as-png "^1.4.5"
 
 react-style-proptype@^3.0.0:
   version "3.2.0"
@@ -7339,10 +7339,10 @@ sass-loader@^6.0.1:
     lodash.tail "^4.1.1"
     pify "^3.0.0"
 
-save-svg-as-png@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/save-svg-as-png/-/save-svg-as-png-1.2.0.tgz#b09a5e8bea5ba57ccd8d269ef92c00d894cf6b1c"
-  integrity sha1-sJpei+pbpXzNjSae+SwA2JTPaxw=
+save-svg-as-png@^1.4.5:
+  version "1.4.9"
+  resolved "https://registry.yarnpkg.com/save-svg-as-png/-/save-svg-as-png-1.4.9.tgz#0ac8e037de150e202dd80cc63061a2fe3e15199e"
+  integrity sha512-e7kLlXMfudHQKxk49Z4qV6SE1B7or4MEjiTFNwhst3aesly7UOQ+qST5u47YUYpCbeFsF8mr4ZhTMLgXqHMyoA==
 
 sax@~1.2.1:
   version "1.2.4"
