@@ -116,7 +116,7 @@ async def latest_prices_async():
                 data.append(r.serialize())
         return data
     except exc.SQLAlchemyError as err:
-
+        logger.debug('Error getting latest prices', err)
         session.rollback()
 
 
