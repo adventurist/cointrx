@@ -76955,7 +76955,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var TRXLogo = function TRXLogo() {
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("img", {
     id: "trx-logo-img",
-    height: "64px",
+    height: "96px",
     src: "/static/images/logo.png"
   }));
 };

@@ -28,7 +28,11 @@ const styles = {
   root: {
     display: 'flex',
     flexWrap: 'wrap',
+    margin: '0px'
     // justifyContent: 'space-around'
+  },
+  gridChild: {
+    padding: '0px'
   }
 }
 
@@ -90,12 +94,12 @@ export default class App extends Component {
     <div id="main-wrap" >
       <TradeDialog tradeHandler={this.tradeHandler} bids={tradeManager.getMatched()}/>
       <Grid container spacing={8} style={styles.root}>
-        <Grid item xs={8} sm={4}>
+        <Grid style={styles.gridChild} item xs={8} sm={4}>
           <TrxGrid />
           <OfferForm balance={userDataObject.balance} uid={userDataObject.id} />
           <BidForm balance={userDataObject.balance} uid={userDataObject.id} />
         </Grid>
-        <Grid item xs={12} sm={8} id={ids.tradeRight}>
+        <Grid style={styles.gridChild}  item xs={12} sm={8} id={ids.tradeRight}>
           <TrxChart />
         </Grid>
       </Grid>
