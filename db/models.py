@@ -13,6 +13,8 @@ from sqlalchemy.ext.declarative import declarative_base, as_declarative
 from types import SimpleNamespace
 from db import db_config
 
+from config.config import currency_symbol_map
+
 import re
 import json
 
@@ -216,6 +218,7 @@ class User(Base):
     utc_offset = Column(Integer)
     level = Column(Integer, nullable=False, server_default='0')
     balance = Column(DECIMAL(12, 2), server_default='0.00')
+    currency = Column(String(3))
     CheckConstraint('level BETWEEN 0 and 4')
 
     # TODO
@@ -351,7 +354,8 @@ class CXPriceRevision(Base):
             'buy': re.sub("[^0-9^.]", "", str(self.buy)),
             'sell': re.sub("[^0-9^.]", "", str(self.sell)),
             'modified': self.modified,
-            'currency_id': self.currency_id
+            'currency_id': self.currency_id,
+            'symbol': currency_symbol_map[self.currency_id]
         }
 
 
