@@ -27,10 +27,16 @@ const styles = {
     container: {
         flexGrow: 1,
         textAlign: 'center',
-        backgroundColor: '#333333'
+        backgroundColor: '#333333',
+        paddingTop: '12px'
     },
     textField: {
         width: '100%'
+    },
+    cleanHeader: {
+        marginBlockStart: 0,
+        marginBlckEnd: 0,
+        color: '#065b6b'
     }
 }
 
@@ -97,8 +103,8 @@ export class OfferForm extends React.Component {
     render () {
         return (
             <div style={styles.container}>
-                <h2>Trade Form</h2>
-                <h3>Offer</h3>
+                <h2 style={styles.cleanHeader}>Trade Form</h2>
+                <h3 style={styles.cleanHeader}>Offer</h3>
                 <form onSubmit={this.onSubmit}>
                     <TextField
                     className={classes.textField}
@@ -141,7 +147,7 @@ export class OfferForm extends React.Component {
                     <Button
                         label='Create Offer'
                         onClick={this.onSubmit}
-                        variant="contained" color="primary"
+                        variant="contained" color="accent"
                     >
                         Offer
                         <AddIcon />
@@ -197,7 +203,7 @@ export class BidForm extends React.Component {
     render () {
         return (
             <div style={styles.container}>
-                <h3>Bid</h3>
+                <h3 style={styles.cleanHeader}>Bid</h3>
                 <form onSubmit={this.onSubmit}>
                     <TextField
                     className={classes.textField}
@@ -239,7 +245,7 @@ export class BidForm extends React.Component {
                     <Button
                         label='Create Bid'
                         onClick={this.onSubmit}
-                        variant="contained" color="primary"
+                        variant="contained" color="accent"
                     >
                         Bid
                         <AddIcon />
@@ -256,6 +262,7 @@ export class TrxGrid extends React.Component {
         this.createRows()
         this._columns = [
             { key: 'cur', name: 'Currency' },
+            { key: 'sym', name: 'Symbol' },
             { key: 'sell', name: 'Sell' },
             { key: 'buy', name: 'Buy' } ]
 
@@ -269,6 +276,7 @@ export class TrxGrid extends React.Component {
     static buildRows(price) {
         return {
             'cur': price.currency,
+            'sym': price.symbol,
             'sell': price.sell,
             'buy': price.buy
         }

@@ -33,6 +33,9 @@ const styles = {
   },
   gridChild: {
     padding: '0px'
+  },
+  gridItem: {
+    paddingTop: '12px'
   }
 }
 
