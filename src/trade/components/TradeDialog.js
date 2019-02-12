@@ -54,7 +54,7 @@ export default class TradeDialog extends Component {
 
   selectedTradesHandler = trades => {
     const selectedTrades = []
-    trades.forEach(trade => selectedTrades.push(this.state.bids.find(bid => parseInt(bid.id) === parseInt(trade)))
+    trades.forEach(trade => selectedTrades.push(this.state.bids.find(bid => parseInt(bid.id) === parseInt(trade))))
     console.log(selectedTrades)
     this.setState({ selectedTrades })
   }
