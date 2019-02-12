@@ -251,7 +251,7 @@ class EnhancedTable extends React.Component {
     }
 
     if (this.props.selectedTradesHandler) {
-      this.props.selectedTradesHandler(newSelected)
+      this.props.selectedTradesHandler(newSelected.map(idx => this.state.data[idx].id))
     }
 
     this.setState({ selected: newSelected })
