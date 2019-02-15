@@ -222,6 +222,8 @@ class Transaction:
                                 return send_tx_result
                         else:
                             print('No response received')
+                    else:
+                        return {'error': 'Insufficient funds', 'code': TRXConfig.TransactionError.INSUFFICIENT_FUNDS }
 
     @staticmethod
     def run_alt():
