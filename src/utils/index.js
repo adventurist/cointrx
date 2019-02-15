@@ -88,9 +88,9 @@ export function handleResponse(response) {
     }
 
     return {
-        body: 'body' in response ? response.body : false,
+        body: response.body || false,
         error: error,
-        code: 'code' in response ? response.body : false,
+        code: response.code || false,
     }
 }
 

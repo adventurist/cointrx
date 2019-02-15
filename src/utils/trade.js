@@ -42,4 +42,27 @@ export default function TradeManager (user, pending = { bids: [], offers: [] }) 
   this.getMatched = () => {
     return [... this.matchedBids, ... this.matchedOffers ]
   }
+
+  this.removeTrade = (tradeInfo = {type: undefined, id: undefined}) => {
+    switch (tradeInfo.type) {
+      case 'bid':
+        const remainingBids = this.matchedBids.filter(bid => parseInt(bid.id) !== parseInt(tradeInfo.id))
+        delete this.matchedBids
+        this.matchedBids = remainingBids
+        break
+      case 'offer':
+        const remainingOffers = this.matchedOffers.filter(offer => parseInt(offer.id) !== parseInt(tradeInfo.id))
+        delete this.matchedOffers
+        this.matchedOffers = remainingOffers
+        break
+      default:
+        log.error('Unable to remove trade. No recognized trade type defined')
+        return false
+    }
+    return true
+  }
+
+  this.numOfAvailableTrades = () => {
+    return this.matchedBids.length + this.matchedOffers.length
+  }
 }

@@ -17,7 +17,9 @@ import TradeDialog from './components/TradeDialog'
 /* TradeManager */
 import TradeManager from '../utils/trade'
 /* Request */
-import { request } from '../utils/index'
+import { request, handleResponse } from '../utils/index'
+/* Logging*/
+import log from 'loglevel'
 
 
 
@@ -60,33 +62,24 @@ const offers = JSON.parse(activeOffers.replace(/'/g, '"')).map(offer => {
 })
 
 const tradeManager = new TradeManager(userDataObject, { bids, offers })
-
 tradeManager.start()
-console.log('Matched offers', tradeManager.getMatchedOffers())
-console.log('Matched bids', tradeManager.getMatchedBids())
-
-const date = Date.now()
-
-console.log(date)
-
-
-
-console.log(bids)
 
 export default class App extends Component {
 
-  tradeHandler = trades => {
-    console.log(trades)
-    trades.forEach( trade => {
-      request({
-        method: 'POST',
-        url: '/api/trade/request',
-        body: {
-          trade: trade,
-          uid: userDataObject.id
-        }
-      })
-    })
+  tradeHandler = async trades => {
+    let completed
+    trades.forEach( async trade => {if (await requestTrade(trade)) completed++})
+    log.info(`${completed} trades completed.`)
+  }
+
+  tradeManyHandler = () => {
+    trades = tradeManager.getMatched()
+    while (userDataObject.balance > 0 && tradeManager.numOfAvailableTrades()) {
+      const trade = trades.shift()
+      if (!requestTrade(trade)) {
+        break
+      }
+    }
   }
   /**
      * Render the component
@@ -95,7 +88,7 @@ export default class App extends Component {
       return (
 
     <div id="main-wrap" >
-      <TradeDialog tradeHandler={this.tradeHandler} bids={tradeManager.getMatched()}/>
+      <TradeDialog tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} bids={tradeManager.getMatched()}/>
       <Grid container spacing={8} style={styles.root}>
         <Grid style={styles.gridChild} item xs={8} sm={4}>
           <TrxGrid />
@@ -109,4 +102,27 @@ export default class App extends Component {
     </div>
       )
   }
+}
+
+async function requestTrade(trade) {
+  const response = await request({
+    method: 'POST',
+    url: '/api/trade/request',
+    body: {
+      trade: trade,
+      uid: userDataObject.id
+    }
+  })
+  const result = handleResponse(response)
+  if (result.error) {
+    log.error(result.error)
+    return false
+  } else {
+    log.info('Trade completed', result)
+    if (tradeManager.removeTrade({type: trade.type, id: trade.id})) {
+      log.info('Trade removed from trade manager')
+      userDataObject.balance = userDataObject.balance = trade.type === 'offer' ? userDataObject.balance + trade.amount : userDataObject - trade.amount
+    }
+  }
+  return true
 }
