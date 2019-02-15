@@ -43,6 +43,8 @@ http_client = Client()
 
 define("port", default=6969, help="Default port for the WebServer")
 
+TransactionError = TRXConfig.TransactionError
+
 
 # class MJSONEncoder(json.JSONEncoder):
 #     def default(self, obj):
@@ -655,13 +657,9 @@ class TransactionTestHandler(TrxRequestHandler):
                 'amount': amount
             }
 
-            transaction_result = await trx__tx_out.Transaction.request_transaction(
+            return await trx__tx_out.Transaction.request_transaction(
                 {'sender': data['sender'], 'recipient': data['recipient'],
                  'amount': int(round(int(data['amount'])))})
-            if transaction_result:
-                return True
-            else:
-                return False
 
 
 class RegTestPayUserHandler(TrxRequestHandler):
@@ -1261,10 +1259,10 @@ class TradeRequestHandler(TrxRequestHandler):
         if trade and trade_type and acceptor:
             if trade_type == 'offer':
                 trade_object = await db.get_offer(trade['id'])
-                trade_response = await request_trade(trade_object.uid, acceptor, trade_object.amount, trade_object.rate, trade_object.currency)
+                trade_response = await request_trade(acceptor, trade_object.uid, trade_object.amount, trade_object.rate, trade_object.currency)
             elif trade_type == 'bid':
                 trade_object = await db.get_bid(trade['id'])
-                trade_response = await request_trade(acceptor, trade_object.uid, trade_object.amount, trade_object.rate, trade_object.currency)
+                trade_response = await request_trade(trade_object.uid, acceptor, trade_object.amount, trade_object.rate, trade_object.currency)
             else:
                 self.set_status(400)
                 self.write(json.dumps({'code': 400, 'message': 'Invalid trade type'}))
@@ -1286,6 +1284,7 @@ async def request_trade(sid, rid, amount, rate, currency):
                 return {'result': True, 'transaction': True, 'code': 200}
             else:
                 application.queue.enqueue(TRXTransaction(sid, rid, COIN * amount))
+                await db.trx_block_pending()
                 return {'result': True, 'transaction': False, 'code': 202,
                         'message': 'The request was accepted, but has been queued for processing at a later time.'}
         except Exception as e:
@@ -1491,6 +1490,15 @@ async def request_transaction(sid, rid, amount):
     return await TransactionTestHandler.create_transaction(await db.get_user(sid), await db.get_user(rid), amount)
 
 
+async def handle_failed_transaction(result: dict):
+    message, code = result['error'], result['code']
+    logger.info('Transaction failed with {} code.\n Message: \n{}'.format(message, code))
+    if int(code) == TransactionError.INSUFFICIENT_FUNDS:
+        logger.debug('Must inform user of insufficient funds')
+        return {'result': 'handling complete'}
+
+
+
 async def handle_transaction_queue():
     coinmaster_available = True
     intra_user_pending = None
@@ -1504,6 +1512,8 @@ async def handle_transaction_queue():
                 intra_user_pending = True
                 result = await request_transaction(transaction.sender, transaction.recipient, transaction.amount)
                 if result:
+                    if 'error' in result:
+                        await handle_failed_transaction(result)
                     intra_user_pending = False
             if not result:
                 application.queue.enqueue(transaction)
