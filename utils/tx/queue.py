@@ -26,6 +26,8 @@ class Queue:
         else:
             self.tail.next = Node(data)
             self.tail = self.tail.next
+            if self.head.next is None:
+                self.head.next = self.tail
 
     def dequeue(self):
         if self.is_empty():
@@ -40,7 +42,7 @@ class Queue:
             return outgoing
 
     def is_empty(self):
-        return self.head == self.tail and self.tail is None
+        return self.head == self.tail is None
 
     def size(self):
         count = 0
