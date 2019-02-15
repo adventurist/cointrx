@@ -1,16 +1,17 @@
 
 import hashlib
 import config.config as TRXConfig
-from bitcoin.core import x, b2x, lx, COIN, COutPoint, CMutableTxOut, CMutableTxIn, CMutableTransaction, Hash160, b2lx
-from bitcoin.core.script import CScript, OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG, SignatureHash, SIGHASH_ALL
-from bitcoin.core.scripteval import VerifyScript, SCRIPT_VERIFY_P2SH
-from bitcoin.wallet import CBitcoinAddress, CBitcoinSecret
-from bitcoin.rpc import Proxy
+# from bitcoin.core import x, b2x, lx, COIN, COutPoint, CMutableTxOut, CMutableTxIn, CMutableTransaction, Hash160, b2lx
+# from bitcoin.core.script import CScript, OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG, SignatureHash, SIGHASH_ALL
+# from bitcoin.core.scripteval import VerifyScript, SCRIPT_VERIFY_P2SH
+# from bitcoin.wallet import CBitcoinAddress, CBitcoinSecret
+# from bitcoin.rpc import Proxy
 from utils.cointrx_client import Client
 from utils import btcd_utils
 from tornado.escape import json_encode, json_decode
 from db import db
 
+COIN = 100000000
 
 def set_trx_urls():
     environment_variables = TRXConfig.get_env_variables()
@@ -207,9 +208,7 @@ class Transaction:
                         tx_remain_amount = tx_input_total - new_tx.amount
                         tx_output = [{'value': new_tx.amount, 'address': new_tx.recipient},
                                      {'value': tx_remain_amount - 1000, 'address': sender_addr}]
-                        tx_output_total = new_tx.amount + tx_remain_amount
                         client = Client()
-                        myurls = TRX_urls
                         response = await client.connect(TRX_urls['tx_app'], json_encode(
                             {'txIn': tx_input, 'txOut': tx_output, 'network': 'regtest'}))
 
@@ -223,7 +222,7 @@ class Transaction:
                         else:
                             print('No response received')
                     else:
-                        return {'error': 'Insufficient funds', 'code': TRXConfig.TransactionError.INSUFFICIENT_FUNDS }
+                        return {'error': 'Insufficient funds', 'code': TRXConfig.TransactionError.INSUFFICIENT_FUNDS}
 
     @staticmethod
     def run_alt():

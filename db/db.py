@@ -7,7 +7,6 @@ from sqlalchemy import func
 from sqlalchemy.sql.expression import true, false
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker
-from bitcoin.core import COIN
 from db import db_config
 from types import SimpleNamespace
 from decimal import Decimal, ROUND_HALF_UP
@@ -22,6 +21,7 @@ import logging
 
 from db.models import TrxKey, TRX, SKey, MKey, KeyLabel, Offer, Bid, TRCHistory, User, ETHPrice, ETHPriceRevision, CXPrice, CXPriceRevision, Heartbeat, HeartbeatComment, HeartbeatCommentBase, HeartbeatUser, engine, Base, Session, session
 
+COIN = 100000000
 trxapp = SimpleNamespace()
 trxapp.config = {'SECRET_KEY': "jigga does as jigga does"}
 

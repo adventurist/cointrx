@@ -33,11 +33,10 @@ from utils import drupal_utils, session, trc_utils, eth_utils
 from utils.cointrx_client import Client
 from utils.mail_helper import Sender as mail_sender
 
-from bitcoin.core import COIN
-
 from utils.login_helpers import retrieve_api_request_headers, retrieve_json_login_headers, \
     retrieve_json_login_credentials, create_user_session_data, retrieve_login_credentials
 
+COIN = 100000000
 io_handler = IOHandler()
 http_client = Client()
 
@@ -1267,10 +1266,12 @@ class TradeRequestHandler(TrxRequestHandler):
                 self.set_status(400)
                 self.write(json.dumps({'code': 400, 'message': 'Invalid trade type'}))
             trade_response['completed'] = await db.trade_finish(trade_object)
+            self.set_status(trade_response['code'])
             self.write(json.dumps(trade_response))
 
 
 async def request_trade(sid, rid, amount, rate, currency):
+    logger.info('Trade requested')
     sender = await db.get_user(sid)
     recipient = await db.get_user(rid)
     if db.sender_recipient_ready(sender, recipient):
@@ -1556,10 +1557,10 @@ if __name__ == "__main__":
     logger.info('Logger configured')
 
     looper = asyncio.get_event_loop()
-    looper.set_debug(True)
+    # looper.set_debug(True)
     looper.slow_callback_duration = 0.001
 
-    warnings.simplefilter('always')
+    # warnings.simplefilter('always')
     application = TRXApplication()
     http_server = httpserver.HTTPServer(application)
     http_server.listen(6969)
