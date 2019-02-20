@@ -9,6 +9,7 @@ from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker
 from db import db_config
 from types import SimpleNamespace
+from typing import Tuple
 from decimal import Decimal, ROUND_HALF_UP
 from utils import btcd_utils
 from config.config import DEFAULT_LANGUAGE, currency_index
@@ -1082,10 +1083,12 @@ async def get_bid(bid):
         return bid
 
 
-async def trade_finish(trade: Union[Bid, Offer]):
-    trade.completed = true()
+async def trade_finish(offer: Offer, bid: Bid):
+    offer.completed = true()
+    bid.completed = true()
     try:
-        session.add(trade)
+        session.add(offer)
+        session.add(bid)
         session.commit()
         session.flush()
         return True
