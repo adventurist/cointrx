@@ -1256,16 +1256,14 @@ class TradeRequestHandler(TrxRequestHandler):
         trade, trade_type, acceptor = body['trade'], body['trade']['type'], body['uid']
         trade_response, trade_object = None, None
         if trade and trade_type and acceptor:
-            if trade_type == 'offer':
-                trade_object = await db.get_offer(trade['id'])
-                trade_response = await request_trade(acceptor, trade_object.uid, trade_object.amount, trade_object.rate, trade_object.currency)
-            elif trade_type == 'bid':
-                trade_object = await db.get_bid(trade['id'])
-                trade_response = await request_trade(trade_object.uid, acceptor, trade_object.amount, trade_object.rate, trade_object.currency)
+            offer = await db.get_offer(trade['offer']['id'])
+            bid = await db.get_bid(trade['bid']['id'])
+            if offer and bid:
+                trade_response = await request_trade(offer.uid, bid.uid, offer.amount, offer.rate, offer.currency)
             else:
                 self.set_status(400)
                 self.write(json.dumps({'code': 400, 'message': 'Invalid trade type'}))
-            trade_response['completed'] = await db.trade_finish(trade_object)
+            trade_response['completed'] = await db.trade_finish(offer, bid)
             self.set_status(trade_response['code'])
             self.write(json.dumps(trade_response))
 
@@ -1515,6 +1513,7 @@ async def handle_transaction_queue():
                 if result:
                     if 'error' in result:
                         await handle_failed_transaction(result)
+                        continue
                     intra_user_pending = False
             if not result:
                 application.queue.enqueue(transaction)
