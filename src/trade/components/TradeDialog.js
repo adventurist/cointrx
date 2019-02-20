@@ -56,6 +56,16 @@ export default class TradeDialog extends Component {
     })
   }
 
+  componentWillReceiveProps(props) {
+    // If the available trades have changed, we need to remove selections
+    if (props.trades) {
+      this.setState({
+        trades: props.trades,
+        selectedTrades: props.trades.length === this.state.trades.length ? this.state.selectedTrades : []
+      })
+    }
+  }
+
   handleClose = () => {
     this.setState({ open: false })
   }

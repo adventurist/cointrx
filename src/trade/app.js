@@ -15,7 +15,7 @@ import { OfferForm, BidForm, TrxGrid } from './TradeForm'
 /* TradeDialog component */
 import TradeDialog from './components/TradeDialog'
 /* TradeManager */
-import TradeManager from '../utils/trade'
+import TradeManager, { TradeType } from '../utils/trade'
 /* Request */
 import { request, handleResponse } from '../utils/index'
 /* Logging*/
@@ -63,13 +63,38 @@ const offers = JSON.parse(activeOffers.replace(/'/g, '"')).map(offer => {
 
 const tradeManager = new TradeManager(userDataObject, { bids, offers })
 tradeManager.start()
-
+async function requestTrades (trades) {
+  return new Promise( resolve => {
+    const result = { completed: [], failed: [] }
+    trades.forEach( async (trade, idx) => {
+      const tradeInfo = { type: trade.type, id: trade.type === TradeType.BID ? trade.bid.id : trade.offer.id }
+      if (await requestTrade(trade)) {
+        result.completed.push(tradeInfo)
+      } else {
+        result.failed.push(tradeInfo)
+        log.info('Requested trade failed: ', trade);
+      }
+      if (trades.length === idx + 1) {
+        resolve(result)
+      }
+    })
+  })
+}
 export default class App extends Component {
 
+  constructor(props) {
+    super(props)
+    this.state = {
+      trades: tradeManager.getMatchedTrades()
+    }
+  }
+
   tradeHandler = async trades => {
-    let completed = 0
-    trades.forEach( async trade => {if (await requestTrade(trade)) completed++})
-    log.info(`${completed} trades completed.`)
+    requestTrades(trades).then(result => {
+      log.info(`${result.completed.length} trades completed..\n${result.failed.length} trades failed.`)
+      tradeManager.removeTrades(result.completed)
+      this.setState({ trades: tradeManager.getMatchedTrades() })
+    })
   }
 
   tradeManyHandler = () => {
@@ -88,7 +113,7 @@ export default class App extends Component {
       return (
 
     <div id="main-wrap" >
-      <TradeDialog tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} trades={tradeManager.getMatchedTrades()} bids={tradeManager.getMatched()}/>
+      <TradeDialog tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} trades={this.state.trades} bids={tradeManager.getMatched()}/>
       <Grid container spacing={8} style={styles.root}>
         <Grid style={styles.gridChild} item xs={8} sm={4}>
           <TrxGrid />

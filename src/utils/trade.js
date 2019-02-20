@@ -19,6 +19,7 @@ export const TradeType = Object.freeze({
 export default function TradeManager (user, pending = { bids: [], offers: [] }) {
   // set member variables
   const { bids, offers } = pending
+  this.user = user
   this.matchedBids = []
   this.matchedOffers = []
   this.candidates = []
@@ -148,6 +149,23 @@ export default function TradeManager (user, pending = { bids: [], offers: [] }) 
         return false
     }
     return true
+  }
+
+  /**
+   * @param {Array<Object>} completedTrades An array of objects representing trades which have completed and must be removed from the TradeManager's state
+   */
+  this.removeTrades = (completedTrades = []) => {
+    this.candidates = [
+      ...this.candidates.filter(candidate =>
+        !completedTrades.some(completed =>
+          completed.type === TradeType.BID
+            ?
+            candidate.bid.id === completed.id && parseInt(candidate.bid.uid) === parseInt(this.user.id)
+            :
+            candidate.offer.id === completed.id && parseInt(candidate.offer.uid) === parseInt(this.user.id)
+        )
+      )
+    ]
   }
 
   /**

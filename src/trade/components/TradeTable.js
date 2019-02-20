@@ -214,6 +214,12 @@ class EnhancedTable extends React.Component {
     rowsPerPage: 5,
   }
 
+  componentWillReceiveProps (props) {
+    if (props.trades && this.state.data.length !== props.trades.length) {
+      this.setState({ data: prepareData(this.props.trades), selected: [] })
+    }
+  }
+
   handleRequestSort = (event, property) => {
     const orderBy = property
     let order = 'desc'
