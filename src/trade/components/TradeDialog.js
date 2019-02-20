@@ -9,6 +9,8 @@ import CancelIcon from '@material-ui/icons/Cancel'
 
 import TradeTable from '../components/TradeTable'
 
+import { TradeType } from '../../utils/trade'
+
 const classes = {
   table: {
     root: 'table-main',
@@ -43,6 +45,7 @@ export default class TradeDialog extends Component {
     this.state = {
       open: true,
       bids: props.bids,
+      trades: props.trades,
       selectedTrades: undefined
     }
 
@@ -62,11 +65,11 @@ export default class TradeDialog extends Component {
     this.props.tradeHandler(this.state.selectedTrades)
   }
 
-
-
-  selectedTradesHandler = trades => {
+  selectedTradesHandler = tradeItems => {
     const selectedTrades = []
-    trades.forEach(trade => selectedTrades.push(this.state.bids.find(bid => parseInt(bid.id) === parseInt(trade))))
+    tradeItems.forEach(tradeItem => selectedTrades.push(this.state.trades.find(trade => {
+      return parseInt(tradeItem.bid.id) === parseInt(trade.bid.id) && parseInt(tradeItem.offer.id) === parseInt(trade.offer.id)
+    })))
     console.log(selectedTrades)
     this.setState({ selectedTrades })
   }
@@ -77,16 +80,6 @@ export default class TradeDialog extends Component {
     }
   }
 
-  renderBid = () => {
-    return (
-      <div>
-        <div>ID: {this.state.bid.id}</div>
-        <div>Amount: {this.state.bid.amount}</div>
-        <div>Rate: {this.state.bid.rate}</div>
-        <div>Valid: {new Date(this.state.bid.end_date).toTimeString()}</div>
-      </div>
-    )
-  }
   render () {
     return (
         <Dialog
@@ -104,7 +97,7 @@ export default class TradeDialog extends Component {
               </DialogContentText>
             </DialogContent>
             <DialogContent>
-              <TradeTable classes={classes.table} bids={this.state.bids} selectedTradesHandler={this.selectedTradesHandler} />
+              <TradeTable classes={classes.table} trades={this.state.trades} bids={this.state.bids} selectedTradesHandler={this.selectedTradesHandler} />
             </DialogContent>
             <DialogActions>
               <IconButton color='primary'
@@ -121,7 +114,7 @@ export default class TradeDialog extends Component {
               </IconButton>
             </DialogActions>
             <DialogActions>
-              <IconButton color='accent'
+              <IconButton color='primary'
                 onClick={this.addMany}>
                   Shazam
                   <TestIcon />

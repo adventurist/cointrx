@@ -18,6 +18,7 @@ import Tooltip from '@material-ui/core/Tooltip'
 import DeleteIcon from '@material-ui/icons/Delete'
 import FilterListIcon from '@material-ui/icons/FilterList'
 import { lighten } from '@material-ui/core/styles/colorManipulator'
+import { TradeType } from '../../utils/trade'
 
 import format from 'date-fns/format'
 
@@ -116,25 +117,25 @@ const toolbarStyles = theme => ({
   root: {
     paddingRight: theme.spacing.unit,
   },
-  highlight:
-    theme.palette.type === 'light'
-      ? {
-          color: theme.palette.secondary.main,
-          backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-        }
-      : {
-          color: theme.palette.text.primary,
-          backgroundColor: theme.palette.secondary.dark,
-        },
-  spacer: {
-    flex: '1 1 100%',
-  },
-  actions: {
-    color: theme.palette.text.secondary,
-  },
-  title: {
-    flex: '0 0 auto',
-  },
+  // highlight:
+  //   theme.palette.type === 'light'
+  //     ? {
+  //         color: theme.palette.secondary.main,
+  //         backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+  //       }
+  //     : {
+  //         color: theme.palette.text.primary,
+  //         backgroundColor: theme.palette.secondary.dark,
+  //       },
+  // spacer: {
+  //   flex: '1 1 100%',
+  // },
+  // actions: {
+  //   color: theme.palette.text.secondary,
+  // },
+  // title: {
+  //   flex: '0 0 auto',
+  // },
 })
 
 let EnhancedTableToolbar = props => {
@@ -152,7 +153,7 @@ let EnhancedTableToolbar = props => {
             {numSelected} selected
           </Typography>
         ) : (
-          <Typography variant="h6" id="tableTitle">
+          <Typography variant="headline" id="tableTitle">
             Trades
           </Typography>
         )}
@@ -199,7 +200,7 @@ const styles = theme => ({
 
 function prepareData (data) {
   return data.map((e, idx) => {
-    return { ...e, idx: idx }
+    return { ...e, idx: idx, key: idx }
   })
 }
 
@@ -208,7 +209,7 @@ class EnhancedTable extends React.Component {
     order: 'asc',
     orderBy: 'rate',
     selected: [],
-    data: prepareData(this.props.bids) || [],
+    data: prepareData(this.props.trades) || [],
     page: 0,
     rowsPerPage: 5,
   }
@@ -251,7 +252,7 @@ class EnhancedTable extends React.Component {
     }
 
     if (this.props.selectedTradesHandler) {
-      this.props.selectedTradesHandler(newSelected.map(idx => this.state.data[idx].id))
+      this.props.selectedTradesHandler(newSelected.map(idx => this.state.data.find(trade => trade.idx === idx)))
     }
 
     this.setState({ selected: newSelected })
@@ -288,32 +289,7 @@ class EnhancedTable extends React.Component {
             <TableBody>
               {stableSort(data, getSorting(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map(n => {
-                  const isSelected = this.isSelected(n.idx)
-                  return (
-                    <TableRow
-                      hover
-                      onClick={event => this.handleClick(event, n.idx)}
-                      role="checkbox"
-                      aria-checked={isSelected}
-                      tabIndex={-1}
-                      key={n.idx}
-                      selected={isSelected}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox checked={isSelected} />
-                      </TableCell>
-                      <TableCell component="th" scope="row" padding="none">
-                        {n.rate}
-                      </TableCell>
-                      <TableCell align="right">{n.amount}</TableCell>
-                      <TableCell align="right">{n.currency}</TableCell>
-                      <TableCell align="right">{format(new Date(n.end_date), 'MMMM dd, YYYY - H:mm')} UTC</TableCell>
-                      <TableCell align="right">{n.uid}</TableCell>
-                      <TableCell align="right">{n.type}</TableCell>
-                    </TableRow>
-                  )
-                })}
+                .map(n => this.tradeRow(n))}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 49 * emptyRows }}>
                   <TableCell colSpan={6} />
@@ -339,6 +315,57 @@ class EnhancedTable extends React.Component {
         />
       </Paper>
     )
+  }
+
+  tradeRow = (trade) => {
+    const isSelected = this.isSelected(trade.idx)
+    if (trade.type === TradeType.BID) {
+      return (
+        <TableRow
+          hover
+          onClick={event => this.handleClick(event, trade.idx)}
+          role="checkbox"
+          aria-checked={isSelected}
+          tabIndex={-1}
+          key={trade.idx}
+          selected={isSelected}
+        >
+          <TableCell padding="checkbox">
+            <Checkbox checked={isSelected} />
+          </TableCell>
+          <TableCell component="th" scope="row" padding="none">
+            {trade.offer.rate}
+          </TableCell>
+          <TableCell align="right">{trade.offer.amount}</TableCell>
+          <TableCell align="right">{trade.offer.currency}</TableCell>
+          <TableCell align="right">{format(new Date(trade.offer.end_date), 'MMMM dd, YYYY - H:mm')} UTC</TableCell>
+          <TableCell align="right">{trade.offer.uid}</TableCell>
+          <TableCell align="right">{trade.offer.type}</TableCell>
+        </TableRow>)
+    } else if (trade.type === TradeType.OFFER) {
+      return (
+        <TableRow
+          hover
+          onClick={event => this.handleClick(event, trade.idx)}
+          role="checkbox"
+          aria-checked={isSelected}
+          tabIndex={-1}
+          key={trade.idx}
+          selected={isSelected}
+        >
+          <TableCell padding="checkbox">
+            <Checkbox checked={isSelected} />
+          </TableCell>
+          <TableCell component="th" scope="row" padding="none">
+            {trade.bid.rate}
+          </TableCell>
+          <TableCell align="right">{trade.bid.amount}</TableCell>
+          <TableCell align="right">{trade.bid.currency}</TableCell>
+          <TableCell align="right">{format(new Date(trade.bid.end_date), 'MMMM dd, YYYY - H:mm')} UTC</TableCell>
+          <TableCell align="right">{trade.bid.uid}</TableCell>
+          <TableCell align="right">{trade.bid.type}</TableCell>
+        </TableRow>)
+    }
   }
 }
 

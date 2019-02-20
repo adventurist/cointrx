@@ -67,7 +67,7 @@ tradeManager.start()
 export default class App extends Component {
 
   tradeHandler = async trades => {
-    let completed
+    let completed = 0
     trades.forEach( async trade => {if (await requestTrade(trade)) completed++})
     log.info(`${completed} trades completed.`)
   }
@@ -88,7 +88,7 @@ export default class App extends Component {
       return (
 
     <div id="main-wrap" >
-      <TradeDialog tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} bids={tradeManager.getMatched()}/>
+      <TradeDialog tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} trades={tradeManager.getMatchedTrades()} bids={tradeManager.getMatched()}/>
       <Grid container spacing={8} style={styles.root}>
         <Grid style={styles.gridChild} item xs={8} sm={4}>
           <TrxGrid />

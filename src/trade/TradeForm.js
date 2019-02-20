@@ -147,7 +147,7 @@ export class OfferForm extends React.Component {
                     <Button
                         label='Create Offer'
                         onClick={this.onSubmit}
-                        variant="contained" color="accent"
+                        variant="contained" color="primary"
                     >
                         Offer
                         <AddIcon />
@@ -245,7 +245,7 @@ export class BidForm extends React.Component {
                     <Button
                         label='Create Bid'
                         onClick={this.onSubmit}
-                        variant="contained" color="accent"
+                        variant="contained" color="primary"
                     >
                         Bid
                         <AddIcon />
