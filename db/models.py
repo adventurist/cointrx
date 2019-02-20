@@ -168,6 +168,13 @@ class Bid(Base):
         }
 
 
+class Account(Base):
+    __tablename__ = 'account'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    uid = Column(Integer, ForeignKey('users.id'))
+    balance = Column(DECIMAL(12, 2))
+
+
 class SKey(Base):
     __tablename__ = 'skey'
     id = Column(Integer, primary_key=True)
