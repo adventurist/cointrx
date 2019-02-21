@@ -216,7 +216,7 @@ class EnhancedTable extends React.Component {
 
   componentWillReceiveProps (props) {
     if (props.trades && this.state.data.length !== props.trades.length) {
-      this.setState({ data: prepareData(this.props.trades), selected: [] })
+      this.setState({ data: prepareData(props.trades), selected: [] })
     }
   }
 

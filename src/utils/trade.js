@@ -88,6 +88,7 @@ export default function TradeManager (user, pending = { bids: [], offers: [] }) 
    * @returns {Array<Trade>} An array of trade objects
    */
   this.getMatchedTrades = () => {
+    console.log('getting matched trades: ', this.candidates)
     return [ ... this.candidates ]
   }
 
