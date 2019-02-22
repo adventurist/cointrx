@@ -16,7 +16,6 @@ from db import db_config
 from config.config import currency_symbol_map
 
 import re
-import json
 
 Base = declarative_base()
 metadata = MetaData()
@@ -168,6 +167,15 @@ class Bid(Base):
         }
 
 
+class Trade(Base):
+    __tablename__ = 'trade'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    bid = Column(Integer, ForeignKey('bid.id'))
+    offer = Column(Integer, ForeignKey('offer.id'))
+    pending = Column(Boolean, server_default=true())
+    time = Column(DateTime(timezone=True), server_default=func.now())
+
+
 class Account(Base):
     __tablename__ = 'account'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -225,7 +233,7 @@ class User(Base):
     utc_offset = Column(Integer)
     level = Column(Integer, nullable=False, server_default='0')
     balance = Column(DECIMAL(12, 2), server_default='0.00')
-    currency = Column(String(3))
+    currency = Column(String(3), server_default='CAD')
     CheckConstraint('level BETWEEN 0 and 4')
 
     # TODO

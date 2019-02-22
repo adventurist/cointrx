@@ -710,7 +710,7 @@ class UserProfileHandler(TrxRequestHandler):
 
 async def retrieve_user_data():
     user_data = await db.regtest_user_data(application.session.user['id'])
-    prices = await db.latest_prices_async()
+    prices = await db.latest_prices_async(user_data[0]['currency'])
     return user_data, prices
 
 
@@ -1230,7 +1230,7 @@ class BidHandler(TrxRequestHandler):
         body = json.loads(self.request.body.decode('utf-8'))
         uid, rate, amount, date, currency = body['uid'], body['rate'], body['amount'], body['date'], body['currency']
         if uid is not None and rate is not None and amount is not None and date is not None and currency is not None:
-            result = await db.create_bid(uid, rate, amount, date, currency)
+            result = await db.create_bid(uid, rate, amount, date, currency, 'btc')
             self.write(json.dumps(result))
 
 
@@ -1243,7 +1243,7 @@ class OfferHandler(TrxRequestHandler):
         body = json.loads(self.request.body.decode('utf-8'))
         uid, rate, amount, date, currency = body['uid'], body['rate'], body['amount'], body['date'], body['currency']
         if uid is not None and rate is not None and amount is not None and date is not None and currency is not None:
-            result = await db.create_offer(uid, rate, amount, date, currency)
+            result = await db.create_offer(uid, rate, amount, date, currency, 'btc')
             self.write(json.dumps(result))
 
 
@@ -1263,7 +1263,7 @@ class TradeRequestHandler(TrxRequestHandler):
             else:
                 self.set_status(400)
                 self.write(json.dumps({'code': 400, 'message': 'Invalid trade type'}))
-            trade_response['completed'] = await db.trade_finish(offer, bid)
+            trade_response['completed'] = await db.trade_finish(offer, bid, trade_type)
             self.set_status(trade_response['code'])
             self.write(json.dumps(trade_response))
 

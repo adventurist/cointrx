@@ -20,7 +20,7 @@ import datetime
 import json
 import logging
 
-from db.models import TrxKey, TRX, SKey, MKey, KeyLabel, Offer, Bid, TRCHistory, User, ETHPrice, ETHPriceRevision, CXPrice, CXPriceRevision, Heartbeat, HeartbeatComment, HeartbeatCommentBase, HeartbeatUser, engine, Base, Session, session
+from db.models import TrxKey, TRX, SKey, MKey, KeyLabel, Offer, Bid, Trade, Account, TRCHistory, User, ETHPrice, ETHPriceRevision, CXPrice, CXPriceRevision, Heartbeat, HeartbeatComment, HeartbeatCommentBase, HeartbeatUser, engine, Base, Session, session
 
 COIN = 100000000
 trxapp = SimpleNamespace()
@@ -108,17 +108,22 @@ async def latest_prices():
         session.rollback()
 
 
-async def latest_prices_async():
-    try:
-        result = session.query(CXPriceRevision).order_by(CXPriceRevision.rid.desc()).limit(16).all()
-        data = []
-        for r in result:
-            if isinstance(r, CXPriceRevision):
-                data.append(r.serialize())
-        return data
-    except exc.SQLAlchemyError as err:
-        logger.debug('Error getting latest prices', err)
-        session.rollback()
+async def latest_prices_async(currency='CAD'):
+    if currency_index[currency]:
+        try:
+            result = session.query(CXPriceRevision).filter(CXPriceRevision.currency == currency).order_by(CXPriceRevision.rid.desc()).limit(3).all()
+            # result = session.query(CXPriceRevision).order_by(CXPriceRevision.rid.desc()).limit(16).all()
+            data = []
+            for r in result:
+                if isinstance(r, CXPriceRevision):
+                    data.append(r.serialize())
+            return data
+        except exc.SQLAlchemyError as err:
+            logger.debug('Error getting latest prices', err)
+            session.rollback()
+    else:
+        #  TODO: This needs proper error handling
+        return False
 
 
 def latest_price(currency: str) -> str:
@@ -594,6 +599,7 @@ async def regtest_user_data(uid: str):
             'name': user.name,
             'email': user.email,
             'level': user.level,
+            'currency': user.currency,
             'utc_offset': user.utc_offset if user.utc_offset is not None else 0,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
             'keys': [{'id': x.id, 'value': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if x.status]
@@ -606,7 +612,7 @@ async def regtest_user_data(uid: str):
 
         data['estimated'] = await regtest_user_estimated_value(uid, data['balance'])
         await update_user_balance(user, data['balance'])
-
+        #  FIXME: Why is this returning an array?
         user_data.append(data)
     return user_data
 
@@ -1037,7 +1043,9 @@ async def connect_to_db():
         await connect_to_db()
 
 
-async def create_offer(uid, rate, amount, date, currency):
+async def create_offer(uid, rate, amount, date, currency, metric='satoshi'):
+    if metric is not 'satoshi':
+        amount = Decimal(amount) * COIN
     new_offer = Offer(uid=uid, rate=rate, amount=amount, end_date=date, currency=currency)
     try:
         session.add(new_offer)
@@ -1049,7 +1057,9 @@ async def create_offer(uid, rate, amount, date, currency):
         return False
 
 
-async def create_bid(uid, rate, amount, date, currency):
+async def create_bid(uid, rate, amount, date, currency, metric='satoshi'):
+    if metric is not 'satoshi':
+        amount = Decimal(amount) * COIN
     new_bid = Bid(uid=uid, rate=rate, amount=amount, end_date=date, currency=currency)
     try:
         session.add(new_bid)
@@ -1083,12 +1093,18 @@ async def get_bid(bid):
         return bid
 
 
-async def trade_finish(offer: Offer, bid: Bid):
+async def trade_finish(offer: Offer, bid: Bid, trade_type: str):
+    #  TODO -> Create a trade here
+    trade = Trade(bid=bid.id, offer=offer.id, pending=false(), time=func.now())
+    accounts = session.query(Account).filter(Account.uid.in_([bid.uid, offer.uid])).all()
+    if len(accounts) == 2:
+        #  Handle account balances
     offer.completed = true()
     bid.completed = true()
     try:
         session.add(offer)
         session.add(bid)
+        session.add(trade)
         session.commit()
         session.flush()
         return True
