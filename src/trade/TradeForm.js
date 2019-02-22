@@ -16,10 +16,8 @@ import MenuItem from '@material-ui/core/MenuItem'
 import Button from '@material-ui/core/IconButton'
 import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers'
 import DateFnsUtils from '@date-io/date-fns'
-
 import AddIcon from '@material-ui/icons/Add'
-
-import { request } from '../utils/index'
+import { request, formatTimestamp } from '../utils/index'
 
 const rowData = JSON.parse(trxPrices.replace(/'/g, '"'))
 
@@ -263,6 +261,7 @@ export class TrxGrid extends React.Component {
         this._columns = [
             { key: 'cur', name: 'Currency' },
             { key: 'sym', name: 'Symbol' },
+            { key: 'time', name: 'Time' },
             { key: 'sell', name: 'Sell' },
             { key: 'buy', name: 'Buy' } ]
 
@@ -277,6 +276,7 @@ export class TrxGrid extends React.Component {
         return {
             'cur': price.currency,
             'sym': price.symbol,
+            'time': formatTimestamp(price.modified, true),
             'sell': price.sell,
             'buy': price.buy
         }

@@ -20,7 +20,7 @@ import FilterListIcon from '@material-ui/icons/FilterList'
 import { lighten } from '@material-ui/core/styles/colorManipulator'
 import { TradeType } from '../../utils/trade'
 
-import format from 'date-fns/format'
+import { formatTimestamp } from '../../utils'
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -344,7 +344,7 @@ class EnhancedTable extends React.Component {
           </TableCell>
           <TableCell align="right">{trade.offer.amount}</TableCell>
           <TableCell align="right">{trade.offer.currency}</TableCell>
-          <TableCell align="right">{format(new Date(trade.offer.end_date), 'MMMM dd, YYYY - H:mm')} UTC</TableCell>
+          <TableCell align="right">{formatTimestamp(trade.offer.end_date)} UTC</TableCell>
           <TableCell align="right">{trade.offer.uid}</TableCell>
           <TableCell align="right">{trade.offer.type}</TableCell>
         </TableRow>)
@@ -367,7 +367,7 @@ class EnhancedTable extends React.Component {
           </TableCell>
           <TableCell align="right">{trade.bid.amount}</TableCell>
           <TableCell align="right">{trade.bid.currency}</TableCell>
-          <TableCell align="right">{format(new Date(trade.bid.end_date), 'MMMM dd, YYYY - H:mm')} UTC</TableCell>
+          <TableCell align="right">{formatTimestamp(trade.bid.end_date)} UTC</TableCell>
           <TableCell align="right">{trade.bid.uid}</TableCell>
           <TableCell align="right">{trade.bid.type}</TableCell>
         </TableRow>)

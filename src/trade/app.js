@@ -21,8 +21,6 @@ import { request, handleResponse } from '../utils/index'
 /* Logging*/
 import log from 'loglevel'
 
-
-
 const styles = {
   center: {
     textAlign: 'center'
@@ -119,6 +117,7 @@ export default class App extends Component {
           <TrxGrid />
           <OfferForm balance={userDataObject.balance} uid={userDataObject.id} />
           <BidForm balance={userDataObject.balance} uid={userDataObject.id} />
+          <TrxGrid />
         </Grid>
         <Grid style={styles.gridChild}  item xs={12} sm={8} id={ids.tradeRight}>
           <TrxChart />

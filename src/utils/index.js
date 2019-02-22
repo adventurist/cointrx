@@ -1,5 +1,8 @@
 import TRXSocket from './TRXSocket'
 
+// Third party tools
+import format from 'date-fns/format'
+
 /**
  *
  * @type {number}
@@ -193,4 +196,16 @@ export function isJson(str) {
         return false;
     }
     return true;
+}
+
+/**
+ *
+ * @param {number|String} timestamp
+ * @returns {String} A human-readable formatted timestamp
+ */
+export function formatTimestamp(timestamp, short = false) {
+    return format(
+        new Date(timestamp),
+        short === false ? 'MMMM dd, YYYY - H:mm' : 'H:mm:ss'
+    )
 }
