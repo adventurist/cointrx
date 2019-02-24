@@ -77061,7 +77061,7 @@ function (_React$Component) {
       }, "position", "static"), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__material_ui_core_Toolbar___default.a, {
         disableGutters: !this.state.open,
         className: "toolbar",
-        title: TRXLogo()
+        title: "Coin TRX"
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: classes.menuBotton,
         onClick: this.props.drawerHandler

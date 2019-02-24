@@ -51,7 +51,7 @@ body {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     width: 6px;
-    background-color: #03282f!important;
+    background-color: #021c21!important;
 }
 ::-webkit-scrollbar-track {
     border: none;
@@ -81,7 +81,7 @@ body {
 }
 
 .react-grid-HeaderRow {
-    width: 607px!important;
+    width: 100%!important;
     overflow-y: hidden!important;
 }
 
@@ -90,13 +90,45 @@ body {
     font-weight: 700;
     color: #FFF;
     line-height: 1.5;
+    border: 1px solid black;
+}
+
+.react-grid-Row:first-child > .react-grid-Cell {
+    background-color: rgb(26, 196, 26)!important;
+    color: #333333;
+    border: 1px solid black;
 }
 
 .react-grid-Row--even:hover > .react-grid-Cell, .react-grid-Row--odd:hover > .react-grid-Cell  {
-    background-color: #f9f9f9!important;
-    color: #333333!important;
+    background-color: #8f8f8f!important;
+    color: #3f5c5e!important;
 }
 
+.react-grid-Cell {
+    border: 1px solid black;
+    outline: none;
+}
 .react-grid-Cell:focus {
     outline: none;
+}
+
+.trxToolWrap {
+    padding: 12px!important;
+    font-family: 'Roboto';
+}
+
+.trxToolWrap:first-child {
+    transform: translateY(-12.3%);
+}
+
+.trxToolWrap:nth-child(2) {
+    transform: translateY(-25%);
+}
+
+.trxToolWrap:nth-child(3) {
+    transform: translateY(-19%);
+}
+
+.trxToolWrap:last-child {
+    transform: translateY(-21%);
 }
