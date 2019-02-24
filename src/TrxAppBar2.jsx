@@ -127,7 +127,7 @@ export default class TrxNav extends React.Component {
     position="sticky"
     className='appbar'
     position='static'>
-    <Toolbar disableGutters={!this.state.open} className='toolbar' title={TRXLogo()}>
+    <Toolbar disableGutters={!this.state.open} className='toolbar' title='Coin TRX'>
         <IconButton className={classes.menuBotton} onClick={this.props.drawerHandler}>
             <MenuIcon className={classes.menuIcon} />
         </IconButton>

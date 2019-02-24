@@ -20,21 +20,41 @@ import AddIcon from '@material-ui/icons/Add'
 import { request, formatTimestamp } from '../utils/index'
 
 const rowData = JSON.parse(trxPrices.replace(/'/g, '"'))
+const tradeData = JSON.parse(trxTrades.replace(/'/g, '"'))
 
 const styles = {
     container: {
         flexGrow: 1,
         textAlign: 'center',
-        backgroundColor: '#333333',
-        paddingTop: '12px'
+        backgroundColor: '#131313',
+        fontFamily: 'Roboto'
     },
     textField: {
         width: '100%'
     },
+    trxForm: {
+        outline: '1px solid #e7eaec',
+        paddingTop: '4px'
+    },
     cleanHeader: {
         marginBlockStart: 0,
-        marginBlckEnd: 0,
-        color: '#065b6b'
+        marginBlckEnd: 0
+    },
+    gridTitle: {
+        height: '48px',
+        lineHeight: 2.75,
+        textAlign: 'center',
+        backgroundColor: '#131313',
+        margin: 0,
+        color: '#FFF'
+    },
+    input: {
+        width: '85%'
+    },
+    submitButton: {
+        padding: '16px',
+        borderRadius: '35%'
+
     }
 }
 
@@ -101,12 +121,12 @@ export class OfferForm extends React.Component {
     render () {
         return (
             <div style={styles.container}>
-                <h2 style={styles.cleanHeader}>Trade Form</h2>
-                <h3 style={styles.cleanHeader}>Offer</h3>
-                <form onSubmit={this.onSubmit}>
+                <h3 style={{...styles.cleanHeader, ...styles.gridTitle}}>Offer</h3>
+                <form style={styles.trxForm} onSubmit={this.onSubmit}>
                     <TextField
                     className={classes.textField}
                     id="select-currency"
+                    style={styles.input}
                     select
                     label="Currency"
                     value={this.state.currency}
@@ -122,10 +142,12 @@ export class OfferForm extends React.Component {
                         className={classes.textField}
                         max={this.props.balance}
                         currency={'BTC'}
+                        offer={true}
                         handler={this.amountHandler}
                     />
                     <TextField
                         className={classes.textField}
+                        style={styles.input}
                         type='number'
                         label='Rate per BTC'
                         value={this.state.offerPrice}
@@ -136,6 +158,7 @@ export class OfferForm extends React.Component {
                         <Grid container className='date-grid' justify="space-around">
                         <DatePicker
                             margin="normal"
+                            style={styles.input}
                             label='Offer end date'
                             value={this.state.offerDate}
                             onChange={this.handleDateChange}
@@ -145,6 +168,7 @@ export class OfferForm extends React.Component {
                     <Button
                         label='Create Offer'
                         onClick={this.onSubmit}
+                        style={styles.submitButton}
                         variant="contained" color="primary"
                     >
                         Offer
@@ -201,10 +225,11 @@ export class BidForm extends React.Component {
     render () {
         return (
             <div style={styles.container}>
-                <h3 style={styles.cleanHeader}>Bid</h3>
-                <form onSubmit={this.onSubmit}>
+                <h3 style={{...styles.cleanHeader, ...styles.gridTitle}}>Bid</h3>
+                <form style={styles.trxForm} onSubmit={this.onSubmit}>
                     <TextField
                     className={classes.textField}
+                    style={styles.input}
                     id="select-currency"
                     select
                     label="Currency"
@@ -221,6 +246,7 @@ export class BidForm extends React.Component {
                         className={classes.textField}
                         max={this.props.balance}
                         currency={'BTC'}
+                        offer={false}
                         handler={this.amountHandler}
                     />
                     <TextField
@@ -234,6 +260,7 @@ export class BidForm extends React.Component {
                         <Grid container className='date-grid' justify="space-around">
                         <DatePicker
                             margin="normal"
+                            style={styles.input}
                             label='Bid end date'
                             value={this.state.bidDate}
                             onChange={this.handleDateChange}
@@ -243,6 +270,7 @@ export class BidForm extends React.Component {
                     <Button
                         label='Create Bid'
                         onClick={this.onSubmit}
+                        style={styles.submitButton}
                         variant="contained" color="primary"
                     >
                         Bid
@@ -289,10 +317,67 @@ export class TrxGrid extends React.Component {
 
     render() {
         return  (
-            <ReactDataGrid
-                columns={this._columns}
-                rowGetter={this.rowGetter}
-                rowsCount={this._rows.length}
-                minHeight={500} />)
+            <div>
+                <div style={styles.gridTitle}>
+                    <h3>Market</h3>
+                </div>
+                <ReactDataGrid
+                    columns={this._columns}
+                    rowGetter={this.rowGetter}
+                    rowsCount={this._rows.length}
+                    minHeight={135}/>
+            </div>)
+    }
+}
+
+export class TradeGrid extends React.Component {
+    constructor(props, context) {
+        super(props, context)
+        this.createRows()
+        this._columns = [
+            { key: 'cur', name: 'Currency' },
+            { key: 'sym', name: 'Symbol' },
+            { key: 'time', name: 'Time' },
+            { key: 'amt', name: 'Amount' },
+            { key: 'rate', name: 'Rate' },
+            { key: 'prc', name: 'Price' } ]
+
+        this.state = null
+    }
+
+    createRows = () => {
+        this._rows = tradeData.map(x => TradeGrid.buildRows(x))
+    };
+
+    static buildRows(trade) {
+        const symbol = rowData[0].symbol
+        console.log(trade.time)
+        return {
+            'cur': trade.currency,
+            'sym': symbol,
+            'time': formatTimestamp(trade.time, true),
+            'amt': trade.offer.amount,
+            'rate': trade.offer.rate,
+            'prc': `${symbol}${trade.offer.amount * trade.offer.rate / 100000000} ${symbol}`
+        }
+
+    }
+
+    rowGetter = (i) => {
+        return this._rows[i];
+    };
+
+    render() {
+        return  (
+            <div>
+                <div style={styles.gridTitle}>
+                    <h3 >TRX Trades</h3>
+                </div>
+                <ReactDataGrid
+                    columns={this._columns}
+                    rowGetter={this.rowGetter}
+                    rowsCount={this._rows.length}
+                    minHeight={135}/>
+            </div>)
     }
 }

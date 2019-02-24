@@ -6,6 +6,11 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } 
 import PropTypes from 'prop-types'
 import log from 'loglevel'
 
+const styles = {
+  input: {
+    width: '85%'
+  }
+}
 
 export default class FundField extends Component {
   constructor(props) {
@@ -21,7 +26,7 @@ export default class FundField extends Component {
     this.setState({
       value: event.target.value
     }, () => {
-      if (parseFloat(this.state.value) <= parseFloat(this.props.max)) {
+      if (!this.props.offer || parseFloat(this.state.value) <= parseFloat(this.props.max)) {
         if (this.props.handler) {
           this.props.handler(this.state.value)
         }
@@ -48,6 +53,7 @@ export default class FundField extends Component {
           type='number'
           max={parseFloat(this.props.max)}
           label='Amount to offer'
+          style={styles.input}
           prefix={this.props.currency}
           startAdornment={<InputAdornment position='start'>{this.props.currency}</InputAdornment>}
           onChange={this.handleChange}

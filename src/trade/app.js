@@ -10,7 +10,7 @@ import Paper from '@material-ui/core/Paper'
 import TrxChart from './chart/TrxChart'
 
 /* Form */
-import { OfferForm, BidForm, TrxGrid } from './TradeForm'
+import { OfferForm, BidForm, TrxGrid, TradeGrid } from './TradeForm'
 
 /* TradeDialog component */
 import TradeDialog from './components/TradeDialog'
@@ -32,12 +32,17 @@ const styles = {
     // justifyContent: 'space-around'
   },
   gridChild: {
-    padding: '0px'
+    padding: '0px',
+    backgroundColor: '#021c21'
   },
   gridItem: {
     paddingTop: '12px'
+  },
+  trxTool: {
+    padding: '4px!important'
   }
 }
+
 
 const ids = {
   tradeLeft: 'trade-left',
@@ -114,13 +119,15 @@ export default class App extends Component {
       <TradeDialog tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} trades={this.state.trades} bids={tradeManager.getMatched()}/>
       <Grid container spacing={8} style={styles.root}>
         <Grid style={styles.gridChild} item xs={8} sm={4}>
-          <TrxGrid />
-          <OfferForm balance={userDataObject.balance} uid={userDataObject.id} />
-          <BidForm balance={userDataObject.balance} uid={userDataObject.id} />
-          <TrxGrid />
+          <div className="trxToolWrap">
+            <TrxGrid style={styles.trxTool}/>
+          </div>
+          <div className="trxToolWrap"><TradeGrid style={styles.trxTool}/></div>
+          <div className="trxToolWrap"><OfferForm balance={userDataObject.balance} uid={userDataObject.id} style={styles.trxTool}/> </div>
+          <div className="trxToolWrap"><BidForm balance={userDataObject.balance} uid={userDataObject.id} style={styles.trxTool}/></div>
         </Grid>
         <Grid style={styles.gridChild}  item xs={12} sm={8} id={ids.tradeRight}>
-          <TrxChart />
+          <TrxChart style={styles.trxTool}/>
         </Grid>
       </Grid>
     </div>
