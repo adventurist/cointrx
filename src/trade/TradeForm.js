@@ -313,8 +313,8 @@ export class TrxGrid extends React.Component {
             'cur': price.currency,
             'sym': price.symbol,
             'time': formatTimestamp(price.modified, true),
-            'sell': price.sell,
-            'buy': price.buy
+            'sell': price.symbol + price.sell,
+            'buy': price.symbol + price.buy
         }
 
     }
@@ -364,9 +364,9 @@ export class TradeGrid extends React.Component {
             'cur': trade.currency,
             'sym': symbol,
             'time': formatTimestamp(trade.time, true),
-            'amt': trade.offer.amount,
-            'rate': trade.offer.rate,
-            'prc': `${symbol}${trade.offer.amount * trade.offer.rate / 100000000} ${symbol}`
+            'amt': trade.offer.amount / 100000000 + ' BTC',
+            'rate': symbol + trade.offer.rate + '/BTC',
+            'prc': `${symbol}${parseFloat(trade.offer.amount * trade.offer.rate / 100000000).toFixed(2)}`
         }
 
     }

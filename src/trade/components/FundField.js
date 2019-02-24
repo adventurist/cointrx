@@ -52,11 +52,12 @@ export default class FundField extends Component {
         <TextField
           value={this.state.value || 0}
           type='number'
+          className='textField'
           max={parseFloat(this.props.max)}
-          label='Amount to offer'
+          label={`Amount to ${this.props.offer ? 'offer' : 'bid'}`}
           style={styles.input}
           prefix={this.props.currency}
-          inputProps={{
+          InputProps={{
             startAdornment: <InputAdornment position='start'>{this.props.currency}</InputAdornment>
           }}
           onChange={this.handleChange}
