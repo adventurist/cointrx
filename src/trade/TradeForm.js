@@ -117,6 +117,9 @@ export class OfferForm extends React.Component {
                 currency: getCurrency(this.state.currency)
             }
         })
+        if (this.props.msgHandler) {
+            this.props.msgHandler('Offer request sent')
+        }
     }
 
     render () {
@@ -221,6 +224,9 @@ export class BidForm extends React.Component {
                 currency: getCurrency(this.state.currency)
             }
         })
+        if (this.props.msgHandler) {
+            this.props.msgHandler('Bid request sent')
+        }
     }
 
     render () {
@@ -252,6 +258,7 @@ export class BidForm extends React.Component {
                     />
                     <TextField
                         className={classes.textField}
+                        style={styles.input}
                         type='number'
                         label='Rate per BTC'
                         value={this.state.offerPrice}

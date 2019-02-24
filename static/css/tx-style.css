@@ -132,3 +132,8 @@ body {
 .trxToolWrap:last-child {
     transform: translateY(-21%);
 }
+
+.console-out input {
+    color: rgb(0, 255, 0);
+    margin: '0px 60px 0px 60px';
+}

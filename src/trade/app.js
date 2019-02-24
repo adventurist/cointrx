@@ -20,6 +20,7 @@ import TradeManager, { TradeType } from '../utils/trade'
 import { request, handleResponse } from '../utils/index'
 /* Logging*/
 import log from 'loglevel'
+import Console from '../utils/component/Console'
 
 const styles = {
   center: {
@@ -88,11 +89,13 @@ export default class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      trades: tradeManager.getMatchedTrades()
+      trades: tradeManager.getMatchedTrades(),
+      lastMessage: 'Initialized'
     }
   }
 
   tradeHandler = async trades => {
+    this.log('Attempting trades')
     requestTrades(trades).then(result => {
       log.info(`${result.completed.length} trades completed..\n${result.failed.length} trades failed.`)
       tradeManager.removeTrades(result.completed)
@@ -109,6 +112,14 @@ export default class App extends Component {
       }
     }
   }
+
+  messageHandler = (message) => {
+    this.log(message)
+  }
+
+  log = (message) => {
+    this.setState({ lastMessage: message })
+  }
   /**
      * Render the component
      */
@@ -116,6 +127,7 @@ export default class App extends Component {
       return (
 
     <div id="main-wrap" >
+    <Console message={this.state.lastMessage}/>
       <TradeDialog tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} trades={this.state.trades} bids={tradeManager.getMatched()}/>
       <Grid container spacing={8} style={styles.root}>
         <Grid style={styles.gridChild} item xs={8} sm={4}>
@@ -123,8 +135,8 @@ export default class App extends Component {
             <TrxGrid style={styles.trxTool}/>
           </div>
           <div className="trxToolWrap"><TradeGrid style={styles.trxTool}/></div>
-          <div className="trxToolWrap"><OfferForm balance={userDataObject.balance} uid={userDataObject.id} style={styles.trxTool}/> </div>
-          <div className="trxToolWrap"><BidForm balance={userDataObject.balance} uid={userDataObject.id} style={styles.trxTool}/></div>
+          <div className="trxToolWrap"><OfferForm balance={userDataObject.balance} msgHandler={this.messageHandler} uid={userDataObject.id} style={styles.trxTool}/> </div>
+          <div className="trxToolWrap"><BidForm balance={userDataObject.balance} msgHandler={this.messageHandler} uid={userDataObject.id} style={styles.trxTool}/></div>
         </Grid>
         <Grid style={styles.gridChild}  item xs={12} sm={8} id={ids.tradeRight}>
           <TrxChart style={styles.trxTool}/>
