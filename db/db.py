@@ -1139,7 +1139,8 @@ async def retrieve_trade_data():
             data.append({
                 'bid': trade.joinbid.serialize(),
                 'offer': offer_data,
-                'currency': offer_data['currency']
+                'currency': offer_data['currency'],
+                'time': trade.time
             })
         return data
     except exc.SQLAlchemyError as err:
