@@ -130,6 +130,7 @@ class Offer(Base):
     currency = Column(String(4))
     end_date = Column(DateTime(timezone=True))
     completed = Column(Boolean, server_default=false())
+    trade = relationship("Trade", back_populates='joinoffer')
 
     def serialize(self):
         return {
@@ -153,6 +154,7 @@ class Bid(Base):
     currency = Column(String(4))
     end_date = Column(DateTime(timezone=True))
     completed = Column(Boolean, server_default=false())
+    trade = relationship("Trade", back_populates='joinbid')
 
     def serialize(self):
         return {
@@ -174,6 +176,8 @@ class Trade(Base):
     offer = Column(Integer, ForeignKey('offer.id'))
     pending = Column(Boolean, server_default=true())
     time = Column(DateTime(timezone=True), server_default=func.now())
+    joinoffer = relationship("Offer", back_populates='trade')
+    joinbid = relationship("Bid", back_populates='trade')
 
 
 class Account(Base):
