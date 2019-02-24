@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import Button from '@material-ui/core/Button'
 import Input from '@material-ui/core/Input'
+import TextField from '@material-ui/core/TextField'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core'
 import PropTypes from 'prop-types'
@@ -48,14 +49,16 @@ export default class FundField extends Component {
   render () {
     return (
       <div>
-        <Input
+        <TextField
           value={this.state.value || 0}
           type='number'
           max={parseFloat(this.props.max)}
           label='Amount to offer'
           style={styles.input}
           prefix={this.props.currency}
-          startAdornment={<InputAdornment position='start'>{this.props.currency}</InputAdornment>}
+          inputProps={{
+            startAdornment: <InputAdornment position='start'>{this.props.currency}</InputAdornment>
+          }}
           onChange={this.handleChange}
         />
         <AlertDialog
