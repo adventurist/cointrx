@@ -34,7 +34,8 @@ const styles = {
     },
     trxForm: {
         outline: '1px solid #e7eaec',
-        paddingTop: '4px'
+        paddingTop: '4px',
+        backgroundColor: '#4a4a4a'
     },
     cleanHeader: {
         marginBlockStart: 0,
