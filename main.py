@@ -1214,9 +1214,10 @@ class TradeGuiHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         if check_attribute(application.session, 'user'):
             user_data, prices = await retrieve_user_data()
+            trade_data = await db.retrieve_trade_data()
             bids, offers = await db.get_bids(), await db.get_offers()
             self.render("templates/trade.html", title="TRX Trade Control", trx_prices=prices, user_data=user_data,
-                        bids=bids, offers=offers)
+                        bids=bids, offers=offers, trade_data=trade_data)
         else:
             login_redirect(self)
 
@@ -1497,16 +1498,25 @@ async def handle_failed_transaction(result: dict):
         return {'result': 'handling complete'}
 
 
-
 async def handle_transaction_queue():
+    """
+    Transaction queue handler
+
+    Iterates the queue until full traversed, or until it is likely that transactions are futile on the current block
+    """
+    # Assume coinmaster is available. At start, no intra user transactions have been iterated.
+    # Handling of queue under way, thus the queue is not paused
     coinmaster_available = True
-    intra_user_pending = None
+    intra_user_pending, result = None, None
     paused = False
+    # If handling is not paused and there are transactions in the queue
     while not paused and not application.queue.is_empty():
         transaction = application.queue.dequeue()
         if transaction is not None:
+            # Check to see if this transaction is a payout from TRX to a user
             if transaction.sender == coinmaster() and coinmaster_available:
                 result = await db.trx_pay_user(transaction.recipient, transaction.amount)
+            # Otherwise, the transaction is between users. Set intra_user_pending to true
             elif not transaction.sender == coinmaster():
                 intra_user_pending = True
                 result = await request_transaction(transaction.sender, transaction.recipient, transaction.amount)
@@ -1514,14 +1524,23 @@ async def handle_transaction_queue():
                     if 'error' in result:
                         await handle_failed_transaction(result)
                         continue
-                    intra_user_pending = False
+                    intra_user_pending = None
             if not result:
+                # If the transaction had no result, we need to enqueue it again and attempt for a result later
                 application.queue.enqueue(transaction)
+                # If the sender was the coinmaster, we can assume there was no result because the coinmaster is
+                # exhausted for the current block
                 if transaction.sender == coinmaster():
                     coinmaster_available = False
+                # Otherwise, we just enqueued an intra_user transaction, thus it is no longer in a pending state
+                elif intra_user_pending:
+                    intra_user_pending = False
+            # If there are no more transactions in queue, we should stop iterating
             if application.queue.is_empty():
                 break
-            elif transaction == application.queue.tail.data and not intra_user_pending and not coinmaster_available:
+            # If we have traversed the queue, or if transactions between users fail
+            # and payouts are exhausted, pause the queue
+            elif transaction == application.queue.tail.data or (intra_user_pending is False and not coinmaster_available):
                 paused = True
         else:
             break
