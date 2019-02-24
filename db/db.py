@@ -20,7 +20,9 @@ import datetime
 import json
 import logging
 
-from db.models import TrxKey, TRX, SKey, MKey, KeyLabel, Offer, Bid, Trade, Account, TRCHistory, User, ETHPrice, ETHPriceRevision, CXPrice, CXPriceRevision, Heartbeat, HeartbeatComment, HeartbeatCommentBase, HeartbeatUser, engine, Base, Session, session
+from db.models import TrxKey, TRX, SKey, MKey, KeyLabel, Offer, Bid, Trade, Account, TRCHistory, User, ETHPrice, \
+    ETHPriceRevision, CXPrice, CXPriceRevision, Heartbeat, HeartbeatComment, HeartbeatCommentBase, HeartbeatUser, \
+    engine, Base, Session, session
 
 COIN = 100000000
 trxapp = SimpleNamespace()
@@ -111,7 +113,8 @@ async def latest_prices():
 async def latest_prices_async(currency='CAD'):
     if currency_index[currency]:
         try:
-            result = session.query(CXPriceRevision).filter(CXPriceRevision.currency == currency).order_by(CXPriceRevision.rid.desc()).limit(3).all()
+            result = session.query(CXPriceRevision).filter(CXPriceRevision.currency == currency).order_by(
+                CXPriceRevision.rid.desc()).limit(3).all()
             # result = session.query(CXPriceRevision).order_by(CXPriceRevision.rid.desc()).limit(16).all()
             data = []
             for r in result:
@@ -583,7 +586,8 @@ async def regtest_all_user_data():
             'email': user.email,
             'level': user.level,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
-            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if x.status is not False]
+            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if
+                     x.status is not False]
         }
         user_data.append(data)
 
@@ -602,7 +606,8 @@ async def regtest_user_data(uid: str):
             'currency': user.currency,
             'utc_offset': user.utc_offset if user.utc_offset is not None else 0,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
-            'keys': [{'id': x.id, 'value': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if x.status]
+            'keys': [{'id': x.id, 'value': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if
+                     x.status]
         }
 
         for key in data['keys']:
@@ -700,12 +705,13 @@ async def regtest_block_info():
     return json.dumps({'info': block_info, 'unspent': unspent_transactions}, indent=4, sort_keys=True)
 
 
-async def regtest_user_estimated_value(uid: str, balance: any=None):
+async def regtest_user_estimated_value(uid: str, balance: any = None):
     user = await get_user(uid)
     if user and user.trxkey is not None:
         price = await latest_price_data(DEFAULT_LANGUAGE)
         if price and price.last is not None:
-            btc = Decimal(await btcd_utils.RegTest.get_user_balance(user.trxkey)) if balance is None else Decimal(balance)
+            btc = Decimal(await btcd_utils.RegTest.get_user_balance(user.trxkey)) if balance is None else Decimal(
+                balance)
             estimated_value = btc * price.last
             logger.info('Price before quantization: %s' % str(estimated_value))
             return str(estimated_value.quantize(Decimal(".01"), rounding=ROUND_HALF_UP))
@@ -777,10 +783,10 @@ async def regtest_graph_data(time, days):
 async def btc_hour_minmax_price(time: str, days: str):
     return engine.execute("SELECT date_trunc('minute', to_timestamp(modified)) - "
                           "(EXTRACT('minute' FROM to_timestamp(modified))::integer %% " + time + ") * interval '15 minutes' as date, min(last), max(last) "
-                          "FROM cx_price_revision "
-                          "WHERE currency='CAD' "
-                          "AND to_timestamp(modified) < CURRENT_TIMESTAMP AND to_timestamp(modified) > (CURRENT_TIMESTAMP - INTERVAL '" + days + " days')"
-                          "GROUP BY 1 ORDER BY date;")
+                                                                                                 "FROM cx_price_revision "
+                                                                                                 "WHERE currency='CAD' "
+                                                                                                 "AND to_timestamp(modified) < CURRENT_TIMESTAMP AND to_timestamp(modified) > (CURRENT_TIMESTAMP - INTERVAL '" + days + " days')"
+                                                                                                                                                                                                                        "GROUP BY 1 ORDER BY date;")
 
 
 def min_30_interval():
@@ -889,7 +895,8 @@ async def regtest_total_balance():
 async def regtest_balance_by_account(active=False):
     account_data = []
     if active:
-        keys = session.query(TrxKey).filter(TrxKey.status == true()).group_by(TrxKey.id).order_by(func.max(TrxKey.id).desc()).all()
+        keys = session.query(TrxKey).filter(TrxKey.status == true()).group_by(TrxKey.id).order_by(
+            func.max(TrxKey.id).desc()).all()
     else:
         keys = session.query(TrxKey).group_by(TrxKey.id).order_by(func.max(TrxKey.id).desc()).all()
     if keys is not None and len(keys) > 0:
@@ -918,7 +925,8 @@ async def regtest_balance_by_user():
     for user in users:
         user_data = {'name': user.name, 'id': user.id, 'keys': []}
         for key in user.trxkey:
-            user_data['keys'].append({'id': key.id, 'value': key.value, 'balance': await btcd_utils.RegTest.get_user_balance([key])})
+            user_data['keys'].append(
+                {'id': key.id, 'value': key.value, 'balance': await btcd_utils.RegTest.get_user_balance([key])})
         data.append(user_data)
     return data
 
@@ -947,11 +955,13 @@ async def regtest_active_balance_by_user():
 
 
 async def regtest_user_balance_by_key(name):
-    user = session.query(User).filter(User.name == name).group_by(User.id).order_by(func.max(User.id).desc()).one_or_none()
+    user = session.query(User).filter(User.name == name).group_by(User.id).order_by(
+        func.max(User.id).desc()).one_or_none()
     if user:
         user_data = {'name': user.name, 'id': user.id, 'keys': []}
         for key in user.trxkey:
-            user_data['keys'].append({'id': key.id, 'value': key.value, 'balance': await btcd_utils.RegTest.get_user_balance([key])})
+            user_data['keys'].append(
+                {'id': key.id, 'value': key.value, 'balance': await btcd_utils.RegTest.get_user_balance([key])})
         return user_data
 
 
@@ -1095,12 +1105,14 @@ async def get_bid(bid):
 
 async def trade_finish(offer: Offer, bid: Bid, trade_type: str):
     #  TODO -> Create a trade here
-    trade = Trade(bid=bid.id, offer=offer.id, pending=false(), time=func.now())
+    trade = Trade(bid=bid.id, offer=offer.id, pending=true(), time=func.now())
     accounts = session.query(Account).filter(Account.uid.in_([bid.uid, offer.uid])).all()
     if len(accounts) == 2:
         #  Handle account balances
-    offer.completed = true()
-    bid.completed = true()
+        transfer_between_accounts(accounts[1], accounts[0], offer.rate * offer.amount / COIN)
+        trade.pending = false()
+        offer.completed = true()
+        bid.completed = true()
     try:
         session.add(offer)
         session.add(bid)
@@ -1110,4 +1122,26 @@ async def trade_finish(offer: Offer, bid: Bid, trade_type: str):
         return True
     except exc.SQLAlchemyError as e:
         logger.info(e)
+        return False
+
+
+def transfer_between_accounts(from_account: Account, to_account: Account, amount):
+    from_account.balance = from_account.balance - amount
+    to_account.balance = to_account.balance + amount
+
+
+async def retrieve_trade_data():
+    try:
+        trades = session.query(Trade).filter(Trade.pending == false()).all()
+        data = []
+        for trade in trades:
+            offer_data = trade.joinoffer.serialize()
+            data.append({
+                'bid': trade.joinbid.serialize(),
+                'offer': offer_data,
+                'currency': offer_data['currency']
+            })
+        return data
+    except exc.SQLAlchemyError as err:
+        logger.debug('Join error', err)
         return False
