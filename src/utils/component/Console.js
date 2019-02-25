@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import TextField from '@material-ui/core/TextField'
+import { formatTimestamp } from '../../utils'
 
 const styles = {
 	console: {
@@ -14,11 +15,13 @@ export default class Console extends Component {
 		this.state = {
 			consoleText: ''
 		}
-		if (props.message) {
-			this.consoleOut(props.message)
-		}
 	}
 
+	componentDidMount () {
+		if (this.props.message) {
+			this.consoleOut(this.props.message)
+		}
+	}
 	componentWillReceiveProps (props) {
 		if (props.message) {
 			this.consoleOut(props.message)
@@ -32,7 +35,7 @@ export default class Console extends Component {
 	 * @param {String} incomingText
 	 */
 	consoleOut (incomingText) {
-		const time = Date.now().toString().slice(0, -3)
+		const time = formatTimestamp(Date.now(), true)
 
 		const textArr = this.state.consoleText.split('\n')
 		if (textArr.length > 11) {
@@ -52,12 +55,13 @@ export default class Console extends Component {
 		return (
 		<div>
 			<TextField
-					multiLine={true}
+					multiline={true}
 					className='console-out'
-					rows={12}
-					rowsMax={	12}
+					rows={3}
+					rowsMax={12}
 					style={styles.console}
 					hintText='Console'
+					spellCheck={false}
 					value={this.state.consoleText}
 					onChange={this.handleConsoleChange}
 						/>
