@@ -8,7 +8,6 @@ export default class TrxNavigation extends Component {
   }
 
   drawerHandler = () => {
-    console.log('Clicked')
     this.setState({ open: !this.state.open })
   }
 
