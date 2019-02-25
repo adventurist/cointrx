@@ -70831,8 +70831,6 @@ function (_Component) {
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "drawerHandler", function () {
-      console.log('Clicked');
-
       _this.setState({
         open: !_this.state.open
       });
@@ -70946,7 +70944,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var TRXLogo = function TRXLogo() {
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("img", {
     id: "trx-logo-img",
-    height: "96px",
+    height: "64px",
     src: "/static/images/logo.png"
   }));
 };
