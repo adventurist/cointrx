@@ -17,7 +17,8 @@ import Button from '@material-ui/core/IconButton'
 import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers'
 import DateFnsUtils from '@date-io/date-fns'
 import AddIcon from '@material-ui/icons/Add'
-import { request, formatTimestamp } from '../utils/index'
+import CloudUploadIcon from '@material-ui/icons/CloudUpload'
+import { request, formatTimestamp, handleResponse } from '../utils/index'
 
 const rowData = JSON.parse(trxPrices.replace(/'/g, '"'))
 const tradeData = JSON.parse(trxTrades.replace(/'/g, '"'))
@@ -54,13 +55,19 @@ const styles = {
     },
     submitButton: {
         padding: '16px',
-        borderRadius: '35%'
-
+        backgroundColor: '#64dd17',
+        marginLeft: '60%',
+        minWidth: '112px!important',
+        marginBottom: '8px'
     }
 }
 
 const classes = {
-    textField: 'textField'
+    textField: 'textField',
+    filledTextField: 'filledTextField',
+    datePicker: 'datePicker',
+    filledDatePicker: 'filledDatePicker',
+    submitButton: 'submitButton'
 }
 
 const currencies = [
@@ -105,7 +112,9 @@ export class OfferForm extends React.Component {
 
     onSubmit = async e => {
         e.preventDefault()
-        console.log(this.state)
+        if (this.props.msgHandler) {
+            this.props.msgHandler('Sending request for offer')
+        }
         const response = await request({
             url: '/offer',
             method: 'POST',
@@ -117,8 +126,16 @@ export class OfferForm extends React.Component {
                 currency: getCurrency(this.state.currency)
             }
         })
-        if (this.props.msgHandler) {
-            this.props.msgHandler('Offer request sent')
+        const result = handleResponse(response)
+        if (!result.error) {
+            this.setState({
+                offerDate: undefined,
+                offerAmount: undefined,
+                offerPrice: undefined
+            })
+            this.props.msgHandler('Offer accepted')
+        } else {
+            this.props.msgHandler(result.body ? result.body : 'Unable to process offer at this time')
         }
     }
 
@@ -143,14 +160,14 @@ export class OfferForm extends React.Component {
                         ))}
                     </TextField>
                     <FundField
-                        className={classes.textField}
+                        className={parseFloat(this.state.offerAmount) > 0 ? classes.filledTextField : classes.textField}
                         max={this.props.balance}
                         currency={'BTC'}
                         offer={true}
                         handler={this.amountHandler}
                     />
                     <TextField
-                        className={classes.textField}
+                        className={this.state.offerPrice > 0 ? classes.filledTextField : classes.textField}
                         style={styles.input}
                         type='number'
                         label='Rate per BTC'
@@ -164,6 +181,7 @@ export class OfferForm extends React.Component {
                             margin="normal"
                             style={styles.input}
                             label='Offer end date'
+                            className={this.state.offerDate ? classes.filledDatePicker : classes.datePicker}
                             value={this.state.offerDate}
                             onChange={this.handleDateChange}
                         />
@@ -173,10 +191,11 @@ export class OfferForm extends React.Component {
                         label='Create Offer'
                         onClick={this.onSubmit}
                         style={styles.submitButton}
-                        variant="contained" color="primary"
+                        className={classes.submitButton}
+                        variant="contained" color="default"
                     >
                         Offer
-                        <AddIcon />
+                        <CloudUploadIcon />
                     </Button>
                 </form>
             </div>
@@ -212,7 +231,7 @@ export class BidForm extends React.Component {
 
     onSubmit = async e => {
         e.preventDefault()
-        console.log(this.state)
+        this.props.msgHandler(`Requesting bid for ${this.state.bidAmount} BTC at a rate of ${this.state.bidPrice} ${getCurrency(this.state.currency)} with an expiry of ${formatTimestamp(this.state.bidDate)}`)
         const response = await request({
             url: '/bid',
             method: 'POST',
@@ -224,8 +243,16 @@ export class BidForm extends React.Component {
                 currency: getCurrency(this.state.currency)
             }
         })
-        if (this.props.msgHandler) {
-            this.props.msgHandler('Bid request sent')
+        const result = handleResponse(response)
+        if (!result.error) {
+            this.setState({
+                bidDate: undefined,
+                bidAmount: undefined,
+                bidPrice: undefined
+            })
+            this.props.msgHandler('Bid accepted')
+        } else {
+            this.props.msgHandler(result.body ? result.body : 'Unable to process bid at this time')
         }
     }
 
@@ -250,14 +277,14 @@ export class BidForm extends React.Component {
                         ))}
                     </TextField>
                     <FundField
-                        className={classes.textField}
+                        className={parseFloat(this.state.bidAmount) > 0 ? classes.filledTextField : classes.textField}
                         max={this.props.balance}
                         currency={'BTC'}
                         offer={false}
                         handler={this.amountHandler}
                     />
                     <TextField
-                        className={classes.textField}
+                        className={this.state.bidPrice > 0 ? classes.filledTextField : classes.textField}
                         style={styles.input}
                         type='number'
                         label='Rate per BTC'
@@ -270,6 +297,7 @@ export class BidForm extends React.Component {
                             margin="normal"
                             style={styles.input}
                             label='Bid end date'
+                            className={this.state.bidDate ? classes.filledDatePicker : classes.datePicker}
                             value={this.state.bidDate}
                             onChange={this.handleDateChange}
                         />
@@ -278,11 +306,12 @@ export class BidForm extends React.Component {
                     <Button
                         label='Create Bid'
                         onClick={this.onSubmit}
+                        className={classes.submitButton}
                         style={styles.submitButton}
-                        variant="contained" color="primary"
+                        variant="contained" color="default"
                     >
                         Bid
-                        <AddIcon />
+                        <CloudUploadIcon />
                     </Button>
                 </form>
             </div>
