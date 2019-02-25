@@ -24,7 +24,7 @@ import BasicIcon from '@material-ui/core/Icon'
 const TRXLogo = () => {
     return (
     <div>
-        <img id="trx-logo-img" height='96px' src="/static/images/logo.png"/>
+        <img id="trx-logo-img" height='64px' src="/static/images/logo.png"/>
     </div>)
 }
 
