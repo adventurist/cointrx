@@ -13,6 +13,11 @@ const styles = {
   }
 }
 
+const classes = {
+  textField: 'textField',
+  filledTextField: 'filledTextField',
+}
+
 export default class FundField extends Component {
   constructor(props) {
     super(props)
@@ -42,6 +47,13 @@ export default class FundField extends Component {
     })
   }
 
+  keyHandler = e => {
+    console.log(e)
+    if (this.state.alertOpen && e.keyCode === 27) {
+      this.closeAlert()
+    }
+  }
+
   closeAlert = () => {
     this.setState({ alertOpen: false })
   }
@@ -52,7 +64,7 @@ export default class FundField extends Component {
         <TextField
           value={this.state.value || 0}
           type='number'
-          className='textField'
+          className={parseFloat(this.state.value) > 0 ? classes.filledTextField : classes.textField}
           max={parseFloat(this.props.max)}
           label={`Amount to ${this.props.offer ? 'offer' : 'bid'}`}
           style={styles.input}
@@ -61,6 +73,7 @@ export default class FundField extends Component {
             startAdornment: <InputAdornment position='start'>{this.props.currency}</InputAdornment>
           }}
           onChange={this.handleChange}
+          onKeyUp={this.keyHandler}
         />
         <AlertDialog
           open={this.state.alertOpen}
