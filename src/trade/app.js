@@ -94,10 +94,19 @@ export default class App extends Component {
     }
   }
 
+  componentDidMount () {
+    const tradeNum = tradeManager.numOfAvailableTrades()
+    if (tradeNum) {
+      this.log(`${tradeNum} potential trades have been matched`)
+    } else {
+      this.log('No matched trades have been found')
+    }
+  }
+
   tradeHandler = async trades => {
     this.log('Attempting trades')
     requestTrades(trades).then(result => {
-      log.info(`${result.completed.length} trades completed..\n${result.failed.length} trades failed.`)
+      this.log(`${result.completed.length} trades completed..\n${result.failed.length} trades failed.`)
       tradeManager.removeTrades(result.completed)
       this.setState({ trades: tradeManager.getMatchedTrades() })
     })
@@ -118,6 +127,7 @@ export default class App extends Component {
   }
 
   log = (message) => {
+    log.info(message)
     this.setState({ lastMessage: message })
   }
   /**
