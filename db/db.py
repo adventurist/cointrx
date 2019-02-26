@@ -1132,7 +1132,7 @@ def transfer_between_accounts(from_account: Account, to_account: Account, amount
 
 async def retrieve_trade_data():
     try:
-        trades = session.query(Trade).filter(Trade.pending == false()).all()
+        trades = session.query(Trade).filter(Trade.pending == false()).order_by(Trade.time.desc()).limit(10)
         data = []
         for trade in trades:
             offer_data = trade.joinoffer.serialize()
