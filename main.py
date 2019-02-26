@@ -1223,7 +1223,7 @@ class TradeGuiHandler(TrxRequestHandler):
 
 
 class BidHandler(TrxRequestHandler):
-
+    #  FIXME: We need some sort of structure to this endpoint
     async def get(self, *args, **kwargs):
         self.write(json.dumps(await db.get_bids()))
 
@@ -1236,7 +1236,7 @@ class BidHandler(TrxRequestHandler):
 
 
 class OfferHandler(TrxRequestHandler):
-
+    #  FIXME: We need some sort of structure to this endpoint
     async def get(self, *args, **kwargs):
         self.write(json.dumps(await db.get_offers()))
 
