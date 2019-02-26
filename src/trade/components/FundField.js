@@ -25,6 +25,11 @@ export default class FundField extends Component {
       value: undefined,
       alertOpen: false
     }
+    window.addEventListener('keyup', e => {
+      if (this.state.alertOpen && e.keyCode === 27) {
+        this.closeAlert()
+      }
+    })
   }
 
   handleChange = event => {
@@ -47,10 +52,11 @@ export default class FundField extends Component {
     })
   }
 
-  keyHandler = e => {
-    console.log(e)
-    if (this.state.alertOpen && e.keyCode === 27) {
-      this.closeAlert()
+  componentWillReceiveProps (props) {
+    if (props.updateValue) {
+      this.setState({
+        value: props.updateValue
+      })
     }
   }
 
@@ -73,7 +79,6 @@ export default class FundField extends Component {
             startAdornment: <InputAdornment position='start'>{this.props.currency}</InputAdornment>
           }}
           onChange={this.handleChange}
-          onKeyUp={this.keyHandler}
         />
         <AlertDialog
           open={this.state.alertOpen}

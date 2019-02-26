@@ -105,9 +105,17 @@ export default class App extends Component {
 
   tradeHandler = async trades => {
     this.log('Attempting trades')
-    requestTrades(trades).then(result => {
+    requestTrades(trades).then(async result => {
+      console.log()
       this.log(`${result.completed.length} trades completed..\n${result.failed.length} trades failed.`)
+      // TODO: choose either one of removeTrades or replacing the trades outright
       tradeManager.removeTrades(result.completed)
+      // Get fresh data and update the state
+      const bids = await requestTradeParts('bid')
+      const offers = await requestTradeParts('offer')
+      tradeManager.clear()
+      tradeManager.setPending({ bids, offers })
+      tradeManager.start()
       this.setState({ trades: tradeManager.getMatchedTrades() })
     })
   }
@@ -178,4 +186,24 @@ async function requestTrade(trade) {
     }
   }
   return true
+}
+
+async function requestTradeParts(part) {
+  if (part && TradeType[part.toUpperCase()]) {
+    const url = '/' + part
+    const response = await request({
+      method: 'GET',
+      url,
+    })
+    const result = handleResponse(response)
+    if (result.error) {
+      log.error(result.error)
+    }
+    if (result.body) {
+      return result.body
+    }
+  } else {
+    log.error('Unrecognized trade part requested')
+    return false
+  }
 }

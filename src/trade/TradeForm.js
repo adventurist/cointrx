@@ -165,6 +165,7 @@ export class OfferForm extends React.Component {
                         currency={'BTC'}
                         offer={true}
                         handler={this.amountHandler}
+                        updateValue={this.state.offerAmount}
                     />
                     <TextField
                         className={this.state.offerPrice > 0 ? classes.filledTextField : classes.textField}
@@ -282,6 +283,7 @@ export class BidForm extends React.Component {
                         currency={'BTC'}
                         offer={false}
                         handler={this.amountHandler}
+                        updateValue={this.state.bidAmount}
                     />
                     <TextField
                         className={this.state.bidPrice > 0 ? classes.filledTextField : classes.textField}
