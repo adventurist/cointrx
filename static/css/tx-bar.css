@@ -29,3 +29,9 @@
     /* background-color: #333!important; */
     background-color: #021c21!important;
 }
+
+.bell {
+    background-color: #00ccf5!important;
+    margin-right: 4px;
+    vertical-align: middle;
+}

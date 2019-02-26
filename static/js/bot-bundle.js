@@ -71605,8 +71605,8 @@ function (_Component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__material_ui_core_MenuItem___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8__material_ui_core_MenuItem__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton__ = __webpack_require__(1019);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_material_ui_svg_icons_navigation_more_vert__ = __webpack_require__(1021);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_material_ui_svg_icons_navigation_more_vert___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10_material_ui_svg_icons_navigation_more_vert__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__material_ui_icons_MoreVert__ = __webpack_require__(1120);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__material_ui_icons_MoreVert___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10__material_ui_icons_MoreVert__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__material_ui_core_List__ = __webpack_require__(269);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__material_ui_core_List___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_11__material_ui_core_List__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__material_ui_core_ListItem__ = __webpack_require__(270);
@@ -71623,9 +71623,11 @@ function (_Component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Menu___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Menu__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon__ = __webpack_require__(1035);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon__ = __webpack_require__(428);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -71635,14 +71637,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
@@ -71662,6 +71665,23 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+
+var classes = {
+  menuButton: 'menu-button',
+  menuIcon: 'menu-icon',
+  logoIcon: 'trx-logo-icon',
+  logoButton: 'trx-logo-button'
+};
+var styles = {
+  userMenu: {
+    marginLeft: 'auto'
+  },
+  bell: {
+    marginLeft: 'auto',
+    backgroundColor: '#00ccf5'
+  }
+};
 
 var TRXLogo = function TRXLogo() {
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("img", {
@@ -71671,12 +71691,36 @@ var TRXLogo = function TRXLogo() {
   }));
 };
 
-var classes = {
-  menuButton: 'menu-button',
-  menuIcon: 'menu-icon',
-  logoIcon: 'trx-logo-icon',
-  logoButton: 'trx-logo-button'
+var BellIcon = function BellIcon() {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon___default.a, {
+    className: "bell"
+  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("svg", {
+    style: {
+      width: '24px',
+      height: '24px'
+    },
+    viewBox: "0 0 24 24"
+  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("path", {
+    fill: "#000000",
+    d: "M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21"
+  })));
 };
+
+var EmptyBellIcon = function EmptyBellIcon() {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon___default.a, {
+    className: "bell"
+  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("svg", {
+    style: {
+      width: '24px',
+      height: '24px'
+    },
+    viewBox: "0 0 24 24"
+  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("path", {
+    fill: "#000000",
+    d: "M16,17H7V10.5C7,8 9,6 11.5,6C14,6 16,8 16,10.5M18,16V10.5C18,7.43 15.86,4.86 13,4.18V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V4.18C7.13,4.86 5,7.43 5,10.5V16L3,18V19H20V18M11.5,22A2,2 0 0,0 13.5,20H9.5A2,2 0 0,0 11.5,22Z"
+  })));
+};
+
 var menuItems = [{
   url: '/user',
   label: 'User Profile',
@@ -71714,6 +71758,10 @@ var menuItems = [{
   label: 'BTC Price Graph',
   icon: 'trending_up'
 }];
+var userMenuItems = [{
+  label: 'Logout',
+  url: '/logout'
+}];
 /**
  *
  * @param {Array} menuItems An Array of menu item objects
@@ -71750,8 +71798,34 @@ function (_React$Component) {
     _classCallCheck(this, TrxNav);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(TrxNav).call(this, props));
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleUserMenuClick", function () {
+      _this.setState({
+        userMenuOpen: !_this.state.userMenuOpen
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleUserMenuClose", function () {
+      _this.setState({
+        userMenuOpen: false
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleNotificationMenuClick", function () {
+      _this.setState({
+        notificationMenuOpen: !_this.state.notificationMenuOpen
+      });
+    });
+
     _this.state = {
-      open: false
+      open: false,
+      userMenuOpen: false,
+      notification: true,
+      notificationMenuOpen: false,
+      messages: [{
+        label: 'Important',
+        url: '/nowhere'
+      }]
     };
     return _this;
   }
@@ -71762,10 +71836,18 @@ function (_React$Component) {
       if (props.drawerHandler) {
         this.drawerHandler = props.drawerHandler;
       }
+
+      if (props.messages) {
+        this.setState({
+          messages: _objectSpread({}, this.state.messages, props.message)
+        });
+      }
     }
   }, {
     key: "render",
     value: function render() {
+      var _this2 = this;
+
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__material_ui_core_AppBar___default.a, _defineProperty({
         position: "sticky",
         className: "appbar"
@@ -71782,7 +71864,53 @@ function (_React$Component) {
         className: classes.logoButton
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TRXLogo, {
         className: classes.logoIcon
-      })))));
+      })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
+        style: styles.userMenu
+      }, this.state.notification ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(BellIcon, {
+        onClick: this.handleNotificationMenuClick,
+        className: "bell",
+        style: styles.bell
+      }, " ", __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(NotificationMenu, {
+        messages: this.state.messages,
+        open: this.state.notificationMenuOpen
+      }), " ") : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(EmptyBellIcon, {
+        onClick: this.handleNotificationMenuClick,
+        className: "bell",
+        style: styles.bell
+      }, " ", __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(NotificationMenu, {
+        messages: this.state.messages,
+        open: this.state.notificationMenuOpen
+      })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
+        className: "user-menu-iconbutton",
+        onClick: this.handleUserMenuClick
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_10__material_ui_icons_MoreVert___default.a, null)), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Menu___default.a, {
+        open: this.state.userMenuOpen,
+        onClose: this.handleUserMenuClose,
+        PaperProps: {
+          style: {
+            maxHeight: 48 * 4.5,
+            width: 200
+          }
+        },
+        className: "user-menu",
+        anchorOrigin: {
+          horizontal: 'right',
+          vertical: 'top'
+        },
+        targetOrigin: {
+          horizontal: 'right',
+          vertical: 'top'
+        },
+        getContentAnchorEl: null
+      }, userMenuItems.map(function (option) {
+        return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_8__material_ui_core_MenuItem___default.a, {
+          key: option.label,
+          selected: option === 'logout',
+          onClick: _this2.handleClose
+        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4_react_toolbox_lib_link___default.a, {
+          href: option.url
+        }, option.label));
+      }))))));
     }
   }]);
 
@@ -71797,6 +71925,59 @@ var logoIcon = function logoIcon() {
     hidden: false
   }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TRXLogo, null));
 };
+
+var NotificationMenu =
+/*#__PURE__*/
+function (_React$Component2) {
+  _inherits(NotificationMenu, _React$Component2);
+
+  function NotificationMenu(props) {
+    var _this3;
+
+    _classCallCheck(this, NotificationMenu);
+
+    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(NotificationMenu).call(this, props));
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this3)), "handleClose", function () {
+      _this3.setState({
+        open: false
+      });
+    });
+
+    _this3.state = {
+      open: props.open || false,
+      messages: props.messages || []
+    };
+    return _this3;
+  }
+
+  _createClass(NotificationMenu, [{
+    key: "render",
+    value: function render() {
+      var _this4 = this;
+
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Menu___default.a, {
+        open: this.state.open,
+        onClose: this.handleClose,
+        PaperProps: {
+          style: {
+            maxHeight: 48 * 4.5,
+            width: 200
+          }
+        }
+      }, this.state.messages.map(function (option) {
+        return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_8__material_ui_core_MenuItem___default.a, {
+          key: option.label,
+          onClick: _this4.handleClose
+        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4_react_toolbox_lib_link___default.a, {
+          href: option.url
+        }, option.label));
+      }));
+    }
+  }]);
+
+  return NotificationMenu;
+}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
 
 /***/ }),
 /* 877 */
@@ -87374,44 +87555,7 @@ exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
-/* 1021 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _pure = __webpack_require__(31);
-
-var _pure2 = _interopRequireDefault(_pure);
-
-var _SvgIcon = __webpack_require__(32);
-
-var _SvgIcon2 = _interopRequireDefault(_SvgIcon);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var NavigationMoreVert = function NavigationMoreVert(props) {
-  return _react2.default.createElement(
-    _SvgIcon2.default,
-    props,
-    _react2.default.createElement('path', { d: 'M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z' })
-  );
-};
-NavigationMoreVert = (0, _pure2.default)(NavigationMoreVert);
-NavigationMoreVert.displayName = 'NavigationMoreVert';
-NavigationMoreVert.muiName = 'SvgIcon';
-
-exports.default = NavigationMoreVert;
-
-/***/ }),
+/* 1021 */,
 /* 1022 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -97422,7 +97566,7 @@ function isJson(str) {
 
 function formatTimestamp(timestamp) {
   var short = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-  return Object(__WEBPACK_IMPORTED_MODULE_1_date_fns_format__["a" /* default */])(new Date(timestamp), short === false ? 'MMMM dd, YYYY - H:mm' : 'H:mm:ss');
+  return Object(__WEBPACK_IMPORTED_MODULE_1_date_fns_format__["a" /* default */])(new Date(timestamp), short === false ? 'MMMM dd, YYYY - H:mm' : 'M/d H:mm:ss');
 }
 
 /***/ }),
@@ -100075,6 +100219,33 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
     return defaultLogger;
 }));
 
+
+/***/ }),
+/* 1120 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(4);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(__webpack_require__(0));
+
+var _createSvgIcon = _interopRequireDefault(__webpack_require__(122));
+
+var _default = (0, _createSvgIcon.default)(_react.default.createElement(_react.default.Fragment, null, _react.default.createElement("path", {
+  fill: "none",
+  d: "M0 0h24v24H0z"
+}), _react.default.createElement("path", {
+  d: "M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+})), 'MoreVert');
+
+exports.default = _default;
 
 /***/ })
 /******/ ]);
