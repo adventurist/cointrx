@@ -18,7 +18,8 @@ export const TradeType = Object.freeze({
  */
 export default function TradeManager (user, pending = { bids: [], offers: [] }) {
   // set member variables
-  const { bids, offers } = pending
+  this.bids = pending.bids
+  this.offers = pending.offers
   this.user = user
   this.matchedBids = []
   this.matchedOffers = []
@@ -40,11 +41,11 @@ export default function TradeManager (user, pending = { bids: [], offers: [] }) 
    * Parse all added bids and determine which are valid matches to offers of the current user
    */
   this.parseBids = function () {
-    bids.forEach(bid => {
+    this.bids.forEach(bid => {
       if (parseInt(bid.uid) === parseInt(user.id)) {
         this.candidates = [
           ...this.candidates,
-          ...offers.filter(offer =>
+          ...this.offers.filter(offer =>
             parseFloat(offer.rate) <= parseFloat(bid.rate) &&
             offer.uid !== bid.uid &&
             !this.candidates.some(candidate => candidate.bid.id === bid.id)
@@ -60,11 +61,11 @@ export default function TradeManager (user, pending = { bids: [], offers: [] }) 
    * Parse all added offers and determine which are valid matches to bids of the current user
    */
   this.parseOffers = function () {
-    offers.forEach(offer => {
+    this.offers.forEach(offer => {
       if (parseInt(offer.uid) === parseInt(user.id)) {
         this.candidates = [
           ...this.candidates,
-          ...bids.filter(bid =>
+          ...this.bids.filter(bid =>
             parseFloat(bid.rate) <= parseFloat(offer.rate) &&
             bid.uid !== offer.uid &&
             !this.candidates.some(candidate => candidate.offer.id === offer.id)
@@ -167,6 +168,19 @@ export default function TradeManager (user, pending = { bids: [], offers: [] }) 
         )
       )
     ]
+  }
+
+  this.clear = () => {
+    this.bids = undefined
+    this.offers = undefined
+    this.candidates = []
+    this.matchedBids = []
+    this.matchedOffers = []
+  }
+
+  this.setPending = pending => {
+    this.bids = pending.bids
+    this.offers = pending.offers
   }
 
   /**
