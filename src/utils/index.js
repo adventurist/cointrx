@@ -206,6 +206,6 @@ export function isJson(str) {
 export function formatTimestamp(timestamp, short = false) {
     return format(
         new Date(timestamp),
-        short === false ? 'MMMM dd, YYYY - H:mm' : 'H:mm:ss'
+        short === false ? 'MMMM dd, YYYY - H:mm' : 'M/d H:mm:ss'
     )
 }
