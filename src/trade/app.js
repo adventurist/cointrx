@@ -2,9 +2,14 @@
 import { Fragment, Component } from 'react'
 
 /* Material UI */
-import { Grid } from '@material-ui/core'
-import Typography from '@material-ui/core/Typography'
+import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
+import Switch from '@material-ui/core/Switch'
+import ExpansionPanel from '@material-ui/core/ExpansionPanel'
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import Typography from '@material-ui/core/Typography'
 
 /* Chart */
 import TrxChart from './chart/TrxChart'
@@ -41,7 +46,16 @@ const styles = {
   },
   trxTool: {
     padding: '4px!important'
+  },
+  expand: {
+    minHeight: '24px!important',
+    maxHeight: '24px!important',
+    margin: 0
   }
+}
+
+const classes = {
+  expand: 'panel'
 }
 
 
@@ -90,7 +104,12 @@ export default class App extends Component {
     super(props)
     this.state = {
       trades: tradeManager.getMatchedTrades(),
-      lastMessage: 'Initialized'
+      lastMessage: 'Initialized',
+      trxGrid: true,
+      tradeGrid: true,
+      bidForm: true,
+      offerForm: true,
+      chart: true
     }
   }
 
@@ -101,6 +120,7 @@ export default class App extends Component {
     } else {
       this.log('No matched trades have been found')
     }
+    document.querySelector('.console-out').focus()
   }
 
   tradeHandler = async trades => {
@@ -130,6 +150,15 @@ export default class App extends Component {
     }
   }
 
+  // handleCollapse = component => {
+  //   log.info(component)
+  // }
+  handleCollapse = (component) => {
+    this.setState({
+      [component]: !this.state[component]
+    })
+  }
+
   messageHandler = (message) => {
     this.log(message)
   }
@@ -149,15 +178,45 @@ export default class App extends Component {
       <TradeDialog tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} trades={this.state.trades} bids={tradeManager.getMatched()}/>
       <Grid container spacing={8} style={styles.root}>
         <Grid style={styles.gridChild} item xs={8} sm={4}>
-          <div className="trxToolWrap">
-            <TrxGrid style={styles.trxTool}/>
-          </div>
-          <div className="trxToolWrap"><TradeGrid style={styles.trxTool}/></div>
-          <div className="trxToolWrap"><OfferForm balance={userDataObject.balance} msgHandler={this.messageHandler} uid={userDataObject.id} style={styles.trxTool}/> </div>
-          <div className="trxToolWrap"><BidForm balance={userDataObject.balance} msgHandler={this.messageHandler} uid={userDataObject.id} style={styles.trxTool}/></div>
+          <ExpansionPanel style={styles.expand} defaultExpanded={true}>
+            <ExpansionPanelSummary className={classes.expand} expandIcon={<ExpandMoreIcon />}>
+              <Typography>Market</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+                <Paper className="trxToolWrap" elevation={4}>
+                  <TrxGrid style={styles.trxTool}/>
+                </Paper>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
+          <ExpansionPanel style={styles.expand} defaultExpanded={true}>
+            <ExpansionPanelSummary className={classes.expand} expandIcon={<ExpandMoreIcon />}>
+                <Typography>Trades</Typography>
+              </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <Paper className="trxToolWrap" elevation={4}><TradeGrid style={styles.trxTool}/></Paper>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
+          <ExpansionPanel style={styles.expand} defaultExpanded={true}>
+            <ExpansionPanelSummary className={classes.expand} expandIcon={<ExpandMoreIcon />}>
+              <Typography>Offer</Typography>
+            </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <Paper className="trxToolWrap" elevation={4}><OfferForm balance={userDataObject.balance} msgHandler={this.messageHandler} uid={userDataObject.id} style={styles.trxTool}/> </Paper>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
+          <ExpansionPanel style={styles.expand} defaultExpanded={true}>
+            <ExpansionPanelSummary className={classes.expand} expandIcon={<ExpandMoreIcon />}>
+              <Typography>Bid</Typography>
+            </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <Paper className="trxToolWrap" elevation={4}><BidForm balance={userDataObject.balance} msgHandler={this.messageHandler} uid={userDataObject.id} style={styles.trxTool}/></Paper>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
         </Grid>
         <Grid style={styles.gridChild}  item xs={12} sm={8} id={ids.tradeRight}>
-          <TrxChart style={styles.trxTool}/>
+          <Paper elevation={4}>
+            <TrxChart style={styles.trxTool}/>
+          </Paper>
         </Grid>
       </Grid>
     </div>
