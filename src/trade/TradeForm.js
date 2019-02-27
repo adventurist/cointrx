@@ -53,6 +53,9 @@ const styles = {
     input: {
         width: '85%'
     },
+    icon: {
+        paddingLeft: '4px'
+    },
     submitButton: {
         padding: '16px',
         backgroundColor: '#64dd17',
@@ -196,7 +199,7 @@ export class OfferForm extends React.Component {
                         variant="contained" color="default"
                     >
                         Offer
-                        <CloudUploadIcon />
+                        <CloudUploadIcon style={styles.icon}/>
                     </Button>
                 </form>
             </div>
@@ -313,7 +316,7 @@ export class BidForm extends React.Component {
                         variant="contained" color="default"
                     >
                         Bid
-                        <CloudUploadIcon />
+                        <CloudUploadIcon style={styles.icon} />
                     </Button>
                 </form>
             </div>
