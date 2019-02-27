@@ -58,7 +58,7 @@ export default class Console extends Component {
 					multiline={true}
 					className='console-out'
 					rows={3}
-					rowsMax={12}
+					rowsMax={3}
 					style={styles.console}
 					hintText='Console'
 					spellCheck={false}
