@@ -15,7 +15,16 @@ export default class TrxChart extends Component {
     getJson().then(data => {
         this.setState({ data })
     })
+    // this.runTimer()
   }
+
+  // runTimer = () => {
+  //   setInterval(() => {
+  //     getJson().then(data => {
+  //       this.setState({ data })
+  //     })
+  //   }, 5000)
+  // }
 
   render() {
     if (this.state == null) {

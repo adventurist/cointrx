@@ -57,10 +57,10 @@ const styles = {
         paddingLeft: '4px'
     },
     submitButton: {
-        padding: '16px',
+        padding: '12px',
         backgroundColor: '#64dd17',
         marginLeft: '60%',
-        minWidth: '112px!important',
+        minWidth: '64px!important',
         marginBottom: '8px'
     }
 }
@@ -414,6 +414,70 @@ export class TradeGrid extends React.Component {
             <div>
                 <div style={styles.gridTitle}>
                     <h3 >TRX Trades</h3>
+                </div>
+                <ReactDataGrid
+                    columns={this._columns}
+                    rowGetter={this.rowGetter}
+                    rowsCount={this._rows.length}
+                    minHeight={135}/>
+            </div>)
+    }
+}
+
+export class SummaryGrid extends React.Component {
+    constructor(props, context) {
+        super(props, context)
+        this.state = {
+            data: props.data || []
+        }
+        this.createRows()
+        this._columns = [
+            { key: 'cur', name: 'Currency' },
+            { key: 'sym', name: 'Symbol' },
+            { key: 'time', name: 'Time' },
+            { key: 'amt', name: 'Amount' },
+            { key: 'rate', name: 'Rate' },
+            { key: 'prc', name: 'Price' } ]
+    }
+
+    createRows = () => {
+        if (this.state.data) {
+            this._rows = this.state.data.map(x => SummaryGrid.buildRows(x))
+        }
+    };
+
+    componentWillReceiveProps (props) {
+        if (props.data) {
+            this.setState({ data: props.data }, () => {
+                this.createRows()
+            })
+        }
+    }
+
+    static buildRows(trade) {
+        console.log('building row', trade)
+        // TODO: We need symbol in the trade object
+        const symbol = '$'
+        return {
+            'cur': trade.offer.currency,
+            'sym': symbol,
+            'time': formatTimestamp(trade.time, true),
+            'amt': trade.offer.amount / 100000000 + ' BTC',
+            'rate': symbol + trade.offer.rate + '/BTC',
+            'prc': `${symbol}${parseFloat(trade.offer.amount * trade.offer.rate / 100000000).toFixed(2)}`
+        }
+
+    }
+
+    rowGetter = (i) => {
+        return this._rows[i];
+    };
+
+    render() {
+        return  (
+            <div>
+                <div style={styles.gridTitle}>
+                    <h3 >Your Summary</h3>
                 </div>
                 <ReactDataGrid
                     columns={this._columns}

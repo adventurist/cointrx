@@ -15,7 +15,7 @@ import Typography from '@material-ui/core/Typography'
 import TrxChart from './chart/TrxChart'
 
 /* Form */
-import { OfferForm, BidForm, TrxGrid, TradeGrid } from './TradeForm'
+import { OfferForm, BidForm, SummaryGrid, TrxGrid, TradeGrid } from './TradeForm'
 
 /* TradeDialog component */
 import TradeDialog from './components/TradeDialog'
@@ -85,7 +85,7 @@ async function requestTrades (trades) {
   return new Promise( resolve => {
     const result = { completed: [], failed: [] }
     trades.forEach( async (trade, idx) => {
-      const tradeInfo = { type: trade.type, id: trade.type === TradeType.BID ? trade.bid.id : trade.offer.id }
+      const tradeInfo = { ...trade, time: Date.now(), id: trade.type === TradeType.BID ? trade.bid.id : trade.offer.id }
       if (await requestTrade(trade)) {
         result.completed.push(tradeInfo)
       } else {
@@ -104,6 +104,7 @@ export default class App extends Component {
     super(props)
     this.state = {
       trades: tradeManager.getMatchedTrades(),
+      completedTrades: [],
       lastMessage: 'Initialized',
       trxGrid: true,
       tradeGrid: true,
@@ -121,6 +122,9 @@ export default class App extends Component {
       this.log('No matched trades have been found')
     }
     document.querySelector('.console-out').focus()
+    if (this.props.userHandler) {
+      this.props.userHandler(userDataObject)
+    }
   }
 
   tradeHandler = async trades => {
@@ -136,7 +140,10 @@ export default class App extends Component {
       tradeManager.clear()
       tradeManager.setPending({ bids, offers })
       tradeManager.start()
-      this.setState({ trades: tradeManager.getMatchedTrades() })
+      this.setState({
+        trades: tradeManager.getMatchedTrades(),
+        completedTrades: [ ... this.state.completedTrades, ... result.completed ]
+      })
     })
   }
 
@@ -217,6 +224,14 @@ export default class App extends Component {
           <Paper elevation={4}>
             <TrxChart style={styles.trxTool}/>
           </Paper>
+          <ExpansionPanel style={styles.expand} defaultExpanded={true}>
+            <ExpansionPanelSummary className={classes.expand} expandIcon={<ExpandMoreIcon />}>
+              <Typography>Summary</Typography>
+            </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <Paper className="trxToolWrap" elevation={4}><SummaryGrid style={styles.trxTool} data={this.state.completedTrades} /></Paper>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
         </Grid>
       </Grid>
     </div>
