@@ -135,7 +135,6 @@ body {
 }
 
 .textField {
-    margin-top: 10px;
     font-size: 12pt!important;
 }
 
@@ -143,17 +142,23 @@ body {
     color: rgb(0, 255, 0);
 }
 
+.datePicker, .textField {
+    margin-top: 4px!important;
+}
+
 .filledDatePicker, .filledTextField {
     background-color: rgba(26, 196, 26, 0.27)!important;
+    margin-top: 4px!important;
 }
 
 .submitButton {
     opacity: 0.7;
     border-radius: 4px;
-    /* transform: translateX(150%); */
     border-radius: 16px!important;
-    min-width: 112px!important;
+    min-width: 72px!important;
     font-size: 14pt!important;
+    font-weight: 700;
+    color: #FFF;
 }
 
 .submitButton:hover {

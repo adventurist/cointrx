@@ -77574,6 +77574,7 @@ function (_Component) {
     key: "render",
     value: function render() {
       return React.createElement("div", null, React.createElement(__WEBPACK_IMPORTED_MODULE_1__TrxAppBar2_jsx__["a" /* default */], {
+        user: this.props.user,
         drawerHandler: this.drawerHandler
       }), React.createElement(__WEBPACK_IMPORTED_MODULE_2__TrxDrawer__["a" /* default */], {
         drawerHandler: this.drawerHandler,
@@ -77634,6 +77635,16 @@ function (_Component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card__ = __webpack_require__(377);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_CardActions__ = __webpack_require__(382);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_CardActions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_CardActions__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent__ = __webpack_require__(380);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_Button__ = __webpack_require__(91);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Button__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
@@ -77676,6 +77687,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
+
+
+
+
 var classes = {
   menuButton: 'menu-button',
   menuIcon: 'menu-icon',
@@ -77684,11 +77700,19 @@ var classes = {
 };
 var styles = {
   userMenu: {
-    marginLeft: 'auto'
-  },
-  bell: {
     marginLeft: 'auto',
-    backgroundColor: '#00ccf5'
+    display: 'flex'
+  },
+  bell: _defineProperty({
+    marginLeft: 'auto',
+    backgroundColor: '#00ccf5',
+    flex: 1,
+    marginTop: '10%'
+  }, "marginLeft", '24px'),
+  userInfo: {
+    flex: 1,
+    minWidth: '80px',
+    maxHeight: '64px!important'
   }
 };
 
@@ -77834,7 +77858,8 @@ function (_React$Component) {
       messages: [{
         label: 'Important',
         url: '/nowhere'
-      }]
+      }],
+      userData: props.user || {}
     };
     return _this;
   }
@@ -77849,6 +77874,12 @@ function (_React$Component) {
       if (props.messages) {
         this.setState({
           messages: _objectSpread({}, this.state.messages, props.message)
+        });
+      }
+
+      if (props.user) {
+        this.setState({
+          userData: props.user
         });
       }
     }
@@ -77875,7 +77906,10 @@ function (_React$Component) {
         className: classes.logoIcon
       })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
         style: styles.userMenu
-      }, this.state.notification ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(BellIcon, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(UserInfo, {
+        style: styles.userInfo,
+        user: this.state.userData
+      }), this.state.notification ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(BellIcon, {
         onClick: this.handleNotificationMenuClick,
         className: "bell",
         style: styles.bell
@@ -77986,6 +78020,61 @@ function (_React$Component2) {
   }]);
 
   return NotificationMenu;
+}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
+
+var UserInfo =
+/*#__PURE__*/
+function (_React$Component3) {
+  _inherits(UserInfo, _React$Component3);
+
+  function UserInfo(props) {
+    var _this5;
+
+    _classCallCheck(this, UserInfo);
+
+    _this5 = _possibleConstructorReturn(this, _getPrototypeOf(UserInfo).call(this, props));
+    _this5.state = {
+      user: props.user && props.user.user ? props.user.user : {
+        balance: 0
+      } || {
+        balance: 2
+      }
+    };
+    return _this5;
+  }
+
+  _createClass(UserInfo, [{
+    key: "componentWillReceiveProps",
+    value: function componentWillReceiveProps(props) {
+      if (props.user) {
+        this.setState({
+          user: props.user
+        });
+      }
+
+      console.log('UserInfo props', props);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var style = {
+        fontSize: '9pt'
+      };
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card___default.a, {
+        style: {
+          maxHeight: '64px'
+        }
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default.a, {
+        style: style,
+        color: "textSecondary"
+      }, "Welcome, ", this.state.user.name), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default.a, {
+        style: style,
+        color: "textSecondary"
+      }, this.state.user.balance, " BTC / ", this.state.user.estimated, " ", this.state.user.currency))));
+    }
+  }]);
+
+  return UserInfo;
 }(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
 
 /***/ }),

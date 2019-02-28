@@ -71565,6 +71565,7 @@ function (_Component) {
     key: "render",
     value: function render() {
       return React.createElement("div", null, React.createElement(__WEBPACK_IMPORTED_MODULE_1__TrxAppBar2_jsx__["a" /* default */], {
+        user: this.props.user,
         drawerHandler: this.drawerHandler
       }), React.createElement(__WEBPACK_IMPORTED_MODULE_2__TrxDrawer__["a" /* default */], {
         drawerHandler: this.drawerHandler,
@@ -71625,6 +71626,16 @@ function (_Component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon__ = __webpack_require__(428);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card__ = __webpack_require__(1121);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_CardActions__ = __webpack_require__(1123);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_CardActions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_CardActions__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent__ = __webpack_require__(1125);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_Button__ = __webpack_require__(1042);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Button__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography__ = __webpack_require__(1024);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
@@ -71667,6 +71678,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
+
+
+
+
 var classes = {
   menuButton: 'menu-button',
   menuIcon: 'menu-icon',
@@ -71675,11 +71691,19 @@ var classes = {
 };
 var styles = {
   userMenu: {
-    marginLeft: 'auto'
-  },
-  bell: {
     marginLeft: 'auto',
-    backgroundColor: '#00ccf5'
+    display: 'flex'
+  },
+  bell: _defineProperty({
+    marginLeft: 'auto',
+    backgroundColor: '#00ccf5',
+    flex: 1,
+    marginTop: '10%'
+  }, "marginLeft", '24px'),
+  userInfo: {
+    flex: 1,
+    minWidth: '80px',
+    maxHeight: '64px!important'
   }
 };
 
@@ -71825,7 +71849,8 @@ function (_React$Component) {
       messages: [{
         label: 'Important',
         url: '/nowhere'
-      }]
+      }],
+      userData: props.user || {}
     };
     return _this;
   }
@@ -71840,6 +71865,12 @@ function (_React$Component) {
       if (props.messages) {
         this.setState({
           messages: _objectSpread({}, this.state.messages, props.message)
+        });
+      }
+
+      if (props.user) {
+        this.setState({
+          userData: props.user
         });
       }
     }
@@ -71866,7 +71897,10 @@ function (_React$Component) {
         className: classes.logoIcon
       })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
         style: styles.userMenu
-      }, this.state.notification ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(BellIcon, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(UserInfo, {
+        style: styles.userInfo,
+        user: this.state.userData
+      }), this.state.notification ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(BellIcon, {
         onClick: this.handleNotificationMenuClick,
         className: "bell",
         style: styles.bell
@@ -71977,6 +72011,61 @@ function (_React$Component2) {
   }]);
 
   return NotificationMenu;
+}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
+
+var UserInfo =
+/*#__PURE__*/
+function (_React$Component3) {
+  _inherits(UserInfo, _React$Component3);
+
+  function UserInfo(props) {
+    var _this5;
+
+    _classCallCheck(this, UserInfo);
+
+    _this5 = _possibleConstructorReturn(this, _getPrototypeOf(UserInfo).call(this, props));
+    _this5.state = {
+      user: props.user && props.user.user ? props.user.user : {
+        balance: 0
+      } || {
+        balance: 2
+      }
+    };
+    return _this5;
+  }
+
+  _createClass(UserInfo, [{
+    key: "componentWillReceiveProps",
+    value: function componentWillReceiveProps(props) {
+      if (props.user) {
+        this.setState({
+          user: props.user
+        });
+      }
+
+      console.log('UserInfo props', props);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var style = {
+        fontSize: '9pt'
+      };
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card___default.a, {
+        style: {
+          maxHeight: '64px'
+        }
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default.a, {
+        style: style,
+        color: "textSecondary"
+      }, "Welcome, ", this.state.user.name), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default.a, {
+        style: style,
+        color: "textSecondary"
+      }, this.state.user.balance, " BTC / ", this.state.user.estimated, " ", this.state.user.currency))));
+    }
+  }]);
+
+  return UserInfo;
 }(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
 
 /***/ }),
@@ -100246,6 +100335,323 @@ var _default = (0, _createSvgIcon.default)(_react.default.createElement(_react.d
 })), 'MoreVert');
 
 exports.default = _default;
+
+/***/ }),
+/* 1121 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(4);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _Card.default;
+  }
+});
+
+var _Card = _interopRequireDefault(__webpack_require__(1122));
+
+/***/ }),
+/* 1122 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(4);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(14));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(15));
+
+var _react = _interopRequireDefault(__webpack_require__(0));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(1));
+
+var _classnames = _interopRequireDefault(__webpack_require__(7));
+
+var _Paper = _interopRequireDefault(__webpack_require__(257));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(27));
+
+// @inheritedComponent Paper
+var styles = {
+  /* Styles applied to the root element. */
+  root: {
+    overflow: 'hidden'
+  }
+};
+exports.styles = styles;
+
+function Card(props) {
+  var classes = props.classes,
+      className = props.className,
+      raised = props.raised,
+      other = (0, _objectWithoutProperties2.default)(props, ["classes", "className", "raised"]);
+  return _react.default.createElement(_Paper.default, (0, _extends2.default)({
+    className: (0, _classnames.default)(classes.root, className),
+    elevation: raised ? 8 : 1
+  }, other));
+}
+
+Card.propTypes = process.env.NODE_ENV !== "production" ? {
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * @ignore
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * If `true`, the card will use raised styling.
+   */
+  raised: _propTypes.default.bool
+} : {};
+Card.defaultProps = {
+  raised: false
+};
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiCard'
+})(Card);
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+
+/***/ }),
+/* 1123 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(4);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _CardActions.default;
+  }
+});
+
+var _CardActions = _interopRequireDefault(__webpack_require__(1124));
+
+/***/ }),
+/* 1124 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(4);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(14));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(15));
+
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(26));
+
+var _react = _interopRequireDefault(__webpack_require__(0));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(1));
+
+var _classnames = _interopRequireDefault(__webpack_require__(7));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(27));
+
+var _reactHelpers = __webpack_require__(409);
+
+__webpack_require__(1042);
+
+// So we don't have any override priority issue.
+var styles = function styles(theme) {
+  return {
+    /* Styles applied to the root element. */
+    root: (0, _defineProperty2.default)({
+      display: 'flex',
+      alignItems: 'center',
+      boxSizing: 'border-box',
+      padding: '8px 4px'
+    }, theme.breakpoints.up('sm'), {
+      padding: '8px 12px'
+    }),
+
+    /* Styles applied to the children. */
+    action: {
+      margin: '0 4px'
+    }
+  };
+};
+
+exports.styles = styles;
+
+function CardActions(props) {
+  var disableActionSpacing = props.disableActionSpacing,
+      children = props.children,
+      classes = props.classes,
+      className = props.className,
+      other = (0, _objectWithoutProperties2.default)(props, ["disableActionSpacing", "children", "classes", "className"]);
+  return _react.default.createElement("div", (0, _extends2.default)({
+    className: (0, _classnames.default)(classes.root, className)
+  }, other), disableActionSpacing ? children : (0, _reactHelpers.cloneChildrenWithClassName)(children, classes.action));
+}
+
+CardActions.propTypes = process.env.NODE_ENV !== "production" ? {
+  /**
+   * The content of the component.
+   */
+  children: _propTypes.default.node,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * @ignore
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * If `true`, the card actions do not have additional margin.
+   */
+  disableActionSpacing: _propTypes.default.bool
+} : {};
+CardActions.defaultProps = {
+  disableActionSpacing: false
+};
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiCardActions'
+})(CardActions);
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+
+/***/ }),
+/* 1125 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(4);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _CardContent.default;
+  }
+});
+
+var _CardContent = _interopRequireDefault(__webpack_require__(1126));
+
+/***/ }),
+/* 1126 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(4);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(14));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(15));
+
+var _react = _interopRequireDefault(__webpack_require__(0));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(1));
+
+var _classnames = _interopRequireDefault(__webpack_require__(7));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(27));
+
+var styles = function styles(theme) {
+  return {
+    /* Styles applied to the root element. */
+    root: theme.mixins.gutters({
+      paddingTop: 16,
+      paddingBottom: 16,
+      '&:last-child': {
+        paddingBottom: 24
+      }
+    })
+  };
+};
+
+exports.styles = styles;
+
+function CardContent(props) {
+  var classes = props.classes,
+      className = props.className,
+      Component = props.component,
+      other = (0, _objectWithoutProperties2.default)(props, ["classes", "className", "component"]);
+  return _react.default.createElement(Component, (0, _extends2.default)({
+    className: (0, _classnames.default)(classes.root, className)
+  }, other));
+}
+
+CardContent.propTypes = process.env.NODE_ENV !== "production" ? {
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * @ignore
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * The component used for the root node.
+   * Either a string to use a DOM element or a component.
+   */
+  component: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.func, _propTypes.default.object])
+} : {};
+CardContent.defaultProps = {
+  component: 'div'
+};
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiCardContent'
+})(CardContent);
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ })
 /******/ ]);
