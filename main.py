@@ -3,26 +3,23 @@ import asyncio
 import logging
 import sys
 import uuid
-import traceback
 
 import base64
 import json
 import os
 import random
-import warnings
 
 # from graphql.error import GraphQLError
 # from graphql.error import format_error as format_graphql_error
 
 from time import time
-from functools import wraps
 from utils.btcd_utils import RegTest
 
 from tornado import escape, httpserver
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.options import define
 from tornado.websocket import WebSocketHandler
-from tornado.web import Application, RequestHandler, StaticFileHandler, HTTPError
+from tornado.web import Application, RequestHandler, StaticFileHandler
 
 from config import config as TRXConfig
 from db import db
@@ -1276,7 +1273,7 @@ async def request_trade(sid, rid, amount, rate, currency):
     if db.sender_recipient_ready(sender, recipient):
         logger.info(
             'Attempting trade between ' + str(sid) + ' and ' + str(rid) + ' in the amount of ' + str(
-                amount) + ' at a rate of ' + str(rate) + 'rate ' + str(currency) + ' for a total of: ' + str(
+                amount) + ' at a rate of ' + str(rate) + ' ' + str(currency) + ' for a total of: ' + str(
                 rate * amount))
         try:
             if await TransactionTestHandler.handle_transaction(sender, recipient, COIN * amount):
