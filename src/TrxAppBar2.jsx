@@ -22,6 +22,12 @@ import MenuIcon from '@material-ui/icons/Menu'
 import BasicIcon from '@material-ui/core/Icon'
 import SvgIcon from '@material-ui/core/SvgIcon'
 
+import Card from '@material-ui/core/Card'
+import CardActions from '@material-ui/core/CardActions'
+import CardContent from '@material-ui/core/CardContent'
+import Button from '@material-ui/core/Button'
+import Typography from '@material-ui/core/Typography'
+
 const classes = {
     menuButton: 'menu-button',
     menuIcon: 'menu-icon',
@@ -32,11 +38,20 @@ const classes = {
 
 const styles = {
     userMenu: {
-        marginLeft: 'auto'
+        marginLeft: 'auto',
+        display: 'flex'
     },
     bell: {
         marginLeft: 'auto',
-        backgroundColor: '#00ccf5'
+        backgroundColor: '#00ccf5',
+        flex: 1,
+        marginTop: '10%',
+        marginLeft: '24px'
+    },
+    userInfo: {
+        flex: 1,
+        minWidth: '80px',
+        maxHeight: '64px!important'
     }
 }
 
@@ -146,7 +161,8 @@ export default class TrxNav extends React.Component {
             userMenuOpen: false,
             notification: true,
             notificationMenuOpen: false,
-            messages: [{label: 'Important', url: '/nowhere'}]
+            messages: [{label: 'Important', url: '/nowhere'}],
+            userData: props.user || {}
         };
     }
 
@@ -156,6 +172,9 @@ export default class TrxNav extends React.Component {
         }
         if (props.messages) {
             this.setState({ messages: { ... this.state.messages, ... props.message } })
+        }
+        if (props.user) {
+            this.setState({ userData: props.user })
         }
     }
 
@@ -186,6 +205,7 @@ export default class TrxNav extends React.Component {
             <TRXLogo className={classes.logoIcon}/>
         </IconButton>
         <div style={styles.userMenu}>
+        <UserInfo style={styles.userInfo} user={this.state.userData} ></UserInfo>
             {
                 this.state.notification ?
                     <BellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}> <NotificationMenu messages={this.state.messages} open={this.state.notificationMenuOpen} /> </BellIcon> :
@@ -251,6 +271,42 @@ class NotificationMenu extends React.Component {
                     </MenuItem>
                 ))}
             </Menu>
+        )
+    }
+}
+
+class UserInfo extends React.Component {
+    constructor (props) {
+        super(props)
+        this.state = {
+            user: props.user && props.user.user ? props.user.user : { balance: 0 } || { balance: 2}
+        }
+    }
+
+    componentWillReceiveProps (props) {
+        if (props.user) {
+            this.setState({ user: props.user })
+        }
+        console.log('UserInfo props', props)
+    }
+
+    render () {
+        const style = {
+            fontSize: '9pt'
+        }
+        return (
+            <div>
+            <Card style={{maxHeight: '64px'}}>
+                <CardContent>
+                    <Typography style={style} color="textSecondary" >
+                        Welcome, {this.state.user.name}
+                    </Typography>
+                    <Typography style={style} color="textSecondary" >
+                        {this.state.user.balance} BTC / {this.state.user.estimated} {this.state.user.currency}
+                    </Typography>
+                </CardContent>
+            </Card>
+            </div>
         )
     }
 }

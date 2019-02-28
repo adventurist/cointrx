@@ -1,3 +1,4 @@
+import { Component } from 'react'
 import { render } from 'react-dom'
 import App from './app'
 import TrxNavigation from '../TrxNavigation.jsx'
@@ -21,14 +22,29 @@ const theme = createMuiTheme({
   }
 })
 
+class MainApplication extends Component {
+  constructor (props) {
+    super(props)
+   this.state = {
+     user: undefined
+   }
+  }
 
+  userHandler = user => { this.setState({ user: user }) }
+
+  render () {
+    return (
+      <div id='container' style={styles.main}>
+        <TrxNavigation user={this.state.user}/>
+        <App userHandler={this.userHandler} />
+    </div>
+    )
+  }
+}
 
 render (
   <MuiThemeProvider theme={theme}>
-    <div id='container' style={styles.main}>
-      <TrxNavigation />
-      <App />
-    </div>
+      <MainApplication></MainApplication>
   </MuiThemeProvider>
   , document.getElementById('root')
 )
