@@ -77881,8 +77881,6 @@ function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleNotificationMenuClick", function () {
-      console.log('Click');
-
       _this.setState({
         notificationMenuOpen: !_this.state.notificationMenuOpen
       });
@@ -77897,12 +77895,9 @@ function (_React$Component) {
     _this.state = {
       open: false,
       userMenuOpen: false,
-      notification: true,
+      notification: false,
       notificationMenuOpen: false,
-      messages: [{
-        text: 'Important',
-        url: '/trade?parameter=1'
-      }],
+      messages: [],
       userData: props.user || {}
     };
     return _this;
@@ -77911,8 +77906,6 @@ function (_React$Component) {
   _createClass(TrxNav, [{
     key: "componentWillReceiveProps",
     value: function componentWillReceiveProps(props) {
-      var _this2 = this;
-
       if (props.drawerHandler) {
         this.drawerHandler = props.drawerHandler;
       }
@@ -77931,16 +77924,15 @@ function (_React$Component) {
 
       if (props.notificationMessage) {
         this.setState({
-          messages: _toConsumableArray(this.state.messages).concat([props.notificationMessage])
-        }, function () {
-          console.log(_this2.state);
+          messages: _toConsumableArray(this.state.messages).concat([props.notificationMessage]),
+          notification: true
         });
       }
     }
   }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this2 = this;
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__material_ui_core_AppBar___default.a, _defineProperty({
         position: "sticky",
@@ -77977,11 +77969,7 @@ function (_React$Component) {
         onClick: this.handleNotificationMenuClick,
         className: "bell",
         style: styles.bell
-      }, " ", __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(NotificationMenu, {
-        className: "notification-menu",
-        messages: this.state.messages,
-        open: this.state.notificationMenuOpen
-      }))), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
+      })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: "user-menu-iconbutton",
         onClick: this.handleUserMenuClick
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_10__material_ui_icons_MoreVert___default.a, null)), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Menu___default.a, {
@@ -78007,7 +77995,7 @@ function (_React$Component) {
         return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_8__material_ui_core_MenuItem___default.a, {
           key: option.label,
           selected: option === 'logout',
-          onClick: _this3.handleClose
+          onClick: _this2.handleClose
         }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4_react_toolbox_lib_link___default.a, {
           href: option.url
         }, option.label));
@@ -78033,36 +78021,36 @@ function (_React$Component2) {
   _inherits(NotificationMenu, _React$Component2);
 
   function NotificationMenu(props) {
-    var _this4;
+    var _this3;
 
     _classCallCheck(this, NotificationMenu);
 
-    _this4 = _possibleConstructorReturn(this, _getPrototypeOf(NotificationMenu).call(this, props));
+    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(NotificationMenu).call(this, props));
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this4)), "handleClose", function () {
-      _this4.props.closeHandler();
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this3)), "handleClose", function () {
+      _this3.props.closeHandler();
 
-      _this4.setState({
+      _this3.setState({
         open: false
       });
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this4)), "handleNotificationClick", function (i) {
-      var message = _this4.state.messages[i];
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this3)), "handleNotificationClick", function (i) {
+      var message = _this3.state.messages[i];
 
       if (message.handler) {
         message.handler();
       }
     });
 
-    _this4.state = {
+    _this3.state = {
       open: props.open,
       messages: props.messages || [{
         label: 'test',
         url: 'test'
       }]
     };
-    return _this4;
+    return _this3;
   }
 
   _createClass(NotificationMenu, [{
@@ -78085,7 +78073,7 @@ function (_React$Component2) {
   }, {
     key: "render",
     value: function render() {
-      var _this5 = this;
+      var _this4 = this;
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Menu___default.a, {
         className: "notification-menu",
@@ -78099,7 +78087,7 @@ function (_React$Component2) {
         return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_8__material_ui_core_MenuItem___default.a, {
           key: i,
           onClick: function onClick() {
-            return _this5.handleNotificationClick(i);
+            return _this4.handleNotificationClick(i);
           }
         }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default.a, {
           color: "textSecondary",
@@ -78118,19 +78106,19 @@ function (_React$Component3) {
   _inherits(UserInfo, _React$Component3);
 
   function UserInfo(props) {
-    var _this6;
+    var _this5;
 
     _classCallCheck(this, UserInfo);
 
-    _this6 = _possibleConstructorReturn(this, _getPrototypeOf(UserInfo).call(this, props));
-    _this6.state = {
+    _this5 = _possibleConstructorReturn(this, _getPrototypeOf(UserInfo).call(this, props));
+    _this5.state = {
       user: props.user && props.user.user ? props.user.user : {
         balance: 0
       } || {
         balance: 2
       }
     };
-    return _this6;
+    return _this5;
   }
 
   _createClass(UserInfo, [{

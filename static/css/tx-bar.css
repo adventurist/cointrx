@@ -30,9 +30,18 @@
     background-color: #021c21!important;
 }
 
-.bell {
+svg.bell {
     background-color: #00ccf5!important;
     flex: 1;
-    margin-top: 6.5%;
-    margin-left: 24px;
+    margin-top: 85%;
+}
+
+button.bell {
+    max-height: 0;
+    padding: 0;
+    padding-left: 10%;
+}
+
+svg.bell:hover {
+    opacity: 0.7;
 }

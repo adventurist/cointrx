@@ -159,9 +159,9 @@ export default class TrxNav extends React.Component {
         this.state = {
             open: false,
             userMenuOpen: false,
-            notification: true,
+            notification: false,
             notificationMenuOpen: false,
-            messages: [{text: 'Important', url: '/trade?parameter=1'}],
+            messages: [],
             userData: props.user || {}
         };
     }
@@ -177,9 +177,7 @@ export default class TrxNav extends React.Component {
             this.setState({ userData: props.user })
         }
         if (props.notificationMessage) {
-            this.setState({ messages: [ ... this.state.messages, props.notificationMessage ] }, () => {
-                console.log(this.state)
-            })
+            this.setState({ messages: [ ... this.state.messages, props.notificationMessage ], notification: true })
         }
     }
 
@@ -192,7 +190,6 @@ export default class TrxNav extends React.Component {
     }
 
     handleNotificationMenuClick = () => {
-        console.log('Click')
         this.setState({ notificationMenuOpen: !this.state.notificationMenuOpen })
     }
 
@@ -220,7 +217,7 @@ export default class TrxNav extends React.Component {
             <IconButton className='bell' onClick={this.handleNotificationMenuClick}> {
                 this.state.notification ?
                     <BellIcon style={styles.bell}></BellIcon> :
-                    <EmptyBellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}> <NotificationMenu className='notification-menu' messages={this.state.messages} open={this.state.notificationMenuOpen} /></EmptyBellIcon>
+                    <EmptyBellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}></EmptyBellIcon>
             }
             </IconButton>
             <IconButton className="user-menu-iconbutton" onClick={this.handleUserMenuClick}>
