@@ -71886,8 +71886,9 @@ function (_React$Component) {
       });
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleNotificationMenuClick", function () {
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleNotificationMenuClick", function (e) {
       _this.setState({
+        notificationAnchor: e.currentTarget,
         notificationMenuOpen: !_this.state.notificationMenuOpen
       });
     });
@@ -71904,7 +71905,8 @@ function (_React$Component) {
       notification: false,
       notificationMenuOpen: false,
       messages: [],
-      userData: props.user || {}
+      userData: props.user || {},
+      notifcationAnchor: undefined
     };
     return _this;
   }
@@ -71963,6 +71965,7 @@ function (_React$Component) {
         user: this.state.userData
       }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(NotificationMenu, {
         className: "notification-menu",
+        anchor: this.state.notificationAnchor,
         messages: this.state.messages,
         open: this.state.notificationMenuOpen,
         closeHandler: this.handleNotificationMenuClose
@@ -72054,7 +72057,8 @@ function (_React$Component2) {
       messages: props.messages || [{
         label: 'test',
         url: 'test'
-      }]
+      }],
+      anchorEl: props.anchor || undefined
     };
     return _this3;
   }
@@ -72075,6 +72079,12 @@ function (_React$Component2) {
           messages: props.messages
         });
       }
+
+      if (props.anchor) {
+        this.setState({
+          anchorEl: props.anchor
+        });
+      }
     }
   }, {
     key: "render",
@@ -72082,20 +72092,31 @@ function (_React$Component2) {
       var _this4 = this;
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Menu___default.a, {
-        className: "notification-menu",
+        anchorEl: this.state.anchorEl,
         anchorOrigin: {
           horizontal: 'right',
           vertical: 'top'
         },
         open: this.state.open,
-        onClose: this.handleClose
+        onClose: this.handleClose,
+        PaperProps: {
+          style: {
+            top: '16px',
+            left: '0.666%',
+            width: '100%',
+            height: '80%'
+          }
+        }
       }, this.state.messages.map(function (message, i) {
         return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_8__material_ui_core_MenuItem___default.a, {
+          className: "notification-item-wrap",
           key: i,
           onClick: function onClick() {
             return _this4.handleNotificationClick(i);
           }
-        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default.a, {
+        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card___default.a, {
+          className: "notification-item"
+        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default.a, {
           color: "textSecondary",
           gutterBottom: true
         }, message.text))));
