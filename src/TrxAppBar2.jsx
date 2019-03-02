@@ -162,7 +162,8 @@ export default class TrxNav extends React.Component {
             notification: false,
             notificationMenuOpen: false,
             messages: [],
-            userData: props.user || {}
+            userData: props.user || {},
+            notifcationAnchor: undefined
         };
     }
 
@@ -189,8 +190,8 @@ export default class TrxNav extends React.Component {
         this.setState({ userMenuOpen: false })
     }
 
-    handleNotificationMenuClick = () => {
-        this.setState({ notificationMenuOpen: !this.state.notificationMenuOpen })
+    handleNotificationMenuClick = e => {
+        this.setState({ notificationAnchor: e.currentTarget, notificationMenuOpen: !this.state.notificationMenuOpen })
     }
 
     handleNotificationMenuClose = () => {
@@ -213,7 +214,7 @@ export default class TrxNav extends React.Component {
         </IconButton>
         <div style={styles.userMenu}>
         <UserInfo style={styles.userInfo} user={this.state.userData} ></UserInfo>
-        <NotificationMenu className='notification-menu' messages={this.state.messages} open={this.state.notificationMenuOpen} closeHandler={this.handleNotificationMenuClose} />
+        <NotificationMenu className='notification-menu' anchor={this.state.notificationAnchor} messages={this.state.messages} open={this.state.notificationMenuOpen} closeHandler={this.handleNotificationMenuClose} />
             <IconButton className='bell' onClick={this.handleNotificationMenuClick}> {
                 this.state.notification ?
                     <BellIcon style={styles.bell}></BellIcon> :
@@ -259,7 +260,8 @@ class NotificationMenu extends React.Component {
         super(props)
         this.state = {
             open: props.open,
-            messages: props.messages || [{label: 'test', url: 'test'}]
+            messages: props.messages || [{label: 'test', url: 'test'}],
+            anchorEl: props.anchor || undefined
         }
     }
 
@@ -283,19 +285,25 @@ class NotificationMenu extends React.Component {
         if (props.messages) {
             this.setState({ messages: props.messages })
         }
+        if (props.anchor) {
+            this.setState( { anchorEl: props.anchor })
+        }
     }
 
     render () {
         return (
-    <Menu className='notification-menu' anchorOrigin={{horizontal: 'right', vertical: 'top'}} open={this.state.open} onClose={this.handleClose}>
+    <Menu anchorEl={this.state.anchorEl}  anchorOrigin={{horizontal: 'right', vertical: 'top'}} open={this.state.open} onClose={this.handleClose}PaperProps={{
+        style: {
+            top: '16px',
+            left: '0.666%',
+            width: '100%',
+            height: '80%'
+        }}}
+        >
                 {this.state.messages.map((message, i) => (
-                    <MenuItem key={i} onClick={() => this.handleNotificationClick(i)}>
-                    <Card>
+                    <MenuItem className='notification-item-wrap' key={i} onClick={() => this.handleNotificationClick(i)}>
+                    <Card className='notification-item'>
                         <CardContent>
-                            {/* {message.url ? */}
-                            {/* (<Link href={message.url}><Typography color="textSecondary" gutterBottom>
-                                {message.text}
-                            </Typography></Link>) : */}
                             <Typography color="textSecondary" gutterBottom>
                                 {message.text}
                             </Typography>
