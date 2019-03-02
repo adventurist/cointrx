@@ -26,17 +26,21 @@ class MainApplication extends Component {
   constructor (props) {
     super(props)
    this.state = {
-     user: undefined
+     user: undefined,
+     lastMessage: undefined
    }
   }
 
+  notificationMessageHandler = message => {
+    this.setState({ lastMessage: message })
+  }
   userHandler = user => { this.setState({ user: user }) }
 
   render () {
     return (
       <div id='container' style={styles.main}>
-        <TrxNavigation user={this.state.user}/>
-        <App userHandler={this.userHandler} />
+        <TrxNavigation notificationMessage={this.state.lastMessage} user={this.state.user}/>
+        <App notificationHandler={this.notificationMessageHandler} userHandler={this.userHandler} />
     </div>
     )
   }

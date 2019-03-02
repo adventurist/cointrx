@@ -161,7 +161,7 @@ export default class TrxNav extends React.Component {
             userMenuOpen: false,
             notification: true,
             notificationMenuOpen: false,
-            messages: [{label: 'Important', url: '/nowhere'}],
+            messages: [{text: 'Important', url: '/trade?parameter=1'}],
             userData: props.user || {}
         };
     }
@@ -176,6 +176,11 @@ export default class TrxNav extends React.Component {
         if (props.user) {
             this.setState({ userData: props.user })
         }
+        if (props.notificationMessage) {
+            this.setState({ messages: [ ... this.state.messages, props.notificationMessage ] }, () => {
+                console.log(this.state)
+            })
+        }
     }
 
     handleUserMenuClick = () => {
@@ -187,7 +192,12 @@ export default class TrxNav extends React.Component {
     }
 
     handleNotificationMenuClick = () => {
+        console.log('Click')
         this.setState({ notificationMenuOpen: !this.state.notificationMenuOpen })
+    }
+
+    handleNotificationMenuClose = () => {
+        this.setState({ notificationMenuOpen: false})
     }
 
     render() {
@@ -206,11 +216,13 @@ export default class TrxNav extends React.Component {
         </IconButton>
         <div style={styles.userMenu}>
         <UserInfo style={styles.userInfo} user={this.state.userData} ></UserInfo>
-            {
+        <NotificationMenu className='notification-menu' messages={this.state.messages} open={this.state.notificationMenuOpen} closeHandler={this.handleNotificationMenuClose} />
+            <IconButton className='bell' onClick={this.handleNotificationMenuClick}> {
                 this.state.notification ?
-                    <BellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}> <NotificationMenu messages={this.state.messages} open={this.state.notificationMenuOpen} /> </BellIcon> :
-                    <EmptyBellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}> <NotificationMenu messages={this.state.messages} open={this.state.notificationMenuOpen} /></EmptyBellIcon>
+                    <BellIcon style={styles.bell}></BellIcon> :
+                    <EmptyBellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}> <NotificationMenu className='notification-menu' messages={this.state.messages} open={this.state.notificationMenuOpen} /></EmptyBellIcon>
             }
+            </IconButton>
             <IconButton className="user-menu-iconbutton" onClick={this.handleUserMenuClick}>
                         <MoreVertIcon />
             </IconButton>
@@ -249,26 +261,50 @@ class NotificationMenu extends React.Component {
     constructor (props) {
         super(props)
         this.state = {
-            open: props.open || false,
-            messages: props.messages || []
+            open: props.open,
+            messages: props.messages || [{label: 'test', url: 'test'}]
         }
     }
 
     handleClose = () => {
+        this.props.closeHandler()
         this.setState({ open: false })
+    }
+
+    handleNotificationClick = i => {
+        const message = this.state.messages[i]
+        if (message.handler) {
+            message.handler()
+        }
+    }
+
+    componentWillReceiveProps (props) {
+        console.log('NOTIFICATIONMENU', props)
+        if (props.open) {
+            this.setState({ open: props.open })
+        }
+        if (props.messages) {
+            this.setState({ messages: props.messages })
+        }
     }
 
     render () {
         return (
-            <Menu open={this.state.open} onClose={this.handleClose} PaperProps={{
-                style: {
-                    maxHeight: 48 * 4.5,
-                    width: 200
-                }}}>
-                {this.state.messages.map(option => (
-                    <MenuItem key={option.label} onClick={this.handleClose}>
-                        <Link href={option.url}>{option.label}</Link>
-                    </MenuItem>
+    <Menu className='notification-menu' anchorOrigin={{horizontal: 'right', vertical: 'top'}} open={this.state.open} onClose={this.handleClose}>
+                {this.state.messages.map((message, i) => (
+                    <MenuItem key={i} onClick={() => this.handleNotificationClick(i)}>
+                    <Card>
+                        <CardContent>
+                            {/* {message.url ? */}
+                            {/* (<Link href={message.url}><Typography color="textSecondary" gutterBottom>
+                                {message.text}
+                            </Typography></Link>) : */}
+                            <Typography color="textSecondary" gutterBottom>
+                                {message.text}
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                     </MenuItem>
                 ))}
             </Menu>
         )
@@ -307,6 +343,20 @@ class UserInfo extends React.Component {
                 </CardContent>
             </Card>
             </div>
+        )
+    }
+}
+
+class NotificationMessage extends React.Component {
+    render () {
+        return (
+            <Card>
+                <CardContent>
+                    <Typography>
+                        {this.props.message}
+                    </Typography>
+                </CardContent>
+            </Card>
         )
     }
 }

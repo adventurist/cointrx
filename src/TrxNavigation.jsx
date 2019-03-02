@@ -14,7 +14,7 @@ export default class TrxNavigation extends Component {
   render () {
     return (
       <div>
-        <TrxAppBar user={this.props.user} drawerHandler={this.drawerHandler} />
+        <TrxAppBar notificationMessage={this.props.notificationMessage} user={this.props.user} drawerHandler={this.drawerHandler} />
         <TrxDrawer drawerHandler={this.drawerHandler} open={this.state.open} />
       </div>
     )

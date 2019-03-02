@@ -424,6 +424,41 @@ export class TradeGrid extends React.Component {
     }
 }
 
+export class Summary extends React.Component {
+    constructor (props) {
+        super(props)
+        this.state = {
+
+        }
+    }
+
+    render () {
+        return (
+            <SummaryGrid data={this.props.data} />
+        )
+    }
+}
+
+export class BaseGrid extends React.Component {
+    constructor (props) {
+        super(props)
+        this.columns = BaseGrid.buildColumns(props.columns)
+    }
+
+    createRows = () => {
+        if (this.state.data) {
+            this._rows = this.state.data.map(x => BaseGrid.buildRows(x))
+        }
+    }
+    // keys, names
+    // columns { object with key and name}
+    // rowBuilder function
+
+
+
+
+}
+
 export class SummaryGrid extends React.Component {
     constructor(props, context) {
         super(props, context)

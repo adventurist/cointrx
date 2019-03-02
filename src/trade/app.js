@@ -15,7 +15,7 @@ import Typography from '@material-ui/core/Typography'
 import TrxChart from './chart/TrxChart'
 
 /* Form */
-import { OfferForm, BidForm, SummaryGrid, TrxGrid, TradeGrid } from './TradeForm'
+import { OfferForm, BidForm, Summary, TrxGrid, TradeGrid } from './TradeForm'
 
 /* TradeDialog component */
 import TradeDialog from './components/TradeDialog'
@@ -110,7 +110,8 @@ export default class App extends Component {
       tradeGrid: true,
       bidForm: true,
       offerForm: true,
-      chart: true
+      chart: true,
+      tradeDialogOpen: false
     }
   }
 
@@ -124,6 +125,15 @@ export default class App extends Component {
     document.querySelector('.console-out').focus()
     if (this.props.userHandler) {
       this.props.userHandler(userDataObject)
+    }
+    if (tradeManager.numOfAvailableTrades() > 0) {
+      this.notificationMessage( { text: 'Trades available', url: '/trade?showTrades=1', handler: this.dialogHandler })
+    }
+  }
+
+  notificationMessage = message => {
+    if (this.props.notificationHandler) {
+      this.props.notificationHandler(message)
     }
   }
 
@@ -147,6 +157,10 @@ export default class App extends Component {
     })
   }
 
+  dialogHandler = () => {
+    this.setState({ tradeDialogOpen: true })
+  }
+
   tradeManyHandler = () => {
     trades = tradeManager.getMatched()
     while (userDataObject.balance > 0 && tradeManager.numOfAvailableTrades()) {
@@ -157,9 +171,9 @@ export default class App extends Component {
     }
   }
 
-  // handleCollapse = component => {
-  //   log.info(component)
-  // }
+  tradeDialogCloseHandler = () => {
+    this.setState({ tradeDialogOpen: false })
+  }
   handleCollapse = (component) => {
     this.setState({
       [component]: !this.state[component]
@@ -182,7 +196,7 @@ export default class App extends Component {
 
     <div id="main-wrap" >
     <Console message={this.state.lastMessage}/>
-      <TradeDialog tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} trades={this.state.trades} bids={tradeManager.getMatched()}/>
+      <TradeDialog open={this.state.tradeDialogOpen} closeHandler={this.tradeDialogCloseHandler} tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} trades={this.state.trades} bids={tradeManager.getMatched()}/>
       <Grid container spacing={8} style={styles.root}>
         <Grid style={styles.gridChild} item xs={8} sm={4}>
           <ExpansionPanel style={styles.expand} defaultExpanded={true}>
@@ -229,7 +243,7 @@ export default class App extends Component {
               <Typography>Summary</Typography>
             </ExpansionPanelSummary>
           <ExpansionPanelDetails>
-            <Paper className="trxToolWrap" elevation={4}><SummaryGrid style={styles.trxTool} data={this.state.completedTrades} /></Paper>
+            <Paper className="trxToolWrap" elevation={4}><Summary style={styles.trxTool} data={this.state.completedTrades} /></Paper>
             </ExpansionPanelDetails>
           </ExpansionPanel>
         </Grid>

@@ -43,7 +43,7 @@ export default class TradeDialog extends Component {
     super(props)
     console.log(props)
     this.state = {
-      open: true,
+      open: props.open,
       bids: props.bids,
       trades: props.trades,
       selectedTrades: undefined
@@ -64,9 +64,13 @@ export default class TradeDialog extends Component {
         selectedTrades: props.trades.length === this.state.trades.length ? this.state.selectedTrades : []
       })
     }
+    if (props.open) {
+      this.setState({ open: props.open })
+    }
   }
 
   handleClose = () => {
+    this.props.closeHandler()
     this.setState({ open: false })
   }
 
