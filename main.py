@@ -119,6 +119,14 @@ class TrxRequestHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
+    def compute_user_from_cookie(self):
+        cookie = self.get_secure_cookie('session_info', None)
+        trx_cookie = self.get_secure_cookie('trx_cookie', None)
+        if cookie and trx_cookie:
+            return json.loads(base64.b64decode(
+                cookie.decode('utf-8').replace(trx_cookie.decode('utf-8'), '')
+            ).decode('utf-8'))
+
 
 class MainHandler(TrxRequestHandler):
     def get(self):
@@ -205,7 +213,6 @@ class LoginHandler(TrxRequestHandler):
         if content_type == 'application/json':
             # auth_name, auth_pass = check_basic_auth(basic_auth)
             decoded_body = escape.json_decode(self.request.body)
-            iterables = decoded_body.items()
             email, name, password = retrieve_json_login_credentials(json.loads(str(self.request.body, 'utf-8')))
 
             if name is None or password is None:
@@ -246,9 +253,13 @@ class LoginHandler(TrxRequestHandler):
                 user_verified = db.check_auth_by_name(name, password)
                 if user_verified is not None and user_verified is not -1:
                     csrf = user_verified.generate_auth_token(expiration=1200)
-                    application.create_session(user={'name': name, 'pass': password, 'id': user_verified.id},
-                                               csrf=csrf)
-                    self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                    user_info = {
+                        'name': name, 'pass': password, 'id': user_verified.id
+                    }
+                    trx_cookie = session.Session.generate_cookie()
+                    application.create_session(user=user_info, csrf=csrf)
+                    self.set_secure_cookie(name="trx_cookie", value=trx_cookie)
+                    self.set_secure_cookie(name="session_info", value=trx_cookie + base64.b64encode(json.dumps(user_info).encode()))
                     self.set_cookie(name='csrf', value=csrf)
                     self.set_cookie(name='refresh', value=user_verified.generate_refresh_token())
                     self.set_cookie(name='username', value=user_verified.name)
@@ -705,8 +716,8 @@ class UserProfileHandler(TrxRequestHandler):
             self.redirect('/login')
 
 
-async def retrieve_user_data():
-    user_data = await db.regtest_user_data(application.session.user['id'])
+async def retrieve_user_data(user):
+    user_data = await db.regtest_user_data(user['id'])
     prices = await db.latest_prices_async(user_data[0]['currency'])
     return user_data, prices
 
@@ -1209,8 +1220,9 @@ class TRXTokenVerifyHandler(TrxRequestHandler):
 
 class TradeGuiHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
-        if check_attribute(application.session, 'user'):
-            user_data, prices = await retrieve_user_data()
+        user = self.compute_user_from_cookie()
+        if user:
+            user_data, prices = await retrieve_user_data(user)
             trade_data = await db.retrieve_trade_data()
             bids, offers = await db.get_bids(), await db.get_offers()
             self.render("templates/trade.html", title="TRX Trade Control", trx_prices=prices, user_data=user_data,
