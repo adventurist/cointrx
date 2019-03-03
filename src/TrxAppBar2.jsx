@@ -198,6 +198,10 @@ export default class TrxNav extends React.Component {
         this.setState({ notificationMenuOpen: false})
     }
 
+    handleAllNotificationsRead = () => {
+        this.setState({ notification: false })
+    }
+
     render() {
         return (
 <div>
@@ -214,11 +218,11 @@ export default class TrxNav extends React.Component {
         </IconButton>
         <div style={styles.userMenu}>
         <UserInfo style={styles.userInfo} user={this.state.userData} ></UserInfo>
-        <NotificationMenu className='notification-menu' anchor={this.state.notificationAnchor} messages={this.state.messages} open={this.state.notificationMenuOpen} closeHandler={this.handleNotificationMenuClose} />
+        <NotificationMenu className='notification-menu' anchor={this.state.notificationAnchor} messages={this.state.messages} open={this.state.notificationMenuOpen} closeHandler={this.handleNotificationMenuClose} notifyAllMessagesRead={this.handleAllNotificationsRead} />
             <IconButton className='bell' onClick={this.handleNotificationMenuClick}> {
                 this.state.notification ?
-                    <BellIcon style={styles.bell}></BellIcon> :
-                    <EmptyBellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}></EmptyBellIcon>
+                <EmptyBellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}></EmptyBellIcon> :
+                    <BellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}></BellIcon>
             }
             </IconButton>
             <IconButton className="user-menu-iconbutton" onClick={this.handleUserMenuClick}>
@@ -260,7 +264,7 @@ class NotificationMenu extends React.Component {
         super(props)
         this.state = {
             open: props.open,
-            messages: props.messages || [{label: 'test', url: 'test'}],
+            messages: props.messages.map(message => new NotificationMessage(message)) || [{label: 'test', url: 'test'}.map(message => new NotificationMessage(message))],
             anchorEl: props.anchor || undefined
         }
     }
@@ -272,9 +276,19 @@ class NotificationMenu extends React.Component {
 
     handleNotificationClick = i => {
         const message = this.state.messages[i]
+        message.read = true
         if (message.handler) {
             message.handler()
         }
+        this.setState({ messages: [ ...this.state.messages, message ]}, () => {
+            if (!this.state.messages.find(message => !message.read)) {
+                this.notifyAllMessagesRead()
+            }
+        })
+    }
+
+    notifyAllMessagesRead = () => {
+        this.props.notifyAllMessagesRead()
     }
 
     componentWillReceiveProps (props) {
@@ -295,8 +309,7 @@ class NotificationMenu extends React.Component {
     <Menu anchorEl={this.state.anchorEl}  anchorOrigin={{horizontal: 'right', vertical: 'top'}} open={this.state.open} onClose={this.handleClose}PaperProps={{
         style: {
             top: '16px',
-            left: '0.666%',
-            width: '100%',
+            width: '85%',
             height: '80%'
         }}}
         >
@@ -352,16 +365,25 @@ class UserInfo extends React.Component {
     }
 }
 
-class NotificationMessage extends React.Component {
-    render () {
-        return (
-            <Card>
-                <CardContent>
-                    <Typography>
-                        {this.props.message}
-                    </Typography>
-                </CardContent>
-            </Card>
-        )
+// class NotificationMessage extends React.Component {
+//     render () {
+//         return (
+//             <Card>
+//                 <CardContent>
+//                     <Typography>
+//                         {this.props.message}
+//                     </Typography>
+//                 </CardContent>
+//             </Card>
+//         )
+//     }
+// }
+
+export class NotificationMessage {
+    constructor (data) {
+        this.text = data.text || ''
+        this.handler = data.handler || undefined
+        this.read = false
+        this.url = data.url || undefined
     }
 }
