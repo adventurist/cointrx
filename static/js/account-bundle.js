@@ -77623,6 +77623,7 @@ function (_Component) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return TrxNav; });
+/* unused harmony export NotificationMessage */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__material_ui_core_AppBar__ = __webpack_require__(233);
@@ -77893,6 +77894,12 @@ function (_React$Component) {
       });
     });
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleAllNotificationsRead", function () {
+      _this.setState({
+        notification: false
+      });
+    });
+
     _this.state = {
       open: false,
       userMenuOpen: false,
@@ -77962,13 +77969,16 @@ function (_React$Component) {
         anchor: this.state.notificationAnchor,
         messages: this.state.messages,
         open: this.state.notificationMenuOpen,
-        closeHandler: this.handleNotificationMenuClose
+        closeHandler: this.handleNotificationMenuClose,
+        notifyAllMessagesRead: this.handleAllNotificationsRead
       }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: "bell",
         onClick: this.handleNotificationMenuClick
-      }, " ", this.state.notification ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(BellIcon, {
+      }, " ", this.state.notification ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(EmptyBellIcon, {
+        onClick: this.handleNotificationMenuClick,
+        className: "bell",
         style: styles.bell
-      }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(EmptyBellIcon, {
+      }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(BellIcon, {
         onClick: this.handleNotificationMenuClick,
         className: "bell",
         style: styles.bell
@@ -78040,18 +78050,37 @@ function (_React$Component2) {
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this3)), "handleNotificationClick", function (i) {
       var message = _this3.state.messages[i];
+      message.read = true;
 
       if (message.handler) {
         message.handler();
       }
+
+      _this3.setState({
+        messages: _toConsumableArray(_this3.state.messages).concat([message])
+      }, function () {
+        if (!_this3.state.messages.find(function (message) {
+          return !message.read;
+        })) {
+          _this3.notifyAllMessagesRead();
+        }
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this3)), "notifyAllMessagesRead", function () {
+      _this3.props.notifyAllMessagesRead();
     });
 
     _this3.state = {
       open: props.open,
-      messages: props.messages || [{
+      messages: props.messages.map(function (message) {
+        return new NotificationMessage(message);
+      }) || [{
         label: 'test',
         url: 'test'
-      }],
+      }.map(function (message) {
+        return new NotificationMessage(message);
+      })],
       anchorEl: props.anchor || undefined
     };
     return _this3;
@@ -78096,8 +78125,7 @@ function (_React$Component2) {
         PaperProps: {
           style: {
             top: '16px',
-            left: '0.666%',
-            width: '100%',
+            width: '85%',
             height: '80%'
           }
         }
@@ -78174,28 +78202,29 @@ function (_React$Component3) {
   }]);
 
   return UserInfo;
-}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
+}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component); // class NotificationMessage extends React.Component {
+//     render () {
+//         return (
+//             <Card>
+//                 <CardContent>
+//                     <Typography>
+//                         {this.props.message}
+//                     </Typography>
+//                 </CardContent>
+//             </Card>
+//         )
+//     }
+// }
 
-var NotificationMessage =
-/*#__PURE__*/
-function (_React$Component4) {
-  _inherits(NotificationMessage, _React$Component4);
 
-  function NotificationMessage() {
-    _classCallCheck(this, NotificationMessage);
+var NotificationMessage = function NotificationMessage(data) {
+  _classCallCheck(this, NotificationMessage);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(NotificationMessage).apply(this, arguments));
-  }
-
-  _createClass(NotificationMessage, [{
-    key: "render",
-    value: function render() {
-      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default.a, null, this.props.message)));
-    }
-  }]);
-
-  return NotificationMessage;
-}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
+  this.text = data.text || '';
+  this.handler = data.handler || undefined;
+  this.read = false;
+  this.url = data.url || undefined;
+};
 
 /***/ }),
 /* 896 */
