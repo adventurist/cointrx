@@ -77658,22 +77658,24 @@ function (_Component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__material_ui_icons_Inbox___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_15__material_ui_icons_Inbox__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__material_ui_icons_Mail__ = __webpack_require__(398);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__material_ui_icons_Mail___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_16__material_ui_icons_Mail__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Menu__ = __webpack_require__(921);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Menu___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Menu__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon__ = __webpack_require__(399);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card__ = __webpack_require__(243);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_CardActions__ = __webpack_require__(245);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_CardActions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_CardActions__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent__ = __webpack_require__(244);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_Button__ = __webpack_require__(79);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Button__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Close__ = __webpack_require__(885);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Close___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Close__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu__ = __webpack_require__(921);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_core_Icon__ = __webpack_require__(399);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_core_Icon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_19__material_ui_core_Icon__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_core_SvgIcon__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_core_SvgIcon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_SvgIcon__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_Card__ = __webpack_require__(243);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_Card__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardActions__ = __webpack_require__(245);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardActions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardActions__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_CardContent__ = __webpack_require__(244);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_CardContent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_CardContent__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Button__ = __webpack_require__(79);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Button__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_Typography__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_Typography__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
@@ -77703,6 +77705,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -77762,7 +77765,7 @@ var TRXLogo = function TRXLogo() {
 };
 
 var BellIcon = function BellIcon() {
-  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon___default.a, {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_SvgIcon___default.a, {
     className: "bell"
   }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("svg", {
     style: {
@@ -77777,7 +77780,7 @@ var BellIcon = function BellIcon() {
 };
 
 var EmptyBellIcon = function EmptyBellIcon() {
-  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_19__material_ui_core_SvgIcon___default.a, {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_SvgIcon___default.a, {
     className: "bell"
   }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("svg", {
     style: {
@@ -77953,7 +77956,7 @@ function (_React$Component) {
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: classes.menuBotton,
         onClick: this.props.drawerHandler
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Menu___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu___default.a, {
         className: classes.menuIcon
       })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: classes.logoButton
@@ -78022,7 +78025,7 @@ function (_React$Component) {
 
 
 var logoIcon = function logoIcon() {
-  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_18__material_ui_core_Icon___default.a, {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_19__material_ui_core_Icon___default.a, {
     className: classes.logoIcon,
     hidden: false
   }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TRXLogo, null));
@@ -78129,16 +78132,22 @@ function (_React$Component2) {
             height: '80%'
           }
         }
-      }, this.state.messages.map(function (message, i) {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Button___default.a, {
+        onClick: this.handleClose,
+        style: {
+          float: 'right'
+        },
+        size: "small"
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Close___default.a, null)), this.state.messages.map(function (message, i) {
         return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_8__material_ui_core_MenuItem___default.a, {
           className: "notification-item-wrap",
           key: i,
           onClick: function onClick() {
             return _this4.handleNotificationClick(i);
           }
-        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card___default.a, {
+        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_Card___default.a, {
           className: "notification-item"
-        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default.a, {
+        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_Typography___default.a, {
           color: "textSecondary",
           gutterBottom: true
         }, message.text))));
@@ -78187,14 +78196,14 @@ function (_React$Component3) {
       var style = {
         fontSize: '9pt'
       };
-      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_Card___default.a, {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_Card___default.a, {
         style: {
           maxHeight: '64px'
         }
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_Typography___default.a, {
         style: style,
         color: "textSecondary"
-      }, "Welcome, ", this.state.user.name), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Typography___default.a, {
+      }, "Welcome, ", this.state.user.name), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_Typography___default.a, {
         style: style,
         color: "textSecondary"
       }, this.state.user.balance, " BTC / ", this.state.user.estimated, " ", this.state.user.currency))));

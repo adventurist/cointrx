@@ -49,6 +49,7 @@ svg.bell:hover {
 .notification-item-wrap {
     border: 1px solid black;
     height: 100%!important;
+    width: 100%!important;
 }
 
 .notification-item {
