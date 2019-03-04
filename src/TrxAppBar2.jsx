@@ -18,6 +18,7 @@ import ListItemText from '@material-ui/core/ListItemText'
 
 import InboxIcon from '@material-ui/icons/Inbox'
 import MailIcon from '@material-ui/icons/Mail'
+import CloseIcon from '@material-ui/icons/Close'
 import MenuIcon from '@material-ui/icons/Menu'
 import BasicIcon from '@material-ui/core/Icon'
 import SvgIcon from '@material-ui/core/SvgIcon'
@@ -313,6 +314,9 @@ class NotificationMenu extends React.Component {
             height: '80%'
         }}}
         >
+        <Button onClick={this.handleClose} style={{float: 'right'}}size='small'>
+            <CloseIcon />
+        </Button>
                 {this.state.messages.map((message, i) => (
                     <MenuItem className='notification-item-wrap' key={i} onClick={() => this.handleNotificationClick(i)}>
                     <Card className='notification-item'>
