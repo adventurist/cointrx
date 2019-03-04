@@ -233,12 +233,7 @@ export default class App extends Component {
             <Paper className="trxToolWrap" elevation={4}><BidForm balance={userDataObject.balance} msgHandler={this.messageHandler} uid={userDataObject.id} style={styles.trxTool}/></Paper>
             </ExpansionPanelDetails>
           </ExpansionPanel>
-        </Grid>
-        <Grid style={styles.gridChild}  item xs={12} sm={8} id={ids.tradeRight}>
-          <Paper elevation={4}>
-            <TrxChart style={styles.trxTool}/>
-          </Paper>
-          <ExpansionPanel style={styles.expand} defaultExpanded={true}>
+          <ExpansionPanel style={styles.expand} defaultExpanded={false}>
             <ExpansionPanelSummary className={classes.expand} expandIcon={<ExpandMoreIcon />}>
               <Typography>Summary</Typography>
             </ExpansionPanelSummary>
@@ -246,6 +241,11 @@ export default class App extends Component {
             <Paper className="trxToolWrap" elevation={4}><Summary style={styles.trxTool} data={this.state.completedTrades} /></Paper>
             </ExpansionPanelDetails>
           </ExpansionPanel>
+        </Grid>
+        <Grid style={styles.gridChild}  item xs={12} sm={8} id={ids.tradeRight}>
+          <Paper elevation={4}>
+            <TrxChart style={styles.trxTool}/>
+          </Paper>
         </Grid>
       </Grid>
     </div>

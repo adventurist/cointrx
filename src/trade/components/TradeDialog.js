@@ -102,12 +102,12 @@ export default class TradeDialog extends Component {
           fullWidth={true}
           maxWidth={false}
           >
-          <DialogTitle>Trade</DialogTitle>
+          <DialogTitle>Available Trades</DialogTitle>
             <DialogContent>
               <DialogContentText>
               </DialogContentText>
               <DialogContentText>
-                <h3>Do you accept?</h3>
+                <h3>Select trades to be accepted</h3>
               </DialogContentText>
             </DialogContent>
             <DialogContent>
@@ -116,22 +116,13 @@ export default class TradeDialog extends Component {
             <DialogActions>
               <IconButton color='primary'
               onClick={this.handleTrade}>
-                Trade
+                Accept
                 <DoneIcon />
               </IconButton>
-            </DialogActions>
-            <DialogActions>
               <IconButton color='secondary'
                 onClick={this.handleClose}>
                 Close
                 <CancelIcon />
-              </IconButton>
-            </DialogActions>
-            <DialogActions>
-              <IconButton color='primary'
-                onClick={this.addMany}>
-                  Shazam
-                  <TestIcon />
               </IconButton>
             </DialogActions>
           </Dialog>

@@ -57,8 +57,9 @@ const styles = {
         paddingLeft: '4px'
     },
     submitButton: {
-        padding: '12px',
+        padding: '8px',
         backgroundColor: '#64dd17',
+        color: '#000',
         marginLeft: '60%',
         minWidth: '64px!important',
         marginBottom: '8px'
@@ -145,7 +146,6 @@ export class OfferForm extends React.Component {
     render () {
         return (
             <div style={styles.container}>
-                <h3 style={{...styles.cleanHeader, ...styles.gridTitle}}>Offer</h3>
                 <form style={styles.trxForm} onSubmit={this.onSubmit}>
                     <TextField
                     className={classes.textField}
@@ -263,7 +263,6 @@ export class BidForm extends React.Component {
     render () {
         return (
             <div style={styles.container}>
-                <h3 style={{...styles.cleanHeader, ...styles.gridTitle}}>Bid</h3>
                 <form style={styles.trxForm} onSubmit={this.onSubmit}>
                     <TextField
                     className={classes.textField}
@@ -360,9 +359,6 @@ export class TrxGrid extends React.Component {
     render() {
         return  (
             <div>
-                <div style={styles.gridTitle}>
-                    <h3>Market</h3>
-                </div>
                 <ReactDataGrid
                     columns={this._columns}
                     rowGetter={this.rowGetter}
@@ -412,9 +408,6 @@ export class TradeGrid extends React.Component {
     render() {
         return  (
             <div>
-                <div style={styles.gridTitle}>
-                    <h3 >TRX Trades</h3>
-                </div>
                 <ReactDataGrid
                     columns={this._columns}
                     rowGetter={this.rowGetter}
@@ -511,9 +504,6 @@ export class SummaryGrid extends React.Component {
     render() {
         return  (
             <div>
-                <div style={styles.gridTitle}>
-                    <h3 >Your Summary</h3>
-                </div>
                 <ReactDataGrid
                     columns={this._columns}
                     rowGetter={this.rowGetter}
