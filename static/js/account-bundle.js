@@ -77680,6 +77680,8 @@ function (_Component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography__ = __webpack_require__(47);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip__ = __webpack_require__(1089);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
@@ -77709,6 +77711,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -77944,12 +77947,14 @@ function (_React$Component) {
         disableGutters: !this.state.open,
         className: "toolbar",
         title: "Coin TRX"
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
+        title: "Click to open the navigation drawer"
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: classes.menuBotton,
         onClick: this.props.drawerHandler
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu___default.a, {
         className: classes.menuIcon
-      })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
+      }))), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: classes.logoButton
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TRXLogo, {
         className: classes.logoIcon
@@ -77965,21 +77970,23 @@ function (_React$Component) {
         open: this.state.notificationMenuOpen,
         closeHandler: this.handleNotificationMenuClose,
         notifyAllMessagesRead: this.handleAllNotificationsRead
-      }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
+        title: this.state.notification ? 'You have unread notification messages' : 'You have no unread messages'
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: "bell",
         onClick: this.handleNotificationMenuClick
       }, " ", this.state.notification ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(BellIcon, {
-        onClick: this.handleNotificationMenuClick,
         className: "bell",
         style: styles.bell
       }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(EmptyBellIcon, {
-        onClick: this.handleNotificationMenuClick,
         className: "bell",
         style: styles.bell
-      })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
+      }))), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
+        title: "User menu"
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: "user-menu-iconbutton",
         onClick: this.handleUserMenuClick
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_10__material_ui_icons_Person___default.a, null)), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Menu___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_10__material_ui_icons_Person___default.a, null))), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Menu___default.a, {
         open: this.state.userMenuOpen,
         onClose: this.handleUserMenuClose,
         PaperProps: {
@@ -78186,7 +78193,9 @@ function (_React$Component3) {
       var style = {
         fontSize: '9pt'
       };
-      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card___default.a, {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
+        title: "Balance summary"
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card___default.a, {
         style: {
           maxHeight: '64px'
         }
@@ -78196,7 +78205,7 @@ function (_React$Component3) {
       }, "Welcome, ", this.state.user.name), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default.a, {
         style: style,
         color: "textSecondary"
-      }, this.state.user.balance, " BTC / ", this.state.user.estimated, " ", this.state.user.currency))));
+      }, this.state.user.balance, " BTC / ", this.state.user.estimated, " ", this.state.user.currency)))));
     }
   }]);
 
