@@ -9,7 +9,7 @@ import IconMenu from 'material-ui/IconMenu'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import IconButton from '@material-ui/core/IconButton'
-import MoreVertIcon from '@material-ui/icons/MoreVert'
+import Person from '@material-ui/icons/Person'
 
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -20,6 +20,8 @@ import InboxIcon from '@material-ui/icons/Inbox'
 import MailIcon from '@material-ui/icons/Mail'
 import CloseIcon from '@material-ui/icons/Close'
 import MenuIcon from '@material-ui/icons/Menu'
+import Notifications from '@material-ui/icons/Notifications'
+import NotificationsActive from '@material-ui/icons/NotificationsActive'
 import BasicIcon from '@material-ui/core/Icon'
 import SvgIcon from '@material-ui/core/SvgIcon'
 
@@ -64,21 +66,13 @@ const TRXLogo = () => {
 }
 
 const BellIcon = () => {
-    return (<SvgIcon className='bell'>
-        <svg style={{width:'24px', height: '24px'}} viewBox="0 0 24 24">
-            <path fill="#000000" d="M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21" />
-        </svg>
-    </SvgIcon>
-)}
-
+    return (<NotificationsActive className='bell' />)
+}
 
 const EmptyBellIcon = () => {
-    return (<SvgIcon className='bell'>
-        <svg style={{width:'24px', height: '24px'}} viewBox="0 0 24 24">
-            <path fill="#000000" d="M16,17H7V10.5C7,8 9,6 11.5,6C14,6 16,8 16,10.5M18,16V10.5C18,7.43 15.86,4.86 13,4.18V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V4.18C7.13,4.86 5,7.43 5,10.5V16L3,18V19H20V18M11.5,22A2,2 0 0,0 13.5,20H9.5A2,2 0 0,0 11.5,22Z" />
-        </svg>
-    </SvgIcon>
-)}
+    return (<Notifications className='bell' />)
+}
+
 
 const menuItems = [
 {
@@ -129,6 +123,8 @@ const menuItems = [
 ]
 
 const userMenuItems = [
+    {   label: 'User Profile',
+        url: '/user'  },
     {   label: 'Logout',
         url: '/logout'  }
 ]
@@ -222,12 +218,12 @@ export default class TrxNav extends React.Component {
         <NotificationMenu className='notification-menu' anchor={this.state.notificationAnchor} messages={this.state.messages} open={this.state.notificationMenuOpen} closeHandler={this.handleNotificationMenuClose} notifyAllMessagesRead={this.handleAllNotificationsRead} />
             <IconButton className='bell' onClick={this.handleNotificationMenuClick}> {
                 this.state.notification ?
-                <EmptyBellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}></EmptyBellIcon> :
-                    <BellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}></BellIcon>
+                    <BellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}></BellIcon> :
+                <EmptyBellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}></EmptyBellIcon>
             }
             </IconButton>
             <IconButton className="user-menu-iconbutton" onClick={this.handleUserMenuClick}>
-                        <MoreVertIcon />
+                        <Person />
             </IconButton>
 
             <Menu open={this.state.userMenuOpen} onClose={this.handleUserMenuClose} PaperProps={{

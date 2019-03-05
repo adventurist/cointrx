@@ -71650,8 +71650,8 @@ function (_Component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__material_ui_core_MenuItem___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8__material_ui_core_MenuItem__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton__ = __webpack_require__(1021);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__material_ui_icons_MoreVert__ = __webpack_require__(1023);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__material_ui_icons_MoreVert___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10__material_ui_icons_MoreVert__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__material_ui_icons_Person__ = __webpack_require__(1054);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__material_ui_icons_Person___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10__material_ui_icons_Person__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__material_ui_core_List__ = __webpack_require__(270);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__material_ui_core_List___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_11__material_ui_core_List__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__material_ui_core_ListItem__ = __webpack_require__(271);
@@ -71668,20 +71668,24 @@ function (_Component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Close___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_17__material_ui_icons_Close__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu__ = __webpack_require__(1036);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_core_Icon__ = __webpack_require__(1037);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_core_Icon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_19__material_ui_core_Icon__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_core_SvgIcon__ = __webpack_require__(273);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_core_SvgIcon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_SvgIcon__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_Card__ = __webpack_require__(1039);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_Card__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardActions__ = __webpack_require__(1041);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardActions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_CardActions__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_CardContent__ = __webpack_require__(1044);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_CardContent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_CardContent__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Button__ = __webpack_require__(274);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Button__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_Typography__ = __webpack_require__(430);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_Typography__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_icons_Notifications__ = __webpack_require__(1127);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_icons_Notifications___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_19__material_ui_icons_Notifications__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_icons_NotificationsActive__ = __webpack_require__(1128);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_icons_NotificationsActive___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_20__material_ui_icons_NotificationsActive__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_Icon__ = __webpack_require__(1037);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_Icon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_Icon__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_SvgIcon__ = __webpack_require__(273);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_SvgIcon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_SvgIcon__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card__ = __webpack_require__(1039);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_CardActions__ = __webpack_require__(1041);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_CardActions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_CardActions__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent__ = __webpack_require__(1044);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button__ = __webpack_require__(274);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography__ = __webpack_require__(430);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
@@ -71711,6 +71715,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 
 
@@ -71771,33 +71777,15 @@ var TRXLogo = function TRXLogo() {
 };
 
 var BellIcon = function BellIcon() {
-  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_SvgIcon___default.a, {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_icons_NotificationsActive___default.a, {
     className: "bell"
-  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("svg", {
-    style: {
-      width: '24px',
-      height: '24px'
-    },
-    viewBox: "0 0 24 24"
-  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("path", {
-    fill: "#000000",
-    d: "M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21"
-  })));
+  });
 };
 
 var EmptyBellIcon = function EmptyBellIcon() {
-  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_core_SvgIcon___default.a, {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_19__material_ui_icons_Notifications___default.a, {
     className: "bell"
-  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("svg", {
-    style: {
-      width: '24px',
-      height: '24px'
-    },
-    viewBox: "0 0 24 24"
-  }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("path", {
-    fill: "#000000",
-    d: "M16,17H7V10.5C7,8 9,6 11.5,6C14,6 16,8 16,10.5M18,16V10.5C18,7.43 15.86,4.86 13,4.18V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V4.18C7.13,4.86 5,7.43 5,10.5V16L3,18V19H20V18M11.5,22A2,2 0 0,0 13.5,20H9.5A2,2 0 0,0 11.5,22Z"
-  })));
+  });
 };
 
 var menuItems = [{
@@ -71838,6 +71826,9 @@ var menuItems = [{
   icon: 'trending_up'
 }];
 var userMenuItems = [{
+  label: 'User Profile',
+  url: '/user'
+}, {
   label: 'Logout',
   url: '/logout'
 }];
@@ -71983,18 +71974,18 @@ function (_React$Component) {
       }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: "bell",
         onClick: this.handleNotificationMenuClick
-      }, " ", this.state.notification ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(EmptyBellIcon, {
+      }, " ", this.state.notification ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(BellIcon, {
         onClick: this.handleNotificationMenuClick,
         className: "bell",
         style: styles.bell
-      }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(BellIcon, {
+      }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(EmptyBellIcon, {
         onClick: this.handleNotificationMenuClick,
         className: "bell",
         style: styles.bell
       })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: "user-menu-iconbutton",
         onClick: this.handleUserMenuClick
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_10__material_ui_icons_MoreVert___default.a, null)), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Menu___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_10__material_ui_icons_Person___default.a, null)), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Menu___default.a, {
         open: this.state.userMenuOpen,
         onClose: this.handleUserMenuClose,
         PaperProps: {
@@ -72031,7 +72022,7 @@ function (_React$Component) {
 
 
 var logoIcon = function logoIcon() {
-  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_19__material_ui_core_Icon___default.a, {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_Icon___default.a, {
     className: classes.logoIcon,
     hidden: false
   }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TRXLogo, null));
@@ -72137,7 +72128,7 @@ function (_React$Component2) {
             height: '80%'
           }
         }
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Button___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button___default.a, {
         onClick: this.handleClose,
         style: {
           float: 'right'
@@ -72150,9 +72141,9 @@ function (_React$Component2) {
           onClick: function onClick() {
             return _this4.handleNotificationClick(i);
           }
-        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_Card___default.a, {
+        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card___default.a, {
           className: "notification-item"
-        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_Typography___default.a, {
+        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default.a, {
           color: "textSecondary",
           gutterBottom: true
         }, message.text))));
@@ -72201,14 +72192,14 @@ function (_React$Component3) {
       var style = {
         fontSize: '9pt'
       };
-      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_Card___default.a, {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card___default.a, {
         style: {
           maxHeight: '64px'
         }
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_Typography___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default.a, {
         style: style,
         color: "textSecondary"
-      }, "Welcome, ", this.state.user.name), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_Typography___default.a, {
+      }, "Welcome, ", this.state.user.name), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default.a, {
         style: style,
         color: "textSecondary"
       }, this.state.user.balance, " BTC / ", this.state.user.estimated, " ", this.state.user.currency))));
@@ -87816,33 +87807,7 @@ exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
-/* 1023 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _interopRequireDefault = __webpack_require__(4);
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireDefault(__webpack_require__(0));
-
-var _createSvgIcon = _interopRequireDefault(__webpack_require__(83));
-
-var _default = (0, _createSvgIcon.default)(_react.default.createElement(_react.default.Fragment, null, _react.default.createElement("path", {
-  fill: "none",
-  d: "M0 0h24v24H0z"
-}), _react.default.createElement("path", {
-  d: "M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-})), 'MoreVert');
-
-exports.default = _default;
-
-/***/ }),
+/* 1023 */,
 /* 1024 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -100808,6 +100773,57 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
     return defaultLogger;
 }));
 
+
+/***/ }),
+/* 1127 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(4);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(__webpack_require__(0));
+
+var _createSvgIcon = _interopRequireDefault(__webpack_require__(83));
+
+var _default = (0, _createSvgIcon.default)(_react.default.createElement(_react.default.Fragment, null, _react.default.createElement("path", {
+  d: "M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
+})), 'Notifications');
+
+exports.default = _default;
+
+/***/ }),
+/* 1128 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(4);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(__webpack_require__(0));
+
+var _createSvgIcon = _interopRequireDefault(__webpack_require__(83));
+
+var _default = (0, _createSvgIcon.default)(_react.default.createElement(_react.default.Fragment, null, _react.default.createElement("path", {
+  fill: "none",
+  d: "M0 0h24v24H0z"
+}), _react.default.createElement("path", {
+  d: "M7.58 4.08L6.15 2.65C3.75 4.48 2.17 7.3 2.03 10.5h2c.15-2.65 1.51-4.97 3.55-6.42zm12.39 6.42h2c-.15-3.2-1.73-6.02-4.12-7.85l-1.42 1.43c2.02 1.45 3.39 3.77 3.54 6.42zM18 11c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2v-5zm-6 11c.14 0 .27-.01.4-.04.65-.14 1.18-.58 1.44-1.18.1-.24.15-.5.15-.78h-4c.01 1.1.9 2 2.01 2z"
+})), 'NotificationsActive');
+
+exports.default = _default;
 
 /***/ })
 /******/ ]);
