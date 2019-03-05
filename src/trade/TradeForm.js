@@ -36,7 +36,7 @@ const styles = {
     trxForm: {
         outline: '1px solid #e7eaec',
         paddingTop: '4px',
-        backgroundColor: '#4a4a4a'
+        backgroundColor: 'rgb(51, 51, 51)'
     },
     cleanHeader: {
         marginBlockStart: 0,
@@ -420,14 +420,16 @@ export class TradeGrid extends React.Component {
 export class Summary extends React.Component {
     constructor (props) {
         super(props)
+        const { userParts } = props
         this.state = {
-
+            offers: userParts.offers,
+            bids: userParts.bids
         }
     }
 
     render () {
         return (
-            <SummaryGrid data={this.props.data} />
+            <SummaryGrid data={this.props.data} offers={this.state.offers} bids={this.state.bids} />
         )
     }
 }
@@ -446,69 +448,95 @@ export class BaseGrid extends React.Component {
     // keys, names
     // columns { object with key and name}
     // rowBuilder function
-
-
-
-
 }
 
 export class SummaryGrid extends React.Component {
     constructor(props, context) {
         super(props, context)
         this.state = {
-            data: props.data || []
+            data: props.data || [],
+            offers: props.offers || [],
+            bids: props.bids || []
         }
-        this.createRows()
-        this._columns = [
-            { key: 'cur', name: 'Currency' },
-            { key: 'sym', name: 'Symbol' },
-            { key: 'time', name: 'Time' },
-            { key: 'amt', name: 'Amount' },
-            { key: 'rate', name: 'Rate' },
-            { key: 'prc', name: 'Price' } ]
+        this._pendingRows = []
+        this.createTradeRows()
+        this._tradeColumns = [
+            { key: 'info', name: 'Info' },
+            { key: 'time', name: 'Time' }
+        ]
+        this._pendingColumns = [
+            { key: 'info', name: 'Info' },
+            { key: 'time', name: 'Time' }
+        ]
     }
 
     createRows = () => {
+        this.createTradeRows()
+        this.createPendingRows()
+    }
+
+    createTradeRows = () => {
         if (this.state.data) {
-            this._rows = this.state.data.map(x => SummaryGrid.buildRows(x))
+            this._tradeRows = this.state.data.map(x => SummaryGrid.buildTradeRows(x)) || []
         }
-    };
+    }
+
+    createPendingRows = () => {
+        if (this.state.offers && this.state.bids) {
+            this._pendingRows = [ ...this.state.offers, ...this.state.bids ].map(x => SummaryGrid.buildPendingRows(x)) ||[]
+        }
+    }
 
     componentWillReceiveProps (props) {
         if (props.data) {
+            console.log('Receiving props', props)
             this.setState({ data: props.data }, () => {
                 this.createRows()
             })
         }
     }
 
-    static buildRows(trade) {
-        console.log('building row', trade)
+    static buildTradeRows(trade) {
         // TODO: We need symbol in the trade object
         const symbol = '$'
+        const btcAmount = parseFloat(trade.offer.amount * trade.offer.rate / 100000000).toFixed(2)
         return {
-            'cur': trade.offer.currency,
-            'sym': symbol,
             'time': formatTimestamp(trade.time, true),
-            'amt': trade.offer.amount / 100000000 + ' BTC',
-            'rate': symbol + trade.offer.rate + '/BTC',
-            'prc': `${symbol}${parseFloat(trade.offer.amount * trade.offer.rate / 100000000).toFixed(2)}`
+            'info': `${trade.offer.amount} BTC (${symbol + btcAmount} ${trade.offer.currency})`
         }
-
     }
 
-    rowGetter = (i) => {
-        return this._rows[i];
+    static buildPendingRows(pending) {
+        // TODO: We need symbol in the trade object
+        const symbol = '$'
+        const btcAmount = parseFloat(pending.amount * pending.rate / 100000000).toFixed(2)
+        return {
+            'time': formatTimestamp(pending.time, true),
+            'info': `${pending.type}: ${pending.amount} BTC for (${symbol + btcAmount} ${pending.currency})`
+        }
+    }
+
+    tradeRowGetter = (i) => {
+        return this._tradeRows[i];
+    };
+
+    pendingRowGetter = (i) => {
+        return this._pendingRows[i];
     };
 
     render() {
         return  (
             <div>
                 <ReactDataGrid
-                    columns={this._columns}
-                    rowGetter={this.rowGetter}
-                    rowsCount={this._rows.length}
-                    minHeight={135}/>
+                    columns={this._tradeColumns}
+                    rowGetter={this.tradeRowGetter}
+                    rowsCount={this._tradeRows.length}
+                    minHeight={135} />
+                <ReactDataGrid
+                    columns={this._pendingColumns}
+                    rowGetter={this.pendingRowGetter}
+                    rowsCount={this._pendingRows ? this._pendingRows.length : 0}
+                    minHeight={135} />
             </div>)
     }
 }

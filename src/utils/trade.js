@@ -23,6 +23,10 @@ export default function TradeManager (user, pending = { bids: [], offers: [] }) 
   this.user = user
   this.matchedBids = []
   this.matchedOffers = []
+  this.userParts = {
+    bids: [],
+    offers: []
+  }
   this.candidates = []
 
   /**
@@ -43,6 +47,9 @@ export default function TradeManager (user, pending = { bids: [], offers: [] }) 
   this.parseBids = function () {
     this.bids.forEach(bid => {
       if (parseInt(bid.uid) === parseInt(user.id)) {
+        if (!this.userParts.bids.some(userBid => userBid.id === bid.id)) {
+          this.userParts.bids = [ ... this.userParts.bids, bid ]
+        }
         this.candidates = [
           ...this.candidates,
           ...this.offers.filter(offer =>
@@ -63,6 +70,9 @@ export default function TradeManager (user, pending = { bids: [], offers: [] }) 
   this.parseOffers = function () {
     this.offers.forEach(offer => {
       if (parseInt(offer.uid) === parseInt(user.id)) {
+        if (!this.userParts.offers.some(userOffer => userOffer.id === offer.id)) {
+          this.userParts.offers = [ ... this.userParts.offers, offer ]
+        }
         this.candidates = [
           ...this.candidates,
           ...this.bids.filter(bid =>
@@ -105,6 +115,13 @@ export default function TradeManager (user, pending = { bids: [], offers: [] }) 
    */
   this.getBidMatches = () => {
     return [ ... this.candidates.filter(candidate => candidate.type === TradeType.OFFER)]
+  }
+
+  /**
+   * @returns {Object<Array, Array>} All matched trade parts owned by the user (offers or bids)
+   */
+  this.getUserParts = () => {
+    return this.userParts
   }
 
   /**

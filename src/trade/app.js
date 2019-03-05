@@ -111,7 +111,9 @@ export default class App extends Component {
       bidForm: true,
       offerForm: true,
       chart: true,
-      tradeDialogOpen: false
+      tradeDialogOpen: false,
+      userParts: tradeManager.getUserParts()
+
     }
   }
 
@@ -122,7 +124,7 @@ export default class App extends Component {
     } else {
       this.log('No matched trades have been found')
     }
-    document.querySelector('.console-out').focus()
+
     if (this.props.userHandler) {
       this.props.userHandler(userDataObject)
     }
@@ -140,7 +142,6 @@ export default class App extends Component {
   tradeHandler = async trades => {
     this.log('Attempting trades')
     requestTrades(trades).then(async result => {
-      console.log()
       this.log(`${result.completed.length} trades completed..\n${result.failed.length} trades failed.`)
       // TODO: choose either one of removeTrades or replacing the trades outright
       tradeManager.removeTrades(result.completed)
@@ -238,7 +239,7 @@ export default class App extends Component {
               <Typography>Summary</Typography>
             </ExpansionPanelSummary>
           <ExpansionPanelDetails>
-            <Paper className="trxToolWrap" elevation={4}><Summary style={styles.trxTool} data={this.state.completedTrades} /></Paper>
+            <Paper className="trxToolWrap" elevation={4}><Summary style={styles.trxTool} data={this.state.completedTrades} userParts={this.state.userParts}/></Paper>
             </ExpansionPanelDetails>
           </ExpansionPanel>
         </Grid>

@@ -265,7 +265,7 @@ class NotificationMenu extends React.Component {
         super(props)
         this.state = {
             open: props.open,
-            messages: props.messages.map(message => new NotificationMessage(message)) || [{label: 'test', url: 'test'}.map(message => new NotificationMessage(message))],
+            messages: props.messages.map(message => new NotificationMessage(message)) || [{ label: 'No messages' }.map(message => new NotificationMessage(message))],
             anchorEl: props.anchor || undefined
         }
     }
@@ -310,7 +310,7 @@ class NotificationMenu extends React.Component {
     <Menu anchorEl={this.state.anchorEl}  anchorOrigin={{horizontal: 'right', vertical: 'top'}} open={this.state.open} onClose={this.handleClose}PaperProps={{
         style: {
             top: '16px',
-            width: '85%',
+            width: '50%',
             height: '80%'
         }}}
         >
