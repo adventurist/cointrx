@@ -30,6 +30,7 @@ import CardActions from '@material-ui/core/CardActions'
 import CardContent from '@material-ui/core/CardContent'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
+import Tooltip from '@material-ui/core/Tooltip'
 
 const classes = {
     menuButton: 'menu-button',
@@ -207,24 +208,29 @@ export default class TrxNav extends React.Component {
     className='appbar'
     position='static'>
     <Toolbar disableGutters={!this.state.open} className='toolbar' title='Coin TRX'>
-        <IconButton className={classes.menuBotton} onClick={this.props.drawerHandler}>
+        <Tooltip title='Click to open the navigation drawer'><IconButton className={classes.menuBotton} onClick={this.props.drawerHandler}>
             <MenuIcon className={classes.menuIcon} />
         </IconButton>
+        </Tooltip>
         <IconButton className={classes.logoButton}>
             <TRXLogo className={classes.logoIcon}/>
         </IconButton>
         <div style={styles.userMenu}>
-        <UserInfo style={styles.userInfo} user={this.state.userData} ></UserInfo>
+        <UserInfo style={styles.userInfo} user={this.state.userData} />
         <NotificationMenu className='notification-menu' anchor={this.state.notificationAnchor} messages={this.state.messages} open={this.state.notificationMenuOpen} closeHandler={this.handleNotificationMenuClose} notifyAllMessagesRead={this.handleAllNotificationsRead} />
+            <Tooltip title={this.state.notification ? 'You have unread notification messages' : 'You have no unread messages'} >
             <IconButton className='bell' onClick={this.handleNotificationMenuClick}> {
                 this.state.notification ?
-                    <BellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}></BellIcon> :
-                <EmptyBellIcon onClick={this.handleNotificationMenuClick} className='bell' style={styles.bell}></EmptyBellIcon>
+                    <BellIcon className='bell' style={styles.bell}></BellIcon> :
+                <EmptyBellIcon className='bell' style={styles.bell}></EmptyBellIcon>
             }
             </IconButton>
+            </Tooltip>
+            <Tooltip title='User menu'>
             <IconButton className="user-menu-iconbutton" onClick={this.handleUserMenuClick}>
                         <Person />
             </IconButton>
+            </Tooltip>
 
             <Menu open={this.state.userMenuOpen} onClose={this.handleUserMenuClose} PaperProps={{
             style: {
@@ -350,16 +356,18 @@ class UserInfo extends React.Component {
         }
         return (
             <div>
-            <Card style={{maxHeight: '64px'}}>
-                <CardContent>
-                    <Typography style={style} color="textSecondary" >
-                        Welcome, {this.state.user.name}
-                    </Typography>
-                    <Typography style={style} color="textSecondary" >
-                        {this.state.user.balance} BTC / {this.state.user.estimated} {this.state.user.currency}
-                    </Typography>
-                </CardContent>
-            </Card>
+            <Tooltip title='Balance summary'>
+                <Card style={{maxHeight: '64px'}}>
+                    <CardContent>
+                        <Typography style={style} color="textSecondary" >
+                            Welcome, {this.state.user.name}
+                        </Typography>
+                        <Typography style={style} color="textSecondary" >
+                            {this.state.user.balance} BTC / {this.state.user.estimated} {this.state.user.currency}
+                        </Typography>
+                    </CardContent>
+                </Card>
+            </Tooltip>
             </div>
         )
     }

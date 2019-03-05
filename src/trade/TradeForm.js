@@ -511,7 +511,7 @@ export class SummaryGrid extends React.Component {
         const symbol = '$'
         const btcAmount = parseFloat(pending.amount * pending.rate / 100000000).toFixed(2)
         return {
-            'time': formatTimestamp(pending.time, true),
+            'time': formatTimestamp(pending.end_date, true),
             'info': `${pending.type}: ${pending.amount} BTC for (${symbol + btcAmount} ${pending.currency})`
         }
     }
