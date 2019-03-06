@@ -124,7 +124,7 @@ export default class App extends Component {
                             <Face />
                         </Grid>
                         <Grid item md={true} sm={true} xs={true}>
-                            <TextField name='name' id="name" label="Username" type="text" onChange={this.handleName} fullWidth autoFocus required />
+                            <TextField name='name' id="name" label="Username" type="text" onChange={this.handleName} fullWidth autoFocus />
                         </Grid>
                     </Grid>
                     <Grid container spacing={8} alignItems="flex-end">
@@ -132,7 +132,7 @@ export default class App extends Component {
                             <Email />
                         </Grid>
                         <Grid item md={true} sm={true} xs={true}>
-                            <TextField name="email" id="email" label="Email" type="text" onChange={this.handleEmail} fullWidth autoFocus required />
+                            <TextField name="email" id="email" label="Email" type="text" onChange={this.handleEmail} fullWidth autoFocus />
                         </Grid>
                     </Grid>
                     <Grid container spacing={8} alignItems="flex-end">
