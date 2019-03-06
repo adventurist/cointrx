@@ -384,7 +384,7 @@ class RegisterHandler(TrxRequestHandler):
         req_type = self.request.headers.get("Content-Type")
         if req_type == 'application/x-www-form-urlencoded':
             name, password, email = self.get_body_argument('name'), self.get_body_argument(
-                'pass'), self.get_body_argument('email')
+                'password'), self.get_body_argument('email')
         elif req_type == 'application/json':
             body = json.loads(self.request.body.decode('utf-8'))
             name, password, email = body['name'], body['password'], body['email']
@@ -704,8 +704,9 @@ class UiReactHandler(TrxRequestHandler):
 
 class UserProfileHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
-        if check_attribute(application.session, 'user'):
-            user_data, prices = await retrieve_user_data()
+        user = self.compute_user_from_cookie()
+        if user:
+            user_data, prices = await retrieve_user_data(user)
             tx_url, blockgen_url, userbalance_url, btckeygen_url = retrieve_user_urls()
             self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
             self.render("templates/user.html", title="TRX USER PROFILE", keygen_url=btckeygen_url, tx_url=tx_url,
