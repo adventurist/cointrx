@@ -10,7 +10,7 @@ def retrieve_json_login_credentials(request_data):
 
 
 def retrieve_login_credentials(request_handler):
-    return request_handler.get_body_argument('name'), request_handler.get_body_argument('pass')
+    return request_handler.get_body_argument('name'), request_handler.get_body_argument('password')
 
 
 def retrieve_api_request_headers(headers):
