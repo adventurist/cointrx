@@ -4,7 +4,9 @@ const path = require('path');
 let config = {
     entry: {
         tx: path.resolve(__dirname, 'src/tx/main.jsx'),
-        trade: path.resolve(__dirname, 'src/trade/index.jsx')
+        trade: path.resolve(__dirname, 'src/trade/index.jsx'),
+        login: path.resolve(__dirname, 'src/login/index.js'),
+        register: path.resolve(__dirname, 'src/register/index.js')
     },
     output: {
         path: path.resolve(__dirname, 'static'),
