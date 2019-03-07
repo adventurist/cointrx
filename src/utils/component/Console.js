@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import { Component, createRef } from 'react'
 import TextField from '@material-ui/core/TextField'
 import { formatTimestamp } from '../../utils'
 
@@ -15,6 +15,7 @@ export default class Console extends Component {
 		this.state = {
 			consoleText: ''
 		}
+		this.logArea = createRef()
 	}
 
 	componentDidMount () {
@@ -22,10 +23,15 @@ export default class Console extends Component {
 			this.consoleOut(this.props.message)
 		}
 	}
+
 	componentWillReceiveProps (props) {
 		if (props.message) {
 			this.consoleOut(props.message)
 		}
+	}
+
+	componentDidUpdate() {
+    this.logArea.current.scrollTop = this.logArea.current.scrollHeight;
 	}
 
 	/**
@@ -57,6 +63,7 @@ export default class Console extends Component {
 			<TextField
 					multiline={true}
 					className='console-out'
+					inputRef={this.logArea}
 					rows={3}
 					rowsMax={3}
 					style={styles.console}

@@ -55,7 +55,8 @@ const styles = {
     userInfo: {
         flex: 1,
         minWidth: '80px',
-        maxHeight: '64px!important'
+        maxHeight: '64px!important',
+        marginRight: '17px'
     }
 }
 
@@ -161,7 +162,7 @@ export default class TrxNav extends React.Component {
             notificationMenuOpen: false,
             messages: [],
             userData: props.user || {},
-            notifcationAnchor: undefined
+            notificationAnchor: undefined
         };
     }
 
@@ -282,6 +283,7 @@ class NotificationMenu extends React.Component {
         message.read = true
         if (message.handler) {
             message.handler()
+            this.handleClose()
         }
         this.setState({ messages: [ ...this.state.messages, message ]}, () => {
             if (!this.state.messages.find(message => !message.read)) {
