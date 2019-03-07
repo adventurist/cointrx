@@ -175,6 +175,11 @@ export default class App extends Component {
   tradeDialogCloseHandler = () => {
     this.setState({ tradeDialogOpen: false })
   }
+
+  selectionUpdateHandler = selected => {
+    return tradeManager.getMatchedWithoutConflict(selected)
+  }
+
   handleCollapse = (component) => {
     this.setState({
       [component]: !this.state[component]
@@ -197,7 +202,7 @@ export default class App extends Component {
 
     <div id="main-wrap" >
     <Console message={this.state.lastMessage}/>
-      <TradeDialog open={this.state.tradeDialogOpen} closeHandler={this.tradeDialogCloseHandler} tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} trades={this.state.trades} bids={tradeManager.getMatched()}/>
+      <TradeDialog open={this.state.tradeDialogOpen} closeHandler={this.tradeDialogCloseHandler} tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} trades={this.state.trades} selectionUpdateHandler={this.selectionUpdateHandler} bids={tradeManager.getMatched()}/>
       <Grid container spacing={8} style={styles.root}>
         <Grid style={styles.gridChild} item xs={8} sm={4}>
           <ExpansionPanel style={styles.expand} defaultExpanded={true}>
