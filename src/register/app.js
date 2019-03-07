@@ -11,7 +11,6 @@ import Typography from '@material-ui/core/Typography'
 import { Paper, withStyles, Grid, TextField, Button, FormControlLabel, Checkbox } from '@material-ui/core'
 
 import { Email,Face, Fingerprint } from '@material-ui/icons'
-
 /* Request */
 import { request, handleResponse } from '../utils/index'
 /* Logging*/
@@ -165,3 +164,4 @@ export default class App extends Component {
       )
   }
 }
+
