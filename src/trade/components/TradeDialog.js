@@ -46,7 +46,8 @@ export default class TradeDialog extends Component {
       open: props.open,
       bids: props.bids,
       trades: props.trades,
-      selectedTrades: undefined
+      selectedTrades: undefined,
+      noConflictTrades: []
     }
 
     window.addEventListener('keyup', e => {
@@ -81,11 +82,23 @@ export default class TradeDialog extends Component {
 
   selectedTradesHandler = tradeItems => {
     const selectedTrades = []
-    tradeItems.forEach(tradeItem => selectedTrades.push(this.state.trades.find(trade => {
-      return parseInt(tradeItem.bid.id) === parseInt(trade.bid.id) && parseInt(tradeItem.offer.id) === parseInt(trade.offer.id)
-    })))
+    tradeItems.forEach(tradeItem => {
+      // If we have have selected some trades, then we need to make sure these additional selections are considered `noConflict` trades
+      // if (this.state.noConflictTrades && this.state.noConflictTrades.length > 0) {
+      //   if (!this.state.noConflictTrades.find(noConflictTrade => (noConflictTrade.bid.id === tradeItem.bid.id && noConflictTrade.offer.id === tradeItem.offer.id))) {
+      //     alert('Selecting this trade would create a conflict with your other selections')
+      //     return
+      //   }
+      // }
+      selectedTrades.push(this.state.trades.find(trade => {
+        return parseInt(tradeItem.bid.id) === parseInt(trade.bid.id) && parseInt(tradeItem.offer.id) === parseInt(trade.offer.id)
+      }))
+    }
+    )
     console.log(selectedTrades)
-    this.setState({ selectedTrades })
+    // this.setState({ selectedTrades }, () => {
+    //   this.setState({ noConflictTrades: this.props.selectionUpdateHandler(this.state.selectedTrades)})
+    // })
   }
 
   addMany = () => {
