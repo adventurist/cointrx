@@ -129,14 +129,6 @@ export default class App extends Component {
                     </Grid>
                     <Grid container spacing={8} alignItems="flex-end">
                         <Grid item>
-                            <Email />
-                        </Grid>
-                        <Grid item md={true} sm={true} xs={true}>
-                            <TextField name="email" id="email" label="Email" type="text" onChange={this.handleEmail} fullWidth autoFocus />
-                        </Grid>
-                    </Grid>
-                    <Grid container spacing={8} alignItems="flex-end">
-                        <Grid item>
                             <Fingerprint />
                         </Grid>
                         <Grid item md={true} sm={true} xs={true}>

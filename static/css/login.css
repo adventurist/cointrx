@@ -1,0 +1,10 @@
+#main-wrap {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+#main-wrap > div {
+  width: 35%;
+}
