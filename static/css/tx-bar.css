@@ -33,13 +33,10 @@
 svg.bell {
     background-color: #1ac41a;
     flex: 1;
-    margin-top: 85%;
 }
 
 button.bell {
-    max-height: 0;
-    padding: 0;
-    padding-left: 10%;
+    padding:0 16px 0 16px;
 }
 
 svg.bell:hover {
