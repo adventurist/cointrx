@@ -146,6 +146,17 @@ export default function TradeManager (user, pending = { bids: [], offers: [] }) 
   }
 
   /**
+   * @returns {Array<Trade>} An array of Trade objects which do not conflict with those provided as a parameter to this function
+   */
+  this.getMatchedWithoutConflict = selected => {
+    return [ ... this.getMatchedTrades().filter(matched =>
+      !selected.some(selectedTrade =>
+        matched.offer.id === selectedTrade.offer.id || matched.bid.id === selectedTrade.bid.id
+      )
+    )]
+  }
+
+  /**
    * @param {Object} tradeInfo
    * @param {string} tradeInfo.type The type of trade
    * @param {number|string} tradeInfo.id The id of the trade part to be removed from the TradeManager's state
