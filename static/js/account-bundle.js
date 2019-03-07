@@ -77782,7 +77782,8 @@ var styles = {
   userInfo: {
     flex: 1,
     minWidth: '80px',
-    maxHeight: '64px!important'
+    maxHeight: '64px!important',
+    marginRight: '17px'
   }
 };
 
@@ -77925,7 +77926,7 @@ function (_React$Component) {
       notificationMenuOpen: false,
       messages: [],
       userData: props.user || {},
-      notifcationAnchor: undefined
+      notificationAnchor: undefined
     };
     return _this;
   }
@@ -78076,6 +78077,8 @@ function (_React$Component2) {
 
       if (message.handler) {
         message.handler();
+
+        _this3.handleClose();
       }
 
       _this3.setState({
