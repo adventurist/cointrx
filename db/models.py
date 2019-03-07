@@ -225,6 +225,13 @@ class TRCHistory(Base):
     value = Column(DECIMAL(12, 2))
 
 
+class BotReservation(Base):
+    __tablename__ = 'bot_reservation'
+    id = Column(Integer, primary_key=True)
+    uid = Column(Integer, ForeignKey('users.id'))
+    time = Column(DateTime(timezone=False))
+
+
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)

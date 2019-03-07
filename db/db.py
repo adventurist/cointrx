@@ -331,6 +331,7 @@ def create_user(user, password, email):
 
 
 def check_auth_by_name(user, password):
+    #  Create fallback for checking password
     query_user = session.query(User).filter(User.name == user).first()
     if query_user is not None:
         if not User.verify_password_by_name(user, password):
