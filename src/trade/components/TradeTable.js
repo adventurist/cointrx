@@ -258,9 +258,10 @@ class EnhancedTable extends React.Component {
     }
 
     if (this.props.selectedTradesHandler) {
-      this.props.selectedTradesHandler(newSelected.map(idx => this.state.data.find(trade => trade.idx === idx)))
+      if (!this.props.selectedTradesHandler(newSelected.map(idx => this.state.data.find(trade => trade.idx === idx)))) {
+        return
+      }
     }
-
     this.setState({ selected: newSelected })
   }
 
@@ -275,14 +276,18 @@ class EnhancedTable extends React.Component {
   isSelected = id => this.state.selected.indexOf(id) !== -1
 
   render() {
-    const { classes } = this.props
+    const classes = {
+      root: 'trade-table-root',
+      tableWrapper: 'table-wrap',
+
+    }
     const { data, order, orderBy, selected, rowsPerPage, page } = this.state
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage)
 
     return (
       <Paper className={classes.root}>
         <EnhancedTableToolbar numSelected={selected.length} />
-        <div className={classes.tableWrapper}>
+        <div style={{width: '70%'}} className={classes.tableWrapper}>
           <Table className={classes.table} aria-labelledby="tableTitle">
             <EnhancedTableHead
               numSelected={selected.length}

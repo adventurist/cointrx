@@ -82,23 +82,38 @@ export default class TradeDialog extends Component {
 
   selectedTradesHandler = tradeItems => {
     const selectedTrades = []
+    let conflict = false
     tradeItems.forEach(tradeItem => {
+      if (conflict) {
+        return
+      }
       // If we have have selected some trades, then we need to make sure these additional selections are considered `noConflict` trades
-      // if (this.state.noConflictTrades && this.state.noConflictTrades.length > 0) {
-      //   if (!this.state.noConflictTrades.find(noConflictTrade => (noConflictTrade.bid.id === tradeItem.bid.id && noConflictTrade.offer.id === tradeItem.offer.id))) {
-      //     alert('Selecting this trade would create a conflict with your other selections')
-      //     return
-      //   }
-      // }
+      if (this.state.noConflictTrades && this.state.noConflictTrades.length > 0) {
+        if (!this.state.noConflictTrades.find(noConflictTrade => {
+          if (noConflictTrade.bid.id === tradeItem.bid.id && noConflictTrade.offer.id === tradeItem.offer.id) {
+            return true
+          } else {
+            return false
+          }
+        })) {
+          alert('Selecting this trade would create a conflict with your other selections')
+          conflict = true
+          return
+        }
+      }
+
       selectedTrades.push(this.state.trades.find(trade => {
         return parseInt(tradeItem.bid.id) === parseInt(trade.bid.id) && parseInt(tradeItem.offer.id) === parseInt(trade.offer.id)
       }))
+    })
+    if (!conflict) {
+      this.setState({ selectedTrades }, () => {
+        this.setState({ noConflictTrades: this.props.selectionUpdateHandler(this.state.selectedTrades)})
+      })
+      return true
+    } else {
+      return false
     }
-    )
-    console.log(selectedTrades)
-    // this.setState({ selectedTrades }, () => {
-    //   this.setState({ noConflictTrades: this.props.selectionUpdateHandler(this.state.selectedTrades)})
-    // })
   }
 
   addMany = () => {
