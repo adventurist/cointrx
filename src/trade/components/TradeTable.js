@@ -204,14 +204,31 @@ function prepareData (data) {
   })
 }
 
+function parseSelectedFromData(data, selected) {
+  return selected.map(selectedTrade => {
+    const matched = data.find(trade => (trade.offer.id === selectedTrade.offer.id && trade.bid.id === selectedTrade.bid.id))
+    if (!matched) {
+      throw new Error('Selection could not be matched to data in trade table')
+    } else {
+      return matched.idx
+    }
+  })
+}
+
 class EnhancedTable extends React.Component {
-  state = {
-    order: 'asc',
-    orderBy: 'rate',
-    selected: [],
-    data: prepareData(this.props.trades) || [],
-    page: 0,
-    rowsPerPage: 5,
+
+  constructor (props) {
+    super(props)
+    const data = prepareData(props.trades) || []
+
+    this.state = {
+      order: 'asc',
+      orderBy: 'rate',
+      selected: props.selected ? parseSelectedFromData(data, props.selected) : [],
+      data,
+      page: 0,
+      rowsPerPage: 5,
+    }
   }
 
   componentWillReceiveProps (props) {
