@@ -113,7 +113,6 @@ export default class App extends Component {
       chart: true,
       tradeDialogOpen: false,
       userParts: tradeManager.getUserParts()
-
     }
   }
 
@@ -143,8 +142,6 @@ export default class App extends Component {
     this.log('Attempting trades')
     requestTrades(trades).then(async result => {
       this.log(`${result.completed.length} trades completed..\n${result.failed.length} trades failed.`)
-      // TODO: choose either one of removeTrades or replacing the trades outright
-      tradeManager.removeTrades(result.completed)
       // Get fresh data and update the state
       const bids = await requestTradeParts('bid')
       const offers = await requestTradeParts('offer')
@@ -165,8 +162,7 @@ export default class App extends Component {
   tradeManyHandler = () => {
     trades = tradeManager.getMatched()
     while (userDataObject.balance > 0 && tradeManager.numOfAvailableTrades()) {
-      const trade = trades.shift()
-      if (!requestTrade(trade)) {
+      if (!requestTrade(trades.shift())) {
         break
       }
     }
