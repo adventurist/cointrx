@@ -66272,7 +66272,7 @@ window.container = {
   state: Object(__WEBPACK_IMPORTED_MODULE_50__redux__["a" /* default */])(),
   subscription: {
     csrf: undefined,
-    trxCookie: undefined,
+    trxToken: undefined,
     session: undefined
   } // console.log(trxState)
   // The urls provided by the back end
@@ -67477,7 +67477,7 @@ function () {
   var _ref7 = _asyncToGenerator(
   /*#__PURE__*/
   regeneratorRuntime.mark(function _callee8(_ref6) {
-    var message, _message$payload, csrf, trx_cookie, session;
+    var message, _message$payload, csrf, trx_token, session;
 
     return regeneratorRuntime.wrap(function _callee8$(_context8) {
       while (1) {
@@ -67511,10 +67511,10 @@ function () {
 
           case 11:
             __WEBPACK_IMPORTED_MODULE_47_loglevel___default.a.debug('Updating subscription details');
-            _message$payload = message.payload, csrf = _message$payload.csrf, trx_cookie = _message$payload.trx_cookie, session = _message$payload.session;
+            _message$payload = message.payload, csrf = _message$payload.csrf, trx_token = _message$payload.trx_token, session = _message$payload.session;
             window.container.credentials = _objectSpread({}, window.container.credentials, {
               csrf: csrf,
-              trxCookie: trx_cookie,
+              trxToken: trx_token,
               session: session
             });
             return _context8.abrupt("break", 19);
@@ -78215,7 +78215,8 @@ function (_React$Component3) {
     key: "render",
     value: function render() {
       var style = {
-        fontSize: '9pt'
+        fontSize: '9pt',
+        color: '#FFF'
       };
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
         title: "Balance summary"

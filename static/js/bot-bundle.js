@@ -72290,7 +72290,8 @@ function (_React$Component3) {
     key: "render",
     value: function render() {
       var style = {
-        fontSize: '9pt'
+        fontSize: '9pt',
+        color: '#FFF'
       };
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
         title: "Balance summary"
