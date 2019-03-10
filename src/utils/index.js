@@ -25,7 +25,7 @@ export async function request(options) {
         body,
         headers,
         credentials
-    } = {...options}
+    } = { ...options }
 
     delete options.body
     delete options.credentials
