@@ -120,23 +120,30 @@ class TrxRequestHandler(RequestHandler):
         pass
 
     def compute_user_from_cookie(self):
-        cookie = self.get_secure_cookie('session_info', None)
-        trx_cookie = self.get_secure_cookie('trx_cookie', None)
-        if cookie and trx_cookie:
-            return json.loads(base64.b64decode(
-                cookie.decode('utf-8').replace(trx_cookie.decode('utf-8'), '')
-            ).decode('utf-8'))
+        try:
+            cookie = self.get_secure_cookie('session_info', None)
+            trx_token = self.get_secure_cookie('trx_token', None)
+            if cookie and trx_token and len(cookie) > 0 and len(trx_token) > 0:
+                return json.loads(base64.b64decode(
+                    cookie.decode().replace(trx_token.decode(), '')).decode())
+        except Exception as e:
+            logger.info(str(e))
+            return None
 
+    def get_csrf(self):
+        return self.get_cookie('csrf', None)
 
-class MainHandler(TrxRequestHandler):
-    def get(self):
-        self.write("Hi Jigga, Welcome to Tornado Web Framework.")
+    def set_csrf(self, csrf):
+        self.set_cookie('csrf', csrf)
 
-
-class WunderHandler(TrxRequestHandler):
-    def get(self):
-        response = {'jigga1': 'always jigga'}
-        self.write(response)
+    def get_validated_user(self):
+        user = self.compute_user_from_cookie()
+        if user:
+            new_csrf = validate_csrf(self.get_csrf())
+            if new_csrf:
+                self.set_csrf(new_csrf)
+                return user
+        return False
 
 
 class LoginHandler(TrxRequestHandler):
@@ -212,7 +219,6 @@ class LoginHandler(TrxRequestHandler):
 
         if content_type == 'application/json':
             # auth_name, auth_pass = check_basic_auth(basic_auth)
-            decoded_body = escape.json_decode(self.request.body)
             email, name, password = retrieve_json_login_credentials(json.loads(str(self.request.body, 'utf-8')))
 
             if name is None or password is None:
@@ -225,12 +231,12 @@ class LoginHandler(TrxRequestHandler):
                 csrf = user_verify.generate_auth_token(expiration=1200)
                 application.create_session(user=create_user_session_data(name, password, user_verify, csrf))
                 if application.session is not None and isinstance(application.session, session.Session):
-                    trx_cookie = session.Session.generate_cookie()
-                    self.set_secure_cookie(name="trx_cookie", value=trx_cookie)
+                    trx_token = session.Session.generate_cookie()
+                    self.set_secure_cookie(name="trx_token", value=trx_token)
 
                     return self.write(escape.json_encode(
                         {'statuscode': 200, 'token': str(application.session.user['csrf'], 'utf-8'),
-                         'trx_cookie': trx_cookie.decode('utf-8'), 'uid': user_verify.id,
+                         'trx_token': trx_token.decode('utf-8'), 'uid': user_verify.id,
                          'refresh': user_verify.generate_refresh_token().decode('utf-8'),
                          'name': user_verify.name}))
 
@@ -256,10 +262,11 @@ class LoginHandler(TrxRequestHandler):
                     user_info = {
                         'name': name, 'pass': password, 'id': user_verified.id
                     }
-                    trx_cookie = session.Session.generate_cookie()
+                    trx_token = session.Session.generate_cookie()
                     application.create_session(user=user_info, csrf=csrf)
-                    self.set_secure_cookie(name="trx_cookie", value=trx_cookie)
-                    self.set_secure_cookie(name="session_info", value=trx_cookie + base64.b64encode(json.dumps(user_info).encode()))
+                    self.set_secure_cookie(name="trx_token", value=trx_token)
+                    self.set_secure_cookie(name="session_info",
+                                           value=trx_token + base64.b64encode(json.dumps(user_info).encode()))
                     self.set_cookie(name='csrf', value=csrf)
                     self.set_cookie(name='refresh', value=user_verified.generate_refresh_token())
                     self.set_cookie(name='username', value=user_verified.name)
@@ -267,7 +274,8 @@ class LoginHandler(TrxRequestHandler):
                         redirect_target = self.get_secure_cookie('redirect_target')
                         self.clear_cookie('redirect_target')
                         return self.redirect(redirect_target)
-                    self.write(user_verified.name)
+                    else:
+                        self.redirect('/')
 
     def get(self, *args, **kwargs):
         cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
@@ -402,9 +410,9 @@ class RegisterHandler(TrxRequestHandler):
                 user={'name': name, 'pass': password, 'id': user_verify.id, 'csrf': csrf})
             print(str(user_verify))
             if application.session is not None and isinstance(application.session, session.Session):
-                self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+                self.set_secure_cookie(name="trx_token", value=session.Session.generate_cookie())
                 return self.write(escape.json_encode({'token': str(application.session.user['csrf'], 'utf-8'),
-                                                      'cookie': str(self.get_secure_cookie('trx_cookie'))}))
+                                                      'cookie': str(self.get_secure_cookie('trx_token'))}))
 
 
 class PasswordHandler(TrxRequestHandler):
@@ -473,7 +481,7 @@ class ReactTestHandler(TrxRequestHandler):
 
 class HeartbeatHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
-        found_cookie = self.get_secure_cookie("trx_cookie")
+        found_cookie = self.get_secure_cookie("trx_token")
         if found_cookie is not None:
             result = looper.run_until_complete(db.heartbeat_get_all())
 
@@ -530,7 +538,7 @@ class HeartbeatSocketShareHandler(WebSocketHandler):
 
 class TxGuiHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
-        found_cookie = self.get_secure_cookie("trx_cookie")
+        found_cookie = self.get_secure_cookie("trx_token")
         trx_urls = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])
         tx_url = trx_urls['tx_request']
         blockgen_url = trx_urls['blockgen_url']
@@ -704,11 +712,11 @@ class UiReactHandler(TrxRequestHandler):
 
 class UserProfileHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
-        user = self.compute_user_from_cookie()
-        if user:
+        user = self.get_validated_user()
+        if user is not False:
             user_data, prices = await retrieve_user_data(user)
             tx_url, blockgen_url, userbalance_url, btckeygen_url = retrieve_user_urls()
-            self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+            self.set_secure_cookie(name="trx_token", value=session.Session.generate_cookie())
             self.render("templates/user.html", title="TRX USER PROFILE", keygen_url=btckeygen_url, tx_url=tx_url,
                         blockgen_url=blockgen_url,
                         userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
@@ -751,7 +759,7 @@ class KeyWTPHandler(TrxRequestHandler):
 
 class RegTestUserKeyGenerateHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
-        found_cookie = self.get_secure_cookie("trx_cookie")
+        found_cookie = self.get_secure_cookie("trx_token")
 
         if found_cookie is not None and application.session.user is not None:
             await db.regtest_make_user_address(application.session.user['id'])
@@ -811,7 +819,7 @@ class TestKeyHandler(TrxRequestHandler):
     async def post(self, *args, **kwargs):
         csrf, content_type = retrieve_api_request_headers(self.request.headers)
         if content_type == 'application/json':
-            # TODO Check this properly cookie = self.get_secure_cookie("trx_cookie")
+            # TODO Check this properly cookie = self.get_secure_cookie("trx_token")
             if check_attribute(application.session, 'user'):
                 if db.User.verify_auth_token(csrf):
                     key_id = self.request.path.split('/api/key/')[1].split('/update')[0].lstrip('0')
@@ -833,16 +841,10 @@ class TestKeyHandler(TrxRequestHandler):
 
 
 class UserUpdateHandler(TrxRequestHandler):
-    def get(self, *args, **kwargs):
-        jigga = self.get_argument('jigga')
-        print(jigga)
-        key_id = self.request.path.split('/api/key/')[1].split('/update')[0]
-        print(key_id)
-
     async def post(self, *args, **kwargs):
         csrf, content_type = retrieve_api_request_headers(self.request.headers)
         if content_type == 'application/json':
-            # TODO Check this properly cookie = self.get_secure_cookie("trx_cookie")
+            # TODO Check this properly cookie = self.get_secure_cookie("trx_token")
             if check_attribute(application.session, 'user'):
                 if db.User.verify_auth_token(csrf):
                     uid = self.request.path.split('/api/user/')[1].split('/update')[0].lstrip('0')
@@ -961,7 +963,7 @@ class BotGuiHandler(TrxRequestHandler):
             bot_gui_urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
             bot_urls_json = json.dumps({'urls': bot_gui_urls})
 
-            self.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+            self.set_secure_cookie(name="trx_token", value=session.Session.generate_cookie())
             self.set_secure_cookie(name="bot_urls", value=bot_urls_json)
             self.render("templates/bot.html", title="TRX BOT GUI", bot_gui_urls=bot_gui_urls, bot_gui_data=bot_gui_data,
                         trx_env=application.settings['env']['TRX_ENV'])
@@ -972,11 +974,11 @@ class BotGuiHandler(TrxRequestHandler):
 
 class BotStartHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
-        cookie = self.get_secure_cookie('trx_cookie')
+        cookie = self.get_secure_cookie('trx_token')
         number = self.get_argument('number')
         urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
         response = await http_client.get(
-            'http://localhost:9977/start' + '?number=' + str(number) + '&trx_cookie=' + str(cookie))
+            'http://localhost:9977/start' + '?number=' + str(number) + '&trx_token=' + str(cookie))
         if response is not None and hasattr(response, 'body'):
             response_data = str(response.body, 'utf-8')
             self.set_status(200)
@@ -988,13 +990,13 @@ class BotStartHandler(TrxRequestHandler):
 
 class BotTrcPriceRetrieveHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
-        cookie = self.get_secure_cookie('trx_cookie')
+        cookie = self.get_secure_cookie('trx_token')
         time_length = self.get_argument('time')
         bot_id = self.get_argument('bot_id')
         urls = TRXConfig.trx_urls(application.settings['env']['TRX_ENV'])['bot']
         response = await http_client.get(
             'http://localhost:9977/bots/trc/prices' + '?bot_id=' + str(bot_id) + '&time=' + str(
-                time_length) + '&trx_cookie=' + str(cookie))
+                time_length) + '&trx_token=' + str(cookie))
         response_data = str(response.body, 'utf-8')
         self.set_status(200)
         self.write(response_data)
@@ -1104,7 +1106,7 @@ class AccountGuiHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
 
         if check_attribute(application.session, 'user'):
-            set_trx_cookie(self)
+            set_trx_token(self)
             account_urls = TRXConfig.account_urls(application.get_env()['TRX_ENV'])
             self.render("templates/account.html", title="TRX Accounts", account_urls=account_urls)
         else:
@@ -1175,6 +1177,12 @@ class TRUserNewPassHandler(TrxRequestHandler):
 
 
 class WSHandler(WebSocketHandler):
+    def data_received(self, chunk):
+        pass
+
+    def on_message(self, message):
+        pass
+
     def __init__(self, application, request, **kwargs):
         super().__init__(application, request, **kwargs)
         self.connections = []
@@ -1221,15 +1229,14 @@ class TRXTokenVerifyHandler(TrxRequestHandler):
 
 class TradeGuiHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
-        user = self.compute_user_from_cookie()
-        if user:
+        user = self.get_validated_user()
+        if user is not False:
             user_data, prices = await retrieve_user_data(user)
             trade_data = await db.retrieve_trade_data()
             bids, offers = await db.get_bids(), await db.get_offers()
             self.render("templates/trade.html", title="TRX Trade Control", trx_prices=prices, user_data=user_data,
                         bids=bids, offers=offers, trade_data=trade_data)
-        else:
-            login_redirect(self)
+        login_redirect(self)
 
 
 class BidHandler(TrxRequestHandler):
@@ -1262,6 +1269,7 @@ class TradeRequestHandler(TrxRequestHandler):
     """
     Handles all trades originating from bids or offers
     """
+
     async def post(self, *args, **kwargs):
         body = json.loads(self.request.body.decode('utf-8'))
         trade, trade_type, acceptor = body['trade'], body['trade']['type'], body['uid']
@@ -1306,18 +1314,15 @@ class TRXApplication(Application):
         self.session = None
 
         handlers = [
+            # PRIMARY
             # Home
-            (r"/", MainHandler),
-
-            # User GUI
-
-            # - Profile
+            (r"/", TradeGuiHandler),
+            # Profile
             (r"/user", UserProfileHandler),
-            # - Primary
+            # Authentication
             (r"/login", LoginHandler),
             (r"/logout", LogoutHandler),
             (r"/register", RegisterHandler),
-            (r"/trade", TradeGuiHandler),
             (r"/transaction/tx-gui", TxGuiHandler),
             (r"/heartbeat/feed", HeartbeatHandler),
 
@@ -1430,7 +1435,6 @@ class TRXApplication(Application):
             (r"/api/queue", TRXQueueHandler),
 
             # CRUFT
-            (r"/jigga", WunderHandler),
             (r"/password", PasswordHandler),
             (r"/sendmail", SendMailHandler),
             (r"/fakenews", FakeNewsHandler),
@@ -1550,7 +1554,8 @@ async def handle_transaction_queue():
                 break
             # If we have traversed the queue, or if transactions between users fail
             # and payouts are exhausted, pause the queue
-            elif transaction == application.queue.tail.data or (intra_user_pending is False and not coinmaster_available):
+            elif transaction == application.queue.tail.data or (
+                    intra_user_pending is False and not coinmaster_available):
                 paused = True
         else:
             break
@@ -1564,8 +1569,16 @@ async def manage_blockchain():
             await handle_transaction_queue()
 
 
-def set_trx_cookie(handler: RequestHandler):
-    handler.set_secure_cookie(name="trx_cookie", value=session.Session.generate_cookie())
+def set_trx_token(handler: RequestHandler):
+    handler.set_secure_cookie(name="trx_token", value=session.Session.generate_cookie())
+
+
+def validate_csrf(csrf):
+    user = db.User.verify_auth_token(csrf)
+    if user:
+        return user.generate_auth_token(expiration=1200)
+    else:
+        return False
 
 
 async def connect_to_database():
