@@ -329,8 +329,8 @@ class Bot(object):
 
         if login_result:
             login_response = json.loads(login_result.body.decode('utf-8'))
-            if 'token' in login_response and 'trx_cookie' in login_response:
-                session_data = {'token': login_response['token'], 'trx_cookie': login_response['trx_cookie'], 'uid': login_response['uid'], 'name': login_response['name']}
+            if 'token' in login_response and 'trx_token' in login_response:
+                session_data = {'token': login_response['token'], 'trx_token': login_response['trx_token'], 'uid': login_response['uid'], 'name': login_response['name']}
                 self.session = session_data
                 self.logger.info('Bot ' + str(self.number) + ' successfully logged into TRX')
             else:

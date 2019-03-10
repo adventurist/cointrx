@@ -9,10 +9,10 @@ async def handle_ws_request(request_type, data):
         if user_verify is not None and user_verify is not -1:
             csrf = user_verify.generate_auth_token(3600)
             session = session.Session(user_verify, csrf)
-            trx_cookie = session.generate_cookie()
+            trx_token = session.generate_cookie()
             return {
                 'result': 'success',
-                'payload': {'csrf': csrf, 'trx_cookie': trx_cookie, 'session': session},
+                'payload': {'csrf': csrf, 'trx_token': trx_token, 'session': session},
                 'error': 'false',
                 'action': 'subscription:update'
             }
