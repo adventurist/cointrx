@@ -354,7 +354,8 @@ class UserInfo extends React.Component {
 
     render () {
         const style = {
-            fontSize: '9pt'
+            fontSize: '9pt',
+            color: '#FFF'
         }
         return (
             <div>
