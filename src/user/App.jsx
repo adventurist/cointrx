@@ -661,8 +661,8 @@ function getCsrfToken() {
     return getToken('csrf')
 }
 
-function getTrxCookie() {
-    return getToken('trx_cookie')
+function getTrxToken() {
+    return getToken('trx_token')
 }
 
 function getToken(name) {

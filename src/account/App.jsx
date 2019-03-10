@@ -95,7 +95,7 @@ window.container = {
   state: trx(),
   subscription: {
     csrf: undefined,
-    trxCookie: undefined,
+    trxToken: undefined,
     session: undefined
   }
 }
@@ -1040,11 +1040,11 @@ const msgHandler = async ({ ...message }) => {
         break
       case 'subscription:update':
         log.debug('Updating subscription details')
-        const { csrf, trx_cookie, session } = message.payload
+        const { csrf, trx_token, session } = message.payload
         window.container.credentials = {
           ...window.container.credentials,
           csrf,
-          trxCookie: trx_cookie,
+          trxToken: trx_token,
           session: session
         }
         break
