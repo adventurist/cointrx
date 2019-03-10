@@ -74,8 +74,8 @@ class StartHandler(RequestHandler):
         pass
 
     async def get(self, *args, **kwargs):
-        trx_cookie = self.get_argument('trx_cookie')
-        self.set_secure_cookie('trx_cookie', trx_cookie)
+        trx_token = self.get_argument('trx_token')
+        self.set_secure_cookie('trx_token', trx_token)
 
         num_requested = self.get_argument('number')
         identities = []
@@ -174,7 +174,7 @@ class BotTrcPriceHandler(RequestHandler):
         Loads data into the specified bot for the specified period
         """
 
-        trx_cookie = self.get_argument('trx_cookie')
+        trx_token = self.get_argument('trx_token')
         self.initialize()
         bot_id = self.get_argument('bot_id')
         time = self.get_argument('time')
