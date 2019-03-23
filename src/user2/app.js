@@ -68,6 +68,7 @@ export default class App extends Component {
     if (this.props.userHandler) {
       this.props.userHandler(this.state.user)
     }
+    this.log(`User profile for: ${this.state.user.name}`)
   }
 
   notificationMessage = message => {

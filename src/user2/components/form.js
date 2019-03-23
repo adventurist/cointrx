@@ -5,6 +5,7 @@ import { Fragment, Component } from 'react'
 import PropTypes from 'prop-types'
 import ReactDataGrid from 'react-data-grid'
 import { TextField } from '@material-ui/core'
+import SaveIcon from '@material-ui/icons/Save'
 import { Card, CardActions, CardHeader, CardMedia, CardTitle } from '@material-ui/core'
 import { NumberField } from '../../trade/components/FundField'
 import Button from '@material-ui/core/Button'
@@ -231,7 +232,10 @@ export class UserForm extends Component {
                         </div>
                     </div>
 
-                    <Button type='submit' label='Save' color='primary' />
+                    <Button type='submit' variant="contained" size="medium" className="user-save-btn">
+                        <SaveIcon />
+                            Save
+                    </Button>
                 </form>
                 <Snackbar
                     className="user-snackbar"
