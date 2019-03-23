@@ -145,6 +145,10 @@ class TrxRequestHandler(RequestHandler):
                 return user
         return False
 
+    def update_session_info(self, trx_token, user_info):
+        self.clear_cookie('session_info')
+        self.set_secure_cookie('session_info', trx_token + base64.b64encode(json.dumps(user_info).encode()))
+
 
 class LoginHandler(TrxRequestHandler):
     async def post(self, *args, **kwargs) -> str:
@@ -716,7 +720,9 @@ class UserProfileHandler(TrxRequestHandler):
         if user is not False:
             user_data, prices = await retrieve_user_data(user)
             tx_url, blockgen_url, userbalance_url, btckeygen_url = retrieve_user_urls()
-            self.set_secure_cookie(name="trx_token", value=session.Session.generate_cookie())
+            new_trx_token = session.Session.generate_cookie()
+            self.set_secure_cookie(name="trx_token", value=new_trx_token)
+            self.update_session_info(new_trx_token, user)
             self.render("templates/user.html", title="TRX USER PROFILE", keygen_url=btckeygen_url, tx_url=tx_url,
                         blockgen_url=blockgen_url,
                         userbalance_url=userbalance_url, user_data=user_data, trx_prices=prices)
@@ -841,7 +847,7 @@ class TestKeyHandler(TrxRequestHandler):
 
 
 class UserUpdateHandler(TrxRequestHandler):
-    async def post(self, *args, **kwargs):
+    async def put(self, *args, **kwargs):
         csrf, content_type = retrieve_api_request_headers(self.request.headers)
         if content_type == 'application/json':
             # TODO Check this properly cookie = self.get_secure_cookie("trx_token")
@@ -851,8 +857,7 @@ class UserUpdateHandler(TrxRequestHandler):
                     user_data = json.loads(self.request.body.decode())
                     if user_data is not None:
                         if await db.update_user(uid, user_data):
-                            self.write(escape.json_encode([{'Update': 'Successful', 'code': 204}]))
-                            self.set_status(204)
+                            self.write(escape.json_encode([{'Update': 'Successful', 'code': 200}]))
                         else:
                             self.write(escape.json_encode([{'error': 'Key not found', 'code': 404}]))
                             self.set_status(404)
@@ -1230,13 +1235,14 @@ class TRXTokenVerifyHandler(TrxRequestHandler):
 class TradeGuiHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         user = self.get_validated_user()
-        if user is not False:
+        if user and user is not False:
             user_data, prices = await retrieve_user_data(user)
             trade_data = await db.retrieve_trade_data()
             bids, offers = await db.get_bids(), await db.get_offers()
             self.render("templates/trade.html", title="TRX Trade Control", trx_prices=prices, user_data=user_data,
                         bids=bids, offers=offers, trade_data=trade_data)
-        login_redirect(self)
+        else:
+            login_redirect(self)
 
 
 class BidHandler(TrxRequestHandler):
@@ -1574,11 +1580,11 @@ def set_trx_token(handler: RequestHandler):
 
 
 def validate_csrf(csrf):
-    user = db.User.verify_auth_token(csrf)
-    if user:
-        return user.generate_auth_token(expiration=1200)
-    else:
-        return False
+    if csrf:
+        user = db.User.verify_auth_token(csrf)
+        if user:
+            return user.generate_auth_token(expiration=1200)
+    return False
 
 
 async def connect_to_database():
