@@ -19,7 +19,7 @@ export async function fetchTimezoneRequest(zone) {
   const key = 'Z5AO3MSZ12UV'
 
     const response = await request({
-        url: 'http://api.timezonedb.com/v2.1/get-time-zone',
+        url: 'https://api.timezonedb.com/v2.1/get-time-zone',
         params: {
             key,
             format: 'json',

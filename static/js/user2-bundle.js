@@ -118151,7 +118151,7 @@ function _fetchTimezoneRequest() {
             key = 'Z5AO3MSZ12UV';
             _context2.next = 3;
             return Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* request */])({
-              url: 'http://api.timezonedb.com/v2.1/get-time-zone',
+              url: 'https://api.timezonedb.com/v2.1/get-time-zone',
               params: {
                 key: key,
                 format: 'json',
