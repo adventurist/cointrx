@@ -20,8 +20,8 @@ import AddIcon from '@material-ui/icons/Add'
 import CloudUploadIcon from '@material-ui/icons/CloudUpload'
 import { request, formatTimestamp, handleResponse } from '../utils/index'
 
-const rowData = JSON.parse(trxPrices.replace(/'/g, '"'))
-const tradeData = JSON.parse(trxTrades.replace(/'/g, '"'))
+const rowData = JSON.parse(trxPrices.replace(/'/g, '"')) || []
+const tradeData = JSON.parse(trxTrades.replace(/'/g, '"')) || []
 
 const styles = {
     container: {
@@ -157,7 +157,7 @@ export class OfferForm extends React.Component {
                     onChange={this.handleChange('currency')}
                     >
                         {currencies.map(option => (
-                            <MenuItem key={option.label} value={option.label}>
+                            <MenuItem key={option.value} value={option.label}>
                                 {option.value}
                             </MenuItem>
                         ))}
