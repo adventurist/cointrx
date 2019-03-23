@@ -67,7 +67,6 @@ export default class Console extends Component {
 					rows={3}
 					rowsMax={3}
 					style={styles.console}
-					hintText='Console'
 					spellCheck={false}
 					value={this.state.consoleText}
 					onChange={this.handleConsoleChange}
