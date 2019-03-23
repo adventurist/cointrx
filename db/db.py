@@ -588,7 +588,8 @@ async def regtest_all_user_data():
             'level': user.level,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
             'keys': [{'id': x.id, 'wif': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if
-                     x.status is not False]
+                     x.status is not False],
+            'account': str(user.account.balance)
         }
         user_data.append(data)
 
@@ -608,7 +609,9 @@ async def regtest_user_data(uid: str):
             'utc_offset': user.utc_offset if user.utc_offset is not None else 0,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
             'keys': [{'id': x.id, 'value': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if
-                     x.status]
+                     x.status],
+            'account': btcd_utils.currency(user.account.balance)
+
         }
 
         for key in data['keys']:
@@ -714,7 +717,6 @@ async def regtest_user_estimated_value(uid: str, balance: any = None):
             btc = Decimal(await btcd_utils.RegTest.get_user_balance(user.trxkey)) if balance is None else Decimal(
                 balance)
             estimated_value = btc * price.last
-            logger.info('Price before quantization: %s' % str(estimated_value))
             return str(estimated_value.quantize(Decimal(".01"), rounding=ROUND_HALF_UP))
 
 
