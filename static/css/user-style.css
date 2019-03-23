@@ -61,10 +61,6 @@
     padding-bottom: 12px;
 }
 
-#estimated-value {
-    color: rgb(89, 229, 252)!important;
-    font-size: 14pt;
-}
 
 .estimated-value hr {
     display: none;
@@ -84,13 +80,37 @@
 
 .timezone-picker {
     width: 19em;
+    margin-top: 10px;
+    background-color: #424242!important;
 }
-.timezone-picker-list-item-active {
-    background: #303030;
+
+.timezone-picker-list-item, .timezone-picker-textfield input {
+    background-color: #424242!important;
+    color: #FFF!important;
+}
+
+.timezone-picker-list-item-active, .timezone-picker-list-item:hover {
+    background: #E1E1E1!important;
+    color: #424242!important;
+}
+
+.timezone-picker-open .timezone-picker-list {
+    position: absolute;
+    z-index: 1000;
 }
 
 #timezone-container {
     margin-bottom: 8px;
+    justify-content: center;
+}
+
+.text-container {
+    display: flex;
+    justify-content: center;
+}
+
+.balance-wrap {
+    width: 25%;
 }
 
 .userform-separator {
@@ -116,4 +136,8 @@
 
 .react-grid-Canvas .react-grid-Cell, #trade-left, #trade-right {
     background-color: #333333;
+}
+
+.timezoneNum {
+    width: 5%!important;
 }

@@ -78113,8 +78113,6 @@ function (_React$Component2) {
   _createClass(NotificationMenu, [{
     key: "componentWillReceiveProps",
     value: function componentWillReceiveProps(props) {
-      console.log('NOTIFICATIONMENU', props);
-
       if (props.open) {
         this.setState({
           open: props.open
@@ -78208,8 +78206,6 @@ function (_React$Component3) {
           user: props.user
         });
       }
-
-      console.log('UserInfo props', props);
     }
   }, {
     key: "render",
