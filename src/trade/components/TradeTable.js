@@ -231,11 +231,11 @@ class EnhancedTable extends React.Component {
     }
   }
 
-  componentWillReceiveProps (props) {
-    if (props.trades && this.state.data.length !== props.trades.length) {
-      this.setState({ data: prepareData(props.trades), selected: [] })
-    }
-  }
+  // componentWillReceiveProps (props) {
+  //   if (props.trades && this.state.data.length !== props.trades.length) {
+  //     this.setState({ data: prepareData(props.trades), selected: [] })
+  //   }
+  // }
 
   handleRequestSort = (event, property) => {
     const orderBy = property
@@ -399,7 +399,7 @@ class EnhancedTable extends React.Component {
 
 EnhancedTable.propTypes = {
   classes: PropTypes.object.isRequired,
-  bids: PropTypes.array.isRequired
+  trades: PropTypes.array.isRequired
 }
 
 export default withStyles(styles)(EnhancedTable)
