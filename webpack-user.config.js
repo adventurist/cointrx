@@ -2,11 +2,14 @@ const webpack = require('webpack')
 const path = require('path');
 
 let config = {
-    entry: path.resolve(__dirname, 'src/user/main.jsx'),
+    entry: {
+        user: path.resolve(__dirname, 'src/user/main.jsx'),
+        user2: path.resolve(__dirname, 'src/user2/index.jsx')
+    },
     output: {
         path: path.resolve(__dirname, 'static'),
         publicPath: "/static/",
-        filename: 'js/user-bundle.js'
+        filename: 'js/[name]-bundle.js'
     },
     module: {
         loaders: [{
@@ -18,7 +21,7 @@ let config = {
                 loader: 'babel-loader',
                 include: [path.resolve(__dirname, './src')],
                 query: {
-                    presets: ['env', 'stage-0', 'react']
+                    presets: ['@babel/preset-env', '@babel/react']
                 }
             }]
     },
@@ -26,7 +29,8 @@ let config = {
         new webpack.ProvidePlugin({
             "React": "react",
         }),
-    ]
+    ],
+    devtool: 'source-map'
 };
 
 module.exports = config;
