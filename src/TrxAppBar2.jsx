@@ -297,7 +297,6 @@ class NotificationMenu extends React.Component {
     }
 
     componentWillReceiveProps (props) {
-        console.log('NOTIFICATIONMENU', props)
         if (props.open) {
             this.setState({ open: props.open })
         }
@@ -349,7 +348,6 @@ class UserInfo extends React.Component {
         if (props.user) {
             this.setState({ user: props.user })
         }
-        console.log('UserInfo props', props)
     }
 
     render () {
