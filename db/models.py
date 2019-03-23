@@ -185,6 +185,7 @@ class Account(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     uid = Column(Integer, ForeignKey('users.id'))
     balance = Column(DECIMAL(12, 2))
+    # account_user = relationship("User", back_populates='account_user')
 
 
 class SKey(Base):
@@ -241,6 +242,7 @@ class User(Base):
     created = Column(Integer)
     status = Column(Integer)
     trxkey = relationship("TrxKey", backref='user', uselist=True, order_by='TrxKey.status')
+    account = relationship("Account", backref='owner', uselist=False)
     utc_offset = Column(Integer)
     level = Column(Integer, nullable=False, server_default='0')
     balance = Column(DECIMAL(12, 2), server_default='0.00')
