@@ -1,3 +1,4 @@
+from decimal import Decimal, ROUND_HALF_UP
 from subprocess import *
 
 import binascii
@@ -237,3 +238,8 @@ def wif_to_private_key(wif):
     address = private_key.bitcoin_address
     ser = private_key.serialize()
     return private_key
+
+
+def currency(value):
+    new_value = str(Decimal(value).quantize(Decimal(".01"), rounding=ROUND_HALF_UP))
+    return new_value
