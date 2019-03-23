@@ -2,7 +2,7 @@ import { Component } from 'react'
 import { render } from 'react-dom'
 import App from './app'
 import TrxNavigation from '../TrxNavigation.jsx'
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 
 const styles = {
   main: {

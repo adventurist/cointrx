@@ -16,7 +16,7 @@ import TrxChart from './chart/TrxChart'
 
 /* Form */
 import { OfferForm, BidForm, Summary, TrxGrid, TradeGrid } from './TradeForm'
-
+import BotForm from './components/BotForm'
 /* TradeDialog component */
 import TradeDialog from './components/TradeDialog'
 /* TradeManager */
@@ -198,7 +198,7 @@ export default class App extends Component {
 
     <div id="main-wrap" >
     <Console message={this.state.lastMessage}/>
-      <TradeDialog open={this.state.tradeDialogOpen} closeHandler={this.tradeDialogCloseHandler} tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} trades={this.state.trades} selectionUpdateHandler={this.selectionUpdateHandler} bids={tradeManager.getMatched()}/>
+      <TradeDialog open={this.state.tradeDialogOpen} closeHandler={this.tradeDialogCloseHandler} tradeManyHandler={this.tradeManyHandler} tradeHandler={this.tradeHandler} trades={this.state.trades} selectionUpdateHandler={this.selectionUpdateHandler} />
       <Grid container spacing={8} style={styles.root}>
         <Grid style={styles.gridChild} item xs={8} sm={4}>
           <ExpansionPanel style={styles.expand} defaultExpanded={true}>
@@ -241,6 +241,16 @@ export default class App extends Component {
             </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Paper className="trxToolWrap" elevation={4}><Summary style={styles.trxTool} data={this.state.completedTrades} userParts={this.state.userParts}/></Paper>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
+          <ExpansionPanel style={styles.expand} defaultExpanded={false}>
+            <ExpansionPanelSummary className={classes.expand} expandIcon={<ExpandMoreIcon />}>
+              <Typography>Bots</Typography>
+            </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <Paper className="trxToolWrap" elevation={4}>
+              <BotForm />
+            </Paper>
             </ExpansionPanelDetails>
           </ExpansionPanel>
         </Grid>
