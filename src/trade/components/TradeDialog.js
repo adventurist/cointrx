@@ -44,7 +44,6 @@ export default class TradeDialog extends Component {
     console.log(props)
     this.state = {
       open: props.open,
-      bids: props.bids,
       trades: props.trades,
       selectedTrades: undefined,
       noConflictTrades: []
@@ -139,7 +138,7 @@ export default class TradeDialog extends Component {
               </DialogContentText>
             </DialogContent>
             <DialogContent>
-              <TradeTable classes={classes.table} trades={this.state.trades} bids={this.state.bids} selected={this.state.selectedTrades} selectedTradesHandler={this.selectedTradesHandler} />
+              <TradeTable classes={classes.table} trades={this.state.trades} selected={this.state.selectedTrades} selectedTradesHandler={this.selectedTradesHandler} />
             </DialogContent>
             <DialogActions>
               <IconButton color='primary'
