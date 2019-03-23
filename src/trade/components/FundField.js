@@ -32,10 +32,10 @@ export default class FundField extends Component {
     })
   }
 
-  handleChange = event => {
+  handleChange = value => {
     const prevValue = this.state.value
     this.setState({
-      value: event.target.value
+      value
     }, () => {
       if (!this.props.offer || parseFloat(this.state.value) <= parseFloat(this.props.max)) {
         if (this.props.handler) {
@@ -67,19 +67,14 @@ export default class FundField extends Component {
   render () {
     return (
       <div>
-        <TextField
-          value={this.state.value || 0}
-          type='number'
-          className={parseFloat(this.state.value) > 0 ? classes.filledTextField : classes.textField}
+
+        <NumberField
+          value={this.state.value || 0 }
           max={parseFloat(this.props.max)}
           label={`Amount to ${this.props.offer ? 'offer' : 'bid'}`}
-          style={styles.input}
           prefix={this.props.currency}
-          InputProps={{
-            startAdornment: <InputAdornment position='start'>{this.props.currency}</InputAdornment>
-          }}
-          onChange={this.handleChange}
-        />
+          handler={this.handleChange}
+          />
         <AlertDialog
           open={this.state.alertOpen}
           onClose={this.closeAlert}
@@ -96,7 +91,6 @@ FundField.propTypes = {
 }
 
 class AlertDialog extends Component {
-
   render () {
     if (this.props.open) {
       return (
@@ -121,5 +115,50 @@ class AlertDialog extends Component {
     } else {
       return null
     }
+  }
+}
+
+export class NumberField extends Component {
+
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      value: props.value
+    }
+  }
+
+  handleChange = e => {
+    this.setState({ value: e.target.value })
+    if (this.props.handler) {
+      this.props.handler(e.target.value)
+    }
+  }
+
+  render () {
+    const style = {
+      width: this.props.width ? this.props.width : '85%'
+    }
+
+    const classes = this.props.classes ? this.props.classes : {
+      textField: 'textField',
+      filledTextField: 'filledTextField',
+    }
+
+    return (
+      <TextField
+          value={this.props.value || 0}
+          type='number'
+          className={parseFloat(this.state.value) > 0 ? classes.filledTextField : classes.textField}
+          max={this.props.max ? parseFloat(this.props.max) : 99999999}
+          label={this.props.label}
+          style={styles.input}
+          prefix={this.props.prefix}
+          InputProps={{
+            startAdornment: <InputAdornment position='start'>{this.props.prefix}</InputAdornment>
+          }}
+          onChange={this.handleChange}
+      />
+    )
   }
 }
