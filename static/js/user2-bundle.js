@@ -90829,6 +90829,8 @@ function (_Component) {
       if (this.props.userHandler) {
         this.props.userHandler(this.state.user);
       }
+
+      this.log("User profile for: ".concat(this.state.user.name));
     }
   }, {
     key: "render",
@@ -92549,17 +92551,19 @@ exports.default = _default;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_react_data_grid__ = __webpack_require__(352);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_react_data_grid___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_react_data_grid__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__material_ui_core__ = __webpack_require__(536);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__trade_components_FundField__ = __webpack_require__(1179);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__material_ui_core_Button__ = __webpack_require__(90);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6__material_ui_core_Button__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__trade_components_CurrencyField__ = __webpack_require__(1149);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_react_timezone__ = __webpack_require__(386);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_react_timezone___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8_react_timezone__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__snackbar__ = __webpack_require__(1150);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_lodash__ = __webpack_require__(387);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10_lodash__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__utils__ = __webpack_require__(648);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__requests__ = __webpack_require__(1180);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__material_ui_icons_Save__ = __webpack_require__(1181);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__material_ui_icons_Save___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__material_ui_icons_Save__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__trade_components_FundField__ = __webpack_require__(1179);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__material_ui_core_Button__ = __webpack_require__(90);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Button__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__trade_components_CurrencyField__ = __webpack_require__(1149);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_react_timezone__ = __webpack_require__(386);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_react_timezone___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9_react_timezone__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__snackbar__ = __webpack_require__(1150);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_lodash__ = __webpack_require__(387);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_11_lodash__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__utils__ = __webpack_require__(648);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__requests__ = __webpack_require__(1180);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -92589,6 +92593,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
  // import 'react-virtualized/styles.css'
 // import 'react-table/react-table.css'
+
 
 
 
@@ -92633,9 +92638,9 @@ function (_Component) {
       return React.createElement(__WEBPACK_IMPORTED_MODULE_4__material_ui_core__["a" /* Card */], null, React.createElement(__WEBPACK_IMPORTED_MODULE_4__material_ui_core__["c" /* CardHeader */], {
         title: this.props.name,
         subtitle: this.props.email
-      }), React.createElement(__WEBPACK_IMPORTED_MODULE_4__material_ui_core__["b" /* CardActions */], null, React.createElement(__WEBPACK_IMPORTED_MODULE_6__material_ui_core_Button___default.a, {
+      }), React.createElement(__WEBPACK_IMPORTED_MODULE_4__material_ui_core__["b" /* CardActions */], null, React.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Button___default.a, {
         label: "Settings"
-      }), React.createElement(__WEBPACK_IMPORTED_MODULE_6__material_ui_core_Button___default.a, {
+      }), React.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Button___default.a, {
         label: "Security"
       })), React.createElement(__WEBPACK_IMPORTED_MODULE_4__material_ui_core__["d" /* CardMedia */], {
         image: "/static/images/avatar.jpg"
@@ -92709,7 +92714,7 @@ function (_Component2) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return Object(__WEBPACK_IMPORTED_MODULE_12__requests__["b" /* userUpdateRequest */])(_objectSpread({}, _this.props.user, {
+              return Object(__WEBPACK_IMPORTED_MODULE_13__requests__["b" /* userUpdateRequest */])(_objectSpread({}, _this.props.user, {
                 name: _this.state.name,
                 email: _this.state.email,
                 utc_offset: _this.state.tzOffset,
@@ -92850,14 +92855,14 @@ function (_Component2) {
         style: {
           display: 'flex'
         }
-      }, React.createElement(__WEBPACK_IMPORTED_MODULE_8_react_timezone___default.a, {
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_9_react_timezone___default.a, {
         value: this.state.timezone,
         onChange: this.updateTimezone,
         inputProps: {
           placeholder: 'Select Timezone...',
           name: 'timezone'
         }
-      }), React.createElement(__WEBPACK_IMPORTED_MODULE_5__trade_components_FundField__["a" /* NumberField */], {
+      }), React.createElement(__WEBPACK_IMPORTED_MODULE_6__trade_components_FundField__["a" /* NumberField */], {
         value: Math.abs(this.state.tzOffset),
         max: 24,
         label: "Offset",
@@ -92871,7 +92876,7 @@ function (_Component2) {
         className: "userform-separator"
       }), React.createElement("div", {
         className: "text-container"
-      }, React.createElement(__WEBPACK_IMPORTED_MODULE_7__trade_components_CurrencyField__["a" /* CurrencyField */], {
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_8__trade_components_CurrencyField__["a" /* CurrencyField */], {
         currency: this.state.currency,
         handler: this.handleCurrency,
         styles: {
@@ -92897,11 +92902,12 @@ function (_Component2) {
         id: "account-balance",
         className: "account-balance",
         value: "$ " + Number(this.props.user.account)
-      })))), React.createElement(__WEBPACK_IMPORTED_MODULE_6__material_ui_core_Button___default.a, {
+      })))), React.createElement(__WEBPACK_IMPORTED_MODULE_7__material_ui_core_Button___default.a, {
         type: "submit",
-        label: "Save",
-        color: "primary"
-      })), React.createElement(__WEBPACK_IMPORTED_MODULE_9__snackbar__["a" /* default */], {
+        variant: "contained",
+        size: "medium",
+        className: "user-save-btn"
+      }, React.createElement(__WEBPACK_IMPORTED_MODULE_5__material_ui_icons_Save___default.a, null), "Save")), React.createElement(__WEBPACK_IMPORTED_MODULE_10__snackbar__["a" /* default */], {
         className: "user-snackbar",
         open: this.state.snackbarOpen,
         message: this.state.snackbarMsg,
@@ -92946,7 +92952,7 @@ function _fetchTzOffset() {
         switch (_context4.prev = _context4.next) {
           case 0:
             _context4.next = 2;
-            return Object(__WEBPACK_IMPORTED_MODULE_12__requests__["a" /* fetchTimezoneRequest */])(zone);
+            return Object(__WEBPACK_IMPORTED_MODULE_13__requests__["a" /* fetchTimezoneRequest */])(zone);
 
           case 2:
             result = _context4.sent;
@@ -118167,6 +118173,33 @@ function _fetchTimezoneRequest() {
   }));
   return _fetchTimezoneRequest.apply(this, arguments);
 }
+
+/***/ }),
+/* 1181 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(2);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(__webpack_require__(0));
+
+var _createSvgIcon = _interopRequireDefault(__webpack_require__(41));
+
+var _default = (0, _createSvgIcon.default)(_react.default.createElement(_react.default.Fragment, null, _react.default.createElement("path", {
+  fill: "none",
+  d: "M0 0h24v24H0z"
+}), _react.default.createElement("path", {
+  d: "M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"
+})), 'Save');
+
+exports.default = _default;
 
 /***/ })
 /******/ ]);
