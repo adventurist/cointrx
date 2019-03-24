@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography'
 
 /* Form */
 import { UserForm } from './components/form'
+import { UserKeys } from '../trade/components/UserKeys'
 /* Request */
 import { request, handleResponse } from '../utils/index'
 /* Logging*/
@@ -94,7 +95,7 @@ export default class App extends Component {
     <div id="main-wrap" >
     <Console message={this.state.lastMessage}/>
       <Grid container spacing={16} style={styles.root}>
-        <Grid style={styles.gridChild} item xs={12}>
+      <Grid style={styles.gridChild} item xs={6}>
           <ExpansionPanel style={styles.expand} defaultExpanded={true}>
             <ExpansionPanelSummary className={classes.expand} expandIcon={<ExpandMoreIcon />}>
               <Typography>User Form</Typography>
@@ -102,6 +103,18 @@ export default class App extends Component {
             <ExpansionPanelDetails>
                 <Paper className="trxToolWrap" elevation={4}>
                   <UserForm style={styles.trxTool} user={this.state.user} />
+                </Paper>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
+        </Grid>
+        <Grid style={styles.gridChild} item xs={6}>
+          <ExpansionPanel style={styles.expand} defaultExpanded={true}>
+            <ExpansionPanelSummary className={classes.expand} expandIcon={<ExpandMoreIcon />}>
+              <Typography>User Form</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+                <Paper className="trxToolWrap" elevation={4}>
+                  <UserKeys style={styles.trxTool} keys={this.state.user.keys} />
                 </Paper>
             </ExpansionPanelDetails>
           </ExpansionPanel>
