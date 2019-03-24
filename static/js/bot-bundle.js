@@ -71822,7 +71822,7 @@ var EmptyBellIcon = function EmptyBellIcon() {
 
 var menuItems = [{
   url: '/user',
-  label: 'User Profile',
+  label: 'Account settings',
   icon: 'person'
 }, {
   url: '/user/all',

@@ -19,8 +19,14 @@
 
 .user-form {
     background-color: rgb(48, 48, 48);
+    padding: 12px;
+    display: flex;
+    justify-content: center;
 }
 
+.user-save-btn {
+    max-height: 35px;
+}
 .app-bar-icons {
     float: right;
     display: inline-block;
@@ -57,18 +63,14 @@
     left: auto;
     position: fixed;
 }
-.user-form {
-    padding-bottom: 12px;
-}
+
 
 
 .estimated-value hr {
     display: none;
 }
 
-.userform:last-of-type {
-    margin-bottom: 12px;
-}
+
 
 .react-grid-HeaderRow {
     overflow: hidden!important;
@@ -144,4 +146,36 @@
 
 .key-edit {
     background-color: #424242!important;
+}
+
+.keydialog, .keylabel {
+    padding: 4px!important;
+    margin: 8px!important;
+    display: flex!important;
+    align-content: center!important;
+    justify-content: center!important;
+    align-items: center!important;
+}
+
+.key-dialog-paper {
+    padding: 4px!important;
+    margin: 8px!important;
+}
+
+.keybtn {
+    max-width: 35%!important;
+    max-height: 32px;
+    margin: 4px!important;
+}
+
+.expiry-btn {
+    max-width: 35%!important;
+    max-height: 64px!important;
+    padding: 4px!important;
+}
+
+.key-container {
+    width: 100%!important;
+    align-items: center!important;
+    justify-content: center!important;
 }
