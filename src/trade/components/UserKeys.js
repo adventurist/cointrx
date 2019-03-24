@@ -3,8 +3,13 @@ import PropTypes from 'prop-types'
 import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers'
 import ReactDataGrid from 'react-data-grid'
 import DateFnsUtils from '@date-io/date-fns'
-import { Button, Dialog, Fab, TextField, Tooltip } from '@material-ui/core'
+import { Button, Dialog, Fab, Paper, TextField, Typography, Tooltip } from '@material-ui/core'
+import SaveIcon from '@material-ui/icons/Save'
+import CancelIcon from '@material-ui/icons/Cancel'
 import EditIcon from '@material-ui/icons/Edit'
+import CloseIcon from '@material-ui/icons/Close'
+import DeleteIcon from '@material-ui/icons/Delete'
+
 const keyBtnStyles = {
     float: 'right',
     right: '3em',
@@ -40,6 +45,13 @@ export class KeyDialog extends React.Component {
         //   const keyDeleteResult = await deleteKey('temp', csrf)
     }
 
+    handleDate = e => {
+        const value = e.target.value
+        console.log(value)
+    }
+
+
+
     disableKey() {
         this.requestBtcKeyDelete(this.props.keyId).then(
             alert('Eat some clams')
@@ -52,24 +64,7 @@ export class KeyDialog extends React.Component {
 
     render() {
         // const actions = [
-        //     <Button
-        //         label="Save"
-        //         primary={true}
-        //         keyboardFocused={true}
-        //         onClick={this.saveKey.bind(this)}
-        //     />,
-        //     <Button
-        //         label="Delete"
-        //         secondary={true}
-        //         keyboardFocused={true}
-        //         onClick={this.disableKey(this.props.keyId)}
-        //     />,
-        //     <Button
-        //         label="Cancel"
-        //         primary={true}
-        //         keyboardFocused={true}
-        //         onClick={this.handleClose()}
-        //     />,
+
         // ];
 
         return (
@@ -79,19 +74,33 @@ export class KeyDialog extends React.Component {
                     // actions={actions}
                     modal={false}
                     open={this.props.show}
-                    onRequestClose={this.handleClose}
-                >
-                    <div className="datepicker">
-                    <DatePicker
+                    onRequestClose={this.handleClose}>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <DatePicker
+                            onChange={this.handleDate}
                             margin="normal"
-                            label='Expiry Date'
-                    />
-                        <Button label="Set" />
-                    </div>
+                            label='Expiry Date'/>
+                    </MuiPickersUtilsProvider>
+                    <Button
+                        label="Save"
+                        primary={true}
+                        keyboardFocused={true}
+                        onClick={this.saveKey}>Save</Button>
+                    <Button
+                        label="Delete"
+                        secondary={true}
+                        keyboardFocused={true}
+                        onClick={this.disableKey}>Delete</Button>
+                    <Button
+                        label="Cancel"
+                        primary={true}
+                        keyboardFocused={true}
+                        onClick={this.handleClose}>Cancel</Button>
+                    <Button onClick={this.closeDialog} label="Close">Close</Button>
                 </Dialog>
             </div>
         );
-    }
+}
 }
 
 export class UserKeys extends Component {
@@ -177,29 +186,57 @@ export class UserKeys extends Component {
                 </div>
                 <Dialog
                     title="Key Editor"
-                    // actions={actions}
+                    className='keydialog'
                     modal={false}
                     open={this.state.dialogOpen}
-                    onRequestClose={this.handleClose}
-                >
+                    onRequestClose={this.handleClose}>
+                    <Paper className='key-dialog-paper'>
+                    <Typography>
+                        Edit your key
+                    </Typography>
                     <TextField
                         value={this.state.dialogText}
                         className='keylabel'
                         label='Key Label'
                         onChange={this.dialogTextChange}
                     />
-                    <br />
-                    Set a date to automatically disable this key <br/>
+                    <Typography>
+                        Set a date to automatically disable this key
+                    </Typography>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <DatePicker
-                            margin="normal"
-                            label='Expiry Date'
-                            // className={this.state.offerDate ? classes.filledDatePicker : classes.datePicker}
-                            // value={this.state.offerDate}
-                            // onChange={this.handleDateChange
-                        />
-                        <Button label="Set" secondary={true} keyboardFocused={true} onClick={this.setKeyFutureDisable}/>
+                        <div style={{display: 'flex'}}>
+                            <DatePicker
+                                margin="normal"
+                                label='Expiry Date'
+                                onChange={this.handleDate}>
+                                Expiry Date
+                            </DatePicker>
+                            <Button className='expiry-btn' variant='contained' label="Set" secondary={true} keyboardFocused={true} onClick={this.setKeyFutureDisable}>Set Expiry<SaveIcon></SaveIcon></Button>
+                        </div>
                     </MuiPickersUtilsProvider>
+                    <div className='btn-container'>
+                        <Button
+                            label="Save"
+                            color="primary"
+                            variant='contained'
+                            className='keybtn'
+                            keyboardFocused={true}
+                            onClick={this.saveKey}><SaveIcon/>Save</Button>
+                        <Button
+                            label="Delete"
+                            color="secondary"
+                            variant='contained'
+                            className='keybtn'
+                            keyboardFocused={true}
+                            onClick={this.requestBtcKeyDelete}><DeleteIcon/>Delete</Button>
+                        <Button
+                            label="Cancel"
+                            variant='contained'
+                            className='keybtn'
+                            keyboardFocused={true}
+                            onClick={this.handleClose}><CancelIcon/>Cancel</Button>
+                        </div>
+                        </Paper>
                 </Dialog>
 
             </div>
@@ -216,7 +253,7 @@ export class UserKeys extends Component {
                 <div>
                     <Button label="Edit"
                                   className='key-edit' value={row.id}
-                                  onClick={this.openEditKeyDialog.bind(this, row.id)}
+                                  onClick={this.openEditKeyDialog}
                     ><EditIcon /> Edit </Button>
                     {this.state.dialogOpen && isObjectEquivalent(this.props.row, this.state.dialogCursor) ?
                         (<KeyDialog show={this.state.dialogOpen}/>)
@@ -234,6 +271,11 @@ export class UserKeys extends Component {
             'btn': ''
 
         }
+    }
+
+    handleDate = e => {
+        const value = e.target.value
+        console.log(value)
     }
 
     requestBtcKey = async() => {
@@ -257,10 +299,10 @@ export class UserKeys extends Component {
         }
     }
 
-    requestBtcKeyDelete = async(id) => {
-        console.log(`BTC Key deletion requested: ${id}`)
-        const csrf = getCsrfToken()
-        const keyDeleteResult = await deleteKey('temp', csrf)
+    requestBtcKeyDelete = async e => {
+        console.log(`BTC Key deletion requested: ${e.target.value}`)
+        // const csrf = getCsrfToken()
+        // const keyDeleteResult = await deleteKey('temp', csrf)
     }
 
     disableKey() {
@@ -269,8 +311,10 @@ export class UserKeys extends Component {
         )
     }
 
-    openEditKeyDialog(id) {
-        this.updateDialogState(id)
+    openEditKeyDialog = e => {
+        const value = e.target.value
+        console.log(value)
+        this.updateDialogState(value)
     }
 
     updateDialogState(id) {
@@ -318,8 +362,8 @@ export class UserKeys extends Component {
         this.setState({dialogText: value})
     }
 
-    saveKey () {
-
+    saveKey = e => {
+        console.log(e.target.value)
         if (isKeyLabelChanged(this.state.dialogText, this.state.dialogCursor)) {
             this.requestBtcKeyUpdate(this.state.dialogCursor, this.state.dialogText)
         }

@@ -1,8 +1,6 @@
 import { Component } from 'react'
 import { MenuItem, TextField } from '@material-ui/core'
 
-const className = 'textField'
-
 const currencies = [
   {
       value: 'CAD',
@@ -32,11 +30,10 @@ export class CurrencyField extends Component {
   render () {
 
     const style = this.props.styles ? this.props.styles : {
-      width: '85%'
+      width: this.props.full ? '100%' : '85%'
     }
     return (
       <TextField
-                    className={className}
                     id="select-currency"
                     style={style}
                     select
