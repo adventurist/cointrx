@@ -79,7 +79,7 @@ const EmptyBellIcon = () => {
 const menuItems = [
 {
     url: '/user',
-    label: 'User Profile',
+    label: 'Account settings',
     icon: 'person'
 },
 {
