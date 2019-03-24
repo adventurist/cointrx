@@ -116,6 +116,15 @@ body {
     border: 1px solid black;
 }
 
+.key-grid .react-grid-Row:first-child > .react-grid-Cell {
+    background-color: #333!important;
+    color: #E1E1E1!important;
+}
+
+.react-grid-Row:hover .react-grid-Cell {
+    background-color: #8f8f8f!important;
+}
+
 .react-grid-Row--even:hover > .react-grid-Cell, .react-grid-Row--odd:hover > .react-grid-Cell  {
     background-color: #8f8f8f!important;
     color: #3f5c5e!important;
