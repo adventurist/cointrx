@@ -1,6 +1,100 @@
 import { Component} from 'react'
+import PropTypes from 'prop-types'
+import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers'
+import ReactDataGrid from 'react-data-grid'
+import DateFnsUtils from '@date-io/date-fns'
+import { Button, Dialog, Fab, TextField, Tooltip } from '@material-ui/core'
+import EditIcon from '@material-ui/icons/Edit'
+const keyBtnStyles = {
+    float: 'right',
+    right: '3em',
+    bottom: '4em',
+    left: 'auto',
+    position: 'fixed',
+    zIndex: '5555'
+}
 
-export class UserKeys extends React.Component {
+export class KeyDialog extends React.Component {
+    constructor(props, context) {
+        super(props, context)
+        this.props = {
+            keyId: 0,
+            show: false
+        }
+        this.state = {open: true}
+    }
+
+    state = {}
+
+    handleOpen = () => {
+        this.setState({open: true});
+    };
+
+    handleClose = () => {
+        this.setState({open: false});
+    };
+
+    requestBtcKeyDelete = async(id) => {
+        console.log(`BTC Key deletion requested: ${id}`)
+        const csrf = getCsrfToken()
+        //   const keyDeleteResult = await deleteKey('temp', csrf)
+    }
+
+    disableKey() {
+        this.requestBtcKeyDelete(this.props.keyId).then(
+            alert('Eat some clams')
+        )
+    }
+
+    saveKey() {
+        console.log(this)
+    }
+
+    render() {
+        // const actions = [
+        //     <Button
+        //         label="Save"
+        //         primary={true}
+        //         keyboardFocused={true}
+        //         onClick={this.saveKey.bind(this)}
+        //     />,
+        //     <Button
+        //         label="Delete"
+        //         secondary={true}
+        //         keyboardFocused={true}
+        //         onClick={this.disableKey(this.props.keyId)}
+        //     />,
+        //     <Button
+        //         label="Cancel"
+        //         primary={true}
+        //         keyboardFocused={true}
+        //         onClick={this.handleClose()}
+        //     />,
+        // ];
+
+        return (
+            <div>
+                <Dialog
+                    title="Dialog With Date Picker"
+                    // actions={actions}
+                    modal={false}
+                    open={this.props.show}
+                    onRequestClose={this.handleClose}
+                >
+                    <div className="datepicker">
+                    <DatePicker
+                            margin="normal"
+                            label='Expiry Date'
+                    />
+                        <Button label="Set" />
+                    </div>
+                </Dialog>
+            </div>
+        );
+    }
+}
+
+export class UserKeys extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
@@ -12,7 +106,7 @@ export class UserKeys extends React.Component {
                 {key: 'bal', name: 'Balance'},
                 {key: 'btn', name: 'Modify'}
             ],
-            _rows: this.createRows(keyData),
+            _rows: this.createRows(props.keys),
             dialogOpen: false,
             dialogCursor: 0,
             dialogText: ''
@@ -43,77 +137,69 @@ export class UserKeys extends React.Component {
         const {mini, tooltipPosition} = this.props;
         const tooltipPos = tooltipPosition.split('-');
         const tooltip = 'Create new Bitcoin Address'
-        const actions = [
-            <FlatButton
-                label="Save"
-                primary={true}
-                keyboardFocused={true}
-                onClick={this.saveKey.bind(this)}
-            />,
-            <FlatButton
-                label="Delete"
-                secondary={true}
-                keyboardFocused={true}
-                onClick={this.disableKey.bind(this)}
-            />,
-            <FlatButton
-                label="Okay"
-                primary={true}
-                keyboardFocused={true}
-                onClick={this.handleClose}
-            />
-        ];
+        // const actions = [
+        //     <Button
+        //         label="Save"
+        //         primary={true}
+        //         keyboardFocused={true}
+        //         onClick={this.saveKey.bind(this)}
+        //     />,
+        //     <Button
+        //         label="Delete"
+        //         secondary={true}
+        //         keyboardFocused={true}
+        //         onClick={this.disableKey.bind(this)}
+        //     />,
+        //     <Button
+        //         label="Okay"
+        //         primary={true}
+        //         keyboardFocused={true}
+        //         onClick={this.handleClose}
+        //     />
+        // ];
         return (
-            <div id="key-container">
+            <div id="key-container" className='key-grid'>
+            <Tooltip
+                title='Dicks'>
                 <ReactDataGrid
                     columns={this.state._columns}
                     rowGetter={this.rowGetter}
                     rowsCount={this.state._rows.length}
                     rowHeight={48}
-                    minHeight={500}/>
+                    minHeight={500}
+                    enableCellSelect={false}
+                    />
+            </Tooltip>
                 <div style={keyBtnStyles} id="fab-container">
-                    <FloatingActionButton id="btc-key-btn"
-                                          mini={mini}
-                                          onClick={this.requestBtcKey}
-                                          onMouseEnter={() => this.setState({btnHovered: true})}
-                                          onMouseLeave={() => this.setState({btnHovered: false})}>
-
-                        <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                            <path fill="#000000"
-    d="M4.5,5H8V2H10V5H11.5V2H13.5V5C19,5 19,11 16,11.25C20,11 21,19 13.5,19V22H11.5V19H10V22H8V19H4.5L5,17H6A1,1 0 0,0 7,16V8A1,1 0 0,0 6,7H4.5V5M10,7V11C10,11 14.5,11.25 14.5,9C14.5,6.75 10,7 10,7M10,12.5V17C10,17 15.5,17 15.5,14.75C15.5,12.5 10,12.5 10,12.5Z"
-                            />
-                        </svg>
-
-                    </FloatingActionButton>
-                    {tooltip &&
-                    <Tooltip
-                        show={this.state.btnHovered}
-                        label={tooltip}
-                        style={{fontSize: '9pt'}}
-                        horizontalPosition={tooltipPos[1]}
-                        verticalPosition={tooltipPos[0]}/>
-                    }
+                <Fab title='Create Key'
+                onClick={this.requestBtcKey}
+                >Create Key</Fab>
                 </div>
                 <Dialog
                     title="Key Editor"
-                    actions={actions}
+                    // actions={actions}
                     modal={false}
                     open={this.state.dialogOpen}
                     onRequestClose={this.handleClose}
                 >
                     <TextField
                         value={this.state.dialogText}
-                        ref='keylabel'
                         className='keylabel'
-                        floatingLabelText='Key Label'
+                        label='Key Label'
                         onChange={this.dialogTextChange}
                     />
                     <br />
                     Set a date to automatically disable this key <br/>
-                    <div className="datepicker">
-                        <DatePicker hintText="Date Picker" />
-                        <FlatButton label="Set" secondary={true} keyboardFocused={true} onClick={this.setKeyFutureDisable}/>
-                    </div>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <DatePicker
+                            margin="normal"
+                            label='Expiry Date'
+                            // className={this.state.offerDate ? classes.filledDatePicker : classes.datePicker}
+                            // value={this.state.offerDate}
+                            // onChange={this.handleDateChange
+                        />
+                        <Button label="Set" secondary={true} keyboardFocused={true} onClick={this.setKeyFutureDisable}/>
+                    </MuiPickersUtilsProvider>
                 </Dialog>
 
             </div>
@@ -128,10 +214,10 @@ export class UserKeys extends React.Component {
             'bal': row.bal,
             'btn':
                 <div>
-                    <RaisedButton label="Edit" secondary={true}
-                                  id={row.id} value={row.id}
+                    <Button label="Edit"
+                                  className='key-edit' value={row.id}
                                   onClick={this.openEditKeyDialog.bind(this, row.id)}
-                    />
+                    ><EditIcon /> Edit </Button>
                     {this.state.dialogOpen && isObjectEquivalent(this.props.row, this.state.dialogCursor) ?
                         (<KeyDialog show={this.state.dialogOpen}/>)
                         : null}
@@ -215,7 +301,7 @@ export class UserKeys extends React.Component {
     };
 
     keyLabelAtCursor = () => {
-        const currentKey = keyData.find(key => key.id == this.state.dialogCursor)
+        const currentKey = this.props.keys.find(key => key.id == this.state.dialogCursor)
         if (isKeyObject(currentKey)) {
             return currentKey.label
         }
@@ -223,7 +309,7 @@ export class UserKeys extends React.Component {
     }
 
     getKeyLabel = (id) => {
-        const key = keyData.find(key => key.id == id)
+        const key = this.props.keys.find(key => key.id == id)
         if (isKeyObject(key)) {
             return key.label
         }
@@ -255,15 +341,15 @@ export class UserKeys extends React.Component {
 
     updateKeys(id, label) {
         let keyChanged = false
-        for (let i = 0; i < keyData.length; i++) {
-            if (keyData[i].id === id) {
-                keyData[i].label = label
+        for (let i = 0; i < this.props.keys.length; i++) {
+            if (this.props.keys[i].id === id) {
+                this.props.keys[i].label = label
                 keyChanged = true
             }
         }
 
         if (keyChanged) {
-            this.state._rows = this.createRows(keyData)
+            this.state._rows = this.createRows(this.props.keys)
             this.setState({_rows: this.addBtnRows(this.state._rows)})
         }
 
@@ -275,3 +361,27 @@ export class UserKeys extends React.Component {
         // const keyDeleteResult = await deleteKey('temp', csrf)
     }
 }
+
+
+
+
+const isObjectEquivalent = (a, b) => {
+    if (a !== null && typeof a !== 'undefined') {
+        const aProps = Object.getOwnPropertyNames(a);
+        const bProps = Object.getOwnPropertyNames(b);
+
+        if (aProps.length != bProps.length) {
+            return false;
+        }
+
+        for (let i = 0; i < aProps.length; i++) {
+            const propName = aProps[i];
+            if (a[propName] !== b[propName]) {
+                return false;
+            }
+        }
+        return true
+    }
+}
+
+const isKeyObject = (key) => typeof key !== 'undefined' && 'id' in key
