@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import ReactDataGrid from 'react-data-grid'
 import { TextField } from '@material-ui/core'
 import SaveIcon from '@material-ui/icons/Save'
-import { Card, CardActions, CardHeader, CardMedia, CardTitle } from '@material-ui/core'
+import { Typography, Card, CardActions, CardHeader, CardMedia, CardTitle } from '@material-ui/core'
 import { NumberField } from '../../trade/components/FundField'
 import Button from '@material-ui/core/Button'
 import { CurrencyField } from '../../trade/components/CurrencyField'
@@ -15,6 +15,11 @@ import Snackbar from '../../snackbar';
 import { some } from 'lodash'
 import { request, handleResponse } from '../../utils'
 import { userUpdateRequest, fetchTimezoneRequest } from '../requests';
+import Accounting from 'accounting'
+
+function formatMoney(value, symbol = 'CAD') {
+    return Accounting.formatMoney(value, symbol)
+}
 
 const keyBtnStyles = {
     float: 'right',
@@ -28,7 +33,6 @@ const keyBtnStyles = {
 const styles = {
     container: {
         textAlign: 'center',
-        paddingTop: 16
     }
 }
 
@@ -39,20 +43,13 @@ export class UserCard extends Component {
 
     render () {
         return (
-            <Card>
-                <CardHeader
-                    title={this.props.name}
-                    subtitle={this.props.email}
-                />
-                <CardActions>
-                    <Button label="Settings" />
-                    <Button label="Security" />
-                </CardActions>
-                <CardMedia
-                    image='/static/images/avatar.jpg'
-                >
-                </CardMedia>
-            </Card>
+        <Card style={{margin: '16px'}}>
+            <CardMedia
+                style={{marginBottom: '8px', height: '180px', width: 'auto', backgroundSize: 'contain'}}
+                image='/static/images/avatar.jpg'
+            >
+            </CardMedia>
+        </Card>
         )
     }
 }
@@ -138,9 +135,9 @@ export class UserForm extends Component {
     render() {
         return (
             <div style={styles.container}>
-                <h2>Account</h2>
+                <Typography style={{color: '#E1E1E1'}} variant='h5'>Account Settings</Typography>
 
-                <UserCard name={this.state.name} email={this.state.email} />
+                <UserCard />
 
                 <input
                     type="file"
@@ -152,87 +149,90 @@ export class UserForm extends Component {
                 <form
                     className="user-form"
                     onSubmit={this.onSubmit}>
-                    <div className='text-container'>
-                        <TextField
-                            ref='name'
-                            className='userform'
-                            label='Your user name'
-                            value={this.state.name}
-                        />
-                    </div>
-                    <br />
-                    <div className='text-container'>
-                        <TextField
-                            ref='email'
-                            className='userform'
-                            label='Your email'
-                            value={this.state.email}
-                        />
-                    </div>
-                    <br />
-                    <div className='text-container'>
-                        <TextField
-                            ref='language'
-                            className='userform'
-                            label='Your language'
-                            value={this.state.language}
-                        />
-                    </div>
-                    <br />
-                    <div id="timezone-container" style={{display: 'flex'}}>
-                        <TimezonePicker
-                            value={this.state.timezone}
-                            onChange={this.updateTimezone}
-                            inputProps={{
-                                placeholder: 'Select Timezone...',
-                                name: 'timezone',
-                            }}
-                        />
-                        <NumberField
-                            value={Math.abs(this.state.tzOffset)}
-                            max={24}
-                            label='Offset'
-                            prefix={this.state.tzOffset < 0 ? '-' : ''}
-                            classes={{filledTextField: 'timezoneNumFilled', textField: 'timezoneNum' }}
-                            width='15%'
-                        />
-                    </div>
+                    <div className='user-column-1'>
+                        <div className='text-container'>
+                            <TextField
+                                ref='name'
+                                className='userform'
+                                label='Your user name'
+                                value={this.state.name}
+                            />
+                        </div>
+                        <br />
+                        <div className='text-container'>
+                            <TextField
+                                ref='email'
+                                className='userform'
+                                label='Your email'
+                                value={this.state.email}
+                            />
+                        </div>
+                        <br />
+                        <div className='text-container'>
+                            <TextField
+                                ref='language'
+                                className='userform'
+                                label='Your language'
+                                value={this.state.language}
+                            />
+                        </div>
+                        <br />
+                        <div id="timezone-container" style={{display: 'flex'}}>
+                            <TimezonePicker
+                                value={this.state.timezone}
+                                onChange={this.updateTimezone}
+                                inputProps={{
+                                    placeholder: 'Select Timezone...',
+                                    name: 'timezone',
+                                }}
+                            />
+                            <NumberField
+                                value={Math.abs(this.state.tzOffset)}
+                                max={24}
+                                label='Offset'
+                                prefix={this.state.tzOffset < 0 ? '-' : ''}
+                                classes={{filledTextField: 'timezoneNumFilled', textField: 'timezoneNum' }}
+                                width='15%'
+                            />
+                        </div>
 
+                    </div>
+                    {/* <hr className="userform-separator" /> */}
 
-                    <hr className="userform-separator" />
+                    <div className='user-column-2'>
 
-                    <div className="text-container">
-
-                        <CurrencyField currency={this.state.currency} handler={this.handleCurrency} styles={{width: '10%'}}>
+                        <CurrencyField full={true} currency={this.state.currency} handler={this.handleCurrency} >
                         </CurrencyField>
-                        <div className='balance-wrap'>
-                            <div className="text-container balance-container">
-                                <TextField
-                                    id="btc-balance"
-                                    className='btc-balance'
-                                    value={"₿ " + Number(this.props.user.balance)}
-                                />
-                            </div>
 
-                            <div className="text-container estimated-container">
-                                <TextField
-                                    id="estimated-value"
-                                    className='estimated-value'
-                                    value={"$ " + Number(this.props.user.estimated) + " (estimated value)"}
-                                />
-                            </div>
+                        <div className="text-container balance-container">
+                            <TextField
+                                id="btc-balance"
+                                className='btc-balance'
+                                label='BTC Balance'
+                                value={"₿ " + formatMoney(Number(this.props.user.balance), '')}
+                            />
+                        </div>
 
-                            <div className="text-container account-container">
-                                <TextField
-                                    id="account-balance"
-                                    className='account-balance'
-                                    value={"$ " + Number(this.props.user.account)}
-                                />
-                            </div>
+                        <div className="text-container estimated-container">
+                            <TextField
+                                id="estimated-value"
+                                className='estimated-value'
+                                label='Estimated value of BTC'
+                                value={formatMoney(Number(this.props.user.estimated, this.props.user.currency))}
+                            />
+                        </div>
+
+                        <div className="text-container account-container">
+                            <TextField
+                                id="account-balance"
+                                className='account-balance'
+                                label='Account balance'
+                                value={formatMoney(Number(this.props.user.account), this.props.user.currency)}
+                            />
                         </div>
                     </div>
 
-                    <Button type='submit' variant="contained" size="medium" className="user-save-btn">
+                    <Button type='submit' color='primary' variant="contained" size="medium" className="user-save-btn">
                         <SaveIcon />
                             Save
                     </Button>
