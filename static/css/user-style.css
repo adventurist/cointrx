@@ -76,6 +76,21 @@
     overflow: hidden!important;
 }
 
+.react-grid-Canvas, .react-grid-Grid {
+    background-color: #424242!important;
+}
+
+.key-grid .react-grid-Row:first-child > .react-grid-Cell {
+    background-color: #333!important;
+    color: #E1E1E1!important;
+}
+
+.key-grid .react-grid-Row:hover > .react-grid-Cell {
+    color: #3f5c5e!important;
+    background-color: #8f8f8f!important;
+}
+
+
 .datepicker, .datepicker > button, .datepicker > div {
     display: inline-block;
 }
@@ -178,4 +193,8 @@
     width: 100%!important;
     align-items: center!important;
     justify-content: center!important;
+}
+
+.react-grid-Main, .react-grid-Grid {
+    background-color: #333!important;
 }

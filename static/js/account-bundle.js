@@ -78116,24 +78116,26 @@ function (_Component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_icons_Notifications__ = __webpack_require__(941);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_icons_Notifications___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_19__material_ui_icons_Notifications__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_icons_NotificationsActive__ = __webpack_require__(942);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_icons_NotificationsActive___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_20__material_ui_icons_NotificationsActive__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_Icon__ = __webpack_require__(406);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_Icon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_Icon__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_SvgIcon__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_SvgIcon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_SvgIcon__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card__ = __webpack_require__(245);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_CardActions__ = __webpack_require__(248);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_CardActions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_CardActions__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent__ = __webpack_require__(246);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip__ = __webpack_require__(407);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_icons_StoreTwoTone__ = __webpack_require__(1222);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_icons_StoreTwoTone___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_20__material_ui_icons_StoreTwoTone__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_icons_NotificationsActive__ = __webpack_require__(942);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_icons_NotificationsActive___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_21__material_ui_icons_NotificationsActive__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_Icon__ = __webpack_require__(406);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_Icon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_Icon__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_SvgIcon__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_SvgIcon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_SvgIcon__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Card__ = __webpack_require__(245);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Card__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardActions__ = __webpack_require__(248);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardActions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardActions__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__material_ui_core_CardContent__ = __webpack_require__(246);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__material_ui_core_CardContent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_CardContent__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_Button__ = __webpack_require__(81);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Button__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__material_ui_core_Typography__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__material_ui_core_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Typography__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip__ = __webpack_require__(407);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
@@ -78163,6 +78165,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -78227,7 +78230,7 @@ var TRXLogo = function TRXLogo() {
 };
 
 var BellIcon = function BellIcon() {
-  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_icons_NotificationsActive___default.a, {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_21__material_ui_icons_NotificationsActive___default.a, {
     className: "bell"
   });
 };
@@ -78239,6 +78242,10 @@ var EmptyBellIcon = function EmptyBellIcon() {
 };
 
 var menuItems = [{
+  url: '/',
+  label: 'Trade',
+  icon: 'tradeicon'
+}, {
   url: '/user',
   label: 'Account settings',
   icon: 'person'
@@ -78276,7 +78283,7 @@ var menuItems = [{
   icon: 'trending_up'
 }];
 var userMenuItems = [{
-  label: 'User Profile',
+  label: 'Account settings',
   url: '/user'
 }, {
   label: 'Logout',
@@ -78400,7 +78407,7 @@ function (_React$Component) {
         disableGutters: !this.state.open,
         className: "toolbar",
         title: "Coin TRX"
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip___default.a, {
         title: "Click to open the navigation drawer"
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: classes.menuBotton,
@@ -78423,7 +78430,7 @@ function (_React$Component) {
         open: this.state.notificationMenuOpen,
         closeHandler: this.handleNotificationMenuClose,
         notifyAllMessagesRead: this.handleAllNotificationsRead
-      }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip___default.a, {
         title: this.state.notification ? 'You have unread notification messages' : 'You have no unread messages'
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: "bell",
@@ -78434,7 +78441,7 @@ function (_React$Component) {
       }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(EmptyBellIcon, {
         className: "bell",
         style: styles.bell
-      }))), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
+      }))), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip___default.a, {
         title: "User menu"
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: "user-menu-iconbutton",
@@ -78476,7 +78483,7 @@ function (_React$Component) {
 
 
 var logoIcon = function logoIcon() {
-  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_Icon___default.a, {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_Icon___default.a, {
     className: classes.logoIcon,
     hidden: false
   }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TRXLogo, null));
@@ -78582,7 +78589,7 @@ function (_React$Component2) {
             height: '80%'
           }
         }
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Button___default.a, {
         onClick: this.handleClose,
         style: {
           float: 'right'
@@ -78595,9 +78602,9 @@ function (_React$Component2) {
           onClick: function onClick() {
             return _this4.handleNotificationClick(i);
           }
-        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card___default.a, {
+        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Card___default.a, {
           className: "notification-item"
-        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default.a, {
+        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Typography___default.a, {
           color: "textSecondary",
           gutterBottom: true
         }, message.text))));
@@ -78645,16 +78652,16 @@ function (_React$Component3) {
         fontSize: '9pt',
         color: '#FFF'
       };
-      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip___default.a, {
         title: "Balance summary"
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Card___default.a, {
         style: {
           maxHeight: '64px'
         }
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Typography___default.a, {
         style: style,
         color: "textSecondary"
-      }, "Welcome, ", this.state.user.name), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default.a, {
+      }, "Welcome, ", this.state.user.name), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Typography___default.a, {
         style: style,
         color: "textSecondary"
       }, this.state.user.balance, " BTC / ", this.state.user.estimated, " ", this.state.user.currency)))));
@@ -85938,6 +85945,8 @@ Popper.Defaults = Defaults;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__material_ui_icons_People___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_12__material_ui_icons_People__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__material_ui_core_SvgIcon__ = __webpack_require__(40);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__material_ui_core_SvgIcon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_13__material_ui_core_SvgIcon__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__material_ui_icons_StoreTwoTone__ = __webpack_require__(1222);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__material_ui_icons_StoreTwoTone___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_14__material_ui_icons_StoreTwoTone__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -85957,6 +85966,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -86078,8 +86088,12 @@ var styles = {
 };
 var menuItems = // trx_env === 'LOCAL_DEVELOPMENT' ?
 [{
+  url: '/',
+  label: 'Trade',
+  icon: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_14__material_ui_icons_StoreTwoTone___default.a, null)
+}, {
   url: '/user',
-  label: 'User Profile',
+  label: 'Account Settings',
   icon: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_11__material_ui_icons_Person___default.a, null)
 }, {
   url: '/user/all',
@@ -113043,6 +113057,36 @@ var reducer = Object(__WEBPACK_IMPORTED_MODULE_1_redux_actions__["a" /* handleAc
   token: undefined
 });
 /* harmony default export */ __webpack_exports__["a"] = (reducer);
+
+/***/ }),
+/* 1222 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(32);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _createSvgIcon = _interopRequireDefault(__webpack_require__(35));
+
+var _default = (0, _createSvgIcon.default)(_react.default.createElement(_react.default.Fragment, null, _react.default.createElement("path", {
+  fill: "none",
+  d: "M0 0h24v24H0V0z"
+}), _react.default.createElement("path", {
+  d: "M5.64 9l-.6 3h13.92l-.6-3z",
+  opacity: ".3"
+}), _react.default.createElement("path", {
+  d: "M4 4h16v2H4zM20 7H4l-1 5v2h1v6h10v-6h4v6h2v-6h1v-2l-1-5zm-8 11H6v-4h6v4zm-6.96-6l.6-3h12.72l.6 3H5.04z"
+})), 'StoreTwoTone');
+
+exports.default = _default;
 
 /***/ })
 /******/ ]);

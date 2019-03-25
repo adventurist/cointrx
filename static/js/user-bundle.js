@@ -68845,24 +68845,26 @@ exports.default = TableHeaderColumn;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_icons_Notifications__ = __webpack_require__(518);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__material_ui_icons_Notifications___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_19__material_ui_icons_Notifications__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_icons_NotificationsActive__ = __webpack_require__(519);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_icons_NotificationsActive___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_20__material_ui_icons_NotificationsActive__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_Icon__ = __webpack_require__(284);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_core_Icon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_Icon__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_SvgIcon__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_SvgIcon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_SvgIcon__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card__ = __webpack_require__(285);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_CardActions__ = __webpack_require__(286);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_CardActions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_CardActions__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent__ = __webpack_require__(287);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button__ = __webpack_require__(72);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip__ = __webpack_require__(288);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_icons_StoreTwoTone__ = __webpack_require__(1261);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__material_ui_icons_StoreTwoTone___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_20__material_ui_icons_StoreTwoTone__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_icons_NotificationsActive__ = __webpack_require__(519);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__material_ui_icons_NotificationsActive___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_21__material_ui_icons_NotificationsActive__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_Icon__ = __webpack_require__(284);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_Icon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_Icon__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_SvgIcon__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__material_ui_core_SvgIcon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_SvgIcon__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Card__ = __webpack_require__(285);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__material_ui_core_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Card__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardActions__ = __webpack_require__(286);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardActions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardActions__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__material_ui_core_CardContent__ = __webpack_require__(287);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__material_ui_core_CardContent___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_CardContent__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_Button__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__material_ui_core_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Button__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__material_ui_core_Typography__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__material_ui_core_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Typography__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip__ = __webpack_require__(288);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
@@ -68892,6 +68894,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -68956,7 +68959,7 @@ var TRXLogo = function TRXLogo() {
 };
 
 var BellIcon = function BellIcon() {
-  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_20__material_ui_icons_NotificationsActive___default.a, {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_21__material_ui_icons_NotificationsActive___default.a, {
     className: "bell"
   });
 };
@@ -68968,6 +68971,10 @@ var EmptyBellIcon = function EmptyBellIcon() {
 };
 
 var menuItems = [{
+  url: '/',
+  label: 'Trade',
+  icon: 'tradeicon'
+}, {
   url: '/user',
   label: 'Account settings',
   icon: 'person'
@@ -69005,7 +69012,7 @@ var menuItems = [{
   icon: 'trending_up'
 }];
 var userMenuItems = [{
-  label: 'User Profile',
+  label: 'Account settings',
   url: '/user'
 }, {
   label: 'Logout',
@@ -69129,7 +69136,7 @@ function (_React$Component) {
         disableGutters: !this.state.open,
         className: "toolbar",
         title: "Coin TRX"
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip___default.a, {
         title: "Click to open the navigation drawer"
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: classes.menuBotton,
@@ -69152,7 +69159,7 @@ function (_React$Component) {
         open: this.state.notificationMenuOpen,
         closeHandler: this.handleNotificationMenuClose,
         notifyAllMessagesRead: this.handleAllNotificationsRead
-      }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip___default.a, {
         title: this.state.notification ? 'You have unread notification messages' : 'You have no unread messages'
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: "bell",
@@ -69163,7 +69170,7 @@ function (_React$Component) {
       }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(EmptyBellIcon, {
         className: "bell",
         style: styles.bell
-      }))), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
+      }))), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip___default.a, {
         title: "User menu"
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
         className: "user-menu-iconbutton",
@@ -69205,7 +69212,7 @@ function (_React$Component) {
 
 
 var logoIcon = function logoIcon() {
-  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_21__material_ui_core_Icon___default.a, {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_Icon___default.a, {
     className: classes.logoIcon,
     hidden: false
   }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TRXLogo, null));
@@ -69311,7 +69318,7 @@ function (_React$Component2) {
             height: '80%'
           }
         }
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_Button___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Button___default.a, {
         onClick: this.handleClose,
         style: {
           float: 'right'
@@ -69324,9 +69331,9 @@ function (_React$Component2) {
           onClick: function onClick() {
             return _this4.handleNotificationClick(i);
           }
-        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card___default.a, {
+        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Card___default.a, {
           className: "notification-item"
-        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default.a, {
+        }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Typography___default.a, {
           color: "textSecondary",
           gutterBottom: true
         }, message.text))));
@@ -69374,16 +69381,16 @@ function (_React$Component3) {
         fontSize: '9pt',
         color: '#FFF'
       };
-      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Tooltip___default.a, {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_29__material_ui_core_Tooltip___default.a, {
         title: "Balance summary"
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_23__material_ui_core_Card___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_24__material_ui_core_Card___default.a, {
         style: {
           maxHeight: '64px'
         }
-      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_25__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_26__material_ui_core_CardContent___default.a, null, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Typography___default.a, {
         style: style,
         color: "textSecondary"
-      }, "Welcome, ", this.state.user.name), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_27__material_ui_core_Typography___default.a, {
+      }, "Welcome, ", this.state.user.name), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_28__material_ui_core_Typography___default.a, {
         style: style,
         color: "textSecondary"
       }, this.state.user.balance, " BTC / ", this.state.user.estimated, " ", this.state.user.currency)))));
@@ -117981,6 +117988,440 @@ function verifySubselectors(mapStateToProps, mapDispatchToProps, mergeProps, dis
   verify(mapDispatchToProps, 'mapDispatchToProps', displayName);
   verify(mergeProps, 'mergeProps', displayName);
 }
+
+/***/ }),
+/* 857 */,
+/* 858 */,
+/* 859 */,
+/* 860 */,
+/* 861 */,
+/* 862 */,
+/* 863 */,
+/* 864 */,
+/* 865 */,
+/* 866 */,
+/* 867 */,
+/* 868 */,
+/* 869 */,
+/* 870 */,
+/* 871 */,
+/* 872 */,
+/* 873 */,
+/* 874 */,
+/* 875 */,
+/* 876 */,
+/* 877 */,
+/* 878 */,
+/* 879 */,
+/* 880 */,
+/* 881 */,
+/* 882 */,
+/* 883 */,
+/* 884 */,
+/* 885 */,
+/* 886 */,
+/* 887 */,
+/* 888 */,
+/* 889 */,
+/* 890 */,
+/* 891 */,
+/* 892 */,
+/* 893 */,
+/* 894 */,
+/* 895 */,
+/* 896 */,
+/* 897 */,
+/* 898 */,
+/* 899 */,
+/* 900 */,
+/* 901 */,
+/* 902 */,
+/* 903 */,
+/* 904 */,
+/* 905 */,
+/* 906 */,
+/* 907 */,
+/* 908 */,
+/* 909 */,
+/* 910 */,
+/* 911 */,
+/* 912 */,
+/* 913 */,
+/* 914 */,
+/* 915 */,
+/* 916 */,
+/* 917 */,
+/* 918 */,
+/* 919 */,
+/* 920 */,
+/* 921 */,
+/* 922 */,
+/* 923 */,
+/* 924 */,
+/* 925 */,
+/* 926 */,
+/* 927 */,
+/* 928 */,
+/* 929 */,
+/* 930 */,
+/* 931 */,
+/* 932 */,
+/* 933 */,
+/* 934 */,
+/* 935 */,
+/* 936 */,
+/* 937 */,
+/* 938 */,
+/* 939 */,
+/* 940 */,
+/* 941 */,
+/* 942 */,
+/* 943 */,
+/* 944 */,
+/* 945 */,
+/* 946 */,
+/* 947 */,
+/* 948 */,
+/* 949 */,
+/* 950 */,
+/* 951 */,
+/* 952 */,
+/* 953 */,
+/* 954 */,
+/* 955 */,
+/* 956 */,
+/* 957 */,
+/* 958 */,
+/* 959 */,
+/* 960 */,
+/* 961 */,
+/* 962 */,
+/* 963 */,
+/* 964 */,
+/* 965 */,
+/* 966 */,
+/* 967 */,
+/* 968 */,
+/* 969 */,
+/* 970 */,
+/* 971 */,
+/* 972 */,
+/* 973 */,
+/* 974 */,
+/* 975 */,
+/* 976 */,
+/* 977 */,
+/* 978 */,
+/* 979 */,
+/* 980 */,
+/* 981 */,
+/* 982 */,
+/* 983 */,
+/* 984 */,
+/* 985 */,
+/* 986 */,
+/* 987 */,
+/* 988 */,
+/* 989 */,
+/* 990 */,
+/* 991 */,
+/* 992 */,
+/* 993 */,
+/* 994 */,
+/* 995 */,
+/* 996 */,
+/* 997 */,
+/* 998 */,
+/* 999 */,
+/* 1000 */,
+/* 1001 */,
+/* 1002 */,
+/* 1003 */,
+/* 1004 */,
+/* 1005 */,
+/* 1006 */,
+/* 1007 */,
+/* 1008 */,
+/* 1009 */,
+/* 1010 */,
+/* 1011 */,
+/* 1012 */,
+/* 1013 */,
+/* 1014 */,
+/* 1015 */,
+/* 1016 */,
+/* 1017 */,
+/* 1018 */,
+/* 1019 */,
+/* 1020 */,
+/* 1021 */,
+/* 1022 */,
+/* 1023 */,
+/* 1024 */,
+/* 1025 */,
+/* 1026 */,
+/* 1027 */,
+/* 1028 */,
+/* 1029 */,
+/* 1030 */,
+/* 1031 */,
+/* 1032 */,
+/* 1033 */,
+/* 1034 */,
+/* 1035 */,
+/* 1036 */,
+/* 1037 */,
+/* 1038 */,
+/* 1039 */,
+/* 1040 */,
+/* 1041 */,
+/* 1042 */,
+/* 1043 */,
+/* 1044 */,
+/* 1045 */,
+/* 1046 */,
+/* 1047 */,
+/* 1048 */,
+/* 1049 */,
+/* 1050 */,
+/* 1051 */,
+/* 1052 */,
+/* 1053 */,
+/* 1054 */,
+/* 1055 */,
+/* 1056 */,
+/* 1057 */,
+/* 1058 */,
+/* 1059 */,
+/* 1060 */,
+/* 1061 */,
+/* 1062 */,
+/* 1063 */,
+/* 1064 */,
+/* 1065 */,
+/* 1066 */,
+/* 1067 */,
+/* 1068 */,
+/* 1069 */,
+/* 1070 */,
+/* 1071 */,
+/* 1072 */,
+/* 1073 */,
+/* 1074 */,
+/* 1075 */,
+/* 1076 */,
+/* 1077 */,
+/* 1078 */,
+/* 1079 */,
+/* 1080 */,
+/* 1081 */,
+/* 1082 */,
+/* 1083 */,
+/* 1084 */,
+/* 1085 */,
+/* 1086 */,
+/* 1087 */,
+/* 1088 */,
+/* 1089 */,
+/* 1090 */,
+/* 1091 */,
+/* 1092 */,
+/* 1093 */,
+/* 1094 */,
+/* 1095 */,
+/* 1096 */,
+/* 1097 */,
+/* 1098 */,
+/* 1099 */,
+/* 1100 */,
+/* 1101 */,
+/* 1102 */,
+/* 1103 */,
+/* 1104 */,
+/* 1105 */,
+/* 1106 */,
+/* 1107 */,
+/* 1108 */,
+/* 1109 */,
+/* 1110 */,
+/* 1111 */,
+/* 1112 */,
+/* 1113 */,
+/* 1114 */,
+/* 1115 */,
+/* 1116 */,
+/* 1117 */,
+/* 1118 */,
+/* 1119 */,
+/* 1120 */,
+/* 1121 */,
+/* 1122 */,
+/* 1123 */,
+/* 1124 */,
+/* 1125 */,
+/* 1126 */,
+/* 1127 */,
+/* 1128 */,
+/* 1129 */,
+/* 1130 */,
+/* 1131 */,
+/* 1132 */,
+/* 1133 */,
+/* 1134 */,
+/* 1135 */,
+/* 1136 */,
+/* 1137 */,
+/* 1138 */,
+/* 1139 */,
+/* 1140 */,
+/* 1141 */,
+/* 1142 */,
+/* 1143 */,
+/* 1144 */,
+/* 1145 */,
+/* 1146 */,
+/* 1147 */,
+/* 1148 */,
+/* 1149 */,
+/* 1150 */,
+/* 1151 */,
+/* 1152 */,
+/* 1153 */,
+/* 1154 */,
+/* 1155 */,
+/* 1156 */,
+/* 1157 */,
+/* 1158 */,
+/* 1159 */,
+/* 1160 */,
+/* 1161 */,
+/* 1162 */,
+/* 1163 */,
+/* 1164 */,
+/* 1165 */,
+/* 1166 */,
+/* 1167 */,
+/* 1168 */,
+/* 1169 */,
+/* 1170 */,
+/* 1171 */,
+/* 1172 */,
+/* 1173 */,
+/* 1174 */,
+/* 1175 */,
+/* 1176 */,
+/* 1177 */,
+/* 1178 */,
+/* 1179 */,
+/* 1180 */,
+/* 1181 */,
+/* 1182 */,
+/* 1183 */,
+/* 1184 */,
+/* 1185 */,
+/* 1186 */,
+/* 1187 */,
+/* 1188 */,
+/* 1189 */,
+/* 1190 */,
+/* 1191 */,
+/* 1192 */,
+/* 1193 */,
+/* 1194 */,
+/* 1195 */,
+/* 1196 */,
+/* 1197 */,
+/* 1198 */,
+/* 1199 */,
+/* 1200 */,
+/* 1201 */,
+/* 1202 */,
+/* 1203 */,
+/* 1204 */,
+/* 1205 */,
+/* 1206 */,
+/* 1207 */,
+/* 1208 */,
+/* 1209 */,
+/* 1210 */,
+/* 1211 */,
+/* 1212 */,
+/* 1213 */,
+/* 1214 */,
+/* 1215 */,
+/* 1216 */,
+/* 1217 */,
+/* 1218 */,
+/* 1219 */,
+/* 1220 */,
+/* 1221 */,
+/* 1222 */,
+/* 1223 */,
+/* 1224 */,
+/* 1225 */,
+/* 1226 */,
+/* 1227 */,
+/* 1228 */,
+/* 1229 */,
+/* 1230 */,
+/* 1231 */,
+/* 1232 */,
+/* 1233 */,
+/* 1234 */,
+/* 1235 */,
+/* 1236 */,
+/* 1237 */,
+/* 1238 */,
+/* 1239 */,
+/* 1240 */,
+/* 1241 */,
+/* 1242 */,
+/* 1243 */,
+/* 1244 */,
+/* 1245 */,
+/* 1246 */,
+/* 1247 */,
+/* 1248 */,
+/* 1249 */,
+/* 1250 */,
+/* 1251 */,
+/* 1252 */,
+/* 1253 */,
+/* 1254 */,
+/* 1255 */,
+/* 1256 */,
+/* 1257 */,
+/* 1258 */,
+/* 1259 */,
+/* 1260 */,
+/* 1261 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(37);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(__webpack_require__(0));
+
+var _createSvgIcon = _interopRequireDefault(__webpack_require__(43));
+
+var _default = (0, _createSvgIcon.default)(_react.default.createElement(_react.default.Fragment, null, _react.default.createElement("path", {
+  fill: "none",
+  d: "M0 0h24v24H0V0z"
+}), _react.default.createElement("path", {
+  d: "M5.64 9l-.6 3h13.92l-.6-3z",
+  opacity: ".3"
+}), _react.default.createElement("path", {
+  d: "M4 4h16v2H4zM20 7H4l-1 5v2h1v6h10v-6h4v6h2v-6h1v-2l-1-5zm-8 11H6v-4h6v4zm-6.96-6l.6-3h12.72l.6 3H5.04z"
+})), 'StoreTwoTone');
+
+exports.default = _default;
 
 /***/ })
 /******/ ]);
