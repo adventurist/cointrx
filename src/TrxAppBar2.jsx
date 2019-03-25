@@ -21,6 +21,7 @@ import MailIcon from '@material-ui/icons/Mail'
 import CloseIcon from '@material-ui/icons/Close'
 import MenuIcon from '@material-ui/icons/Menu'
 import Notifications from '@material-ui/icons/Notifications'
+import TradeIcon from '@material-ui/icons/StoreTwoTone'
 import NotificationsActive from '@material-ui/icons/NotificationsActive'
 import BasicIcon from '@material-ui/core/Icon'
 import SvgIcon from '@material-ui/core/SvgIcon'
@@ -78,6 +79,11 @@ const EmptyBellIcon = () => {
 
 const menuItems = [
 {
+    url: '/',
+    label: 'Trade',
+    icon: 'tradeicon'
+},
+{
     url: '/user',
     label: 'Account settings',
     icon: 'person'
@@ -125,7 +131,7 @@ const menuItems = [
 ]
 
 const userMenuItems = [
-    {   label: 'User Profile',
+    {   label: 'Account settings',
         url: '/user'  },
     {   label: 'Logout',
         url: '/logout'  }

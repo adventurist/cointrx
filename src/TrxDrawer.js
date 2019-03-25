@@ -12,6 +12,7 @@ import MailIcon from '@material-ui/icons/Mail';
 import PersonIcon from '@material-ui/icons/Person';
 import PeopleIcon from '@material-ui/icons/People';
 import SvgIcon from '@material-ui/core/SvgIcon';
+import TradeIcon from '@material-ui/icons/StoreTwoTone'
 
 export const LoginIcon = () => {
   return (
@@ -106,9 +107,14 @@ const styles = {
 const menuItems =
 // trx_env === 'LOCAL_DEVELOPMENT' ?
 [{
-    url: '/user',
-    label: 'User Profile',
-    icon: <PersonIcon />
+  url: '/',
+  label: 'Trade',
+  icon: <TradeIcon />
+},
+{
+  url: '/user',
+  label: 'Account Settings',
+  icon: <PersonIcon />
 },
 {
     url: '/user/all',
