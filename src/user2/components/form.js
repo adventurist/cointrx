@@ -43,9 +43,9 @@ export class UserCard extends Component {
 
     render () {
         return (
-        <Card style={{margin: '16px'}}>
+        <Card style={{backgroundColor: '#303030', padding: '12px', minWidth: '150px'}}>
             <CardMedia
-                style={{marginBottom: '8px', height: '180px', width: 'auto', backgroundSize: 'contain'}}
+                style={{minHeight: '100px', width: 'auto', backgroundSize: 'contain'}}
                 image='/static/images/avatar.jpg'
             >
             </CardMedia>
@@ -135,67 +135,61 @@ export class UserForm extends Component {
     render() {
         return (
             <div style={styles.container}>
-                <Typography style={{color: '#E1E1E1'}} variant='h5'>Account Settings</Typography>
-
-                <UserCard />
-
-                <input
-                    type="file"
-                    ref="userimagefile"
-                    className="userimage-file"
-                    onChange={this.fileChange}
-                />
-
+                <Typography style={{color: '#E1E1E1', paddingBottom: '12px'}} variant='h5'>Account Settings</Typography>
                 <form
                     className="user-form"
                     onSubmit={this.onSubmit}>
+                    <div>
+                        <UserCard />
+                        </div>
                     <div className='user-column-1'>
-                        <div className='text-container'>
-                            <TextField
-                                ref='name'
-                                className='userform'
-                                label='Your user name'
-                                value={this.state.name}
-                            />
+                        <div>
+                            <div className='text-container'>
+                                <TextField
+                                    ref='name'
+                                    className='userform'
+                                    label='Your user name'
+                                    value={this.state.name}
+                                />
+                            </div>
+                            <br />
+                            <div className='text-container'>
+                                <TextField
+                                    ref='email'
+                                    className='userform'
+                                    label='Your email'
+                                    value={this.state.email}
+                                />
+                            </div>
+                            <br />
+                            <div className='text-container'>
+                                <TextField
+                                    ref='language'
+                                    className='userform'
+                                    label='Your language'
+                                    value={this.state.language}
+                                />
+                            </div>
+                            <br />
+                            <div id="timezone-container" style={{display: 'flex'}}>
+                                <TimezonePicker
+                                    value={this.state.timezone}
+                                    onChange={this.updateTimezone}
+                                    inputProps={{
+                                        placeholder: 'Select Timezone...',
+                                        name: 'timezone',
+                                    }}
+                                />
+                                <NumberField
+                                    value={Math.abs(this.state.tzOffset)}
+                                    max={24}
+                                    label='Offset'
+                                    prefix={this.state.tzOffset < 0 ? '-' : ''}
+                                    classes={{filledTextField: 'timezoneNumFilled', textField: 'timezoneNum' }}
+                                    width='15%'
+                                />
+                            </div>
                         </div>
-                        <br />
-                        <div className='text-container'>
-                            <TextField
-                                ref='email'
-                                className='userform'
-                                label='Your email'
-                                value={this.state.email}
-                            />
-                        </div>
-                        <br />
-                        <div className='text-container'>
-                            <TextField
-                                ref='language'
-                                className='userform'
-                                label='Your language'
-                                value={this.state.language}
-                            />
-                        </div>
-                        <br />
-                        <div id="timezone-container" style={{display: 'flex'}}>
-                            <TimezonePicker
-                                value={this.state.timezone}
-                                onChange={this.updateTimezone}
-                                inputProps={{
-                                    placeholder: 'Select Timezone...',
-                                    name: 'timezone',
-                                }}
-                            />
-                            <NumberField
-                                value={Math.abs(this.state.tzOffset)}
-                                max={24}
-                                label='Offset'
-                                prefix={this.state.tzOffset < 0 ? '-' : ''}
-                                classes={{filledTextField: 'timezoneNumFilled', textField: 'timezoneNum' }}
-                                width='15%'
-                            />
-                        </div>
-
                     </div>
                     {/* <hr className="userform-separator" /> */}
 
