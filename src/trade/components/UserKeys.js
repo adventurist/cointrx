@@ -16,8 +16,10 @@ const keyBtnStyles = {
     bottom: '4em',
     left: 'auto',
     position: 'fixed',
-    zIndex: '5555'
+    zIndex: '5555',
 }
+
+const btcSvgPath = () => {return "M4.5,5H8V2H10V5H11.5V2H13.5V5C19,5 19,11 16,11.25C20,11 21,19 13.5,19V22H11.5V19H10V22H8V19H4.5L5,17H6A1,1 0 0,0 7,16V8A1,1 0 0,0 6,7H4.5V5M10,7V11C10,11 14.5,11.25 14.5,9C14.5,6.75 10,7 10,7M10,12.5V17C10,17 15.5,17 15.5,14.75C15.5,12.5 10,12.5 10,12.5Z"}
 
 export class KeyDialog extends React.Component {
     constructor(props, context) {
@@ -113,7 +115,7 @@ export class UserKeys extends Component {
                 {key: 'lbl', name: 'Label'},
                 {key: 'adr', name: 'Address'},
                 {key: 'bal', name: 'Balance'},
-                {key: 'btn', name: 'Modify'}
+                {key: 'btn', name: 'Edit'}
             ],
             _rows: this.createRows(props.keys),
             dialogOpen: false,
@@ -169,7 +171,7 @@ export class UserKeys extends Component {
         return (
             <div id="key-container" className='key-grid'>
             <Tooltip
-                title='Dicks'>
+            title='Your bitcoin keys'>
                 <ReactDataGrid
                     columns={this.state._columns}
                     rowGetter={this.rowGetter}
@@ -179,10 +181,15 @@ export class UserKeys extends Component {
                     enableCellSelect={false}
                     />
             </Tooltip>
-                <div style={keyBtnStyles} id="fab-container">
-                <Fab title='Create Key'
-                onClick={this.requestBtcKey}
-                >Create Key</Fab>
+                <div id="fab-container">
+                <Tooltip
+                title='Create a new Bitcoin Address'>
+                    <Fab style={keyBtnStyles} onClick={this.requestBtcKey}>
+                        <svg style={{width:'24px', height:'24px'}} viewBox="0 0 24 24">
+                                <path fill="#000000" d={btcSvgPath()} />
+                        </svg>
+                    </Fab>
+                </Tooltip>
                 </div>
                 <Dialog
                     title="Key Editor"
@@ -211,7 +218,10 @@ export class UserKeys extends Component {
                                 onChange={this.handleDate}>
                                 Expiry Date
                             </DatePicker>
-                            <Button className='expiry-btn' variant='contained' label="Set" secondary={true} keyboardFocused={true} onClick={this.setKeyFutureDisable}>Set Expiry<SaveIcon></SaveIcon></Button>
+                            <Tooltip
+                            title='Click to schedule this key for expiration on the date entered'>
+                                <Button className='expiry-btn' variant='contained' label="Set" secondary={true} keyboardFocused={true} onClick={this.setKeyFutureDisable}>Set Expiry<SaveIcon></SaveIcon></Button>
+                            </Tooltip>
                         </div>
                     </MuiPickersUtilsProvider>
                     <div className='btn-container'>
@@ -238,7 +248,6 @@ export class UserKeys extends Component {
                         </div>
                         </Paper>
                 </Dialog>
-
             </div>
         )
     }
@@ -254,7 +263,7 @@ export class UserKeys extends Component {
                     <Button label="Edit"
                                   className='key-edit' value={row.id}
                                   onClick={this.openEditKeyDialog}
-                    ><EditIcon /> Edit </Button>
+                    ><EditIcon /></Button>
                     {this.state.dialogOpen && isObjectEquivalent(this.props.row, this.state.dialogCursor) ?
                         (<KeyDialog show={this.state.dialogOpen}/>)
                         : null}
