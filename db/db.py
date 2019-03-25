@@ -756,10 +756,13 @@ async def update_user(uid: str, data: dict):
     user = await get_user(uid)
     if user is not None:
         for k, v in data.items():
-            if hasattr(user, k):
-                if getattr(user, k) != v:
-                    changed = True
-                    setattr(user, k, v)
+            try:
+                if hasattr(user, k):
+                    if getattr(user, k) != v:
+                        changed = True
+                        setattr(user, k, v)
+            except AttributeError as e:
+                logger.debug(e)
     if changed:
         try:
             session.add(user)
