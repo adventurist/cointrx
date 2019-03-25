@@ -121,6 +121,10 @@
     justify-content: center;
 }
 
+.timezoneNumFilled, .timezoneNum {
+    margin-left: 4px!important;
+}
+
 .text-container {
     display: flex;
     justify-content: center;
