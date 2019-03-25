@@ -66,11 +66,8 @@ export class UserForm extends Component {
             snackbarOpen: false,
             name: props.user.name,
             email: props.user.email,
-            // account: props.user.account,
-            // btcBalance: props.user.balance,
-            // estimatedValue: props.user.estimated,
             timezone: undefined,
-            tzOffset: undefined,
+            tzOffset: props.user.utc_offset || 0,
             currency: props.user.currency,
             language: 'English'
         }
@@ -79,15 +76,15 @@ export class UserForm extends Component {
     updateTimezone = (value) => {
         this.setState({
             timezone: value,
-            snackbarMsg: `Timezone offset changed to ${value}`,
+            snackbarMsg: `Timezone changed to ${value}`,
             snackbarOpen: true
         })
     }
 
     handleCurrency = currency => this.setState({ currency })
 
-    handleChange = (field, value) => {
-        this.setState({...this.state, [field]: value});
+    handleChange = name => event => {
+        this.setState({[name]: event.target.value});
     }
 
     snackbarMsg = (msg) => {
@@ -107,20 +104,35 @@ export class UserForm extends Component {
     }
 
     updateUser = async () => {
-        const result = await userUpdateRequest({
+        const userData = {
             ...this.props.user,
             name: this.state.name,
             email: this.state.email,
             utc_offset: this.state.tzOffset,
             currency: this.state.currency
-        }, { csrf: getCSRFToken() })
+        }
+
+        delete userData.account
+        delete userData.balance
+        delete userData.estimated
+
+        const result = await userUpdateRequest(
+            userData,
+            { csrf: getCSRFToken() }
+        )
         let message
         if (!result.error) {
             message = `Successfully updated ${this.props.user.name}`
         } else {
             message = `Unable to update ${this.props.user.name}`
         }
+        this.globalMessage(message)
+
+    }
+
+    globalMessage = message => {
         this.snackbarMsg(message)
+        this.props.log(message)
     }
 
     onSubmit = async e => {
@@ -135,7 +147,7 @@ export class UserForm extends Component {
     render() {
         return (
             <div style={styles.container}>
-                <Typography style={{color: '#E1E1E1', paddingBottom: '12px'}} variant='h5'>Account Settings</Typography>
+                <Typography style={{color: '#E1E1E1', paddingBottom: '12px'}} variant='headline'>Account Settings</Typography>
                 <form
                     className="user-form"
                     onSubmit={this.onSubmit}>
@@ -146,7 +158,7 @@ export class UserForm extends Component {
                         <div>
                             <div className='text-container'>
                                 <TextField
-                                    ref='name'
+                                    onChange={this.handleChange('name')}
                                     className='userform'
                                     label='Your user name'
                                     value={this.state.name}
@@ -155,7 +167,7 @@ export class UserForm extends Component {
                             <br />
                             <div className='text-container'>
                                 <TextField
-                                    ref='email'
+                                    onChange={this.handleChange('email')}
                                     className='userform'
                                     label='Your email'
                                     value={this.state.email}
@@ -164,7 +176,6 @@ export class UserForm extends Component {
                             <br />
                             <div className='text-container'>
                                 <TextField
-                                    ref='language'
                                     className='userform'
                                     label='Your language'
                                     value={this.state.language}
@@ -176,14 +187,14 @@ export class UserForm extends Component {
                                     value={this.state.timezone}
                                     onChange={this.updateTimezone}
                                     inputProps={{
-                                        placeholder: 'Select Timezone...',
+                                        placeholder: 'Change UTC Offset',
                                         name: 'timezone',
                                     }}
                                 />
                                 <NumberField
                                     value={Math.abs(this.state.tzOffset)}
                                     max={24}
-                                    label='Offset'
+                                    label='TZ Offset'
                                     prefix={this.state.tzOffset < 0 ? '-' : ''}
                                     classes={{filledTextField: 'timezoneNumFilled', textField: 'timezoneNum' }}
                                     width='15%'

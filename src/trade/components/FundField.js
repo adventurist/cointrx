@@ -152,7 +152,7 @@ export class NumberField extends Component {
           className={parseFloat(this.state.value) > 0 ? classes.filledTextField : classes.textField}
           max={this.props.max ? parseFloat(this.props.max) : 99999999}
           label={this.props.label}
-          style={styles.input}
+          style={style}
           prefix={this.props.prefix}
           InputProps={{
             startAdornment: <InputAdornment position='start'>{this.props.prefix}</InputAdornment>

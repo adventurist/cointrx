@@ -97,7 +97,7 @@ export default class App extends Component {
       <Grid container spacing={16} style={styles.root}>
         <Grid style={styles.gridChild} item xs={12}>
           <Paper className="trxToolWrap" elevation={4}>
-            <UserForm style={styles.trxTool} user={this.state.user} />
+            <UserForm log={this.log} style={styles.trxTool} user={this.state.user} />
           </Paper>
           <Paper className="trxToolWrap" elevation={4}>
             <UserKeys style={styles.trxTool} keys={this.state.user.keys} />

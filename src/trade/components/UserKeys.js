@@ -148,26 +148,7 @@ export class UserKeys extends Component {
         const {mini, tooltipPosition} = this.props;
         const tooltipPos = tooltipPosition.split('-');
         const tooltip = 'Create new Bitcoin Address'
-        // const actions = [
-        //     <Button
-        //         label="Save"
-        //         primary={true}
-        //         keyboardFocused={true}
-        //         onClick={this.saveKey.bind(this)}
-        //     />,
-        //     <Button
-        //         label="Delete"
-        //         secondary={true}
-        //         keyboardFocused={true}
-        //         onClick={this.disableKey.bind(this)}
-        //     />,
-        //     <Button
-        //         label="Okay"
-        //         primary={true}
-        //         keyboardFocused={true}
-        //         onClick={this.handleClose}
-        //     />
-        // ];
+
         return (
             <div id="key-container" className='key-grid'>
             <Tooltip
