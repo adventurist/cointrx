@@ -180,3 +180,12 @@ body {
 .submitButton > span {
     font-size: 12pt;
 }
+
+.keylabel > label + div {
+    width: 100%;
+    padding: 2px;
+}
+
+.keydialog {
+    margin: 24px!important;
+}

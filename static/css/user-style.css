@@ -24,6 +24,22 @@
     justify-content: center;
 }
 
+.userform-disabled {
+    opacity: 0.5;
+    color: rgb(71, 71, 71);
+}
+
+.user-save-btn-wrap {
+    display: flex;
+    flex-direction: column;
+    margin-left: 8%;
+    padding-top: 3.5%;
+}
+
+.user-save-btn-wrap button {
+    margin: 4px;
+}
+
 .user-save-btn {
     max-height: 35px;
 }

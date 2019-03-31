@@ -3,8 +3,33 @@
   width: 100%;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  transform: translateY(35%);
 }
 
 #main-wrap > div {
   width: 35%;
+  padding: 4px;
+}
+
+#main-wrap .welcome-text {
+  margin-bottom:4px;
+}
+
+form#login-form > div {
+  padding: 4px;
+}
+
+.register-button {
+  margin-left: 4px;
+  width: 84px;
+}
+
+.login-btn {
+  margin: 10px;
+  width: 84px;
+}
+
+.register-button:hover, .login-btn:hover {
+  background-color: #ff844c!important;
 }
