@@ -2,7 +2,8 @@ import { Component } from 'react'
 import { render } from 'react-dom'
 import App from './app'
 import TrxNavigation from '../TrxNavigation.jsx'
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { MuiThemeProvider } from '@material-ui/core/styles'
+import trxTheme from '../theme'
 
 const styles = {
   main: {
@@ -10,17 +11,17 @@ const styles = {
   }
 }
 
-const theme = createMuiTheme({
-  palette: {
-    type: 'dark',
-    primary: {
-      light: '#757ce8',
-      main: '#3f50b5',
-      dark: '#64dd17',
-      contrastText: '#fff',
-    }
-  }
-})
+// const theme = createMuiTheme({
+//   palette: {
+//     type: 'dark',
+//     primary: {
+//       light: '#757ce8',
+//       main: '#3f50b5',
+//       dark: '#64dd17',
+//       contrastText: '#fff',
+//     }
+//   }
+// })
 
 class MainApplication extends Component {
   constructor (props) {
@@ -47,7 +48,7 @@ class MainApplication extends Component {
 }
 
 render (
-  <MuiThemeProvider theme={theme}>
+  <MuiThemeProvider theme={trxTheme()}>
       <MainApplication></MainApplication>
   </MuiThemeProvider>
   , document.getElementById('root')
