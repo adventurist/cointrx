@@ -16,6 +16,7 @@ import { some } from 'lodash'
 import { request, handleResponse } from '../../utils'
 import { userUpdateRequest, fetchTimezoneRequest } from '../requests';
 import Accounting from 'accounting'
+import { Edit } from '@material-ui/icons';
 
 function formatMoney(value, symbol = 'CAD') {
     return Accounting.formatMoney(value, symbol)
@@ -54,7 +55,6 @@ export class UserCard extends Component {
     }
 }
 
-
 export class UserForm extends Component {
     constructor (props) {
         super(props)
@@ -74,17 +74,31 @@ export class UserForm extends Component {
     }
 
     updateTimezone = (value) => {
-        this.setState({
-            timezone: value,
-            snackbarMsg: `Timezone changed to ${value}`,
-            snackbarOpen: true
-        })
+        if (this.state.editing) {
+            this.setState({
+                timezone: value,
+                snackbarMsg: `Timezone changed to ${value}`,
+                snackbarOpen: true
+            })
+        } else {
+            this.notifyCannotUpdate()
+        }
     }
 
-    handleCurrency = currency => this.setState({ currency })
+    handleCurrency = currency => {
+        if (this.state.editing) {
+            this.setState({ currency })
+        } else {
+            this.notifyCannotUpdate()
+        }
+    }
 
     handleChange = name => event => {
-        this.setState({[name]: event.target.value});
+        if (this.state.editing) {
+            this.setState({[name]: event.target.value})
+        } else {
+            this.notifyCannotUpdate()
+        }
     }
 
     snackbarMsg = (msg) => {
@@ -103,32 +117,44 @@ export class UserForm extends Component {
         const clickResult = this.refs.userimagefile.click()
     }
 
-    updateUser = async () => {
-        const userData = {
-            ...this.props.user,
-            name: this.state.name,
-            email: this.state.email,
-            utc_offset: this.state.tzOffset,
-            currency: this.state.currency
-        }
-
-        delete userData.account
-        delete userData.balance
-        delete userData.estimated
-
-        const result = await userUpdateRequest(
-            userData,
-            { csrf: getCSRFToken() }
-        )
-        let message
-        if (!result.error) {
-            message = `Successfully updated ${this.props.user.name}`
-        } else {
-            message = `Unable to update ${this.props.user.name}`
-        }
-        this.globalMessage(message)
-
+    toggleEditMode = e => {
+        e.preventDefault()
+        this.setState({ editing: !this.state.editing }, () => {
+            this.snackbarMsg(this.state.editing ? 'Edit mode enabled' : 'Edit mode disabled')
+        })
     }
+
+    updateUser = async () => {
+        if (this.state.editing) {
+            const userData = {
+                ...this.props.user,
+                name: this.state.name,
+                email: this.state.email,
+                utc_offset: this.state.tzOffset,
+                currency: this.state.currency
+            }
+
+            delete userData.account
+            delete userData.balance
+            delete userData.estimated
+
+            const result = await userUpdateRequest(
+                userData,
+                { csrf: getCSRFToken() }
+            )
+            let message
+            if (!result.error) {
+                message = `Successfully updated ${this.props.user.name}`
+            } else {
+                message = `Unable to update ${this.props.user.name}`
+            }
+            this.globalMessage(message)
+        } else {
+            this.notifyCannotUpdate()
+        }
+    }
+
+    notifyCannotUpdate = () => this.globalMessage('You cannot update user information unless you enable editing. Click the edit button')
 
     globalMessage = message => {
         this.snackbarMsg(message)
@@ -159,7 +185,7 @@ export class UserForm extends Component {
                             <div className='text-container'>
                                 <TextField
                                     onChange={this.handleChange('name')}
-                                    className='userform'
+                                    className={this.state.editing ? 'userform' : 'userform-disabled'}
                                     label='Your user name'
                                     value={this.state.name}
                                 />
@@ -168,7 +194,7 @@ export class UserForm extends Component {
                             <div className='text-container'>
                                 <TextField
                                     onChange={this.handleChange('email')}
-                                    className='userform'
+                                    className={this.state.editing ? 'userform' : 'userform-disabled'}
                                     label='Your email'
                                     value={this.state.email}
                                 />
@@ -176,7 +202,7 @@ export class UserForm extends Component {
                             <br />
                             <div className='text-container'>
                                 <TextField
-                                    className='userform'
+                                    className={this.state.editing ? 'userform' : 'userform-disabled'}
                                     label='Your language'
                                     value={this.state.language}
                                 />
@@ -206,7 +232,7 @@ export class UserForm extends Component {
 
                     <div className='user-column-2'>
 
-                        <CurrencyField full={true} currency={this.state.currency} handler={this.handleCurrency} >
+                        <CurrencyField full={true} enabled={this.state.editing} currency={this.state.currency} handler={this.handleCurrency} >
                         </CurrencyField>
 
                         <div className="text-container balance-container">
@@ -236,11 +262,16 @@ export class UserForm extends Component {
                             />
                         </div>
                     </div>
-
-                    <Button type='submit' color='primary' variant="contained" size="medium" className="user-save-btn">
-                        <SaveIcon />
-                            Save
-                    </Button>
+                    <div className='user-save-btn-wrap'>
+                        <Button type='button' color='#FFF' variant="contained" size="medium" onClick={this.toggleEditMode} className="user-edit-btn">
+                            <Edit fontSize='small' />
+                                Edit
+                        </Button>
+                        <Button type='submit' color='primary' variant="contained" size="medium" className="user-save-btn">
+                            <SaveIcon />
+                                Save
+                        </Button>
+                    </div>
                 </form>
                 <Snackbar
                     className="user-snackbar"
