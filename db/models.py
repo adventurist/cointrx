@@ -180,6 +180,7 @@ class Trade(Base):
     joinbid = relationship("Bid", back_populates='trade')
 
 
+
 class Account(Base):
     __tablename__ = 'account'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -249,6 +250,10 @@ class User(Base):
     currency = Column(String(3), server_default='CAD')
     CheckConstraint('level BETWEEN 0 and 4')
 
+    @staticmethod
+    def create_account(uid):
+        return Account(balance=10000, uid=uid)
+
     # TODO
     def hash_password(self, password):
         self.hash = pwd_context.hash(password)
@@ -283,11 +288,11 @@ class User(Base):
         }
 
     @staticmethod
-    def verify_password(email_or_token, password) -> bool:
-        user = User.verify_auth_token(email_or_token)
+    async def verify_password(email_or_token, password) -> bool:
+        user = await User.verify_auth_token(email_or_token)
         if not user:
-            user = session.query(User).filter(User.email == email_or_token).first()
-            if user is None or not user.compare_hash(password):
+            user = await session.query(User).filter(User.email == email_or_token).first()
+            if user is None or not await user.compare_hash(password):
                 return False
         return True
 
