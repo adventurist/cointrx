@@ -13,6 +13,11 @@ def retrieve_login_credentials(request_handler):
     return request_handler.get_body_argument('name'), request_handler.get_body_argument('password')
 
 
+def retrieve_register_credentials(handler):
+    return handler.get_body_argument('name'), handler.get_body_argument(
+        'password'), handler.get_body_argument('email')
+
+
 def retrieve_api_request_headers(headers):
     return headers.get('csrf-token'), headers.get("Content-Type")
 
