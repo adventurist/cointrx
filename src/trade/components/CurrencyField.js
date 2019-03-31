@@ -21,10 +21,12 @@ export class CurrencyField extends Component {
   }
 
   handleChange = e => {
+    if (this.props.enabled) {
       this.setState({ currency: e.target.value })
       if (this.props.handler) {
         this.props.handler(e.target.value)
       }
+    }
   }
 
   render () {

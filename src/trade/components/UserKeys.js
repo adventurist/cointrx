@@ -112,7 +112,7 @@ export class UserKeys extends Component {
             btnHovered: false,
             _columns: [
                 {key: 'id', name: 'ID'},
-                {key: 'lbl', name: 'Label'},
+                {key: 'lbl', name: 'Name'},
                 {key: 'adr', name: 'Address'},
                 {key: 'bal', name: 'Balance'},
                 {key: 'btn', name: 'Edit'}
@@ -185,8 +185,9 @@ export class UserKeys extends Component {
                     <TextField
                         value={this.state.dialogText}
                         className='keylabel'
-                        label='Key Label'
+                        label='Key Name'
                         onChange={this.dialogTextChange}
+
                     />
                     <Typography>
                         Set a date to automatically disable this key
@@ -244,7 +245,7 @@ export class UserKeys extends Component {
                     <Button label="Edit"
                                   className='key-edit' value={row.id}
                                   onClick={this.openEditKeyDialog}
-                    ><EditIcon /></Button>
+                    ><EditIcon fontSize='small' /></Button>
                     {this.state.dialogOpen && isObjectEquivalent(this.props.row, this.state.dialogCursor) ?
                         (<KeyDialog show={this.state.dialogOpen}/>)
                         : null}
@@ -257,7 +258,7 @@ export class UserKeys extends Component {
             'id': key.id,
             'lbl': key.label,
             'adr': key.address,
-            'bal': key.balance,
+            'bal': key.balance + ' Satoshis (' + key.balance / 100000000 + ' ₿)',
             'btn': ''
 
         }
