@@ -31,7 +31,7 @@ from utils.cointrx_client import Client
 from utils.mail_helper import Sender as mail_sender
 
 from utils.login_helpers import retrieve_api_request_headers, retrieve_json_login_headers, \
-    retrieve_json_login_credentials, create_user_session_data, retrieve_login_credentials
+    retrieve_json_login_credentials, create_user_session_data, retrieve_login_credentials, retrieve_register_credentials
 
 COIN = 100000000
 io_handler = IOHandler()
@@ -251,53 +251,23 @@ class LoginHandler(TrxRequestHandler):
                 self.set_status(401)
                 return self.write(escape.json_encode({'statuscode': 401}))
 
-        elif self.request.headers.get("Content-Type") == 'text/html':
-            name = self.get_argument('name')
-            print(name)
-
         elif content_type == 'application/x-www-form-urlencoded':
-
-            name, password = retrieve_login_credentials(self)
-
-            if name is not None and password is not None and len(name) > 0:
-                user_verified = db.check_auth_by_name(name, password)
+            credentials = retrieve_login_credentials(self)
+            if credentials[0] is not None and credentials[1] is not None and len(credentials[0]) > 0:
+                user_verified = db.check_auth_by_name(credentials[0], credentials[1])
                 if user_verified is not None and user_verified is not -1:
-                    csrf = user_verified.generate_auth_token(expiration=1200)
-                    user_info = {
-                        'name': name, 'pass': password, 'id': user_verified.id
-                    }
-                    trx_token = session.Session.generate_cookie()
-                    application.create_session(user=user_info, csrf=csrf)
-                    self.set_secure_cookie(name="trx_token", value=trx_token)
-                    self.set_secure_cookie(name="session_info",
-                                           value=trx_token + base64.b64encode(json.dumps(user_info).encode()))
-                    self.set_cookie(name='csrf', value=csrf)
-                    self.set_cookie(name='refresh', value=user_verified.generate_refresh_token())
-                    self.set_cookie(name='username', value=user_verified.name)
-                    if self.get_secure_cookie('redirect_target') is not None:
-                        redirect_target = self.get_secure_cookie('redirect_target')
-                        self.clear_cookie('redirect_target')
-                        return self.redirect(redirect_target)
+                    if create_login_session(user_verified, credentials, self):
+                        if self.get_secure_cookie('redirect_target') is not None:
+                            redirect_target = self.get_secure_cookie('redirect_target')
+                            self.clear_cookie('redirect_target')
+                            return self.redirect(redirect_target)
+                        else:
+                            self.redirect('/')
                     else:
-                        self.redirect('/')
+                        login_redirect(self)
 
     def get(self, *args, **kwargs):
-        cookie_secret = base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
-        current_header = self.request.headers.get("Content-Type")
-        print(cookie_secret)
-        print(self._headers)
-        print(self.get_status())
-        print(current_header)
-
-        if self.request.headers.get("Content-Type") == 'text/html':
-            name = self.get_argument('name')
-            print(name)
-
-        message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut",
-                                 "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time",
-                                 "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife",
-                                 "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
-        self.render("templates/login.html", title="Jiggas Login Handler", message=message)
+        self.render("templates/login.html", title="Coin TRX login")
 
 
 class SendMailHandler(TrxRequestHandler):
@@ -384,39 +354,39 @@ class CurrencyRevisionHandler(TrxRequestHandler):
 
 class RegisterHandler(TrxRequestHandler):
     def get(self):
-        message = random.choice(["Be Cool", "Don't be a Bitch", "Try not to be a Cunt", "Don't be a fat ass slut",
-                                 "Respect yourself, bitch", "Try not to be such a Cuck, at least some of the time",
-                                 "Find out if you can learn to be less of a Faggot Sonofabitchnogoodlowlife",
-                                 "If you can not be a bitch for 10 seconds, it will be a magnificent achievement"])
-        self.render("templates/register.html", title="Jiggas Register Handler", message=message)
+        self.render("templates/register.html", title="Register for Coin TRX")
 
-    def post(self, *args, **kwargs):
+    async def post(self, *args, **kwargs):
         name = password = email = None
 
         req_type = self.request.headers.get("Content-Type")
         if req_type == 'application/x-www-form-urlencoded':
-            name, password, email = self.get_body_argument('name'), self.get_body_argument(
-                'password'), self.get_body_argument('email')
+            name, password, email = retrieve_register_credentials(self)
         elif req_type == 'application/json':
-            body = json.loads(self.request.body.decode('utf-8'))
+            body = json.loads(self.request.body.decode())
             name, password, email = body['name'], body['password'], body['email']
 
         if email is None or password is None or name is None:
             self.write("You must supply more arguments")
             self.write_error(401)
         else:
-            user_verify = db.check_authentication(name, password, email)
-            if isinstance(user_verify, int) and user_verify < 0:
-                user_verify = db.create_user(name, password, email)
-
-            csrf = user_verify.generate_auth_token(expiration=1200)
-            application.create_session(
-                user={'name': name, 'pass': password, 'id': user_verify.id, 'csrf': csrf})
-            print(str(user_verify))
-            if application.session is not None and isinstance(application.session, session.Session):
-                self.set_secure_cookie(name="trx_token", value=session.Session.generate_cookie())
-                return self.write(escape.json_encode({'token': str(application.session.user['csrf'], 'utf-8'),
-                                                      'cookie': str(self.get_secure_cookie('trx_token'))}))
+            user = await db.check_authentication(name, password, email)
+            if user is None:
+                user = await db.create_user(name, password, email)
+            else:
+                self.write('This user already exists. Please login')
+                self.write_error(400)
+                login_redirect(self)
+            if create_login_session(user, (name, password), self):
+                if self.get_secure_cookie('redirect_target') is not None:
+                    redirect_target = self.get_secure_cookie('redirect_target')
+                    self.clear_cookie('redirect_target')
+                    return self.redirect(redirect_target)
+                else:
+                    #  TODO: Implement 2FA
+                    self.redirect('/')
+            else:
+                login_redirect(self)
 
 
 class PasswordHandler(TrxRequestHandler):
@@ -424,7 +394,7 @@ class PasswordHandler(TrxRequestHandler):
         message = random.choice(
             ["We gonna DOX you, slut", "A hackathon on yo ass, bitch", "You never gonna be able to log into SHIT",
              "Now we have all your informations", "We sell your passwords to Nigeria"])
-        self.render("templates/password.html", title="Jiggas Password Handler", message=message)
+        self.render("templates/password.html", title="Password handler", message=message)
 
 
 class GraphHandler(TrxRequestHandler):
@@ -733,7 +703,8 @@ class UserProfileHandler(TrxRequestHandler):
 
 async def retrieve_user_data(user):
     user_data = await db.regtest_user_data(user['id'])
-    prices = await db.latest_prices_async(user_data[0]['currency'])
+    currency = user_data[0]['currency'] if user_data[0]['currency'] is not None else 'CAD'
+    prices = await db.latest_prices_async(currency)
     return user_data, prices
 
 
@@ -1589,6 +1560,27 @@ def validate_csrf(csrf):
 
 async def connect_to_database():
     await db.connect_to_db()
+
+
+def create_login_session(user, credentials, handler):
+    try:
+        csrf = user.generate_auth_token(expiration=1200)
+        user_info = {
+            'name': credentials[0], 'pass': credentials[1], 'id': user.id
+        }
+        trx_token = session.Session.generate_cookie()
+        application.create_session(user=user_info, csrf=csrf)
+        handler.set_secure_cookie(name="trx_token", value=trx_token)
+        handler.set_secure_cookie(name="session_info",
+                                  value=trx_token + base64.b64encode(json.dumps(user_info).encode()))
+        handler.set_cookie(name='csrf', value=csrf)
+        handler.set_cookie(name='refresh', value=user.generate_refresh_token())
+        handler.set_cookie(name='username', value=user.name)
+        return True
+    except Exception as e:
+        logger.error('Error creating session')
+        logger.debug(e)
+        return False
 
 
 if __name__ == "__main__":
