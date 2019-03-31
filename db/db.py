@@ -111,6 +111,8 @@ async def latest_prices():
 
 
 async def latest_prices_async(currency='CAD'):
+    if currency is None:
+        currency = 'CAD'
     if currency_index[currency]:
         try:
             result = session.query(CXPriceRevision).filter(CXPriceRevision.currency == currency).order_by(
@@ -296,14 +298,14 @@ def find_rid(data):
     return None
 
 
-def check_authentication(user, password, email):
+async def check_authentication(user, password, email):
     query_user = session.query(User).filter(User.name == user).first()
     if query_user is not None:
         if not User.verify_password(email, password):
-            return -1
+            return None
         return query_user
     else:
-        return -2
+        return None
 
 
 def check_authentication_by_name(user, password):
@@ -317,12 +319,14 @@ def check_authentication_by_name(user, password):
         return -1
 
 
-def create_user(user, password, email):
+async def create_user(user, password, email):
     pass_hash = User.generate_hash(password)
-    new_user = User(name=user, hash=pass_hash, email=email,
+    new_user = User(name=user, hash=pass_hash, email=email, currency='CAD',
                     created=int(time.mktime(datetime.datetime.now().timetuple())), status=1)
     try:
         session.add(new_user)
+        session.commit()
+        new_user.account = User.create_account(new_user.id)
         session.commit()
         return new_user
 
