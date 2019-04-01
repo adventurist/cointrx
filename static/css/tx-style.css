@@ -189,3 +189,22 @@ body {
 .keydialog {
     margin: 24px!important;
 }
+
+.btn-container {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+}
+
+.key-edit:hover {
+    background-color: rgba(255, 255, 255, 0.1)!important;
+}
+
+.keydialog > div > div {
+    max-width: 1000px!important;
+}
+
+.key-btn:hover {
+    background-color: #b64520!important;
+}

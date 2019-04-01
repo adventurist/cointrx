@@ -27,7 +27,8 @@ const styles = {
   root: {
     display: 'flex',
     flexWrap: 'wrap',
-    margin: '0px'
+    margin: '0px',
+    maxWidth: '1858px'
   },
   gridChild: {
     padding: '0px',

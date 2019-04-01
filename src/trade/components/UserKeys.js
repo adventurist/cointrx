@@ -75,6 +75,8 @@ export class KeyDialog extends React.Component {
                     title="Dialog With Date Picker"
                     // actions={actions}
                     modal={false}
+                    maxWidth='lg'
+                    fullWidth={true}
                     open={this.props.show}
                     onRequestClose={this.handleClose}>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -111,11 +113,11 @@ export class UserKeys extends Component {
         this.state = {
             btnHovered: false,
             _columns: [
-                {key: 'id', name: 'ID'},
-                {key: 'lbl', name: 'Name'},
-                {key: 'adr', name: 'Address'},
-                {key: 'bal', name: 'Balance'},
-                {key: 'btn', name: 'Edit'}
+                {key: 'id', name: 'ID', resizable: true, width: 80, filterable: true, dragable: true},
+                {key: 'lbl', name: 'Name', resizable: true, filterable: true, dragable: true},
+                {key: 'adr', name: 'Address', resizable: true, filterable: true, dragable: true},
+                {key: 'bal', name: 'Balance', resizable: true, filterable: true, dragable: true},
+                {key: 'btn', name: 'Edit', resizable: true, width: 100, filterable: true, dragable: true}
             ],
             _rows: this.createRows(props.keys),
             dialogOpen: false,
@@ -159,7 +161,10 @@ export class UserKeys extends Component {
                     rowsCount={this.state._rows.length}
                     rowHeight={48}
                     minHeight={500}
-                    enableCellSelect={false}
+                    enableAutoFocus={false}
+                    enableDragAndDrop={true}
+                    minColumnWidth={40}
+
                     />
             </Tooltip>
                 <div id="fab-container">
@@ -179,19 +184,24 @@ export class UserKeys extends Component {
                     open={this.state.dialogOpen}
                     onRequestClose={this.handleClose}>
                     <Paper className='key-dialog-paper'>
-                    <Typography>
-                        Edit your key
-                    </Typography>
-                    <TextField
-                        value={this.state.dialogText}
-                        className='keylabel'
-                        label='Key Name'
-                        onChange={this.dialogTextChange}
+                    <div style={{maxWidth: '1000px'}}>
+                        <Typography>
+                            Edit your key
+                        </Typography>
+                        <TextField
+                            value={this.state.dialogText}
+                            className='keylabel'
+                            label='Key Name'
+                            onChange={this.dialogTextChange}
 
-                    />
+                        />
+                    </div>
+
                     <Typography>
                         Set a date to automatically disable this key
                     </Typography>
+
+                    <div style={{display: 'flex', flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <div style={{display: 'flex'}}>
                             <DatePicker
@@ -206,6 +216,7 @@ export class UserKeys extends Component {
                             </Tooltip>
                         </div>
                     </MuiPickersUtilsProvider>
+                    </div>
                     <div className='btn-container'>
                         <Button
                             label="Save"
@@ -396,9 +407,6 @@ export class UserKeys extends Component {
         // const keyDeleteResult = await deleteKey('temp', csrf)
     }
 }
-
-
-
 
 const isObjectEquivalent = (a, b) => {
     if (a !== null && typeof a !== 'undefined') {
