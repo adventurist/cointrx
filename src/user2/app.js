@@ -13,7 +13,7 @@ import Typography from '@material-ui/core/Typography'
 
 /* Form */
 import { UserForm } from './components/form'
-import { UserKeys } from '../trade/components/UserKeys'
+import { UserKeys } from './components/UserKeys'
 /* Request */
 import { request, handleResponse } from '../utils/index'
 /* Logging*/
@@ -101,7 +101,7 @@ export default class App extends Component {
             <UserForm log={this.log} style={styles.trxTool} user={this.state.user} />
           </Paper>
           <Paper className="trxToolWrap" elevation={4}>
-            <UserKeys style={styles.trxTool} keys={this.state.user.keys} />
+            <UserKeys log={this.log} style={styles.trxTool} keys={this.state.user.keys} />
           </Paper>
         </Grid>
       </Grid>
