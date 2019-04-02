@@ -149,6 +149,9 @@ class TrxRequestHandler(RequestHandler):
         self.clear_cookie('session_info')
         self.set_secure_cookie('session_info', trx_token + base64.b64encode(json.dumps(user_info).encode()))
 
+    def get_body(self):
+        return json.loads(self.request.body.decode('utf-8'))
+
 
 class LoginHandler(TrxRequestHandler):
     async def post(self, *args, **kwargs) -> str:
@@ -747,12 +750,15 @@ class RegTestUserKeyGenerateHandler(TrxRequestHandler):
         content_type = self.request.headers.get('Content-Type')
         if content_type == 'application/json':
             csrf = self.request.headers.get('csrf-token')
-            if db.User.verify_auth_token(csrf):
-                await db.regtest_make_user_address(application.session.user['id'])
-                user_data = await db.regtest_user_data(application.session.user['id'])
-                self.write(escape.json_encode(user_data))
+            user = db.User.verify_auth_token(csrf)
+            if user:
+                key = await db.regtest_make_user_address(user.id)
+                self.write(escape.json_encode({'error': False, 'status': self.get_status(), 'key': key}))
             else:
-                self.write(escape.json_encode([{'error': 'Token not valid', 'code': 401}]))
+                self.set_status(401)
+                self.write(escape.json_encode({'error': 'Your credentials are not valid', 'status': 401}))
+        else:
+            self.write(escape.json_encode([{'error': 'Token not valid', 'code': 401}]))
 
 
 def check_content_types(handler: RequestHandler):
@@ -981,6 +987,7 @@ class BotTrcPriceRetrieveHandler(TrxRequestHandler):
 class UserHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         match_pattern = escape.url_unescape(self.request.path.split('/api/user/')[1])
+        user = await db.fetch_users_by_name(match_pattern)
         user = await db.fetch_users_by_name(match_pattern)
         if user is not -1:
             self.write(json.dumps(user.serialize()))
