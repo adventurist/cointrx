@@ -106420,7 +106420,7 @@ function _request() {
   _request = _asyncToGenerator(
   /*#__PURE__*/
   regeneratorRuntime.mark(function _callee(options) {
-    var _options2, url, method, params, body, headers, credentials, queryString, requestHeaders, requestOptions, keys, _keys, response, error, responseData;
+    var _options2, url, method, params, body, headers, credentials, queryString, requestHeaders, requestOptions, keys, _keys, response, responseData, error;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -106474,15 +106474,15 @@ function _request() {
               break;
             }
 
-            error = response.error;
-            _context.next = 18;
+            _context.next = 17;
             return response.json();
 
-          case 18:
+          case 17:
             responseData = _context.sent;
+            error = responseData.error ? responseData.error : false;
             return _context.abrupt("return", {
               body: responseData,
-              error: error !== undefined ? error : false
+              error: error
             });
 
           case 20:
@@ -106501,6 +106501,8 @@ function handleResponse(response) {
 
   if ('error' in data) {
     error = data.error;
+  } else if (response.body && 'error' in response.body) {
+    error = response.body.error;
   }
 
   return {
