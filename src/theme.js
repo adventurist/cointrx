@@ -4,13 +4,13 @@ export default function theme () {
   return createMuiTheme({
     palette: {
       type: 'dark',
-      secondary: {
+      primary: {
         light: '#62efff',
         main: '#00bcd4',
         dark: '#008ba3',
         contrastText: '#fff',
       },
-      primary: {
+      secondary: {
         light: '#ff844c',
         main: '#f4511e',
         // dark: '#b91400',

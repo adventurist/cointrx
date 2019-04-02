@@ -69,11 +69,11 @@ export async function request(options) {
 
     const response = await fetch(`${url}${queryString ? queryString : ''}`, requestOptions)
     if (response) {
-        let error = response.error
         const responseData = await response.json()
+        let error = responseData.error ? responseData.error : false
         return {
             body: responseData,
-            error: error !== undefined ? error : false,
+            error
         }
     }
 }
@@ -88,6 +88,8 @@ export function handleResponse(response) {
     let error = false
     if ('error' in data) {
         error = data.error
+    } else if (response.body && 'error' in response.body) {
+        error = response.body.error
     }
 
     return {
