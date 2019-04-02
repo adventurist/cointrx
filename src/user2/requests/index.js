@@ -30,3 +30,38 @@ export async function fetchTimezoneRequest(zone) {
 
     return handleResponse(response)
 }
+
+
+/**
+ * @request
+ * @param {Object} credentials
+ * @returns {RequestObject|Object} an Object containing response codes, body and error information
+ */
+export async function fetchKeyRequest(credentials) {
+  const response = await request({
+    url: '/keys/btc/regtest/generate',
+    headers: {
+      'csrf-token': credentials.csrf,
+      'Content-Type': 'application/json',
+    },
+    method: 'POST'
+  })
+
+  return handleResponse(response)
+}
+
+
+/**
+ * TODO: Complete implementation after the back end API is finished
+ * @request
+ * @param {Object} credentials
+ * @returns {RequestObject|Object} an Object containing a status code, body (optional) and error information
+ */
+
+ export async function expireKeyRequest(credentials) {
+   const response = await request({
+     url: ''
+   })
+
+   return handleResponse(response)
+ }
