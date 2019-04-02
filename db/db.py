@@ -469,7 +469,7 @@ async def addSingleKey(key: str, uid: int):
 
         try:
             session.commit()
-            return single_key.id
+            return single_key
 
         except exc.SQLAlchemyError as err:
             print(err.args)
@@ -577,8 +577,8 @@ async def regtest_make_user_address(uid):
         new_address = btcd_utils.RegTest.get_new_address()
         if new_address is not None:
             wif = btcd_utils.RegTest.address_to_wif(new_address)
-            add_key_attempt = await addSingleKey(wif, user.id)
-            return new_address if add_key_attempt is not None else false
+            key = await addSingleKey(wif, user.id)
+            return {'address': new_address, 'meta': key.new_serialize()} if key is not None else false
 
 
 async def regtest_all_user_data():

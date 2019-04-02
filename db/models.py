@@ -196,6 +196,16 @@ class SKey(Base):
     kid = Column(Integer, ForeignKey('trxkey.id'))
     value = Column(String)
 
+    def new_serialize(self):
+        return {
+            'id': self.id,
+            'uid': self.uid,
+            'kid': self.kid,
+            'value': self.value,
+            'balance': 0,
+            'label': 'Unnamed'
+            }
+
 
 class MKey(Base):
     __tablename__ = 'mkey'
