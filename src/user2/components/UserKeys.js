@@ -124,7 +124,8 @@ export class UserKeys extends Component {
             _rows: this.createRows(props.keys),
             dialogOpen: false,
             dialogCursor: 0,
-            dialogText: ''
+            dialogText: '',
+            keys: props.keys || []
 
         }
         this._rows = null
@@ -282,13 +283,12 @@ export class UserKeys extends Component {
                     address: response.body.key.address,
                     ...response.body.key.meta
                     }
+                const keys = [... this.state.keys, key ]
                 this.setState({
                     _rows: this.addBtnRows(
-                        this.createRows([
-                            ...this.props.keys,
-                            key
-                        ])
-                    )
+                        this.createRows(keys)
+                    ),
+                    keys
                 })
             } else {
                 this.props.log('Could not create new key')
@@ -338,7 +338,7 @@ export class UserKeys extends Component {
     };
 
     keyLabelAtCursor = () => {
-        const currentKey = this.props.keys.find(key => key.id == this.state.dialogCursor)
+        const currentKey = this.state.keys.find(key => key.id == this.state.dialogCursor)
         if (isKeyObject(currentKey)) {
             return currentKey.label
         }
@@ -346,7 +346,7 @@ export class UserKeys extends Component {
     }
 
     getKeyLabel = (id) => {
-        const key = this.props.keys.find(key => key.id == id)
+        const key = this.state.keys.find(key => key.id == id)
         if (isKeyObject(key)) {
             return key.label
         }
@@ -378,15 +378,15 @@ export class UserKeys extends Component {
 
     updateKeys(id, label) {
         let keyChanged = false
-        for (let i = 0; i < this.props.keys.length; i++) {
-            if (this.props.keys[i].id === id) {
-                this.props.keys[i].label = label
+        for (let i = 0; i < this.state.keys.length; i++) {
+            if (this.state.keys[i].id === id) {
+                this.state.keys[i].label = label
                 keyChanged = true
             }
         }
 
         if (keyChanged) {
-            this.state._rows = this.createRows(this.props.keys)
+            this.state._rows = this.createRows(this.state.keys)
             this.setState({_rows: this.addBtnRows(this.state._rows)})
         }
 
