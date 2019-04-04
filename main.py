@@ -223,7 +223,7 @@ class LoginHandler(TrxRequestHandler):
         """
 
         basic_auth, content_type = retrieve_json_login_headers(self.request.headers)
-
+        # TODO: bring this in line with the implementation that was developed for x-www-form-urlencoded
         if content_type == 'application/json':
             # auth_name, auth_pass = check_basic_auth(basic_auth)
             email, name, password = retrieve_json_login_credentials(json.loads(str(self.request.body, 'utf-8')))
@@ -266,8 +266,12 @@ class LoginHandler(TrxRequestHandler):
                             return self.redirect(redirect_target)
                         else:
                             self.redirect('/')
-                    else:
-                        login_redirect(self)
+                elif user_verified is None:
+                    # do a registration attempt
+                    pass
+                else:
+                    # In this case, the user has entered the wrong password
+                    login_redirect(self)
 
     def get(self, *args, **kwargs):
         self.render("templates/login.html", title="Coin TRX login")
