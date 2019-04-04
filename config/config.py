@@ -7,13 +7,13 @@ def env_variables():
 
 def get_urls(trx_env):
     return {
-        'base_url': 'https://app.cointrx.com',
+        'base_url': 'https://cointrx.com',
         'tx_app': 'http://localhost:3000/transaction',
-        'tx_request': 'https://app.cointrx.com/transaction/request',
-        'blockgen_url': 'https://app.cointrx.com/regtest/generate/block',
-        'userbalance_url': 'https://app.cointrx.com/regtest/user-balance',
+        'tx_request': 'https://cointrx.com/transaction/request',
+        'blockgen_url': 'https://cointrx.com/regtest/generate/block',
+        'userbalance_url': 'https://cointrx.com/regtest/user-balance',
         'wif_to_private_url': 'http://localhost:3000/key/from-wif',
-        'key_gen_url': 'https://app.cointrx.com/keys/btc/regtest/generate'
+        'key_gen_url': 'https://cointrx.com/keys/btc/regtest/generate'
     } if trx_env == 'SNOWFLAKE' else {
         'base_url': 'http://localhost',
         'tx_app': 'http://localhost:3000/transaction',
@@ -27,7 +27,7 @@ def get_urls(trx_env):
 
 def trx_urls(trx_env):
     return {
-        'base_url': 'https://app.cointrx.com',
+        'base_url': 'https://cointrx.com',
         'tx_app': 'http://localhost:3000/transaction',
         'tx_request': 'https://app.cointrx.com/transaction/request',
         'blockgen_url': 'https://app.cointrx.com/regtest/generate/block',

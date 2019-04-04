@@ -437,7 +437,7 @@ class BotFetchHandler(RequestHandler):
     def set_default_headers(self):
         # Only allow real internal requests
         origin = self.request.headers.get('Origin')
-        if origin in ['http://localhost:6969', 'https://app.cointrx.com', 'https:bot.cointrx.com']:
+        if origin in ['http://localhost:6969', 'https://cointrx.com', 'https:bot.cointrx.com']:
             self.set_header("access-control-allow-origin", origin)
             self.set_header("Access-Control-Allow-Headers", "x-requested-with")
             self.set_header('Access-Control-Allow-Methods', 'GET, PUT, DELETE, OPTIONS')
