@@ -10,7 +10,7 @@ import EditIcon from '@material-ui/icons/Edit'
 import CloseIcon from '@material-ui/icons/Close'
 import DeleteIcon from '@material-ui/icons/Delete'
 
-import { fetchKeyRequest } from '../requests/'
+import { fetchKeyRequest, updateKeyRequest } from '../requests/'
 
 const keyBtnStyles = {
     float: 'right',
@@ -351,14 +351,15 @@ export class UserKeys extends Component {
             return key.label
         }
     }
-    dialogTextChange = (event, value) => {
-        this.setState({dialogText: value})
+    dialogTextChange = e => {
+        this.setState({dialogText: e.target.value})
     }
 
-    saveKey = e => {
+    saveKey = async e => {
         const result = this.setKeyFutureDisable()
-        if (isKeyLabelChanged(this.state.dialogText, this.state.dialogCursor)) {
-            this.requestBtcKeyUpdate(this.state.dialogCursor, this.state.dialogText)
+        const key = this.state.keys.find(key => key.id === this.state.dialogCursor)
+        if (key && key.label !== this.state.dialogText ) {
+            await this.requestBtcKeyUpdate(this.state.dialogCursor, this.state.dialogText)
         }
     }
 
@@ -366,9 +367,12 @@ export class UserKeys extends Component {
     requestBtcKeyUpdate = async(id, label) => {
         const csrf = getCsrfToken()
         if (csrf && csrf.length > 0) {
-            const keyUpdateResult = await fetchKeyUpdate(id, label, csrf)
-            if (!keyUpdateResult.error) {
+            const result = await updateKeyRequest({id, label}, {csrf})
+            if (!result.error) {
                this.updateKeys(id, label)
+            } else {
+                this.props.log('Unable to update key')
+
             }
 
         } else {
@@ -378,6 +382,7 @@ export class UserKeys extends Component {
 
     updateKeys(id, label) {
         let keyChanged = false
+
         for (let i = 0; i < this.state.keys.length; i++) {
             if (this.state.keys[i].id === id) {
                 this.state.keys[i].label = label
@@ -417,3 +422,7 @@ const isObjectEquivalent = (a, b) => {
 }
 
 const isKeyObject = (key) => typeof key !== 'undefined' && 'id' in key
+
+function getCsrfToken () {
+    return document.cookie.split(';').find(cookie => cookie.trim().substr(0, 4) === 'csrf').trim().substr(5)
+}

@@ -50,12 +50,31 @@ export async function fetchKeyRequest(credentials) {
   return handleResponse(response)
 }
 
+/**
+ * @request
+ * @param {Object} credentials
+ * @returns {RequestObject|Object} an object containing response codes, body and error information
+ */
+export async function updateKeyRequest(key, credentials) {
+  const response = request({
+    url: `/api/key/${String('0000' + key.id).slice(-4)}/update`,
+    headers: {
+      'Content-Type': 'application/json',
+      'csrf-token': credentials.csrf
+    },
+    method: 'POST',
+    body: JSON.stringify(key)
+  })
+
+  return handleResponse(response)
+}
+
 
 /**
  * TODO: Complete implementation after the back end API is finished
  * @request
  * @param {Object} credentials
- * @returns {RequestObject|Object} an Object containing a status code, body (optional) and error information
+ * @returns {RequestObject|Object} an object containing a status code, body (optional) and error information
  */
 
  export async function expireKeyRequest(credentials) {
