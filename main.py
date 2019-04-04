@@ -792,35 +792,30 @@ class LogoutHandler(TrxRequestHandler):
             user_verify = db.User.verify_auth_token(token)
 
 
-class TestKeyHandler(TrxRequestHandler):
+class KeyUpdateHandler(TrxRequestHandler):
     def get(self, *args, **kwargs):
-        jigga = self.get_argument('jigga')
-        print(jigga)
         key_id = self.request.path.split('/api/key/')[1].split('/update')[0]
-        print(key_id)
 
     async def post(self, *args, **kwargs):
         csrf, content_type = retrieve_api_request_headers(self.request.headers)
         if content_type == 'application/json':
             # TODO Check this properly cookie = self.get_secure_cookie("trx_token")
-            if check_attribute(application.session, 'user'):
-                if db.User.verify_auth_token(csrf):
-                    key_id = self.request.path.split('/api/key/')[1].split('/update')[0].lstrip('0')
-                    key_data = json.loads(self.request.body.decode())
-                    if 'label' in key_data:
-                        if await db.update_key(key_id, key_data['label']):
-                            self.write(escape.json_encode([{'Update': 'Successful', 'code': 200}]))
-                        else:
-                            self.set_status(404)
-                            self.write(escape.json_encode([{'error': 'Key not found', 'code': 404}]))
+            user = db.User.verify_auth_token(csrf)
+            if user:
+                key_id = self.request.path.split('/api/key/')[1].split('/update')[0].lstrip('0')
+                key_data = json.loads(self.request.body.decode())
+                if 'label' in key_data:
+                    if await db.update_key(key_id, key_data['label']):
+                        self.write(escape.json_encode([{'Update': 'Successful', 'code': 200}]))
                     else:
-                        self.set_status(400)
-                        self.write(escape.json_encode([{'error': 'Bad request', 'code': 400}]))
+                        self.set_status(404)
+                        self.write(escape.json_encode([{'error': 'Key not found', 'code': 404}]))
                 else:
-                    self.set_status(401)
-                    self.write(escape.json_encode([{'error': 'Not authorized', 'code': 401}]))
+                    self.set_status(400)
+                    self.write(escape.json_encode([{'error': 'Bad request', 'code': 400}]))
             else:
-                login_redirect(self)
+                self.set_status(401)
+                self.write(escape.json_encode([{'error': 'Not authorized', 'code': 401}]))
 
 
 class UserUpdateHandler(TrxRequestHandler):
@@ -1390,7 +1385,7 @@ class TRXApplication(Application):
             # KEYS
 
             (r"/key/convert/wiftoprivate", KeyWTPHandler),
-            (r"/api/key/[0-9][0-9][0-9][0-9]/update", TestKeyHandler),
+            (r"/api/key/[0-9][0-9][0-9][0-9]/update", KeyUpdateHandler),
 
             # BIDS & OFFERS
 
