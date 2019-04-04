@@ -339,22 +339,10 @@ def check_auth_by_name(user, password):
     query_user = session.query(User).filter(User.name == user).first()
     if query_user is not None:
         if not User.verify_password_by_name(user, password):
-            return None
+            return -1
         return query_user
     else:
-        pass_hash = User.generate_hash(password)
-        new_user = User(name=user, hash=pass_hash, email='temp@jigga.com',
-                        created=int(time.mktime(datetime.datetime.now().timetuple())), status=1)
-
-        try:
-
-            session.add(new_user)
-            session.commit()
-            return new_user
-
-        except exc.SQLAlchemyError as error:
-            return error
-
+        return None
 
 @event.listens_for(CXPrice, 'before_insert')
 def cx_insert_listener(*args):
