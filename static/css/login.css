@@ -9,7 +9,7 @@
 
 #main-wrap > div {
   width: 35%;
-  padding: 4px;
+  padding: 24px;
 }
 
 #main-wrap .welcome-text {
@@ -34,4 +34,8 @@ form#login-form > div {
 
 .register-button:hover, .login-btn:hover {
   background-color: #62efff!important;
+}
+
+input#name, input#password {
+  height: 32px;
 }

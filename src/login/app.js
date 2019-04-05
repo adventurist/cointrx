@@ -160,47 +160,41 @@ export default class App extends Component {
     <CoinTrxWelcome />
     <Paper className={classes.padding}>
       <div className={classes.margin}>
-      <form method="post" id="login-form" accept-charset="UTF-8">
-      <Grid container spacing={8} alignItems="flex-end">
-              <Grid item>
-                  <Face />
-              </Grid>
-              <Grid item md={true} sm={true} xs={true}>
-                  <TextField name='name' id="name" label="Username" type="text" onChange={this.handleName} fullWidth autoFocus />
-              </Grid>
+        <form method="post" id="login-form" accept-charset="UTF-8">
+          <Grid container spacing={8} alignItems="flex-end">
+            <Grid item md={true} sm={true} xs={true}>
+                <TextField name='name' id="name" label="Username" type="text" onChange={this.handleName} fullWidth autoFocus />
+            </Grid>
           </Grid>
           <Grid container spacing={8} alignItems="flex-end">
-              <Grid item>
-                  <Fingerprint />
-              </Grid>
               <Grid item md={true} sm={true} xs={true}>
                   <TextField id="password" name="password" label="Password" type="password" onChange={this.handlePass} fullWidth required />
               </Grid>
           </Grid>
           <Grid container alignItems="center" justify="space-between">
-              <Grid item>
-                  <FormControlLabel control={
-                      <Checkbox
-                          color="primary"
-                      />
-                  } label="Remember me" />
-              </Grid>
-              <Grid item>
-                  <Button disableFocusRipple disableRipple style={{ textTransform: "none" }} variant="text" color="secondary">Forgot password ?</Button>
-              </Grid>
+            <Grid style={{padding: '12px'}} item>
+              <FormControlLabel control={
+                  <Checkbox
+                      color="primary"
+                  />
+              } label="Remember me" />
+            </Grid>
+            <Grid item>
+              <Button disableFocusRipple disableRipple style={{ textTransform: "none" }} variant="text" color="secondary">Forgot password ?</Button>
+            </Grid>
           </Grid>
           <Grid container justify="center" style={{ marginTop: '10px' }}>
-              <Button className='login-btn' type='submit' variant="raised" color="primary" style={{ textTransform: "none" }}><LoginIcon />Login</Button>
+            <Button className='login-btn' type='submit' variant="raised" color="primary" style={{ textTransform: "none" }}><LoginIcon />Login</Button>
           </Grid>
           </form>
         </div>
-      </Paper>
-      <Paper style={{display: 'flex', justifyContent: 'space-evenly'}}>
-      <Typography style={{padding: '4px', marginRight: '4px'}} variant='h5'>
-        Don't have an account?
-      </Typography>
-        <RegisterButton />
-      </Paper>
-    </div>
+    </Paper>
+    <Paper style={{display: 'flex', justifyContent: 'space-evenly'}}>
+    <Typography style={{padding: '4px', marginRight: '4px'}} variant='h5'>
+      Don't have an account?
+    </Typography>
+      <RegisterButton />
+    </Paper>
+  </div>
   )}
 }
