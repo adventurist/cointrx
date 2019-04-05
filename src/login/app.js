@@ -95,7 +95,7 @@ const RegisterButton = () => {
     window.location = '/register'
   }
   return (
-    <Button className='register-button' style={{textTransform: 'none'}} variant='raised' color='primary' onClick={registerRedirect}><RegisterIcon />Register</Button>
+    <Button className='register-button' style={{textTransform: 'none'}} variant='raised' color='secondary' onClick={registerRedirect}><RegisterIcon />Register</Button>
   )
 }
 
@@ -195,7 +195,7 @@ export default class App extends Component {
           </form>
         </div>
       </Paper>
-      <Paper style={{display: 'flex', justifyContent: 'center'}}>
+      <Paper style={{display: 'flex', justifyContent: 'space-evenly'}}>
       <Typography style={{padding: '4px', marginRight: '4px'}} variant='h5'>
         Don't have an account?
       </Typography>

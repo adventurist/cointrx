@@ -28,7 +28,8 @@ form#login-form > div {
 .login-btn {
   margin: 10px;
   width: 84px;
-  background-color: #E1E1E1;
+  color: #000!important;
+  background-color: #FFF!important;
 }
 
 .register-button:hover, .login-btn:hover {
