@@ -363,7 +363,12 @@ class CurrencyRevisionHandler(TrxRequestHandler):
 
 class RegisterHandler(TrxRequestHandler):
     def get(self):
-        self.render("templates/register.html", title="Register for Coin TRX")
+        error = self.get_cookie('error', None)
+        messages = []
+        if error:
+            messages.append(error)
+            self.clear_cookie('error')
+        self.render("templates/register.html", title="Register for Coin TRX", messages=messages)
 
     async def post(self, *args, **kwargs):
         name = password = email = None
@@ -376,16 +381,17 @@ class RegisterHandler(TrxRequestHandler):
             name, password, email = body['name'], body['password'], body['email']
 
         if email is None or password is None or name is None:
-            self.write("You must supply more arguments")
-            self.write_error(401)
+            self.set_status(400)
+            self.set_cookie('error', 'arguments')
+            self.redirect(self.request.uri)
         else:
             user = await db.check_authentication(name, password, email)
             if user is None:
                 user = await db.create_user(name, password, email)
             else:
-                self.write('This user already exists. Please login')
-                self.write_error(400)
-                login_redirect(self)
+                self.set_status(400)
+                self.set_cookie('error', 'exists')
+                self.redirect(self.request.uri)
             if create_login_session(user, (name, password), self):
                 if self.get_secure_cookie('redirect_target') is not None:
                     redirect_target = self.get_secure_cookie('redirect_target')

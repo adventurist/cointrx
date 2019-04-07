@@ -7,8 +7,9 @@ import ExpansionPanel from '@material-ui/core/ExpansionPanel'
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import TrxIcon from '../utils/component/TrxIcon'
 import Typography from '@material-ui/core/Typography'
-import { Paper, withStyles, Grid, TextField, Button, FormControlLabel, Checkbox } from '@material-ui/core'
+import { Dialog, Card, CardContent, CardActions, CardActionArea, Paper, withStyles, Grid, TextField, Button, FormControlLabel, Checkbox } from '@material-ui/core'
 
 import { Email,Face, Fingerprint } from '@material-ui/icons'
 /* Request */
@@ -65,12 +66,26 @@ export default class App extends Component {
       name: undefined,
       email: undefined,
       password: undefined,
-      loggedIn: false
+      loggedIn: false,
+      dialogShow: false,
+      dialogMessage: ''
     }
   }
 
   componentDidMount () {
-
+    if (trxMessages && Array.isArray(trxMessages)) {
+      trxMessages.forEach(message => {
+        let dialogMessage
+        switch (message) {
+          case 'arguments':
+            this.dialogOpen('Unable to register: please input all required arguments')
+            break
+          case 'exists':
+            this.dialogOpen('This user already exists. Please login')
+            break
+        }
+      })
+    }
   }
 
   notificationMessage = message => {
@@ -79,12 +94,12 @@ export default class App extends Component {
     }
   }
 
-  dialogHandler = () => {
-    this.setState({ tradeDialogOpen: true })
+  dialogOpen = message => {
+    this.setState({ dialogMessage: message, dialogShow: true })
   }
 
-  tradeDialogCloseHandler = () => {
-    this.setState({ tradeDialogOpen: false })
+  dialogClose = () => {
+    this.setState({ dialogShow: false, dialogMessage: '' })
   }
 
   handleName = e => {
@@ -160,7 +175,27 @@ export default class App extends Component {
                     </form>
                 </div>
             </Paper>
-    </div>
+            <Dialog
+              title="Invalid Login"
+              maxWidth='lg'
+              fullWidth={true}
+              open={this.state.dialogShow}>
+              <Paper className='error-container' draggable={true}>
+                <Card className='login-error'>
+                  <TrxIcon color='#f4511e' size='lg' path='M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z'></TrxIcon>
+                  <Typography component='h2' variant='h4'>Authentication Error</Typography>
+                  <CardActionArea>
+                    <CardContent>
+                      <Typography component='h3' variant='h5'>{this.state.dialogMessage}</Typography>
+                    </CardContent>
+                  </CardActionArea>
+                  <CardActions className='error-close-action'>
+                    <Button size='large' color='primary' label='Close' onClick={this.dialogClose}>Close</Button>
+                  </CardActions>
+                </Card>
+              </Paper>
+            </Dialog>
+          </div>
       )
   }
 }
