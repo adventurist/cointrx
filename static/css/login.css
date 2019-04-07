@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  transform: translateY(35%);
+  transform: translateY(8.5%);
 }
 
 #main-wrap > div {
@@ -38,4 +38,21 @@ form#login-form > div {
 
 input#name, input#password {
   height: 32px;
+}
+
+.error-container {
+  align-items: center;
+}
+
+.error-container > div {
+  width: 100%;
+  text-align: center;
+}
+
+.login-error {
+
+}
+
+.error-close-action {
+  display: block!important;
 }
