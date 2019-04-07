@@ -225,9 +225,8 @@ class LoginHandler(TrxRequestHandler):
         basic_auth, content_type = retrieve_json_login_headers(self.request.headers)
         # TODO: bring this in line with the implementation that was developed for x-www-form-urlencoded
         if content_type == 'application/json':
-            # auth_name, auth_pass = check_basic_auth(basic_auth)
             email, name, password = retrieve_json_login_credentials(json.loads(str(self.request.body, 'utf-8')))
-
+            # TODO: Perhaps we should replace name with email if name is None
             if name is None or password is None:
                 self.write("You must supply more arguments")
                 self.set_status(400)
@@ -235,24 +234,19 @@ class LoginHandler(TrxRequestHandler):
 
             user_verify = db.check_authentication_by_name(name, password)
             if user_verify is not None and user_verify is not -1:
-                csrf = user_verify.generate_auth_token(expiration=1200)
-                application.create_session(user=create_user_session_data(name, password, user_verify, csrf))
-                if application.session is not None and isinstance(application.session, session.Session):
-                    trx_token = session.Session.generate_cookie()
-                    self.set_secure_cookie(name="trx_token", value=trx_token)
+                session_data = create_login_session(user_verify, (name, password), self)
+                if session_data:
+                    self.write(escape.json_encode(
+                        {'code': 200, 'token': session_data['csrf'].decode(),
+                         'refresh': session_data['refresh'].decode(),
+                         'name': user_verify.name, 'url': '/', 'session_info': session_data['session_info']}))
 
-                    return self.write(escape.json_encode(
-                        {'statuscode': 200, 'token': str(application.session.user['csrf'], 'utf-8'),
-                         'trx_token': trx_token.decode('utf-8'), 'uid': user_verify.id,
-                         'refresh': user_verify.generate_refresh_token().decode('utf-8'),
-                         'name': user_verify.name}))
-
-            elif user_verify < -1:
+            elif user_verify is None:
                 self.set_status(404)
-                return self.write(escape.json_encode({'statuscode': 404}))
+                self.write(escape.json_encode({'code': 404, 'error': 'User does not exist'}))
             else:
                 self.set_status(401)
-                return self.write(escape.json_encode({'statuscode': 401}))
+                self.write(escape.json_encode({'code': 401, 'error': 'Invalid password'}))
 
         elif content_type == 'application/x-www-form-urlencoded':
             credentials = retrieve_login_credentials(self)
@@ -267,14 +261,22 @@ class LoginHandler(TrxRequestHandler):
                         else:
                             self.redirect('/')
                 elif user_verified is None:
-                    # do a registration attempt
-                    pass
+                    self.set_status(404)
+                    self.set_cookie('error', 'user')
+                    self.redirect(self.request.uri)
                 else:
                     # In this case, the user has entered the wrong password
-                    login_redirect(self)
+                    self.set_status(401)
+                    self.set_cookie('error', 'password')
+                    self.redirect(self.request.uri)
 
     def get(self, *args, **kwargs):
-        self.render("templates/login.html", title="Coin TRX login")
+        error = self.get_cookie('error', None)
+        messages = []
+        if error:
+            messages.append(error)
+            self.clear_cookie('error')
+        self.render("templates/login.html", title="Coin TRX login", messages=messages)
 
 
 class SendMailHandler(TrxRequestHandler):
@@ -1575,14 +1577,16 @@ def create_login_session(user, credentials, handler):
             'name': credentials[0], 'pass': credentials[1], 'id': user.id
         }
         trx_token = session.Session.generate_cookie()
+        session_info = trx_token + base64.b64encode(json.dumps(user_info).encode())
+        refresh_token = user.generate_refresh_token()
         application.create_session(user=user_info, csrf=csrf)
         handler.set_secure_cookie(name="trx_token", value=trx_token)
         handler.set_secure_cookie(name="session_info",
-                                  value=trx_token + base64.b64encode(json.dumps(user_info).encode()))
+                                  value=session_info)
         handler.set_cookie(name='csrf', value=csrf)
         handler.set_cookie(name='refresh', value=user.generate_refresh_token())
         handler.set_cookie(name='username', value=user.name)
-        return True
+        return {'csrf': csrf, 'trx_token': trx_token, 'refresh': refresh_token, 'session_info': session_info}
     except Exception as e:
         logger.error('Error creating session')
         logger.debug(e)
