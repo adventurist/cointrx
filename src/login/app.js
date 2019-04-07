@@ -9,7 +9,7 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import TrxIcon from '../utils/component/TrxIcon'
 import Typography from '@material-ui/core/Typography'
-import { Card, CardMedia, Paper, withStyles, Grid, TextField, Button, FormControlLabel, Checkbox } from '@material-ui/core'
+import { Dialog, Card, CardContent, CardActions, CardActionArea, CardMedia, Paper, withStyles, Grid, TextField, Button, FormControlLabel, Checkbox } from '@material-ui/core'
 
 import { Email,Face, Fingerprint } from '@material-ui/icons'
 
@@ -107,12 +107,26 @@ export default class App extends Component {
       name: undefined,
       email: undefined,
       password: undefined,
-      loggedIn: false
+      loggedIn: false,
+      dialogShow: false,
+      dialogMessage: ''
     }
   }
 
   componentDidMount () {
-
+    if (trxMessages && Array.isArray(trxMessages)) {
+      trxMessages.forEach(message => {
+        let dialogMessage
+        switch (message) {
+          case 'password':
+            this.dialogOpen('You entered an invalid password')
+            break
+          case 'user':
+            this.dialogOpen('The user entered does not exist')
+            break
+        }
+      })
+    }
   }
 
   notificationMessage = message => {
@@ -121,12 +135,12 @@ export default class App extends Component {
     }
   }
 
-  dialogHandler = () => {
-    this.setState({ tradeDialogOpen: true })
+  dialogOpen = message => {
+    this.setState({ dialogMessage: message, dialogShow: true })
   }
 
-  tradeDialogCloseHandler = () => {
-    this.setState({ tradeDialogOpen: false })
+  dialogClose = () => {
+    this.setState({ dialogShow: false, dialogMessage: '' })
   }
 
   handleName = e => {
@@ -150,6 +164,33 @@ export default class App extends Component {
     this.setState({ lastMessage: message })
   }
 
+  login = async () => {
+    const name = this.state.name
+    const password = this.state.password
+
+    const response = await request({
+      url: '/login',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST',
+      body: {
+        name,
+        password
+      }
+    })
+
+    const result = handleResponse(response)
+
+    if (!result.error) {
+      this.log('Login successful')
+      window.location = result.body.url
+    } else {
+      this.log('Login failed')
+      this.dialogOpen()
+    }
+  }
+
   /**
      * Render the component
      */
@@ -163,20 +204,20 @@ export default class App extends Component {
         <form method="post" id="login-form" accept-charset="UTF-8">
           <Grid container spacing={8} alignItems="flex-end">
             <Grid item md={true} sm={true} xs={true}>
-                <TextField name='name' id="name" label="Username" type="text" onChange={this.handleName} fullWidth autoFocus />
+              <TextField name='name' id="name" label="Username" type="text" onChange={this.handleName} fullWidth autoFocus />
             </Grid>
           </Grid>
           <Grid container spacing={8} alignItems="flex-end">
-              <Grid item md={true} sm={true} xs={true}>
-                  <TextField id="password" name="password" label="Password" type="password" onChange={this.handlePass} fullWidth required />
-              </Grid>
+            <Grid item md={true} sm={true} xs={true}>
+                <TextField id="password" name="password" label="Password" type="password" onChange={this.handlePass} fullWidth required />
+            </Grid>
           </Grid>
           <Grid container alignItems="center" justify="space-between">
             <Grid style={{padding: '12px'}} item>
               <FormControlLabel control={
-                  <Checkbox
-                      color="primary"
-                  />
+                <Checkbox
+                    color="primary"
+                />
               } label="Remember me" />
             </Grid>
             <Grid item>
@@ -186,8 +227,8 @@ export default class App extends Component {
           <Grid container justify="center" style={{ marginTop: '10px' }}>
             <Button className='login-btn' type='submit' variant="raised" color="primary" style={{ textTransform: "none" }}><LoginIcon />Login</Button>
           </Grid>
-          </form>
-        </div>
+        </form>
+      </div>
     </Paper>
     <Paper style={{display: 'flex', justifyContent: 'space-evenly'}}>
     <Typography style={{padding: '4px', marginRight: '4px'}} variant='h5'>
@@ -195,6 +236,26 @@ export default class App extends Component {
     </Typography>
       <RegisterButton />
     </Paper>
+    <Dialog
+      title="Invalid Login"
+      maxWidth='lg'
+      fullWidth={true}
+      open={this.state.dialogShow}>
+      <Paper className='error-container' draggable={true}>
+        <Card className='login-error'>
+          <TrxIcon color='#f4511e' size='lg' path='M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z'></TrxIcon>
+          <Typography component='h2' variant='h4'>Authentication Error</Typography>
+          <CardActionArea>
+            <CardContent>
+              <Typography component='h3' variant='h5'>{this.state.dialogMessage}</Typography>
+            </CardContent>
+          </CardActionArea>
+          <CardActions className='error-close-action'>
+            <Button size='large' color='primary' label='Close' onClick={this.dialogClose}>Close</Button>
+          </CardActions>
+        </Card>
+      </Paper>
+    </Dialog>
   </div>
   )}
 }
