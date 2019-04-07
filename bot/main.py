@@ -249,6 +249,7 @@ class BotWsStartHandler(WSHandler):
         Returns:
             [bool] -- returns True or False, which decides whether the request is granted
         """
+        log.debug('Origin is', origin)
         return bool(re.match(r'^.*?\.cointrx\.com', origin)) if application.settings['env'] == 'SNOWFLAKE' else True
 
     async def on_message(self, message):
