@@ -1,7 +1,7 @@
 import logging
 
 
-def setup_logger(name, level, json_logging=False):
+def setup_logger(name, level='INFO', json_logging=False):
     logger = logging.getLogger(name)
     logger.setLevel(level)
     log_handler = logging.FileHandler('bot.log')

@@ -2,7 +2,7 @@ from tornado import httpclient as tornado_client
 from tornado.httpclient import HTTPRequest
 from utils.loop_handler import IOHandler
 import aiohttp
-
+from utils import logging
 from types import SimpleNamespace
 
 config = SimpleNamespace()
@@ -10,6 +10,8 @@ config.blockchain_url = "https://blockchain.info/ticker"
 
 http_client = tornado_client.AsyncHTTPClient()
 io_handler = IOHandler()
+
+logger = logging.setup_logger('HTTP_CLIENT', 'DEBUG')
 
 
 class Client:
@@ -28,8 +30,10 @@ class Client:
             # response = await http_client.fetch(url=url, method='POST', body=body, headers=headers)
             response = await http_client.fetch(request)
             return response
-        except tornado_client.HTTPError as e:
-            print(e.message)
+        except ConnectionRefusedError as e:
+            logger.debug('POST Request failed')
+            print(e.strerror)
+            return e
 
     async def get(self, url):
         try:
@@ -37,7 +41,7 @@ class Client:
             response = await http_client.fetch(request)
             return response
         except tornado_client.HTTPError as e:
-            print(e.message)
+            logger.debug('GET Request failed', e.message)
 
     async def auth_connect(self, url, body, headers, auth_username, auth_password):
         try:
@@ -48,7 +52,8 @@ class Client:
             return response
 
         except tornado_client.HTTPError as e:
-            print(e.message)
+            logger.debug('Authentication Request failed', e.message)
+
 
     async def get_prices(self):
         try:
@@ -57,8 +62,7 @@ class Client:
             return price_handle_result
 
         except aiohttp.client_exceptions.ClientError as e:
-            if 'message' in e:
-                print(str(e))
+            logger.debug('Could not get prices. Request failed.', e.message)
 
 
 async def fetch(session, url):
