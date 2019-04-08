@@ -43,6 +43,7 @@ class Transaction:
         if kwargs[0] is not None:
             new_tx = TestTx(r=kwargs[0]['recipient'], v=kwargs[0]['amount'], s=kwargs[0]['sender'])
             if new_tx:
+                logger.info('TX created')
                 sender_addr = new_tx.sender['address']
                 sender_private_key = new_tx.sender['key']
                 tx_history = await btcd_utils.RegTest.get_tx_history(sender_addr)
@@ -50,6 +51,7 @@ class Transaction:
                 tx_input_amount = 0
 
                 if isinstance(tx_history, list) and len(tx_history) > 0 and isinstance(tx_history[0], dict):
+                    logger.info('TX History found')
                     sender_balance = sum([v['value'] for v in tx_history])
                     if sender_balance > new_tx.amount:
                         for v in tx_history:
@@ -92,6 +94,8 @@ class Transaction:
                     else:
                         logger.debug('Insufficient funds')
                         return {'error': 'Insufficient funds', 'code': TRXConfig.TransactionError.INSUFFICIENT_FUNDS}
+                else:
+                    logger.debug('No TX history')
 
 def is_iterable(value):
     try:
