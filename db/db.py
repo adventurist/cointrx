@@ -984,8 +984,9 @@ async def trx_pay_users(amount_to_send):
                         'key': coinmaster_key.value
                     },
                     'recipient': address}
-
+                logger.info('Pay object: {}'.format(json.dumps(pay_object)))
                 transaction_result = await Transaction.request_transaction(pay_object)
+                logger.info('Transaction Result: {}'.format(transaction_result))
                 if transaction_result:
                     await trx_block_pending()
                 else:

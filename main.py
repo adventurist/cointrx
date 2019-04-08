@@ -1087,8 +1087,10 @@ class TRXPayAllUsers(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         amount = self.get_argument('amount')
         pay_all_result = await db.trx_pay_users(amount)
+        logger.info('Pay All result: {}'.format(str(pay_all_result)))
         if pay_all_result and len(pay_all_result) > 0:
             for recipient in pay_all_result:
+                logger.info('Enqueuing {recipient} for this amount: {amount}'.format(recipient=recipient, amount=amount))
                 application.queue.enqueue(TRXTransaction(coinmaster(), recipient, amount))
 
 

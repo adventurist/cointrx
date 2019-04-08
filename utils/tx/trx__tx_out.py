@@ -67,20 +67,35 @@ class Transaction:
                         client = Client()
                         body = json_encode(
                             {'txIn': tx_input, 'txOut': tx_output, 'network': 'regtest'})
-                        logger.debug('Calling Transaction app with body', json_decode(body))
+                        logger.debug('Calling Transaction app with body: {}'.format(json_decode(body)))
                         response = await client.connect(TRX_urls['tx_app'], json_encode(
                             {'txIn': tx_input, 'txOut': tx_output, 'network': 'regtest'}))
                         if response:
-                            logger.debug('Response received', str(response))
-                            data = json_decode(response.body.decode())
-                            logger.debug('Decoded body', data)
-                            result = data.get('result', 'error')
-                            if result != 'error':
+                            logger.debug('Response received: {}'.format(str(response)))
+                            if is_iterable(response) and 'body' in response:
+                                data = json_decode(response.body.decode())
+                            else:
+                                data = 'NO BODY'
+                            logger.debug('Decoded body: {}'.format(str(data)))
+                            if is_iterable(data) and hasattr(data, 'error'):
+                                result = data.get('result', 'error')
+                            else:
+                                result = 'Unable to retrieve result'
+                            if is_iterable(result) and result != 'error' and not isinstance(result, str):
                                 send_tx_result = btcd_utils.send_tx(result['tx'], 'regtest')
-                                logger.debug('Transaction result', send_tx_result)
+                                logger.debug('Transaction result: {}'.format(send_tx_result))
                                 return send_tx_result
+                            else:
+                                return 'Failed'
                         else:
                             logger.debug('No response received')
                     else:
                         logger.debug('Insufficient funds')
                         return {'error': 'Insufficient funds', 'code': TRXConfig.TransactionError.INSUFFICIENT_FUNDS}
+
+def is_iterable(value):
+    try:
+        iter(value)
+        return True
+    except TypeError:
+        return False
