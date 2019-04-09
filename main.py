@@ -995,9 +995,9 @@ class UserHandler(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         match_pattern = escape.url_unescape(self.request.path.split('/api/user/')[1])
         user = await db.fetch_users_by_name(match_pattern)
-        user = await db.fetch_users_by_name(match_pattern)
         if user is not -1:
-            self.write(json.dumps(user.serialize()))
+            user_data = await user.serialize()
+            self.write(json.dumps(user_data))
 
     async def patch(self, *args, **kwargs):
         if self.request.headers.get("Content-Type") == 'application/json':
