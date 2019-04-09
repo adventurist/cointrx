@@ -9,16 +9,17 @@ from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker
 from db import db_config
 from types import SimpleNamespace
-from typing import Tuple
 from decimal import Decimal, ROUND_HALF_UP
 from utils import btcd_utils
+from utils.errors import TX_Errors
+from utils import logging
 from config.config import DEFAULT_LANGUAGE, currency_index
 
 import timeago
 import time
 import datetime
 import json
-import logging
+# import logging
 
 from db.models import TrxKey, TRX, SKey, MKey, KeyLabel, Offer, Bid, Trade, Account, TRCHistory, User, ETHPrice, \
     ETHPriceRevision, CXPrice, CXPriceRevision, Heartbeat, HeartbeatComment, HeartbeatCommentBase, HeartbeatUser, \
@@ -28,13 +29,7 @@ COIN = 100000000
 trxapp = SimpleNamespace()
 trxapp.config = {'SECRET_KEY': "jigga does as jigga does"}
 
-logger = logging.getLogger('DB')
-logger.setLevel(logging.DEBUG)
-log_handler = logging.FileHandler('db.log')
-logger_formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-log_handler.setFormatter(logger_formatter)
-logger.addHandler(log_handler)
-# metadata.create_all(bind=engine)
+logger = logging.setup_logger('DB', 'INFO', 'db.log')
 
 COINMASTER_USER_ID = 16
 
@@ -959,8 +954,29 @@ async def regtest_user_balance_by_key(name):
         user_data = {'name': user.name, 'id': user.id, 'keys': []}
         for key in user.trxkey:
             user_data['keys'].append(
-                {'id': key.id, 'value': key.value, 'balance': await btcd_utils.RegTest.get_user_balance([key])})
+                {'id': key.id, 'status': key.status, 'value': key.value, 'balance': await btcd_utils.RegTest.get_user_balance([key])})
         return user_data
+
+
+async def regtest_balance_by_key(key):
+    return await btcd_utils.RegTest.get_key_balance(key)
+
+
+async def provision_coinmaster():
+    coinmaster = await get_user(COINMASTER_USER_ID)
+    active_key = -1
+    total_balance = 0
+    for key in coinmaster.trxkey:
+        if key.status:
+            balance = regtest_user_balance_by_key(key)
+            logger.debug('Balance for {id}: {balance}'.format(id=key.id, balance=str(balance)))
+            total_balance += balance
+            active_key = key.id if key.id > active_key else active_key
+    logger.debug('Active key: {}'.format(active_key))
+    logger.debug('Total Coinmaster Balance: {}'.format(total_balance))
+    if active_key == -1:
+        new_address = regtest_make_user_address(COINMASTER_USER_ID)
+        logger.debug('New address verification: {}'.format(str(bool('address' in new_address))))
 
 
 async def trx_pay_users(amount_to_send):
@@ -987,10 +1003,12 @@ async def trx_pay_users(amount_to_send):
                 logger.info('Pay object: {}'.format(json.dumps(pay_object)))
                 transaction_result = await Transaction.request_transaction(pay_object)
                 logger.info('Transaction Result: {}'.format(transaction_result))
-                if transaction_result:
+                if isinstance(transaction_result, str):
                     await trx_block_pending()
                 else:
                     failed_transactions.append(user.id)
+                    if 'error' in transaction_result and transaction_result['error'] == TX_Errors.NO_HISTORY:
+                        await provision_coinmaster()
     return failed_transactions
 
 
