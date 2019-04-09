@@ -1,10 +1,10 @@
 import logging
 
 
-def setup_logger(name, level='INFO', json_logging=False):
+def setup_logger(name, level='INFO', filename='trx.log'):
     logger = logging.getLogger(name)
     logger.setLevel(level)
-    log_handler = logging.FileHandler('bot.log')
+    log_handler = logging.FileHandler(filename)
     logger_formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
     log_handler.setFormatter(logger_formatter)
 
