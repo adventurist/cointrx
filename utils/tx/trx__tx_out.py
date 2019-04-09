@@ -1,8 +1,10 @@
-import config.config as TRXConfig
+from tornado.escape import json_encode, json_decode
+from utils.errors import TX_Errors
 from utils.cointrx_client import Client
 from utils import btcd_utils
-from tornado.escape import json_encode, json_decode
 from utils import logging
+
+from config import config as TRXConfig
 
 COIN = 100000000
 
@@ -88,7 +90,7 @@ class Transaction:
                                 logger.debug('Transaction result: {}'.format(send_tx_result))
                                 return send_tx_result
                             else:
-                                return 'Failed'
+                                return {'error': result}
                         else:
                             logger.debug('No response received')
                     else:
@@ -96,6 +98,8 @@ class Transaction:
                         return {'error': 'Insufficient funds', 'code': TRXConfig.TransactionError.INSUFFICIENT_FUNDS}
                 else:
                     logger.debug('No TX history')
+                    return {'error': TX_Errors.NO_HISTORY}
+
 
 def is_iterable(value):
     try:
