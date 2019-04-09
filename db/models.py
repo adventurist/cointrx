@@ -290,6 +290,9 @@ class User(Base):
         return s.dumps({'id': self.id})
 
     async def serialize(self) -> dict:
+        keys = []
+        for key in self.trxkey:
+            keys.append(await key.serialize())
         return {
             'id': self.id,
             'name': self.name,
@@ -297,7 +300,7 @@ class User(Base):
             'email': self.email,
             'created': self.created,
             'status': self.status,
-            'keys': [await x.serialize() for x in self.trxkey if x is not None]
+            'keys': keys
         }
 
     @staticmethod
