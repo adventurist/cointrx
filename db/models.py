@@ -10,6 +10,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, as_declarative
 
+from utils.btcd_utils import RegTest
 from types import SimpleNamespace
 from db import db_config
 
@@ -98,12 +99,14 @@ class TrxKey(Base):
     multi = Column(Boolean)
     status = Column(Boolean)
 
-    def serialize(self):
+    async def serialize(self):
+        balance = await RegTest.get_key_balance({'value': self.value, 'status': self.status})
         return {
             'id': self.id,
             'status': self.status,
             'uid': self.uid,
             'value': self.value,
+            'balance': str(balance)
         }
 
 
@@ -286,7 +289,7 @@ class User(Base):
         s = Serializer(trxapp.config['SECRET_KEY'], expires_in=99999999)
         return s.dumps({'id': self.id})
 
-    def serialize(self) -> dict:
+    async def serialize(self) -> dict:
         return {
             'id': self.id,
             'name': self.name,
@@ -294,7 +297,7 @@ class User(Base):
             'email': self.email,
             'created': self.created,
             'status': self.status,
-            'keys': [x.serialize() for x in self.trxkey if x is not None]
+            'keys': [await x.serialize() for x in self.trxkey if x is not None]
         }
 
     @staticmethod
