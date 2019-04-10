@@ -948,6 +948,7 @@ async def regtest_active_balance_by_user():
 
 
 async def regtest_user_balance_by_key(name):
+    logger.debug('Getting user balance by key for {}'.format(name))
     user = session.query(User).filter(User.name == name).group_by(User.id).order_by(
         func.max(User.id).desc()).one_or_none()
     if user:
