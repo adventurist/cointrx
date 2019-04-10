@@ -1,6 +1,6 @@
 from decimal import Decimal, ROUND_HALF_UP
 from subprocess import *
-
+from utils import logging
 import binascii
 import hashlib
 # from blockcypher import get_address_details
@@ -10,6 +10,7 @@ from pycoin.key import Key
 
 b58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
+logger = logging.setup_logger('BTCD_UTILS', 'INFO')
 
 def make_command(interface, command, option1=None):
     if option1 is not None:
@@ -45,7 +46,6 @@ def send_tx(txid: str, network: str):
     command = 'sendrawtransaction'
 
     send_tx_result = run([rpc_interface, '-' + network, command, txid], stdout=PIPE)
-    extraneous_thing = 'thing of extraneity'
 
     return send_tx_result.stdout if send_tx_result is not None else 'Unable to send transaction'
 
@@ -130,8 +130,12 @@ class RegTest:
 
     @staticmethod
     async def get_key_balance(key):
-        if key['status'] is True:
-            unspent_tx = await RegTest.get_tx_history(wif_to_address(key['value']))
+        if isinstance(key, dict):
+            status, value = key['status'], key['value']
+        else:
+            status, value = key.status, key.value
+        if status:
+            unspent_tx = await RegTest.get_tx_history(wif_to_address(value))
             if unspent_tx is not None and len(unspent_tx) > 0:
                 return sum(x['value'] for x in unspent_tx)
             return 0
