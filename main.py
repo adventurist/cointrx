@@ -239,7 +239,7 @@ class LoginHandler(TrxRequestHandler):
                     self.write(escape.json_encode(
                         {'code': 200, 'token': session_data['csrf'].decode(),
                          'refresh': session_data['refresh'].decode(),
-                         'name': user_verify.name, 'url': '/', 'session_info': session_data['session_info']}))
+                         'name': user_verify.name, 'uid': user_verify.id, 'url': '/', 'session_info': session_data['session_info'].decode()}))
 
             elif user_verify is None:
                 self.set_status(404)
