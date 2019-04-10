@@ -968,7 +968,7 @@ async def provision_coinmaster():
     total_balance = 0
     for key in coinmaster.trxkey:
         if key.status:
-            balance = regtest_user_balance_by_key(key)
+            balance = await regtest_user_balance_by_key(key)
             logger.debug('Balance for {id}: {balance}'.format(id=key.id, balance=str(balance)))
             total_balance += balance
             active_key = key.id if key.id > active_key else active_key
