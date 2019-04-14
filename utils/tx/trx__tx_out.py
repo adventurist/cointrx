@@ -3,6 +3,7 @@ from utils.errors import TX_Errors
 from utils.cointrx_client import Client
 from utils import btcd_utils
 from utils import logging
+from collections.abc import Mapping
 
 from config import config as TRXConfig
 
@@ -51,7 +52,7 @@ class Transaction:
                 tx_history = await btcd_utils.RegTest.get_tx_history(sender_addr)
                 tx_input = []
                 tx_input_amount = 0
-
+                # TODO: find out all possibilities for tx_history
                 if isinstance(tx_history, list) and len(tx_history) > 0 and isinstance(tx_history[0], dict):
                     logger.info('TX History found')
                     sender_balance = sum([v['value'] for v in tx_history])
@@ -74,23 +75,18 @@ class Transaction:
                         logger.debug('Calling Transaction app with body: {}'.format(json_decode(body)))
                         response = await client.connect(TRX_urls['tx_app'], json_encode(
                             {'txIn': tx_input, 'txOut': tx_output, 'network': 'regtest'}))
-                        if response:
+                        if response and response.error is None:
                             logger.debug('Response received: {}'.format(str(response)))
-                            if is_iterable(response) and 'body' in response:
+                            if response.body:
                                 data = json_decode(response.body.decode())
-                            else:
-                                data = 'NO BODY'
-                            logger.debug('Decoded body: {}'.format(str(data)))
-                            if is_iterable(data) and hasattr(data, 'error'):
-                                result = data.get('result', 'error')
-                            else:
-                                result = 'Unable to retrieve result'
-                            if is_iterable(result) and result != 'error' and not isinstance(result, str):
-                                send_tx_result = btcd_utils.send_tx(result['tx'], 'regtest')
-                                logger.debug('Transaction result: {}'.format(send_tx_result))
-                                return send_tx_result
-                            else:
-                                return {'error': result}
+                                logger.debug('Decoded body: {}'.format(data))
+                                result = data['result'] if 'result' in data else data.get('error', 'error')
+                                if 'tx' in result:
+                                    send_tx_result = btcd_utils.send_tx(result['tx'], 'regtest')
+                                    logger.debug('Transaction result: {}'.format(send_tx_result))
+                                    return {'error': False, 'result': send_tx_result}
+                                else:
+                                    return {'error': result}
                         else:
                             logger.debug('No response received')
                     else:

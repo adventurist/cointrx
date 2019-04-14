@@ -1004,7 +1004,7 @@ async def trx_pay_users(amount_to_send):
                 logger.info('Pay object: {}'.format(json.dumps(pay_object)))
                 transaction_result = await Transaction.request_transaction(pay_object)
                 logger.info('Transaction Result: {}'.format(transaction_result))
-                if isinstance(transaction_result, str):
+                if transaction_result['error'] is False:
                     await trx_block_pending()
                 else:
                     failed_transactions.append(user.id)
