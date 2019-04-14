@@ -82,7 +82,7 @@ const RegisterIcon = () => {
 const CoinTrxWelcome = () => {
   return (
     <Card style={{textAlign: 'center'}} raised={true}>
-          <CardMedia style={styles.welcomeLogo}
+          <CardMedia className='trx-logo' style={styles.welcomeLogo}
               image='/static/images/logo.png'>
           </CardMedia>
           <Typography className='welcome-text' variant='h4'>Welcome to CoinTRX</Typography>
@@ -218,10 +218,10 @@ export default class App extends Component {
                 <Checkbox
                     color="primary"
                 />
-              } label="Remember me" />
+              } className='checkbox-label' label="Remember me" />
             </Grid>
             <Grid item>
-              <Button disableFocusRipple disableRipple style={{ textTransform: "none", color: "#fff" }} variant="text">Forgot password ?</Button>
+              <Button disableFocusRipple disableRipple style={{ textTransform: "none", color: "#fff" }} className='forgot-btn' variant="text">Forgot password ?</Button>
             </Grid>
           </Grid>
           <Grid container justify="center" style={{ marginTop: '10px' }}>

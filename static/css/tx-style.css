@@ -208,3 +208,18 @@ body {
 .key-btn:hover {
     background-color: #b64520!important;
 }
+
+
+/* Mobile ----------- */
+@media only screen and (min-device-width : 320px) and (max-device-width : 500px) {
+
+    #main-wrap div:nth-child(2) {
+        flex-direction: column;
+        align-content: center;
+    }
+
+    #main-wrap div:nth-child(2) > div {
+        max-width: 100%;
+        width: 100%;
+    }
+}
