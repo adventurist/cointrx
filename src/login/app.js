@@ -221,7 +221,7 @@ export default class App extends Component {
               } label="Remember me" />
             </Grid>
             <Grid item>
-              <Button disableFocusRipple disableRipple style={{ textTransform: "none" }} variant="text" color="secondary">Forgot password ?</Button>
+              <Button disableFocusRipple disableRipple style={{ textTransform: "none", color: "#fff" }} variant="text">Forgot password ?</Button>
             </Grid>
           </Grid>
           <Grid container justify="center" style={{ marginTop: '10px' }}>
@@ -230,8 +230,8 @@ export default class App extends Component {
         </form>
       </div>
     </Paper>
-    <Paper style={{display: 'flex', justifyContent: 'space-evenly'}}>
-    <Typography style={{padding: '4px', marginRight: '4px'}} variant='h5'>
+    <Paper style={{display: 'flex', justifyContent: 'center'}}>
+    <Typography style={{padding: '4px', marginRight: '4px', fontStyle: 'italic'}} variant='h5'>
       Don't have an account?
     </Typography>
       <RegisterButton />
@@ -243,11 +243,11 @@ export default class App extends Component {
       open={this.state.dialogShow}>
       <Paper className='error-container' draggable={true}>
         <Card className='login-error'>
-          <TrxIcon color='#f4511e' size='lg' path='M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z'></TrxIcon>
-          <Typography component='h2' variant='h4'>Authentication Error</Typography>
+          <TrxIcon style={{padding: '6px', marginTop: '4px'}} color='#f4511e' size='lg' path='M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z'></TrxIcon>
+          <Typography component='h3' variant='h5'>Authentication Error</Typography>
           <CardActionArea>
             <CardContent>
-              <Typography component='h3' variant='h5'>{this.state.dialogMessage}</Typography>
+              <Typography component='h4' variant='h6'>{this.state.dialogMessage}</Typography>
             </CardContent>
           </CardActionArea>
           <CardActions className='error-close-action'>
