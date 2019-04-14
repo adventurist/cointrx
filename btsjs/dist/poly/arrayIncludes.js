@@ -23,7 +23,7 @@ if (!Array.prototype.includes) {
         while (k < len) {
             currentElement = O[k];
             if (searchElement === currentElement ||
-                (searchElement !== searchElement && currentElement !== currentElement)) {
+                (searchElement !== searchElement && currentElement !== currentElement)) { // NaN !== NaN
                 return true;
             }
             k++;

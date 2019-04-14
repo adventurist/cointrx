@@ -40,9 +40,11 @@ router.post('/transaction', (req, res, next) => {
             }
         }
     }
-
-    res.json({ result:
-        transaction(txIn, txOut, network)
+    const result = transaction(txIn, txOut, network)
+    const error = false
+    res.json({
+        result,
+        error
     });
 });
 

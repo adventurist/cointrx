@@ -34,7 +34,11 @@ router.post('/transaction', (req, res, next) => {
             }
         }
     }
-    res.json({ result: transaction_1.transaction(txIn, txOut, network)
+    const result = transaction_1.transaction(txIn, txOut, network);
+    const error = false;
+    res.json({
+        result,
+        error
     });
 });
 router.post('/key/from-wif', (req, res, next) => {
