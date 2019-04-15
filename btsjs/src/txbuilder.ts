@@ -36,6 +36,7 @@ class TrxTransaction {
             .to(txOutFinal)
             .sign(keys);
 
+        console.log('Transaction: ' + transaction)
         let errors = typeof transaction !== 'undefined' ? 0 : 1
 
         return { tx: transaction.serialize(), error: errors }

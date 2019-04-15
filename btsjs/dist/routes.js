@@ -6,18 +6,12 @@ const express_1 = require("express");
 const transaction_1 = require("./transaction");
 const keytool_1 = require("./keytool");
 const router = express_1.Router();
-// placeholder route handler
-router.get('/', (req, res, next) => {
-    res.render('../templates/home.html', { jigga: 'jiggga' });
-});
 router.post('/transaction', (req, res, next) => {
     var txIn = [], txOut = [], network = '';
+    const time = new Date();
+    console.log(time.getTime() + ' - TX REQUEST - ' + req.host + ' \n Body: ' + JSON.stringify(req.body));
     for (const [key, value] of Object.entries(req.body)) {
-        console.log(value[key]);
-        const time = new Date();
-        console.log(time.getTime() + ': TX Request');
         for (const [k, v] of Object.entries(JSON.parse(key))) {
-            console.log(k + ':::' + v);
             switch (k) {
                 case 'txIn':
                     v.forEach((v) => {
@@ -35,6 +29,7 @@ router.post('/transaction', (req, res, next) => {
         }
     }
     const result = transaction_1.transaction(txIn, txOut, network);
+    console.log(time.getTime() + ' - TX RESULT - ' + result !== 'error' ? 'Success' : 'Failure');
     const error = false;
     res.json({
         result,
