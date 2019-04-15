@@ -42,11 +42,10 @@ class Transaction:
 
     @staticmethod
     async def request_transaction(*kwargs):
-        print(kwargs)
         if kwargs[0] is not None:
             new_tx = TestTx(r=kwargs[0]['recipient'], v=kwargs[0]['amount'], s=kwargs[0]['sender'])
             if new_tx:
-                logger.info('TX created')
+                logger.info('Constructing transaction request between {sender} and {recipient} for the amount of {amount}'.format(sender=new_tx.sender, recipient=new_tx.recipient, amount=new_tx.amount))
                 sender_addr = new_tx.sender['address']
                 sender_private_key = new_tx.sender['key']
                 tx_history = await btcd_utils.RegTest.get_tx_history(sender_addr)
@@ -93,7 +92,7 @@ class Transaction:
                         logger.debug('Insufficient funds')
                         return {'error': 'Insufficient funds', 'code': TRXConfig.TransactionError.INSUFFICIENT_FUNDS}
                 else:
-                    logger.debug('No TX history')
+                    logger.debug('No TX history. Account is likely waiting for a new block')
                     return {'error': TX_Errors.NO_HISTORY}
 
 
