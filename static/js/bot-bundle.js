@@ -72027,10 +72027,15 @@ function (_React$Component) {
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_18__material_ui_icons_Menu___default.a, {
         className: classes.menuIcon
       }))), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__material_ui_core_IconButton___default.a, {
-        className: classes.logoButton
+        className: classes.logoButton,
+        onClick: function onClick() {
+          window.location = '/';
+        }
+      }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4_react_toolbox_lib_link___default.a, {
+        href: "/"
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TRXLogo, {
         className: classes.logoIcon
-      })), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
+      }))), __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
         style: styles.userMenu
       }, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(UserInfo, {
         style: styles.userInfo,
@@ -94357,11 +94362,12 @@ var menuItems = // trx_env === 'LOCAL_DEVELOPMENT' ?
   url: '/user',
   label: 'Account Settings',
   icon: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_11__material_ui_icons_Person___default.a, null)
-}, {
-  url: '/user/all',
-  label: 'Users: All',
-  icon: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_12__material_ui_icons_People___default.a, null)
-}, {
+}, // {
+//     url: '/user/all',
+//     label: 'Users: All',
+//     icon: <PeopleIcon />
+// },
+{
   url: '/login',
   label: 'Login',
   icon: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(LoginIcon, null)
@@ -94369,26 +94375,25 @@ var menuItems = // trx_env === 'LOCAL_DEVELOPMENT' ?
   url: '/register',
   label: 'Register',
   icon: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(RegisterIcon, null)
-}, {
-  url: '/heartbeat/feed',
-  label: 'Social Feed',
-  icon: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TimelineIcon, null)
-}, {
-  url: '/transaction/tx-gui',
-  label: 'Transaction GUI',
-  icon: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TransactionIcon, null)
-}, {
-  url: '/regtest/all-users',
-  label: 'Transaction GUI - All users',
-  icon: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(UserListIcon, null)
-}, {
+}, // {
+//     url: '/heartbeat/feed',
+//     label: 'Social Feed',
+//     icon: <TimelineIcon/>
+// },
+// {
+//     url: '/transaction/tx-gui',
+//     label: 'Transaction GUI',
+//     icon: <TransactionIcon/>
+// },
+// {
+//     url: '/regtest/all-users',
+//     label: 'Transaction GUI - All users',
+//     icon: <UserListIcon/>
+// },
+{
   url: '/admin/bot',
   label: 'Bot Interface',
   icon: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(BotIcon, null)
-}, {
-  url: '/prices/graph',
-  label: 'BTC Price Graph',
-  icon: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(TrendsIcon, null)
 }];
 
 var buildSideMenuItems = function buildSideMenuItems(menuItems) {

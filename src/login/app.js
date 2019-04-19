@@ -239,9 +239,8 @@ export default class App extends Component {
     <Dialog
       title="Invalid Login"
       maxWidth='lg'
-      fullWidth={true}
       open={this.state.dialogShow}>
-      <Paper className='error-container' draggable={true}>
+      <Paper className='error-container'draggable={true}>
         <Card className='login-error'>
           <TrxIcon style={{padding: '6px', marginTop: '4px'}} color='#f4511e' size='lg' path='M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z'></TrxIcon>
           <Typography component='h3' variant='h5'>Authentication Error</Typography>

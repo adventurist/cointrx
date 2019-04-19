@@ -49,8 +49,8 @@ input#name, input#password {
   text-align: center;
 }
 
-.login-error {
-
+.login-error svg {
+  padding: 16px;
 }
 
 .error-close-action {

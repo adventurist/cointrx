@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import ReactDataGrid from 'react-data-grid'
 import { TextField } from '@material-ui/core'
 import SaveIcon from '@material-ui/icons/Save'
-import { Typography, Card, CardActions, CardHeader, CardMedia, CardTitle } from '@material-ui/core'
+import { Tooltip, Typography, Card, CardActions, CardHeader, CardMedia, CardTitle } from '@material-ui/core'
 import { NumberField } from '../../trade/components/FundField'
 import Button from '@material-ui/core/Button'
 import { CurrencyField } from '../../trade/components/CurrencyField'
@@ -263,14 +263,18 @@ export class UserForm extends Component {
                         </div>
                     </div>
                     <div className='user-save-btn-wrap'>
-                        <Button type='button' color='#FFF' variant="contained" size="medium" onClick={this.toggleEditMode} className="user-edit-btn">
-                            <Edit fontSize='small' />
-                                Edit
-                        </Button>
-                        <Button type='submit' color='primary' variant="contained" size="medium" className="user-save-btn">
-                            <SaveIcon />
-                                Save
-                        </Button>
+                        <Tooltip title='Toggle edit mode'>
+                            <Button type='button' color='#FFF' variant="contained" size="medium" onClick={this.toggleEditMode} className="user-edit-btn">
+                                <Edit fontSize='small' />
+                                    Edit
+                            </Button>
+                        </Tooltip>
+                        <Tooltip title='Save user information'>
+                            <Button type='submit' color='secondary' variant="contained" size="medium" className="user-save-btn">
+                                <SaveIcon />
+                                    Save
+                            </Button>
+                        </Tooltip>
                     </div>
                 </form>
                 <Snackbar

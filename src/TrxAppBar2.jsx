@@ -219,8 +219,10 @@ export default class TrxNav extends React.Component {
             <MenuIcon className={classes.menuIcon} />
         </IconButton>
         </Tooltip>
-        <IconButton className={classes.logoButton}>
+        <IconButton className={classes.logoButton} onClick={() => { window.location = '/' }}>
+        <Link href='/'>
             <TRXLogo className={classes.logoIcon}/>
+        </Link>
         </IconButton>
         <div style={styles.userMenu}>
         <UserInfo style={styles.userInfo} user={this.state.userData} />

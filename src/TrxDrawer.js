@@ -116,11 +116,11 @@ const menuItems =
   label: 'Account Settings',
   icon: <PersonIcon />
 },
-{
-    url: '/user/all',
-    label: 'Users: All',
-    icon: <PeopleIcon />
-},
+// {
+//     url: '/user/all',
+//     label: 'Users: All',
+//     icon: <PeopleIcon />
+// },
 {
     url: '/login',
     label: 'Login',
@@ -131,31 +131,31 @@ const menuItems =
     label: 'Register',
     icon: <RegisterIcon/>
 },
-{
-    url: '/heartbeat/feed',
-    label: 'Social Feed',
-    icon: <TimelineIcon/>
-},
-{
-    url: '/transaction/tx-gui',
-    label: 'Transaction GUI',
-    icon: <TransactionIcon/>
-},
-{
-    url: '/regtest/all-users',
-    label: 'Transaction GUI - All users',
-    icon: <UserListIcon/>
-},
+// {
+//     url: '/heartbeat/feed',
+//     label: 'Social Feed',
+//     icon: <TimelineIcon/>
+// },
+// {
+//     url: '/transaction/tx-gui',
+//     label: 'Transaction GUI',
+//     icon: <TransactionIcon/>
+// },
+// {
+//     url: '/regtest/all-users',
+//     label: 'Transaction GUI - All users',
+//     icon: <UserListIcon/>
+// },
 {
     url: '/admin/bot',
     label: 'Bot Interface',
     icon: <BotIcon/>
 },
-{
-    url: '/prices/graph',
-    label: 'BTC Price Graph',
-    icon: <TrendsIcon/>
-}
+// {
+//     url: '/prices/graph',
+//     label: 'BTC Price Graph',
+//     icon: <TrendsIcon/>
+// }
 ]
 
 const buildSideMenuItems = (menuItems) => {

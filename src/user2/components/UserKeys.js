@@ -161,7 +161,7 @@ export class UserKeys extends Component {
             </Tooltip>
                 <div id="fab-container">
                 <Tooltip
-                title='Create a new Bitcoin Address'>
+                title='Create a new Bitcoin address'>
                     <Fab style={keyBtnStyles} onClick={this.requestBtcKey}>
                         <svg style={{width:'24px', height:'24px'}} viewBox="0 0 24 24">
                                 <path fill="#000000" d={btcSvgPath()} />
@@ -223,12 +223,6 @@ export class UserKeys extends Component {
                             className='keybtn'
                             keyboardFocused={true}
                             onClick={this.requestBtcKeyDelete}><DeleteIcon/>Delete</Button>
-                        <Button
-                            label="Cancel"
-                            variant='contained'
-                            className='keybtn'
-                            keyboardFocused={true}
-                            onClick={this.handleClose}><CancelIcon/>Cancel</Button>
                         </div>
                         </Paper>
                 </Dialog>
@@ -370,6 +364,7 @@ export class UserKeys extends Component {
             const result = await updateKeyRequest({id, label}, {csrf})
             if (!result.error) {
                this.updateKeys(id, label)
+               this.handleClose()
             } else {
                 this.props.log('Unable to update key')
 
