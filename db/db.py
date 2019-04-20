@@ -167,6 +167,8 @@ async def latest_price_history_async(currency: str):
 def get_users():
     return session.query(User).filter(User.id != COINMASTER_USER_ID).all()
 
+def get_coinmaster():
+    return session.query(User).filter(User.id == COINMASTER_USER_ID).one()
 
 async def fetch_users_by_name(match_pattern):
     result = session.query(User).filter(User.name.ilike(match_pattern)).one_or_none()
@@ -613,7 +615,7 @@ async def regtest_user_data(uid: str):
     return user_data
 
 
-async def regtest_pay_user(uid: str, amount: str):
+async def regtest_pay_user(uid: str, amount: Union[str, int]):
     """
     :param uid:
     :param amount:
@@ -696,6 +698,10 @@ async def regtest_block_info():
     return json.dumps({'info': block_info, 'unspent': unspent_transactions}, indent=4, sort_keys=True)
 
 
+async def regtest_create_block(number=1):
+    return btcd_utils.RegTest.create_new_block(number)
+
+
 async def regtest_user_estimated_value(uid: str, balance: any = None):
     user = await get_user(uid)
     if user and user.trxkey is not None:
@@ -705,6 +711,20 @@ async def regtest_user_estimated_value(uid: str, balance: any = None):
                 balance)
             estimated_value = btc * price.last
             return str(estimated_value.quantize(Decimal(".01"), rounding=ROUND_HALF_UP))
+
+async def regtest_coinmaster_clear_keys():
+    coinmaster = get_coinmaster()
+    for key in coinmaster.trxkey:
+        skey = session.query(SKey).filter(SKey.kid == key.id).one()
+        if skey is not None:
+            session.delete(skey)
+        session.delete(key)
+    try:
+        session.commit()
+        return {'error': False}
+    except exc.SQLAlchemyError as err:
+        logger.error(err)
+        return {'error': True}
 
 
 async def regtest_users_clear_keys():
@@ -1043,7 +1063,7 @@ async def trx_pay_user(uid, amount_to_send):
             'recipient': address}
 
         transaction_result = await Transaction.request_transaction(pay_object)
-        if transaction_result:
+        if transaction_result and not transaction_result['error']:
             await trx_block_pending()
             return True
         else:
