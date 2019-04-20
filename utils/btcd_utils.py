@@ -103,10 +103,10 @@ class RegTest:
                :-1] if priv_key_result is not None else 'Error retrieving Private Key'
 
     @staticmethod
-    def create_new_block():
+    def create_new_block(number_of_blocks=1):
         interface = 'bitcoin-cli'
         command = 'generate'
-        param = '1'
+        param = str(number_of_blocks)
 
         block_generate_result = RegTest.make_command(interface, command, param)
 
