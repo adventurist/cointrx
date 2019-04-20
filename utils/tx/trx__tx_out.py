@@ -86,6 +86,8 @@ class Transaction:
                                     return {'error': False, 'result': send_tx_result}
                                 else:
                                     return {'error': result}
+                        elif response.error:
+                            return {'error': response.error}
                         else:
                             logger.debug('No response received')
                     else:

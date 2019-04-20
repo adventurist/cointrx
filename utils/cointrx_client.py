@@ -1,5 +1,6 @@
 from tornado import httpclient as tornado_client
 from tornado.httpclient import HTTPRequest
+from tornado.httpclient import HTTPClientError
 from utils.loop_handler import IOHandler
 import aiohttp
 from utils import logging
@@ -31,9 +32,12 @@ class Client:
             response = await http_client.fetch(request)
             return response
         except ConnectionRefusedError as e:
-            logger.debug('POST Request failed')
-            print(e.strerror)
+            logger.debug('POST Request failed with the following: {}'.format(e.strerror))
             return e
+        except HTTPClientError as e:
+            details = message_from_body(e.response.body.decode())
+            logger.debug('HTTP Client failed with {code} code and the following message: {message}\n Details: {details}'.format(code=e.code, message=e.message, details=details))
+            return e.response
 
     async def get(self, url):
         try:
@@ -68,3 +72,9 @@ class Client:
 async def fetch(session, url):
     async with session.get(url) as response:
         return await response.text()
+
+
+def message_from_body(body):
+    start = body.index('<pre>') + 5
+    end = body.index('<br>')
+    return body[start:end]
