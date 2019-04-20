@@ -1,4 +1,5 @@
 from tornado import httpclient as tornado_client
+from tornado.simple_httpclient import HTTPStreamClosedError
 from tornado.httpclient import HTTPRequest
 from tornado.httpclient import HTTPClientError
 from utils.loop_handler import IOHandler
@@ -58,13 +59,14 @@ class Client:
         except tornado_client.HTTPError as e:
             logger.debug('Authentication Request failed', e.message)
 
-
     async def get_prices(self):
         try:
             response = await http_client.fetch(config.blockchain_url)
             price_handle_result = await io_handler.handle_price(response)
             return price_handle_result
 
+        except HTTPStreamClosedError as e:
+            print(e)
         except aiohttp.client_exceptions.ClientError as e:
             logger.debug('Could not get prices. Request failed.', e.message)
 
