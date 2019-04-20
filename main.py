@@ -573,6 +573,17 @@ class RegTestAddressAllHandler(TrxRequestHandler):
         self.write(escape.json_encode(new_address_confirmations))
 
 
+class TrxDeployHandler(TrxRequestHandler):
+    async def get(self, *args, **kwargs):
+        key_result = await db.regtest_users_clear_keys()
+        cm_key_result = await db.regtest_coinmaster_clear_keys()
+        cm_address_result = await db.regtest_make_user_address(db.COINMASTER_USER_ID)
+        user_address_result = await db.regtest_make_user_addresses()
+        block_result = await db.regtest_create_block(200)
+        cm_pay_result = await db.regtest_pay_user(db.COINMASTER_USER_ID, 4000)
+        self.write(json.dumps({'clear_keys': key_result, 'cm_clear_keys': cm_key_result, 'cm_address': cm_address_result, 'user_addresses': user_address_result, 'blocks': block_result, 'cm_pay': cm_pay_result}))
+
+
 class RegTestAllUsers(TrxRequestHandler):
     async def get(self, *args, **kwargs):
         trx_urls = TRXConfig.get_urls(application.settings['env']['TRX_ENV'])
@@ -1345,6 +1356,9 @@ class TRXApplication(Application):
             (r"/regtest/balance/user/active", RegTestActiveBalanceByUserHandler),
             (r"/keys/btc/regtest/generate", RegTestUserKeyGenerateHandler),
 
+            # Deployment
+            (r"/regtest/deployment/reset", TrxDeployHandler),
+
             # Regression CoinTRX GW
 
             # Regression CoinTRX Subscription
@@ -1542,6 +1556,8 @@ async def handle_transaction_queue():
                 # Otherwise, we just enqueued an intra_user transaction, thus it is no longer in a pending state
                 elif intra_user_pending:
                     intra_user_pending = False
+            else:
+                logger.debug('Transaction result was good BUT NOT SURE - Debug this')
             # If there are no more transactions in queue, we should stop iterating
             if application.queue.is_empty():
                 break
