@@ -142,7 +142,12 @@ currency_symbol_map = {
     16: "$"
 }
 
+
 class TransactionError:
     INSUFFICIENT_FUNDS = 0
+    NO_HISTORY = 1
+    NO_RESPONSE = 2
+    UNKNOWN = 3
+
 
 DEFAULT_LANGUAGE = 'CAD'
