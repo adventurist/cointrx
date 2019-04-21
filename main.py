@@ -239,7 +239,8 @@ class LoginHandler(TrxRequestHandler):
                     self.write(escape.json_encode(
                         {'code': 200, 'token': session_data['csrf'].decode(),
                          'refresh': session_data['refresh'].decode(),
-                         'name': user_verify.name, 'uid': user_verify.id, 'url': '/', 'session_info': session_data['session_info'].decode()}))
+                         'name': user_verify.name, 'uid': user_verify.id, 'url': '/',
+                         'session_info': session_data['session_info'].decode()}))
 
             elif user_verify is None:
                 self.set_status(404)
@@ -581,7 +582,9 @@ class TrxDeployHandler(TrxRequestHandler):
         user_address_result = await db.regtest_make_user_addresses()
         block_result = await db.regtest_create_block(200)
         cm_pay_result = await db.regtest_pay_user(db.COINMASTER_USER_ID, 4000)
-        self.write(json.dumps({'clear_keys': key_result, 'cm_clear_keys': cm_key_result, 'cm_address': cm_address_result, 'user_addresses': user_address_result, 'blocks': block_result, 'cm_pay': cm_pay_result}))
+        self.write(json.dumps(
+            {'clear_keys': key_result, 'cm_clear_keys': cm_key_result, 'cm_address': cm_address_result,
+             'user_addresses': user_address_result, 'blocks': block_result, 'cm_pay': cm_pay_result}))
 
 
 class RegTestAllUsers(TrxRequestHandler):
@@ -639,7 +642,8 @@ class TransactionTestHandler(TrxRequestHandler):
             logger.info(
                 'Attempting transaction between ' + str(sid) + ' and ' + str(rid) + ' in the amount of ' + str(
                     amount))
-            if await TransactionTestHandler.handle_transaction(sender, recipient, amount):
+            result = await TransactionTestHandler.handle_transaction(sender, recipient, amount)
+            if result:
                 self.write('Success')
             else:
                 application.queue.enqueue(TRXTransaction(sid, rid, amount))
@@ -1101,7 +1105,8 @@ class TRXPayAllUsers(TrxRequestHandler):
         logger.info('Pay All result: {}'.format(str(pay_all_result)))
         if pay_all_result and len(pay_all_result) > 0:
             for recipient in pay_all_result:
-                logger.info('Enqueuing {recipient} for this amount: {amount}'.format(recipient=recipient, amount=amount))
+                logger.info(
+                    'Enqueuing {recipient} for this amount: {amount}'.format(recipient=recipient, amount=amount))
                 application.queue.enqueue(TRXTransaction(coinmaster(), recipient, amount))
 
 
@@ -1516,7 +1521,7 @@ async def handle_failed_transaction(result: dict):
     logger.info('Transaction failed with {} code.\n Message: \n{}'.format(message, code))
     if int(code) == TransactionError.INSUFFICIENT_FUNDS:
         logger.debug('Must inform user of insufficient funds')
-        return {'result': 'handling complete'}
+    return code
 
 
 async def handle_transaction_queue():
@@ -1541,23 +1546,26 @@ async def handle_transaction_queue():
             elif not transaction.sender == coinmaster():
                 intra_user_pending = True
                 result = await request_transaction(transaction.sender, transaction.recipient, transaction.amount)
-                if result:
-                    if 'error' in result:
-                        await handle_failed_transaction(result)
-                        continue
-                    intra_user_pending = None
-            if not result:
-                # If the transaction had no result, we need to enqueue it again and attempt for a result later
+            if result and result['error'] is not False:
+                error_type = await handle_failed_transaction(result)
+                if error_type == TransactionError.INSUFFICIENT_FUNDS:
+                    transaction.set_no_funds()
+                elif error_type == TransactionError.NO_HISTORY:
+                    transaction.set_pending()
+                # Since there was an error, we need to enqueue it for a future re-attempt
                 application.queue.enqueue(transaction)
                 # If the sender was the coinmaster, we can assume there was no result because the coinmaster is
                 # exhausted for the current block
                 if transaction.sender == coinmaster():
                     coinmaster_available = False
-                # Otherwise, we just enqueued an intra_user transaction, thus it is no longer in a pending state
+                # Otherwise, we just enqueued an intra_user transaction, thus there is no currently dequeued transaction between any users
                 elif intra_user_pending:
                     intra_user_pending = False
             else:
-                logger.debug('Transaction result was good BUT NOT SURE - Debug this')
+                logger.debug(
+                    'Successful transaction {id} between {sender} and {recipient} for the amount of {amount}'.format(
+                        id=str(transaction.id), sender=str(transaction.sender), recipient=str(transaction.recipient),
+                        amount=transaction.amount))
             # If there are no more transactions in queue, we should stop iterating
             if application.queue.is_empty():
                 break
@@ -1646,5 +1654,5 @@ if __name__ == "__main__":
 
     loop_instance = IOLoop.instance()
 
-    PeriodicCallback(manage_blockchain, 30000).start()
+    PeriodicCallback(manage_blockchain, 10000).start()
     loop_instance.start()

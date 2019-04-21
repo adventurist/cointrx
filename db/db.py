@@ -1065,9 +1065,7 @@ async def trx_pay_user(uid, amount_to_send):
         transaction_result = await Transaction.request_transaction(pay_object)
         if transaction_result and not transaction_result['error']:
             await trx_block_pending()
-            return True
-        else:
-            return False
+        return transaction_result
 
 
 def is_dust_amount(amount):

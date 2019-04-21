@@ -1,11 +1,30 @@
+from uuid import uuid4
+from types import SimpleNamespace
+
+TX_STATUS = SimpleNamespace(NEW=0, NO_FUNDS=1, BLOCK_PENDING=2)
+
+
 class TRXTransaction:
     def __init__(self, sender, recipient, amount):
         self.sender = sender
         self.recipient = recipient
         self.amount = amount
+        self.id = uuid4()
+        self.status = TX_STATUS.NEW
+
+    def get_status(self):
+        for status in TX_STATUS.__dict__:
+            if TX_STATUS.__dict__[status] == self.status:
+                return status
 
     def get_data(self):
-        return {'sender': self.sender, 'recipient': self.recipient, 'amount': self.amount}
+        return {'sender': self.sender, 'recipient': self.recipient, 'amount': self.amount, 'id': str(self.id), 'status': str(self.get_status())}
+
+    def set_pending(self):
+        self.status = TX_STATUS.BLOCK_PENDING
+
+    def set_no_funds(self):
+        self.status = TX_STATUS.NO_FUNDS
 
 
 class Node:
