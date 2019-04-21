@@ -592,7 +592,7 @@ async def regtest_user_data(uid: str):
             'currency': user.currency,
             'utc_offset': user.utc_offset if user.utc_offset is not None else 0,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
-            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if
+            'keys': [{'id': x.id, 'value': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if
                      x.status is not False],
             'account': btcd_utils.currency(user.account.balance)
 
