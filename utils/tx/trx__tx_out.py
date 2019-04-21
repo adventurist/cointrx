@@ -85,17 +85,19 @@ class Transaction:
                                     logger.debug('Transaction result: {}'.format(send_tx_result))
                                     return {'error': False, 'result': send_tx_result}
                                 else:
-                                    return {'error': result}
+                                    return {'error': result, 'code': TRXConfig.TransactionError.UNKNOWN}
                         elif response.error:
                             return {'error': response.error}
                         else:
                             logger.debug('No response received')
+                            return {'error': 'No response', 'code': TRXConfig.TransactionError.NO_RESPONSE}
+
                     else:
                         logger.debug('Insufficient funds')
                         return {'error': 'Insufficient funds', 'code': TRXConfig.TransactionError.INSUFFICIENT_FUNDS}
                 else:
                     logger.debug('No TX history. Account is likely waiting for a new block')
-                    return {'error': TX_Errors.NO_HISTORY}
+                    return {'error': TX_Errors.NO_HISTORY, 'code': TRXConfig.TransactionError.NO_HISTORY}
 
 
 def is_iterable(value):
