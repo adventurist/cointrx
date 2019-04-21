@@ -498,19 +498,15 @@ export class TrxLayout extends React.Component {
 
     fetchBalance = async () => {
         const bot = getSelectedBot(this.state)
-        if ('analysisBot' in bot) {
-            const data = {
-                data: {
-                    bot_id: bot.id,
-                    recipient: 'recipient',
-                },
-                type: 'fetch:balance'
-            }
-            if (sendMessage(bot, data)) {
-                this.logInfo(`Bot ${bot.number} (${bot.id}) is attempting to fetch balance`)
-            }
-        } else {
-            this.logInfo(`${bot.id}: Analysis bot not instantiated yet.`)
+        const data = {
+            data: {
+                bot_id: bot.id,
+                recipient: 'recipient',
+            },
+            type: 'fetch:balance'
+        }
+        if (sendMessage(bot, data)) {
+            this.logInfo(`Bot ${bot.number} (${bot.id}) is attempting to fetch balance`)
         }
     }
 
@@ -554,27 +550,28 @@ export class TrxLayout extends React.Component {
      */
     performTrade = async () => {
         const bot = getSelectedBot(this.state)
-        if ('analysisBot' in bot && bot.analysisBot.isReady()) {
-            const analysisResult = bot.analysisBot.decide()
-            if (analysisResult) {
-                if (botConnections.length === 1) {
-                    bot.analysisBot.trade(false, true)
-                } else {
-                    const recipient = botConnections[findRandomBotIndex(this.state.selectedBot)]
-                    // bot.analysisBot.trade(recipient, true)
-                    if ('users' in recipient && recipient.users.length > 0) {
+        if (botConnections.length === 1) {
+            bot.analysisBot.trade(false, true)
+        } else {
+            const recipient = botConnections[findRandomBotIndex(this.state.selectedBot)]
+            // bot.analysisBot.trade(recipient, true)
+            if ('users' in recipient && recipient.users.length > 0) {
 
-                    }
-                    sendMessage(bot, {
-                        type: 'transaction:test:create',
-                        data: {
-                            uid: bot.users[0].uid,
-                            rid: recipient.users[0].uid,
-                            amount: 1000000
-                    }})
-                }
             }
+            sendMessage(bot, {
+                type: 'transaction:test:create',
+                data: {
+                    uid: bot.users[0].uid,
+                    rid: recipient.users[0].uid,
+                    amount: 1000000
+            }})
         }
+        // if ('analysisBot' in bot && bot.analysisBot.isReady()) {
+        //     const analysisResult = bot.analysisBot.decide()
+        //     if (analysisResult) {
+
+        //     }
+        // }
     }
 
     /**

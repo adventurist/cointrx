@@ -26457,24 +26457,19 @@ function (_React$Component2) {
           switch (_context9.prev = _context9.next) {
             case 0:
               bot = getSelectedBot(_this2.state);
+              data = {
+                data: {
+                  bot_id: bot.id,
+                  recipient: 'recipient'
+                },
+                type: 'fetch:balance'
+              };
 
-              if ('analysisBot' in bot) {
-                data = {
-                  data: {
-                    bot_id: bot.id,
-                    recipient: 'recipient'
-                  },
-                  type: 'fetch:balance'
-                };
-
-                if (sendMessage(bot, data)) {
-                  _this2.logInfo("Bot ".concat(bot.number, " (").concat(bot.id, ") is attempting to fetch balance"));
-                }
-              } else {
-                _this2.logInfo("".concat(bot.id, ": Analysis bot not instantiated yet."));
+              if (sendMessage(bot, data)) {
+                _this2.logInfo("Bot ".concat(bot.number, " (").concat(bot.id, ") is attempting to fetch balance"));
               }
 
-            case 2:
+            case 3:
             case "end":
               return _context9.stop();
           }
@@ -26579,35 +26574,34 @@ function (_React$Component2) {
     _asyncToGenerator(
     /*#__PURE__*/
     regeneratorRuntime.mark(function _callee13() {
-      var bot, analysisResult, recipient;
+      var bot, recipient;
       return regeneratorRuntime.wrap(function _callee13$(_context13) {
         while (1) {
           switch (_context13.prev = _context13.next) {
             case 0:
               bot = getSelectedBot(_this2.state);
 
-              if ('analysisBot' in bot && bot.analysisBot.isReady()) {
-                analysisResult = bot.analysisBot.decide();
+              if (botConnections.length === 1) {
+                bot.analysisBot.trade(false, true);
+              } else {
+                recipient = botConnections[findRandomBotIndex(_this2.state.selectedBot)]; // bot.analysisBot.trade(recipient, true)
 
-                if (analysisResult) {
-                  if (botConnections.length === 1) {
-                    bot.analysisBot.trade(false, true);
-                  } else {
-                    recipient = botConnections[findRandomBotIndex(_this2.state.selectedBot)]; // bot.analysisBot.trade(recipient, true)
+                if ('users' in recipient && recipient.users.length > 0) {}
 
-                    if ('users' in recipient && recipient.users.length > 0) {}
-
-                    sendMessage(bot, {
-                      type: 'transaction:test:create',
-                      data: {
-                        uid: bot.users[0].uid,
-                        rid: recipient.users[0].uid,
-                        amount: 1000000
-                      }
-                    });
+                sendMessage(bot, {
+                  type: 'transaction:test:create',
+                  data: {
+                    uid: bot.users[0].uid,
+                    rid: recipient.users[0].uid,
+                    amount: 1000000
                   }
-                }
-              }
+                });
+              } // if ('analysisBot' in bot && bot.analysisBot.isReady()) {
+              //     const analysisResult = bot.analysisBot.decide()
+              //     if (analysisResult) {
+              //     }
+              // }
+
 
             case 2:
             case "end":
