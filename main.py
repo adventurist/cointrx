@@ -653,10 +653,11 @@ class TransactionTestHandler(TrxRequestHandler):
 
     @staticmethod
     async def handle_transaction(sender, recipient, amount):
-        if await TransactionTestHandler.create_transaction(sender, recipient, amount):
+        result = await TransactionTestHandler.create_transaction(sender, recipient, amount)
+        if result and not result['error']:
             await db.trx_block_pending()
-            return True
-        return False
+        return result
+
 
     @staticmethod
     async def create_transaction(sender, recipient, amount):
