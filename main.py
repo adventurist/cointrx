@@ -643,7 +643,7 @@ class TransactionTestHandler(TrxRequestHandler):
                 'Attempting transaction between ' + str(sid) + ' and ' + str(rid) + ' in the amount of ' + str(
                     amount))
             result = await TransactionTestHandler.handle_transaction(sender, recipient, amount)
-            if result:
+            if result and not result['error']:
                 self.write('Success')
             else:
                 application.queue.enqueue(TRXTransaction(sid, rid, amount))
