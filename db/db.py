@@ -167,8 +167,10 @@ async def latest_price_history_async(currency: str):
 def get_users():
     return session.query(User).filter(User.id != COINMASTER_USER_ID).all()
 
+
 def get_coinmaster():
     return session.query(User).filter(User.id == COINMASTER_USER_ID).one()
+
 
 async def fetch_users_by_name(match_pattern):
     result = session.query(User).filter(User.name.ilike(match_pattern)).one_or_none()
@@ -340,6 +342,7 @@ def check_auth_by_name(user, password):
         return query_user
     else:
         return None
+
 
 @event.listens_for(CXPrice, 'before_insert')
 def cx_insert_listener(*args):
@@ -570,18 +573,10 @@ async def regtest_all_user_data():
     user_data = []
     users = session.query(User).all()
     for user in users:
-        data = {
-            'id': user.id,
-            'name': user.name,
-            'email': user.email,
-            'level': user.level,
-            'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
-            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if
-                     x.status is not False],
-            'account': str(user.account.balance)
-        }
+        data = await user.serialize()
+        data['balance'] = (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
+        data['account'] = btcd_utils.currency(user.account.balance) if hasattr(user, 'account') and user.account is not None else 'No account'
         user_data.append(data)
-
     return user_data
 
 
@@ -597,8 +592,8 @@ async def regtest_user_data(uid: str):
             'currency': user.currency,
             'utc_offset': user.utc_offset if user.utc_offset is not None else 0,
             'balance': (await btcd_utils.RegTest.get_user_balance(user.trxkey)) / 100000000,
-            'keys': [{'id': x.id, 'value': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if
-                     x.status],
+            'keys': [{'id': x.id, 'wif': x.value, 'status': x.status, 'label': x.label} for x in user.trxkey if
+                     x.status is not False],
             'account': btcd_utils.currency(user.account.balance)
 
         }
@@ -711,6 +706,7 @@ async def regtest_user_estimated_value(uid: str, balance: any = None):
                 balance)
             estimated_value = btc * price.last
             return str(estimated_value.quantize(Decimal(".01"), rounding=ROUND_HALF_UP))
+
 
 async def regtest_coinmaster_clear_keys():
     coinmaster = get_coinmaster()
@@ -975,7 +971,8 @@ async def regtest_user_balance_by_key(name):
         user_data = {'name': user.name, 'id': user.id, 'keys': []}
         for key in user.trxkey:
             user_data['keys'].append(
-                {'id': key.id, 'status': key.status, 'value': key.value, 'balance': await btcd_utils.RegTest.get_user_balance([key])})
+                {'id': key.id, 'status': key.status, 'value': key.value,
+                 'balance': await btcd_utils.RegTest.get_user_balance([key])})
         return user_data
 
 
@@ -1176,7 +1173,8 @@ async def retrieve_trade_data():
                 'bid': trade.joinbid.serialize(),
                 'offer': offer_data,
                 'currency': offer_data['currency'],
-                'time': '{}-{}-{} {}:{}:{}'.format(trade.time.year, trade.time.month, trade.time.day, trade.time.hour, trade.time.minute, trade.time.second),
+                'time': '{}-{}-{} {}:{}:{}'.format(trade.time.year, trade.time.month, trade.time.day, trade.time.hour,
+                                                   trade.time.minute, trade.time.second),
             })
         return data
     except exc.SQLAlchemyError as err:
