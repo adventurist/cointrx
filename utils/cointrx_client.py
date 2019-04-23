@@ -57,7 +57,7 @@ class Client:
             return response
 
         except tornado_client.HTTPError as e:
-            logger.debug('Authentication Request failed', e.message)
+            logger.debug('Authentication Request failed: {}'.format(e.message))
 
     async def get_prices(self):
         try:
