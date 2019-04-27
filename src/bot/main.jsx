@@ -47,8 +47,12 @@ import Chip from 'material-ui/Chip'
 
 /* utils */
 import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
+import TradeManager from '../utils/trade'
 import Bot from '../utils/bot'
 import log from 'loglevel'
+
+/* requests */
+import { fetchTradeParts } from './requests'
 
 // import trx from '../redux'
 
@@ -195,7 +199,8 @@ export class TrxLayout extends React.Component {
             market: undefined,
             timePeriod: '60',
             selectedFile: undefined,
-            dataReady: false
+            dataReady: false,
+            tradeParts: undefined
         }
     }
 
@@ -323,6 +328,12 @@ export class TrxLayout extends React.Component {
             }
         }
         window.trx = container
+        const tradeParts = await fetchTradeParts()
+        if (tradeParts) {
+            this.setState({ tradeParts }, () => {
+                this.logInfo('Pending trade parts retrieved. ' + (tradeParts.bids.length + tradeParts.offers.length) + ' bids or offers discovered')
+            })
+        }
     }
 
     /**
@@ -778,6 +789,18 @@ export class TrxLayout extends React.Component {
         }
     }
 
+
+    findMatches = async (bot) => {
+        // for (bot in botConnections) {
+            if (hasUser(bot)) {
+                const tm = bot.user.tradeManager
+                tm.start()
+                const matched = tm.getMatchedTrades()
+                log.info(`${bot.user[0].name} has the following matched trades`, matched)
+            }
+        // }
+    }
+
     /**
      * updateBotUser
      *
@@ -803,7 +826,8 @@ export class TrxLayout extends React.Component {
                 }
             })
             if (!update) {
-                bot.users.push({...data})
+                bot.users.push({...data, tradeManager: new TradeManager({...data}, { ...this.state.tradeParts })})
+                this.findMatches(bot)
             }
             return true
         } catch (err) {
@@ -1161,4 +1185,12 @@ function getBotWithUser (state, uid) {
         }
     }
     return { bot: matchedBot, user: matchedUser }
+}
+
+/**
+ * Returns true if the bot has a user
+ * @param {Object} bot Object representing a bot
+ */
+function hasUser(bot) {
+    return bot.hasOwnProperty('user') && bot.user.length > 0
 }
