@@ -44,7 +44,6 @@ import FlatButton from 'material-ui/FlatButton/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
 import Chip from 'material-ui/Chip'
 
-
 /* utils */
 import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
 import TradeManager from '../utils/trade'
@@ -215,6 +214,10 @@ export class TrxLayout extends React.Component {
         let fileMenuItems = buildFileMenuItems(0)
         this.setState({botMenuItems: botMenuItems, fileMenuItems: fileMenuItems})
         await this.init()
+    }
+
+    handleChange = () => {
+        this.setState({})
     }
 
     handleClick = () => {
@@ -793,10 +796,18 @@ export class TrxLayout extends React.Component {
     findMatches = async (bot) => {
         // for (bot in botConnections) {
             if (hasUser(bot)) {
-                const tm = bot.user.tradeManager
+                const user = getUser(bot)
+                const tm = user.tradeManager
                 tm.start()
                 const matched = tm.getMatchedTrades()
-                log.info(`${bot.user[0].name} has the following matched trades`, matched)
+                if (matched) {
+                    this.logInfo(`${user.name} has pending bids and/or offers`)
+                    log.info(`${user.name} has the following matched trades`, matched)
+                } else {
+                    this.logInfo(`${user.name} has no bids or offers`)
+                }
+
+
             }
         // }
     }
@@ -942,10 +953,44 @@ export class TrxLayout extends React.Component {
                     primary={false}
                     icon={<PlayCircle />}
                 />
-                <div id="visualizations" style={{padding: '16px'}}><h3>Visualizations</h3>
-                <DropDownMenu id="file-select" style={styles.botSelect} maxHeight={300} value={this.state.selectedFile} onChange={this.handleFileSelect}>
-                    {this.state.fileMenuItems}
-                </DropDownMenu>
+                <div style={{display: 'flex', flexDirection: 'row'}}>
+                    <div id="visualizations" style={{padding: '16px'}}><h3>Visualizations</h3>
+                    <DropDownMenu id="file-select" style={styles.botSelect} maxHeight={300} value={this.state.selectedFile} onChange={this.handleFileSelect}>
+                        {this.state.fileMenuItems}
+                    </DropDownMenu>
+                    </div>
+
+                    <div id="extra" style={{padding: '16px'}}><h3>Trade Actions</h3>
+
+                    <TextField
+                        type='number'
+                        label='Rate per BTC'
+                        value={this.state.offerPrice}
+                        onChange={this.handleChange('btcRate')}
+                    />
+
+                    <TextField
+                        type='number'
+                        label='Number of BTC'
+                        value={this.state.offerPrice}
+                        onChange={this.handleChange('btcNumber')}
+                    />
+
+                    <RaisedButton
+                    label="Bid"
+                    labelPosition="before"
+                    onClick={this.findPatterns}
+                    primary={false}
+                    icon={<Patterns style={{color: '#F44336'}} />} />
+
+                    <RaisedButton
+                    label="Offer"
+                    labelPosition="before"
+                    onClick={this.findPatterns}
+                    primary={false}
+                    icon={<Patterns style={{color: '#F44336'}} />} />
+
+                    </div>
                 </div>
             </Card>
             <Card>
@@ -1192,5 +1237,13 @@ function getBotWithUser (state, uid) {
  * @param {Object} bot Object representing a bot
  */
 function hasUser(bot) {
-    return bot.hasOwnProperty('user') && bot.user.length > 0
+    return ('users' in bot) && (bot.users.length > 0)
+}
+
+/**
+ * Returns the element from the users array that has a truthy name property
+ * @param {Object} bot
+ */
+function getUser(bot) {
+    return bot.users.find(user => user.name)
 }

@@ -398,6 +398,10 @@ function (_React$Component2) {
       sidebarPinned: false
     });
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "handleChange", function () {
+      _this2.setState({});
+    });
+
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "handleClick", function () {
       _this2.setState({
         open: true
@@ -1191,17 +1195,25 @@ function (_React$Component2) {
       var _ref17 = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee16(bot) {
-        var tm, matched;
+        var user, tm, matched;
         return regeneratorRuntime.wrap(function _callee16$(_context16) {
           while (1) {
             switch (_context16.prev = _context16.next) {
               case 0:
                 // for (bot in botConnections) {
                 if (hasUser(bot)) {
-                  tm = bot.user.tradeManager;
+                  user = getUser(bot);
+                  tm = user.tradeManager;
                   tm.start();
                   matched = tm.getMatchedTrades();
-                  __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info("".concat(bot.user[0].name, " has the following matched trades"), matched);
+
+                  if (matched) {
+                    _this2.logInfo("".concat(user.name, " has pending bids and/or offers"));
+
+                    __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info("".concat(user.name, " has the following matched trades"), matched);
+                  } else {
+                    _this2.logInfo("".concat(user.name, " has no bids or offers"));
+                  }
                 } // }
 
 
@@ -1620,6 +1632,11 @@ function (_React$Component2) {
         primary: false,
         icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_14_material_ui_svg_icons_av_play_circle_filled___default.a, null)
       }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"]("div", {
+        style: {
+          display: 'flex',
+          flexDirection: 'row'
+        }
+      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"]("div", {
         id: "visualizations",
         style: {
           padding: '16px'
@@ -1630,7 +1647,42 @@ function (_React$Component2) {
         maxHeight: 300,
         value: this.state.selectedFile,
         onChange: this.handleFileSelect
-      }, this.state.fileMenuItems))), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["Card"], null, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["CardTitle"], {
+      }, this.state.fileMenuItems)), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"]("div", {
+        id: "extra",
+        style: {
+          padding: '16px'
+        }
+      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"]("h3", null, "Trade Actions"), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_21_material_ui_TextField___default.a, {
+        type: "number",
+        label: "Rate per BTC",
+        value: this.state.offerPrice,
+        onChange: this.handleChange('btcRate')
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_21_material_ui_TextField___default.a, {
+        type: "number",
+        label: "Number of BTC",
+        value: this.state.offerPrice,
+        onChange: this.handleChange('btcNumber')
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default.a, {
+        label: "Bid",
+        labelPosition: "before",
+        onClick: this.findPatterns,
+        primary: false,
+        icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_17_material_ui_svg_icons_image_blur_linear___default.a, {
+          style: {
+            color: '#F44336'
+          }
+        })
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default.a, {
+        label: "Offer",
+        labelPosition: "before",
+        onClick: this.findPatterns,
+        primary: false,
+        icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_17_material_ui_svg_icons_image_blur_linear___default.a, {
+          style: {
+            color: '#F44336'
+          }
+        })
+      })))), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["Card"], null, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["CardTitle"], {
         title: "Bot Detail",
         subtitle: botConnections[this.state.selectedBot] !== void 0 && 'id' in botConnections[this.state.selectedBot] ? botConnections[this.state.selectedBot].id : 'None selected'
       }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["CardText"], null, "Bot Controls"), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_28_material_ui_Chip___default.a, {
@@ -1879,7 +1931,18 @@ function getBotWithUser(state, uid) {
 
 
 function hasUser(bot) {
-  return bot.hasOwnProperty('user') && bot.user.length > 0;
+  return 'users' in bot && bot.users.length > 0;
+}
+/**
+ * Returns the element from the users array that has a truthy name property
+ * @param {Object} bot
+ */
+
+
+function getUser(bot) {
+  return bot.users.find(function (user) {
+    return user.name;
+  });
 }
 
 /***/ }),
