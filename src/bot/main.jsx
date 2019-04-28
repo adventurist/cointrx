@@ -34,6 +34,7 @@ import MenuItem from 'material-ui/MenuItem'
 
 /* Inputs */
 import TextField from 'material-ui/TextField'
+import BetterTextField from '@material-ui/core/TextField'
 import NumericInput from 'react-numeric-input'
 
 /* Buttons, Avatars */
@@ -51,7 +52,7 @@ import Bot from '../utils/bot'
 import log from 'loglevel'
 
 /* requests */
-import { fetchTradeParts } from './requests'
+import { fetchTradeParts, bidRequest, offerRequest } from './requests'
 
 // import trx from '../redux'
 
@@ -199,7 +200,9 @@ export class TrxLayout extends React.Component {
             timePeriod: '60',
             selectedFile: undefined,
             dataReady: false,
-            tradeParts: undefined
+            tradeParts: undefined,
+            btcRate: 0,
+            btcNumber: 0
         }
     }
 
@@ -216,8 +219,8 @@ export class TrxLayout extends React.Component {
         await this.init()
     }
 
-    handleChange = () => {
-        this.setState({})
+    handleChange = name => event => {
+        this.setState({ [name]: event.target.value })
     }
 
     handleClick = () => {
@@ -812,6 +815,35 @@ export class TrxLayout extends React.Component {
         // }
     }
 
+    makeBid = async () => {
+        const bot = getSelectedBot(this.state)
+        const now = new Date()
+        const date = new Date(now.getTime() + 1209600000)
+        const result = await bidRequest({
+            user: getUser(bot),
+            price: this.state.btcRate,
+            amount: this.state.btcNumber,
+            date
+        })
+        log.info(result)
+        this.logInfo('Bid error result: ' + result.error)
+    }
+
+    makeOffer = async () => {
+        const bot = getSelectedBot(this.state)
+        const now = new Date()
+        const date = new Date(now.getTime() + 1209600000)
+        const result = await offerRequest({
+            user: getUser(bot),
+            price: this.state.btcRate,
+            amount: this.state.btcNumber,
+            date
+        })
+        log.info(result)
+        this.logInfo('Offer error result: ' + result.error)
+    }
+
+
     /**
      * updateBotUser
      *
@@ -962,14 +994,14 @@ export class TrxLayout extends React.Component {
 
                     <div id="extra" style={{padding: '16px'}}><h3>Trade Actions</h3>
 
-                    <TextField
+                    <BetterTextField
                         type='number'
                         label='Rate per BTC'
                         value={this.state.offerPrice}
                         onChange={this.handleChange('btcRate')}
-                    />
+                        />
 
-                    <TextField
+                    <BetterTextField
                         type='number'
                         label='Number of BTC'
                         value={this.state.offerPrice}
@@ -979,14 +1011,14 @@ export class TrxLayout extends React.Component {
                     <RaisedButton
                     label="Bid"
                     labelPosition="before"
-                    onClick={this.findPatterns}
+                    onClick={this.makeBid}
                     primary={false}
                     icon={<Patterns style={{color: '#F44336'}} />} />
 
                     <RaisedButton
                     label="Offer"
                     labelPosition="before"
-                    onClick={this.findPatterns}
+                    onClick={this.makeOffer}
                     primary={false}
                     icon={<Patterns style={{color: '#F44336'}} />} />
 

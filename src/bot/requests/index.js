@@ -16,6 +16,9 @@ export async function fetchTradeParts() {
   }
 }
 
+/**
+ *
+ */
 async function fetchBids() {
   const response = await request({
     url: '/bid',
@@ -25,11 +28,52 @@ async function fetchBids() {
   return handleResponse(response)
 }
 
+/**
+ *
+ */
 async function fetchOffers() {
   const response = await request({
     url: '/offer',
     method: 'GET'
   })
 
+  return handleResponse(response)
+}
+
+/**
+ *
+ * @param {*} options
+ */
+export async function bidRequest (options) {
+  const response = await request({
+    url: '/bid',
+    method: 'POST',
+    body: {
+        uid: options.user.uid,
+        rate: options.price,
+        amount: options.amount,
+        date: options.date,
+        currency: 'CAD'
+    }
+  })
+  return handleResponse(response)
+}
+
+/**
+ *
+ * @param {*} options
+ */
+export async function offerRequest (options) {
+  const response = await request({
+    url: '/bid',
+    method: 'POST',
+    body: {
+        uid: options.user.uid,
+        rate: options.price,
+        amount: options.amount,
+        date: options.date,
+        currency: 'CAD'
+    }
+  })
   return handleResponse(response)
 }

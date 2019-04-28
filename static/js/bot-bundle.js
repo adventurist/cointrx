@@ -115,27 +115,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_20_material_ui_MenuItem___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_20_material_ui_MenuItem__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_21_material_ui_TextField__ = __webpack_require__(1094);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_21_material_ui_TextField___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_21_material_ui_TextField__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22_react_numeric_input__ = __webpack_require__(1100);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22_react_numeric_input___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_22_react_numeric_input__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23_material_ui_Card__ = __webpack_require__(1101);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23_material_ui_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24_material_ui_Avatar__ = __webpack_require__(440);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24_material_ui_Avatar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24_material_ui_Avatar__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25_material_ui_RadioButton__ = __webpack_require__(1111);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25_material_ui_RadioButton___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_25_material_ui_RadioButton__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26_material_ui_FlatButton_FlatButton__ = __webpack_require__(1116);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26_material_ui_FlatButton_FlatButton___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_26_material_ui_FlatButton_FlatButton__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton__ = __webpack_require__(1118);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28_material_ui_Chip__ = __webpack_require__(1119);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28_material_ui_Chip___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_28_material_ui_Chip__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__utils___ = __webpack_require__(442);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__utils_trade__ = __webpack_require__(1144);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__utils_bot__ = __webpack_require__(1146);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__utils_bot___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_31__utils_bot__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32_loglevel__ = __webpack_require__(446);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32_loglevel___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_32_loglevel__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__requests__ = __webpack_require__(1148);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_TextField__ = __webpack_require__(1157);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__material_ui_core_TextField___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_22__material_ui_core_TextField__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23_react_numeric_input__ = __webpack_require__(1100);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23_react_numeric_input___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_23_react_numeric_input__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24_material_ui_Card__ = __webpack_require__(1101);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24_material_ui_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24_material_ui_Card__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25_material_ui_Avatar__ = __webpack_require__(440);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25_material_ui_Avatar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_25_material_ui_Avatar__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26_material_ui_RadioButton__ = __webpack_require__(1111);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26_material_ui_RadioButton___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_26_material_ui_RadioButton__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27_material_ui_FlatButton_FlatButton__ = __webpack_require__(1116);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27_material_ui_FlatButton_FlatButton___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_27_material_ui_FlatButton_FlatButton__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28_material_ui_RaisedButton_RaisedButton__ = __webpack_require__(1118);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28_material_ui_RaisedButton_RaisedButton___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_28_material_ui_RaisedButton_RaisedButton__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29_material_ui_Chip__ = __webpack_require__(1119);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29_material_ui_Chip___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_29_material_ui_Chip__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__utils___ = __webpack_require__(442);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__utils_trade__ = __webpack_require__(1144);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__utils_bot__ = __webpack_require__(1146);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__utils_bot___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_32__utils_bot__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33_loglevel__ = __webpack_require__(446);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33_loglevel___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_33_loglevel__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__requests__ = __webpack_require__(1148);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
@@ -201,6 +203,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
 /* Buttons, Avatars */
 
 
@@ -223,7 +226,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 // The urls provided by the back end
 
 var urls = JSON.parse(botUrls.replace(/'/g, '"'));
-__WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.setLevel('debug'); // All stylesheet values
+__WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.setLevel('debug'); // All stylesheet values
 
 var styles = {
   chip: {
@@ -358,13 +361,13 @@ function (_React$Component) {
     value: function render() {
       return __WEBPACK_IMPORTED_MODULE_1_react__["createElement"]("div", {
         id: "start-button"
-      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_FlatButton_FlatButton___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_FlatButton_FlatButton___default.a, {
         label: "Start Bots",
         labelPosition: "before",
         onClick: this.props.start,
         primary: false,
         icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_12_material_ui_svg_icons_action_power_settings_new___default.a, null)
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_FlatButton_FlatButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_FlatButton_FlatButton___default.a, {
         label: "Kill Bots",
         labelPosition: "before",
         onClick: this.props.kill,
@@ -398,8 +401,10 @@ function (_React$Component2) {
       sidebarPinned: false
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "handleChange", function () {
-      _this2.setState({});
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "handleChange", function (name) {
+      return function (event) {
+        _this2.setState(_defineProperty({}, name, event.target.value));
+      };
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "handleClick", function () {
@@ -468,7 +473,7 @@ function (_React$Component2) {
           switch (_context2.prev = _context2.next) {
             case 0:
               _context2.next = 2;
-              return Object(__WEBPACK_IMPORTED_MODULE_29__utils___["c" /* requestWs */])({
+              return Object(__WEBPACK_IMPORTED_MODULE_30__utils___["c" /* requestWs */])({
                 url: urls.wsStart,
                 params: {
                   data: JSON.stringify({
@@ -519,7 +524,7 @@ function (_React$Component2) {
 
               window.trx = container;
               _context2.next = 7;
-              return Object(__WEBPACK_IMPORTED_MODULE_33__requests__["a" /* fetchTradeParts */])();
+              return Object(__WEBPACK_IMPORTED_MODULE_34__requests__["b" /* fetchTradeParts */])();
 
             case 7:
               tradeParts = _context2.sent;
@@ -570,7 +575,7 @@ function (_React$Component2) {
               case 10:
                 _context3.prev = 10;
                 _context3.t1 = _context3["catch"](4);
-                __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.error(_context3.t1);
+                __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.error(_context3.t1);
                 return _context3.abrupt("return", false);
 
               case 14:
@@ -625,7 +630,7 @@ function (_React$Component2) {
           switch (_context5.prev = _context5.next) {
             case 0:
               _context5.next = 2;
-              return Object(__WEBPACK_IMPORTED_MODULE_29__utils___["b" /* request */])({
+              return Object(__WEBPACK_IMPORTED_MODULE_30__utils___["b" /* request */])({
                 url: urls.start,
                 method: 'GET',
                 params: {
@@ -636,25 +641,25 @@ function (_React$Component2) {
 
             case 2:
               data = _context5.sent;
-              response = Object(__WEBPACK_IMPORTED_MODULE_29__utils___["a" /* handleResponse */])(data);
+              response = Object(__WEBPACK_IMPORTED_MODULE_30__utils___["a" /* handleResponse */])(data);
 
               if (!response.error) {
                 _this2.logInfo("".concat(_this2.state.botNum, " bots created"));
               }
 
-              __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info(response);
+              __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info(response);
 
               if ('body' in response && 'data' in response.body) {
                 previousBotNumber = botConnections.length;
 
                 if (Array.isArray(data.body.data)) {
                   data.body.data.map(function (bot) {
-                    __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info(bot.message); // Open a message stream for each bot
+                    __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info(bot.message); // Open a message stream for each bot
 
                     var ws = requestWsForBot(_this2.msgHandler);
 
                     if (ws) {
-                      var analysisBot = new __WEBPACK_IMPORTED_MODULE_31__utils_bot___default.a(ws, []); // Place in the container where they will await instruction
+                      var analysisBot = new __WEBPACK_IMPORTED_MODULE_32__utils_bot___default.a(ws, []); // Place in the container where they will await instruction
 
                       botConnections.push({
                         id: bot.id,
@@ -699,9 +704,9 @@ function (_React$Component2) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 bot = getSelectedBot(_this2.state);
-                __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info(event);
+                __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info(event);
                 _context6.next = 4;
-                return Object(__WEBPACK_IMPORTED_MODULE_29__utils___["b" /* request */])({
+                return Object(__WEBPACK_IMPORTED_MODULE_30__utils___["b" /* request */])({
                   url: urls.trc.prices,
                   headers: {
                     'Content-Type': 'application/json'
@@ -715,8 +720,8 @@ function (_React$Component2) {
 
               case 4:
                 data = _context6.sent;
-                response = Object(__WEBPACK_IMPORTED_MODULE_29__utils___["a" /* handleResponse */])(data);
-                __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info(response);
+                response = Object(__WEBPACK_IMPORTED_MODULE_30__utils___["a" /* handleResponse */])(data);
+                __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info(response);
 
                 if (!response.error) {
                   // State needs to reflect that this bot is ready to analyze
@@ -1035,13 +1040,13 @@ function (_React$Component2) {
       var message = _extends({}, _ref16);
 
       if ('type' in message) {
-        __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info("WS Data Event Type", message.type);
+        __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info("WS Data Event Type", message.type);
       }
 
       if ('action' in message) {
         var action = message.action;
         var data = message.payload;
-        __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info('ACTION', action);
+        __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info('ACTION', action);
 
         switch (action) {
           case 'updatebots':
@@ -1100,7 +1105,7 @@ function (_React$Component2) {
 
           case 'pattern:results:update':
             // Pattern search has been completed. Update the UI with the new results
-            __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info('Search results', data);
+            __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info('Search results', data);
 
             if ('filename' in data) {
               _this2.updateFileList(data.filename);
@@ -1109,14 +1114,14 @@ function (_React$Component2) {
               var bot = getSelectedBot(_this2.state);
               var patternName = findPatternName(data); // TODO: make analysis bot here?
 
-              bot.analysisBot = new __WEBPACK_IMPORTED_MODULE_31__utils_bot___default.a(bot.id, bot.ws, data.patterns[patternName]);
-              __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.debug('Analysis bot created', bot.analysisBot);
+              bot.analysisBot = new __WEBPACK_IMPORTED_MODULE_32__utils_bot___default.a(bot.id, bot.ws, data.patterns[patternName]);
+              __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.debug('Analysis bot created', bot.analysisBot);
             }
 
             break;
 
           case 'bot:login:result':
-            __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info('Bot login result', data);
+            __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info('Bot login result', data);
 
             if ('error' in data) {// TODO: better error handling
             } else {
@@ -1129,7 +1134,7 @@ function (_React$Component2) {
                 }
 
                 if (_this2.updateBotUser(data, id)) {
-                  __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.debug('User added to bot with id', id);
+                  __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.debug('User added to bot with id', id);
                 }
               }
             }
@@ -1137,7 +1142,7 @@ function (_React$Component2) {
             break;
 
           case 'account:balance:update':
-            __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info('Fetch balance result', data);
+            __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info('Fetch balance result', data);
 
             if ('balance' in data) {
               if (_this2.updateBotUser(data)) {
@@ -1148,7 +1153,7 @@ function (_React$Component2) {
             break;
 
           case 'transaction:test:result':
-            __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info('Transaction test result', data);
+            __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info('Transaction test result', data);
 
             if (data.result) {
               var result = _this2.updateUserBalance(data.sender, data.recipient, data.amount);
@@ -1159,17 +1164,17 @@ function (_React$Component2) {
             }
 
           default:
-            __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info('Unhandled Websocket message received', data);
+            __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info('Unhandled Websocket message received', data);
             break;
         }
       }
 
       if ('error' in message) {
         var error = message.error;
-        __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info(error);
+        __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info(error);
       }
 
-      __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info("Remaining data to be handled", message);
+      __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info("Remaining data to be handled", message);
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "handleFileSelect", function (event, index, value) {
@@ -1177,7 +1182,7 @@ function (_React$Component2) {
 
       if (value !== void 0) {
         var file = _this2.state.files[value];
-        __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info('File Selection:', file);
+        __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info('File Selection:', file);
 
         _this2.setState({
           selectedFile: value
@@ -1210,7 +1215,7 @@ function (_React$Component2) {
                   if (matched) {
                     _this2.logInfo("".concat(user.name, " has pending bids and/or offers"));
 
-                    __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info("".concat(user.name, " has the following matched trades"), matched);
+                    __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info("".concat(user.name, " has the following matched trades"), matched);
                   } else {
                     _this2.logInfo("".concat(user.name, " has no bids or offers"));
                   }
@@ -1229,6 +1234,76 @@ function (_React$Component2) {
         return _ref17.apply(this, arguments);
       };
     }());
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "makeBid",
+    /*#__PURE__*/
+    _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee17() {
+      var bot, now, date, result;
+      return regeneratorRuntime.wrap(function _callee17$(_context17) {
+        while (1) {
+          switch (_context17.prev = _context17.next) {
+            case 0:
+              bot = getSelectedBot(_this2.state);
+              now = new Date();
+              date = new Date(now.getTime() + 1209600000);
+              _context17.next = 5;
+              return Object(__WEBPACK_IMPORTED_MODULE_34__requests__["a" /* bidRequest */])({
+                user: getUser(bot),
+                price: _this2.state.btcRate,
+                amount: _this2.state.btcNumber,
+                date: date
+              });
+
+            case 5:
+              result = _context17.sent;
+              __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info(result);
+
+              _this2.logInfo('Bid error result: ' + result.error);
+
+            case 8:
+            case "end":
+              return _context17.stop();
+          }
+        }
+      }, _callee17, this);
+    })));
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "makeOffer",
+    /*#__PURE__*/
+    _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee18() {
+      var bot, now, date, result;
+      return regeneratorRuntime.wrap(function _callee18$(_context18) {
+        while (1) {
+          switch (_context18.prev = _context18.next) {
+            case 0:
+              bot = getSelectedBot(_this2.state);
+              now = new Date();
+              date = new Date(now.getTime() + 1209600000);
+              _context18.next = 5;
+              return Object(__WEBPACK_IMPORTED_MODULE_34__requests__["c" /* offerRequest */])({
+                user: getUser(bot),
+                price: _this2.state.btcRate,
+                amount: _this2.state.btcNumber,
+                date: date
+              });
+
+            case 5:
+              result = _context18.sent;
+              __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info(result);
+
+              _this2.logInfo('Offer error result: ' + result.error);
+
+            case 8:
+            case "end":
+              return _context18.stop();
+          }
+        }
+      }, _callee18, this);
+    })));
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this2)), "handleBotSelect", function (event, index, value) {
       var dataReady = value !== -1 ? botConnections[value].dataReady : allDataReady();
@@ -1267,7 +1342,9 @@ function (_React$Component2) {
       timePeriod: '60',
       selectedFile: undefined,
       dataReady: false,
-      tradeParts: undefined
+      tradeParts: undefined,
+      btcRate: 0,
+      btcNumber: 0
     };
     return _this2;
   }
@@ -1277,11 +1354,11 @@ function (_React$Component2) {
     value: function () {
       var _componentDidMount = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee17() {
+      regeneratorRuntime.mark(function _callee19() {
         var botMenuItems, fileMenuItems;
-        return regeneratorRuntime.wrap(function _callee17$(_context17) {
+        return regeneratorRuntime.wrap(function _callee19$(_context19) {
           while (1) {
-            switch (_context17.prev = _context17.next) {
+            switch (_context19.prev = _context19.next) {
               case 0:
                 botMenuItems = buildBotMenuItems(0);
                 fileMenuItems = buildFileMenuItems(0);
@@ -1289,15 +1366,15 @@ function (_React$Component2) {
                   botMenuItems: botMenuItems,
                   fileMenuItems: fileMenuItems
                 });
-                _context17.next = 5;
+                _context19.next = 5;
                 return this.init();
 
               case 5:
               case "end":
-                return _context17.stop();
+                return _context19.stop();
             }
           }
-        }, _callee17, this);
+        }, _callee19, this);
       }));
 
       return function componentDidMount() {
@@ -1334,7 +1411,7 @@ function (_React$Component2) {
   }, {
     key: "logInfo",
     value: function logInfo(logMsg) {
-      __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.info(logMsg);
+      __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info(logMsg);
       this.consoleOut(logMsg);
     }
     /**
@@ -1356,11 +1433,11 @@ function (_React$Component2) {
     value: function () {
       var _killBots = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee18() {
+      regeneratorRuntime.mark(function _callee20() {
         var data;
-        return regeneratorRuntime.wrap(function _callee18$(_context18) {
+        return regeneratorRuntime.wrap(function _callee20$(_context20) {
           while (1) {
-            switch (_context18.prev = _context18.next) {
+            switch (_context20.prev = _context20.next) {
               case 0:
                 data = {
                   data: [],
@@ -1373,10 +1450,10 @@ function (_React$Component2) {
 
               case 2:
               case "end":
-                return _context18.stop();
+                return _context20.stop();
             }
           }
-        }, _callee18, this);
+        }, _callee20, this);
       }));
 
       return function killBots() {
@@ -1482,14 +1559,14 @@ function (_React$Component2) {
 
         if (!update) {
           bot.users.push(_objectSpread({}, data, {
-            tradeManager: new __WEBPACK_IMPORTED_MODULE_30__utils_trade__["a" /* default */](_objectSpread({}, data), _objectSpread({}, this.state.tradeParts))
+            tradeManager: new __WEBPACK_IMPORTED_MODULE_31__utils_trade__["a" /* default */](_objectSpread({}, data), _objectSpread({}, this.state.tradeParts))
           }));
           this.findMatches(bot);
         }
 
         return true;
       } catch (err) {
-        __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.error('Error updating user for bot', err);
+        __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.error('Error updating user for bot', err);
         return false;
       }
     }
@@ -1522,25 +1599,25 @@ function (_React$Component2) {
         id: "bot-panel",
         className: "trx-panel",
         style: styles.trxPanel
-      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["Card"], null, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["CardTitle"], {
+      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_24_material_ui_Card__["Card"], null, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_24_material_ui_Card__["CardTitle"], {
         title: "Bot Setup"
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["CardText"], null, "Configure and create bots"), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"]("div", {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_24_material_ui_Card__["CardText"], null, "Configure and create bots"), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"]("div", {
         id: "number-container"
-      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["CardActions"], {
+      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_24_material_ui_Card__["CardActions"], {
         className: "number-control",
         style: styles.numberControl
-      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_22_react_numeric_input___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_react_numeric_input___default.a, {
         min: 0,
         max: 100,
         value: this.state.botNum,
         onChange: this.botNumberChange
       }))), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"]("div", {
         id: "market-select"
-      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_25_material_ui_RadioButton__["RadioButtonGroup"], {
+      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_RadioButton__["RadioButtonGroup"], {
         name: "market-select",
         defaultSelected: "trx",
         onChange: this.handleMarketSelect
-      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_25_material_ui_RadioButton__["RadioButton"], {
+      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_RadioButton__["RadioButton"], {
         value: "TRX",
         label: "TRX",
         checkedIcon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_8_material_ui_svg_icons_action_trending_up___default.a, {
@@ -1554,7 +1631,7 @@ function (_React$Component2) {
           }
         }),
         style: styles.radioButton
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_25_material_ui_RadioButton__["RadioButton"], {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_RadioButton__["RadioButton"], {
         value: "TRC",
         label: "TRC",
         checkedIcon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_8_material_ui_svg_icons_action_trending_up___default.a, {
@@ -1568,7 +1645,7 @@ function (_React$Component2) {
           }
         }),
         style: styles.radioButton
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_25_material_ui_RadioButton__["RadioButton"], {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_RadioButton__["RadioButton"], {
         value: "Exchange",
         label: "Exchange TRX/TRC",
         checkedIcon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_10_material_ui_svg_icons_action_compare_arrows___default.a, {
@@ -1589,43 +1666,43 @@ function (_React$Component2) {
         id: "analysis-panel",
         className: "trx-panel",
         style: styles.trxPanel
-      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["Card"], null, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["CardTitle"], {
+      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_24_material_ui_Card__["Card"], null, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_24_material_ui_Card__["CardTitle"], {
         title: "Analysis"
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["CardText"], null, "Examine and trade"), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_19_material_ui_DropDownMenu___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_24_material_ui_Card__["CardText"], null, "Examine and trade"), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_19_material_ui_DropDownMenu___default.a, {
         id: "bot-select",
         style: styles.botSelect,
         maxHeight: 300,
         value: this.state.selectedBot,
         onChange: this.handleBotSelect
-      }, this.state.botMenuItems), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_FlatButton_FlatButton___default.a, {
+      }, this.state.botMenuItems), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_FlatButton_FlatButton___default.a, {
         label: "Load Data",
         labelPosition: "before",
         onClick: this.loadMarketData,
         primary: false,
         icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_11_material_ui_svg_icons_action_autorenew___default.a, null)
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_FlatButton_FlatButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_FlatButton_FlatButton___default.a, {
         label: "Login",
         labelPosition: "before",
         onClick: this.loginBot,
         primary: false
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_FlatButton_FlatButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_FlatButton_FlatButton___default.a, {
         label: "Login All",
         labelPosition: "before",
         onClick: this.loginBots,
         primary: false
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_28_material_ui_RaisedButton_RaisedButton___default.a, {
         label: "Analyze",
         labelPosition: "before",
         onClick: this.analyzeMarketData,
         primary: false,
         icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_14_material_ui_svg_icons_av_play_circle_filled___default.a, null)
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_28_material_ui_RaisedButton_RaisedButton___default.a, {
         label: "Prepare Bot",
         labelPosition: "before",
         onClick: this.prepareBot,
         primary: false,
         icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_14_material_ui_svg_icons_av_play_circle_filled___default.a, null)
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_28_material_ui_RaisedButton_RaisedButton___default.a, {
         label: "Prepare Bots",
         labelPosition: "before",
         onClick: this.prepareBots,
@@ -1652,40 +1729,40 @@ function (_React$Component2) {
         style: {
           padding: '16px'
         }
-      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"]("h3", null, "Trade Actions"), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_21_material_ui_TextField___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"]("h3", null, "Trade Actions"), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_22__material_ui_core_TextField___default.a, {
         type: "number",
         label: "Rate per BTC",
         value: this.state.offerPrice,
         onChange: this.handleChange('btcRate')
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_21_material_ui_TextField___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_22__material_ui_core_TextField___default.a, {
         type: "number",
         label: "Number of BTC",
         value: this.state.offerPrice,
         onChange: this.handleChange('btcNumber')
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_28_material_ui_RaisedButton_RaisedButton___default.a, {
         label: "Bid",
         labelPosition: "before",
-        onClick: this.findPatterns,
+        onClick: this.makeBid,
         primary: false,
         icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_17_material_ui_svg_icons_image_blur_linear___default.a, {
           style: {
             color: '#F44336'
           }
         })
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_28_material_ui_RaisedButton_RaisedButton___default.a, {
         label: "Offer",
         labelPosition: "before",
-        onClick: this.findPatterns,
+        onClick: this.makeOffer,
         primary: false,
         icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_17_material_ui_svg_icons_image_blur_linear___default.a, {
           style: {
             color: '#F44336'
           }
         })
-      })))), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["Card"], null, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["CardTitle"], {
+      })))), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_24_material_ui_Card__["Card"], null, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_24_material_ui_Card__["CardTitle"], {
         title: "Bot Detail",
         subtitle: botConnections[this.state.selectedBot] !== void 0 && 'id' in botConnections[this.state.selectedBot] ? botConnections[this.state.selectedBot].id : 'None selected'
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_23_material_ui_Card__["CardText"], null, "Bot Controls"), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_28_material_ui_Chip___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_24_material_ui_Card__["CardText"], null, "Bot Controls"), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_29_material_ui_Chip___default.a, {
         id: "data-ready",
         className: this.state.dataReady ? "data-ready-show" : "data-ready-hidden",
         backgroundColor: __WEBPACK_IMPORTED_MODULE_18_material_ui_styles_colors__["red500"],
@@ -1695,7 +1772,7 @@ function (_React$Component2) {
           height: 5,
           fontSize: 5
         }
-      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_24_material_ui_Avatar___default.a, {
+      }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_25_material_ui_Avatar___default.a, {
         size: 2,
         color: __WEBPACK_IMPORTED_MODULE_18_material_ui_styles_colors__["red500"],
         backgroundColor: __WEBPACK_IMPORTED_MODULE_18_material_ui_styles_colors__["red500"],
@@ -1703,19 +1780,19 @@ function (_React$Component2) {
           fontSize: '12px',
           fontWeight: 700
         }
-      }, "Data ready")), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_FlatButton_FlatButton___default.a, {
+      }, "Data ready")), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_FlatButton_FlatButton___default.a, {
         label: "Close",
         labelPosition: "before",
         onClick: this.closeBotConnection,
         primary: false,
         icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_13_material_ui_svg_icons_communication_call_end___default.a, null)
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_FlatButton_FlatButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_FlatButton_FlatButton___default.a, {
         label: "Reconnect",
         labelPosition: "before",
         onClick: this.reconnectBot,
         primary: false,
         icon: __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_15_material_ui_svg_icons_notification_sync___default.a, null)
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_26_material_ui_FlatButton_FlatButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_FlatButton_FlatButton___default.a, {
         label: "Balance",
         labelPosition: "before",
         onClick: this.fetchBalance,
@@ -1725,7 +1802,7 @@ function (_React$Component2) {
             color: '#F44336'
           }
         })
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_28_material_ui_RaisedButton_RaisedButton___default.a, {
         label: "Find Patterns",
         labelPosition: "before",
         onClick: this.findPatterns,
@@ -1735,7 +1812,7 @@ function (_React$Component2) {
             color: '#F44336'
           }
         })
-      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_27_material_ui_RaisedButton_RaisedButton___default.a, {
+      }), __WEBPACK_IMPORTED_MODULE_1_react__["createElement"](__WEBPACK_IMPORTED_MODULE_28_material_ui_RaisedButton_RaisedButton___default.a, {
         label: "Trade",
         labelPosition: "before",
         onClick: this.performTrade,
@@ -1766,7 +1843,7 @@ Object(__WEBPACK_IMPORTED_MODULE_2_react_dom__["render"])(__WEBPACK_IMPORTED_MOD
 }, __WEBPACK_IMPORTED_MODULE_1_react__["createElement"]("h1", null, " TEST THIS BITCH "))), document.getElementById('root'));
 function requestWsForBot(handler) {
   var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'test';
-  return Object(__WEBPACK_IMPORTED_MODULE_29__utils___["c" /* requestWs */])({
+  return Object(__WEBPACK_IMPORTED_MODULE_30__utils___["c" /* requestWs */])({
     url: urls.wsStart,
     params: {
       data: data
@@ -1786,7 +1863,7 @@ function sendMessage(bot, data) {
 
     return true;
   } catch (err) {
-    __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.debug(err);
+    __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.debug(err);
     return false;
   }
 }
@@ -1830,7 +1907,7 @@ function findPatternName(data) {
     if (keys.length === 1) {
       return keys[0];
     } else {
-      __WEBPACK_IMPORTED_MODULE_32_loglevel___default.a.error('There is not one single pattern name found');
+      __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.error('There is not one single pattern name found');
     }
   }
 }
@@ -106236,7 +106313,9 @@ function isCup(arg) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = fetchTradeParts;
+/* harmony export (immutable) */ __webpack_exports__["b"] = fetchTradeParts;
+/* harmony export (immutable) */ __webpack_exports__["a"] = bidRequest;
+/* harmony export (immutable) */ __webpack_exports__["c"] = offerRequest;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(442);
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
@@ -106255,6 +106334,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 function fetchTradeParts() {
   return _fetchTradeParts.apply(this, arguments);
 }
+/**
+ *
+ */
 
 function _fetchTradeParts() {
   _fetchTradeParts = _asyncToGenerator(
@@ -106305,6 +106387,10 @@ function _fetchTradeParts() {
 function fetchBids() {
   return _fetchBids.apply(this, arguments);
 }
+/**
+ *
+ */
+
 
 function _fetchBids() {
   _fetchBids = _asyncToGenerator(
@@ -106338,6 +106424,11 @@ function _fetchBids() {
 function fetchOffers() {
   return _fetchOffers.apply(this, arguments);
 }
+/**
+ *
+ * @param {*} options
+ */
+
 
 function _fetchOffers() {
   _fetchOffers = _asyncToGenerator(
@@ -106367,6 +106458,5215 @@ function _fetchOffers() {
   }));
   return _fetchOffers.apply(this, arguments);
 }
+
+function bidRequest(_x) {
+  return _bidRequest.apply(this, arguments);
+}
+/**
+ *
+ * @param {*} options
+ */
+
+function _bidRequest() {
+  _bidRequest = _asyncToGenerator(
+  /*#__PURE__*/
+  regeneratorRuntime.mark(function _callee4(options) {
+    var response;
+    return regeneratorRuntime.wrap(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            _context4.next = 2;
+            return Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* request */])({
+              url: '/bid',
+              method: 'POST',
+              body: {
+                uid: options.user.uid,
+                rate: options.price,
+                amount: options.amount,
+                date: options.date,
+                currency: 'CAD'
+              }
+            });
+
+          case 2:
+            response = _context4.sent;
+            return _context4.abrupt("return", Object(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* handleResponse */])(response));
+
+          case 4:
+          case "end":
+            return _context4.stop();
+        }
+      }
+    }, _callee4, this);
+  }));
+  return _bidRequest.apply(this, arguments);
+}
+
+function offerRequest(_x2) {
+  return _offerRequest.apply(this, arguments);
+}
+
+function _offerRequest() {
+  _offerRequest = _asyncToGenerator(
+  /*#__PURE__*/
+  regeneratorRuntime.mark(function _callee5(options) {
+    var response;
+    return regeneratorRuntime.wrap(function _callee5$(_context5) {
+      while (1) {
+        switch (_context5.prev = _context5.next) {
+          case 0:
+            _context5.next = 2;
+            return Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* request */])({
+              url: '/bid',
+              method: 'POST',
+              body: {
+                uid: options.user.uid,
+                rate: options.price,
+                amount: options.amount,
+                date: options.date,
+                currency: 'CAD'
+              }
+            });
+
+          case 2:
+            response = _context5.sent;
+            return _context5.abrupt("return", Object(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* handleResponse */])(response));
+
+          case 4:
+          case "end":
+            return _context5.stop();
+        }
+      }
+    }, _callee5, this);
+  }));
+  return _offerRequest.apply(this, arguments);
+}
+
+/***/ }),
+/* 1149 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(1154);
+
+exports.__esModule = true;
+exports.default = void 0;
+
+var _shouldUpdate = _interopRequireDefault(__webpack_require__(1233));
+
+var _shallowEqual = _interopRequireDefault(__webpack_require__(1237));
+
+var _setDisplayName = _interopRequireDefault(__webpack_require__(1175));
+
+var _wrapDisplayName = _interopRequireDefault(__webpack_require__(1176));
+
+var pure = function pure(BaseComponent) {
+  var hoc = (0, _shouldUpdate.default)(function (props, nextProps) {
+    return !(0, _shallowEqual.default)(props, nextProps);
+  });
+
+  if (process.env.NODE_ENV !== 'production') {
+    return (0, _setDisplayName.default)((0, _wrapDisplayName.default)(BaseComponent, 'pure'))(hoc(BaseComponent));
+  }
+
+  return hoc(BaseComponent);
+};
+
+var _default = pure;
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1150 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = withFormControlContext;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _hoistNonReactStatics = _interopRequireDefault(__webpack_require__(399));
+
+var _FormControlContext = _interopRequireDefault(__webpack_require__(1159));
+
+var _utils = __webpack_require__(28);
+
+function withFormControlContext(Component) {
+  var EnhancedComponent = function EnhancedComponent(props) {
+    return _react.default.createElement(_FormControlContext.default.Consumer, null, function (context) {
+      return _react.default.createElement(Component, (0, _extends2.default)({
+        muiFormControl: context
+      }, props));
+    });
+  };
+
+  if (process.env.NODE_ENV !== 'production') {
+    EnhancedComponent.displayName = "WithFormControlContext(".concat((0, _utils.getDisplayName)(Component), ")");
+  }
+
+  (0, _hoistNonReactStatics.default)(EnhancedComponent, Component);
+  return EnhancedComponent;
+}
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1151 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _Input.default;
+  }
+});
+
+var _Input = _interopRequireDefault(__webpack_require__(1221));
+
+/***/ }),
+/* 1152 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = formControlState;
+
+function formControlState(_ref) {
+  var props = _ref.props,
+      states = _ref.states,
+      muiFormControl = _ref.muiFormControl;
+  return states.reduce(function (acc, state) {
+    acc[state] = props[state];
+
+    if (muiFormControl) {
+      if (typeof props[state] === 'undefined') {
+        acc[state] = muiFormControl[state];
+      }
+    }
+
+    return acc;
+  }, {});
+}
+
+/***/ }),
+/* 1153 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _InputBase.default;
+  }
+});
+
+var _InputBase = _interopRequireDefault(__webpack_require__(1222));
+
+/***/ }),
+/* 1154 */
+/***/ (function(module, exports) {
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
+}
+
+module.exports = _interopRequireDefault;
+
+/***/ }),
+/* 1155 */,
+/* 1156 */,
+/* 1157 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _TextField.default;
+  }
+});
+
+var _TextField = _interopRequireDefault(__webpack_require__(1220));
+
+/***/ }),
+/* 1158 */,
+/* 1159 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+/**
+ * @ignore - internal component.
+ */
+var FormControlContext = _react.default.createContext();
+
+var _default = FormControlContext;
+exports.default = _default;
+
+/***/ }),
+/* 1160 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.hasValue = hasValue;
+exports.isFilled = isFilled;
+exports.isAdornedStart = isAdornedStart;
+
+// Supports determination of isControlled().
+// Controlled input accepts its current value as a prop.
+//
+// @see https://facebook.github.io/react/docs/forms.html#controlled-components
+// @param value
+// @returns {boolean} true if string (including '') or number (including zero)
+function hasValue(value) {
+  return value != null && !(Array.isArray(value) && value.length === 0);
+} // Determine if field is empty or filled.
+// Response determines if label is presented above field or as placeholder.
+//
+// @param obj
+// @param SSR
+// @returns {boolean} False when not present or empty string.
+//                    True when any number or string with length.
+
+
+function isFilled(obj) {
+  var SSR = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  return obj && (hasValue(obj.value) && obj.value !== '' || SSR && hasValue(obj.defaultValue) && obj.defaultValue !== '');
+} // Determine if an Input is adorned on start.
+// It's corresponding to the left with LTR.
+//
+// @param obj
+// @returns {boolean} False when no adornments.
+//                    True when adorned at the start.
+
+
+function isAdornedStart(obj) {
+  return obj.startAdornment;
+}
+
+/***/ }),
+/* 1161 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _Select.default;
+  }
+});
+
+var _Select = _interopRequireDefault(__webpack_require__(1231));
+
+/***/ }),
+/* 1162 */,
+/* 1163 */,
+/* 1164 */,
+/* 1165 */,
+/* 1166 */,
+/* 1167 */,
+/* 1168 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _FilledInput.default;
+  }
+});
+
+var _FilledInput = _interopRequireDefault(__webpack_require__(1224));
+
+/***/ }),
+/* 1169 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _OutlinedInput.default;
+  }
+});
+
+var _OutlinedInput = _interopRequireDefault(__webpack_require__(1225));
+
+/***/ }),
+/* 1170 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _InputLabel.default;
+  }
+});
+
+var _InputLabel = _interopRequireDefault(__webpack_require__(1227));
+
+/***/ }),
+/* 1171 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _FormLabel.default;
+  }
+});
+
+var _FormLabel = _interopRequireDefault(__webpack_require__(1228));
+
+/***/ }),
+/* 1172 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _FormControl.default;
+  }
+});
+
+var _FormControl = _interopRequireDefault(__webpack_require__(1229));
+
+/***/ }),
+/* 1173 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function get() {
+    return _FormHelperText.default;
+  }
+});
+
+var _FormHelperText = _interopRequireDefault(__webpack_require__(1230));
+
+/***/ }),
+/* 1174 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _pure = _interopRequireDefault(__webpack_require__(1149));
+
+var _SvgIcon = _interopRequireDefault(__webpack_require__(275));
+
+var _ref = _react.default.createElement("path", {
+  d: "M7 10l5 5 5-5z"
+});
+
+/**
+ * @ignore - internal component.
+ */
+var ArrowDropDown = function ArrowDropDown(props) {
+  return _react.default.createElement(_SvgIcon.default, props, _ref);
+};
+
+ArrowDropDown = (0, _pure.default)(ArrowDropDown);
+ArrowDropDown.muiName = 'SvgIcon';
+var _default = ArrowDropDown;
+exports.default = _default;
+
+/***/ }),
+/* 1175 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(1154);
+
+exports.__esModule = true;
+exports.default = void 0;
+
+var _setStatic = _interopRequireDefault(__webpack_require__(1235));
+
+var setDisplayName = function setDisplayName(displayName) {
+  return (0, _setStatic.default)('displayName', displayName);
+};
+
+var _default = setDisplayName;
+exports.default = _default;
+
+/***/ }),
+/* 1176 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(1154);
+
+exports.__esModule = true;
+exports.default = void 0;
+
+var _getDisplayName = _interopRequireDefault(__webpack_require__(1236));
+
+var wrapDisplayName = function wrapDisplayName(BaseComponent, hocName) {
+  return hocName + "(" + (0, _getDisplayName.default)(BaseComponent) + ")";
+};
+
+var _default = wrapDisplayName;
+exports.default = _default;
+
+/***/ }),
+/* 1177 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _utils = __webpack_require__(28);
+
+var _NativeSelectInput = _interopRequireDefault(__webpack_require__(1178));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(26));
+
+var _formControlState = _interopRequireDefault(__webpack_require__(1152));
+
+var _withFormControlContext = _interopRequireDefault(__webpack_require__(1150));
+
+var _ArrowDropDown = _interopRequireDefault(__webpack_require__(1174));
+
+var _Input = _interopRequireDefault(__webpack_require__(1151));
+
+// @inheritedComponent Input
+var styles = function styles(theme) {
+  return {
+    /* Styles applied to the `Input` component `root` class. */
+    root: {
+      position: 'relative',
+      width: '100%'
+    },
+
+    /* Styles applied to the `Input` component `select` class. */
+    select: {
+      '-moz-appearance': 'none',
+      // Reset
+      '-webkit-appearance': 'none',
+      // Reset
+      // When interacting quickly, the text can end up selected.
+      // Native select can't be selected either.
+      userSelect: 'none',
+      paddingRight: 32,
+      borderRadius: 0,
+      // Reset
+      height: '1.1875em',
+      // Reset (19px), match the native input line-height
+      width: 'calc(100% - 32px)',
+      minWidth: 16,
+      // So it doesn't collapse.
+      cursor: 'pointer',
+      '&:focus': {
+        // Show that it's not an text input
+        backgroundColor: theme.palette.type === 'light' ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)',
+        borderRadius: 0 // Reset Chrome style
+
+      },
+      // Remove IE 11 arrow
+      '&::-ms-expand': {
+        display: 'none'
+      },
+      '&$disabled': {
+        cursor: 'default'
+      },
+      '&[multiple]': {
+        height: 'auto'
+      },
+      '&:not([multiple]) option, &:not([multiple]) optgroup': {
+        backgroundColor: theme.palette.background.paper
+      }
+    },
+
+    /* Styles applied to the `Input` component if `variant="filled"`. */
+    filled: {
+      width: 'calc(100% - 44px)'
+    },
+
+    /* Styles applied to the `Input` component if `variant="outlined"`. */
+    outlined: {
+      width: 'calc(100% - 46px)',
+      borderRadius: theme.shape.borderRadius
+    },
+
+    /* Styles applied to the `Input` component `selectMenu` class. */
+    selectMenu: {
+      width: 'auto',
+      // Fix Safari textOverflow
+      height: 'auto',
+      // Reset
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      minHeight: '1.1875em' // Reset (19px), match the native input line-height
+
+    },
+
+    /* Styles applied to the `Input` component `disabled` class. */
+    disabled: {},
+
+    /* Styles applied to the `Input` component `icon` class. */
+    icon: {
+      // We use a position absolute over a flexbox in order to forward the pointer events
+      // to the input.
+      position: 'absolute',
+      right: 0,
+      top: 'calc(50% - 12px)',
+      // Center vertically
+      color: theme.palette.action.active,
+      'pointer-events': 'none' // Don't block pointer events on the select under the icon.
+
+    }
+  };
+};
+/**
+ * An alternative to `<Select native />` with a much smaller bundle size footprint.
+ */
+
+
+exports.styles = styles;
+
+function NativeSelect(props) {
+  var children = props.children,
+      classes = props.classes,
+      IconComponent = props.IconComponent,
+      input = props.input,
+      inputProps = props.inputProps,
+      muiFormControl = props.muiFormControl,
+      variant = props.variant,
+      other = (0, _objectWithoutProperties2.default)(props, ["children", "classes", "IconComponent", "input", "inputProps", "muiFormControl", "variant"]);
+  var fcs = (0, _formControlState.default)({
+    props: props,
+    muiFormControl: muiFormControl,
+    states: ['variant']
+  });
+  return _react.default.cloneElement(input, (0, _extends2.default)({
+    // Most of the logic is implemented in `NativeSelectInput`.
+    // The `Select` component is a simple API wrapper to expose something better to play with.
+    inputComponent: _NativeSelectInput.default,
+    inputProps: (0, _extends2.default)({
+      children: children,
+      classes: classes,
+      IconComponent: IconComponent,
+      variant: fcs.variant,
+      type: undefined
+    }, inputProps, input ? input.props.inputProps : {})
+  }, other));
+}
+
+process.env.NODE_ENV !== "production" ? NativeSelect.propTypes = {
+  /**
+   * The option elements to populate the select with.
+   * Can be some `<option>` elements.
+   */
+  children: _propTypes.default.node,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * The icon that displays the arrow.
+   */
+  IconComponent: _utils.componentPropType,
+
+  /**
+   * An `Input` element; does not have to be a material-ui specific `Input`.
+   */
+  input: _propTypes.default.element,
+
+  /**
+   * Attributes applied to the `select` element.
+   */
+  inputProps: _propTypes.default.object,
+
+  /**
+   * @ignore
+   */
+  muiFormControl: _propTypes.default.object,
+
+  /**
+   * Callback function fired when a menu item is selected.
+   *
+   * @param {object} event The event source of the callback.
+   * You can pull out the new value by accessing `event.target.value`.
+   */
+  onChange: _propTypes.default.func,
+
+  /**
+   * The input value.
+   */
+  value: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool]))]),
+
+  /**
+   * The variant to use.
+   */
+  variant: _propTypes.default.oneOf(['standard', 'outlined', 'filled'])
+} : void 0;
+NativeSelect.defaultProps = {
+  IconComponent: _ArrowDropDown.default,
+  input: _react.default.createElement(_Input.default, null)
+};
+NativeSelect.muiName = 'Select';
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiNativeSelect'
+})((0, _withFormControlContext.default)(NativeSelect));
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1178 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(25));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _classnames = _interopRequireDefault(__webpack_require__(8));
+
+var _utils = __webpack_require__(28);
+
+/**
+ * @ignore - internal component.
+ */
+function NativeSelectInput(props) {
+  var _classNames;
+
+  var children = props.children,
+      classes = props.classes,
+      className = props.className,
+      disabled = props.disabled,
+      IconComponent = props.IconComponent,
+      inputRef = props.inputRef,
+      name = props.name,
+      onChange = props.onChange,
+      value = props.value,
+      variant = props.variant,
+      other = (0, _objectWithoutProperties2.default)(props, ["children", "classes", "className", "disabled", "IconComponent", "inputRef", "name", "onChange", "value", "variant"]);
+  return _react.default.createElement("div", {
+    className: classes.root
+  }, _react.default.createElement("select", (0, _extends2.default)({
+    className: (0, _classnames.default)(classes.select, (_classNames = {}, (0, _defineProperty2.default)(_classNames, classes.filled, variant === 'filled'), (0, _defineProperty2.default)(_classNames, classes.outlined, variant === 'outlined'), (0, _defineProperty2.default)(_classNames, classes.disabled, disabled), _classNames), className),
+    name: name,
+    disabled: disabled,
+    onChange: onChange,
+    value: value,
+    ref: inputRef
+  }, other), children), _react.default.createElement(IconComponent, {
+    className: classes.icon
+  }));
+}
+
+process.env.NODE_ENV !== "production" ? NativeSelectInput.propTypes = {
+  /**
+   * The option elements to populate the select with.
+   * Can be some `<option>` elements.
+   */
+  children: _propTypes.default.node,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * The CSS class name of the select element.
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * If `true`, the select will be disabled.
+   */
+  disabled: _propTypes.default.bool,
+
+  /**
+   * The icon that displays the arrow.
+   */
+  IconComponent: _utils.componentPropType,
+
+  /**
+   * Use that property to pass a ref callback to the native select element.
+   */
+  inputRef: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.object]),
+
+  /**
+   * Name attribute of the `select` or hidden `input` element.
+   */
+  name: _propTypes.default.string,
+
+  /**
+   * Callback function fired when a menu item is selected.
+   *
+   * @param {object} event The event source of the callback.
+   * You can pull out the new value by accessing `event.target.value`.
+   */
+  onChange: _propTypes.default.func,
+
+  /**
+   * The input value.
+   */
+  value: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool]))]),
+
+  /**
+   * The variant to use.
+   */
+  variant: _propTypes.default.oneOf(['standard', 'outlined', 'filled'])
+} : void 0;
+var _default = NativeSelectInput;
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1179 */,
+/* 1180 */,
+/* 1181 */,
+/* 1182 */,
+/* 1183 */,
+/* 1184 */,
+/* 1185 */,
+/* 1186 */,
+/* 1187 */,
+/* 1188 */,
+/* 1189 */,
+/* 1190 */,
+/* 1191 */,
+/* 1192 */,
+/* 1193 */,
+/* 1194 */,
+/* 1195 */,
+/* 1196 */,
+/* 1197 */,
+/* 1198 */,
+/* 1199 */,
+/* 1200 */,
+/* 1201 */,
+/* 1202 */,
+/* 1203 */,
+/* 1204 */,
+/* 1205 */,
+/* 1206 */,
+/* 1207 */,
+/* 1208 */,
+/* 1209 */,
+/* 1210 */,
+/* 1211 */,
+/* 1212 */,
+/* 1213 */,
+/* 1214 */,
+/* 1215 */,
+/* 1216 */,
+/* 1217 */,
+/* 1218 */,
+/* 1219 */,
+/* 1220 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _classCallCheck2 = _interopRequireDefault(__webpack_require__(30));
+
+var _createClass2 = _interopRequireDefault(__webpack_require__(31));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(__webpack_require__(32));
+
+var _getPrototypeOf2 = _interopRequireDefault(__webpack_require__(33));
+
+var _inherits2 = _interopRequireDefault(__webpack_require__(34));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _reactDom = _interopRequireDefault(__webpack_require__(19));
+
+var _warning = _interopRequireDefault(__webpack_require__(42));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _Input = _interopRequireDefault(__webpack_require__(1151));
+
+var _FilledInput = _interopRequireDefault(__webpack_require__(1168));
+
+var _OutlinedInput = _interopRequireDefault(__webpack_require__(1169));
+
+var _InputLabel = _interopRequireDefault(__webpack_require__(1170));
+
+var _FormControl = _interopRequireDefault(__webpack_require__(1172));
+
+var _FormHelperText = _interopRequireDefault(__webpack_require__(1173));
+
+var _Select = _interopRequireDefault(__webpack_require__(1161));
+
+// @inheritedComponent FormControl
+var variantComponent = {
+  standard: _Input.default,
+  filled: _FilledInput.default,
+  outlined: _OutlinedInput.default
+};
+/**
+ * The `TextField` is a convenience wrapper for the most common cases (80%).
+ * It cannot be all things to all people, otherwise the API would grow out of control.
+ *
+ * ## Advanced Configuration
+ *
+ * It's important to understand that the text field is a simple abstraction
+ * on top of the following components:
+ * - [FormControl](/api/form-control/)
+ * - [InputLabel](/api/input-label/)
+ * - [Input](/api/input/)
+ * - [FormHelperText](/api/form-helper-text/)
+ *
+ * If you wish to alter the properties applied to the native input, you can do so as follows:
+ *
+ * ```jsx
+ * const inputProps = {
+ *   step: 300,
+ * };
+ *
+ * return <TextField id="time" type="time" inputProps={inputProps} />;
+ * ```
+ *
+ * For advanced cases, please look at the source of TextField by clicking on the
+ * "Edit this page" button above. Consider either:
+ * - using the upper case props for passing values directly to the components
+ * - using the underlying components directly as shown in the demos
+ */
+
+var TextField =
+/*#__PURE__*/
+function (_React$Component) {
+  (0, _inherits2.default)(TextField, _React$Component);
+
+  function TextField(props) {
+    var _this;
+
+    (0, _classCallCheck2.default)(this, TextField);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(TextField).call(this, props));
+    _this.labelRef = _react.default.createRef();
+    return _this;
+  }
+
+  (0, _createClass2.default)(TextField, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      if (this.props.variant === 'outlined') {
+        this.labelNode = _reactDom.default.findDOMNode(this.labelRef.current);
+        this.forceUpdate();
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this$props = this.props,
+          autoComplete = _this$props.autoComplete,
+          autoFocus = _this$props.autoFocus,
+          children = _this$props.children,
+          className = _this$props.className,
+          defaultValue = _this$props.defaultValue,
+          error = _this$props.error,
+          FormHelperTextProps = _this$props.FormHelperTextProps,
+          fullWidth = _this$props.fullWidth,
+          helperText = _this$props.helperText,
+          id = _this$props.id,
+          InputLabelProps = _this$props.InputLabelProps,
+          inputProps = _this$props.inputProps,
+          InputProps = _this$props.InputProps,
+          inputRef = _this$props.inputRef,
+          label = _this$props.label,
+          multiline = _this$props.multiline,
+          name = _this$props.name,
+          onBlur = _this$props.onBlur,
+          onChange = _this$props.onChange,
+          onFocus = _this$props.onFocus,
+          placeholder = _this$props.placeholder,
+          required = _this$props.required,
+          rows = _this$props.rows,
+          rowsMax = _this$props.rowsMax,
+          select = _this$props.select,
+          SelectProps = _this$props.SelectProps,
+          type = _this$props.type,
+          value = _this$props.value,
+          variant = _this$props.variant,
+          other = (0, _objectWithoutProperties2.default)(_this$props, ["autoComplete", "autoFocus", "children", "className", "defaultValue", "error", "FormHelperTextProps", "fullWidth", "helperText", "id", "InputLabelProps", "inputProps", "InputProps", "inputRef", "label", "multiline", "name", "onBlur", "onChange", "onFocus", "placeholder", "required", "rows", "rowsMax", "select", "SelectProps", "type", "value", "variant"]);
+      process.env.NODE_ENV !== "production" ? (0, _warning.default)(!select || Boolean(children), 'Material-UI: `children` must be passed when using the `TextField` component with `select`.') : void 0;
+      var InputMore = {};
+
+      if (variant === 'outlined') {
+        if (InputLabelProps && typeof InputLabelProps.shrink !== 'undefined') {
+          InputMore.notched = InputLabelProps.shrink;
+        }
+
+        InputMore.labelWidth = this.labelNode && this.labelNode.offsetWidth || 0;
+      }
+
+      var helperTextId = helperText && id ? "".concat(id, "-helper-text") : undefined;
+      var InputComponent = variantComponent[variant];
+
+      var InputElement = _react.default.createElement(InputComponent, (0, _extends2.default)({
+        "aria-describedby": helperTextId,
+        autoComplete: autoComplete,
+        autoFocus: autoFocus,
+        defaultValue: defaultValue,
+        fullWidth: fullWidth,
+        multiline: multiline,
+        name: name,
+        rows: rows,
+        rowsMax: rowsMax,
+        type: type,
+        value: value,
+        id: id,
+        inputRef: inputRef,
+        onBlur: onBlur,
+        onChange: onChange,
+        onFocus: onFocus,
+        placeholder: placeholder,
+        inputProps: inputProps
+      }, InputMore, InputProps));
+
+      return _react.default.createElement(_FormControl.default, (0, _extends2.default)({
+        className: className,
+        error: error,
+        fullWidth: fullWidth,
+        required: required,
+        variant: variant
+      }, other), label && _react.default.createElement(_InputLabel.default, (0, _extends2.default)({
+        htmlFor: id,
+        ref: this.labelRef
+      }, InputLabelProps), label), select ? _react.default.createElement(_Select.default, (0, _extends2.default)({
+        "aria-describedby": helperTextId,
+        value: value,
+        input: InputElement
+      }, SelectProps), children) : InputElement, helperText && _react.default.createElement(_FormHelperText.default, (0, _extends2.default)({
+        id: helperTextId
+      }, FormHelperTextProps), helperText));
+    }
+  }]);
+  return TextField;
+}(_react.default.Component);
+
+process.env.NODE_ENV !== "production" ? TextField.propTypes = {
+  /**
+   * This property helps users to fill forms faster, especially on mobile devices.
+   * The name can be confusing, as it's more like an autofill.
+   * You can learn more about it here:
+   * https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill
+   */
+  autoComplete: _propTypes.default.string,
+
+  /**
+   * If `true`, the input will be focused during the first mount.
+   */
+  autoFocus: _propTypes.default.bool,
+
+  /**
+   * @ignore
+   */
+  children: _propTypes.default.node,
+
+  /**
+   * @ignore
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * The default value of the `Input` element.
+   */
+  defaultValue: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * If `true`, the input will be disabled.
+   */
+  disabled: _propTypes.default.bool,
+
+  /**
+   * If `true`, the label will be displayed in an error state.
+   */
+  error: _propTypes.default.bool,
+
+  /**
+   * Properties applied to the [`FormHelperText`](/api/form-helper-text/) element.
+   */
+  FormHelperTextProps: _propTypes.default.object,
+
+  /**
+   * If `true`, the input will take up the full width of its container.
+   */
+  fullWidth: _propTypes.default.bool,
+
+  /**
+   * The helper text content.
+   */
+  helperText: _propTypes.default.node,
+
+  /**
+   * The id of the `input` element.
+   * Use this property to make `label` and `helperText` accessible for screen readers.
+   */
+  id: _propTypes.default.string,
+
+  /**
+   * Properties applied to the [`InputLabel`](/api/input-label/) element.
+   */
+  InputLabelProps: _propTypes.default.object,
+
+  /**
+   * Properties applied to the `Input` element.
+   */
+  InputProps: _propTypes.default.object,
+
+  /**
+   * Attributes applied to the native `input` element.
+   */
+  inputProps: _propTypes.default.object,
+
+  /**
+   * Use this property to pass a ref callback to the native input component.
+   */
+  inputRef: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.object]),
+
+  /**
+   * The label content.
+   */
+  label: _propTypes.default.node,
+
+  /**
+   * If `dense` or `normal`, will adjust vertical spacing of this and contained components.
+   */
+  margin: _propTypes.default.oneOf(['none', 'dense', 'normal']),
+
+  /**
+   * If `true`, a textarea element will be rendered instead of an input.
+   */
+  multiline: _propTypes.default.bool,
+
+  /**
+   * Name attribute of the `input` element.
+   */
+  name: _propTypes.default.string,
+
+  /**
+   * @ignore
+   */
+  onBlur: _propTypes.default.func,
+
+  /**
+   * Callback fired when the value is changed.
+   *
+   * @param {object} event The event source of the callback.
+   * You can pull out the new value by accessing `event.target.value`.
+   */
+  onChange: _propTypes.default.func,
+
+  /**
+   * @ignore
+   */
+  onFocus: _propTypes.default.func,
+
+  /**
+   * The short hint displayed in the input before the user enters a value.
+   */
+  placeholder: _propTypes.default.string,
+
+  /**
+   * If `true`, the label is displayed as required and the input will be required.
+   */
+  required: _propTypes.default.bool,
+
+  /**
+   * Number of rows to display when multiline option is set to true.
+   */
+  rows: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * Maximum number of rows to display when multiline option is set to true.
+   */
+  rowsMax: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * Render a `Select` element while passing the `Input` element to `Select` as `input` parameter.
+   * If this option is set you must pass the options of the select as children.
+   */
+  select: _propTypes.default.bool,
+
+  /**
+   * Properties applied to the [`Select`](/api/select/) element.
+   */
+  SelectProps: _propTypes.default.object,
+
+  /**
+   * Type attribute of the `Input` element. It should be a valid HTML5 input type.
+   */
+  type: _propTypes.default.string,
+
+  /**
+   * The value of the `Input` element, required for a controlled component.
+   */
+  value: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool]))]),
+
+  /**
+   * The variant to use.
+   */
+  variant: _propTypes.default.oneOf(['standard', 'outlined', 'filled'])
+} : void 0;
+TextField.defaultProps = {
+  required: false,
+  select: false,
+  variant: 'standard'
+};
+var _default = TextField;
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1221 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(25));
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _classnames = _interopRequireDefault(__webpack_require__(8));
+
+var _utils = __webpack_require__(28);
+
+var _InputBase = _interopRequireDefault(__webpack_require__(1153));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(26));
+
+// @inheritedComponent InputBase
+var styles = function styles(theme) {
+  var light = theme.palette.type === 'light';
+  var bottomLineColor = light ? 'rgba(0, 0, 0, 0.42)' : 'rgba(255, 255, 255, 0.7)';
+  return {
+    /* Styles applied to the root element. */
+    root: {
+      position: 'relative'
+    },
+
+    /* Styles applied to the root element if the component is a descendant of `FormControl`. */
+    formControl: {
+      'label + &': {
+        marginTop: 16
+      }
+    },
+
+    /* Styles applied to the root element if the component is focused. */
+    focused: {},
+
+    /* Styles applied to the root element if `disabled={true}`. */
+    disabled: {},
+
+    /* Styles applied to the root element if `disableUnderline={false}`. */
+    underline: {
+      '&:after': {
+        borderBottom: "2px solid ".concat(theme.palette.primary[light ? 'dark' : 'light']),
+        left: 0,
+        bottom: 0,
+        // Doing the other way around crash on IE 11 "''" https://github.com/cssinjs/jss/issues/242
+        content: '""',
+        position: 'absolute',
+        right: 0,
+        transform: 'scaleX(0)',
+        transition: theme.transitions.create('transform', {
+          duration: theme.transitions.duration.shorter,
+          easing: theme.transitions.easing.easeOut
+        }),
+        pointerEvents: 'none' // Transparent to the hover style.
+
+      },
+      '&$focused:after': {
+        transform: 'scaleX(1)'
+      },
+      '&$error:after': {
+        borderBottomColor: theme.palette.error.main,
+        transform: 'scaleX(1)' // error is always underlined in red
+
+      },
+      '&:before': {
+        borderBottom: "1px solid ".concat(bottomLineColor),
+        left: 0,
+        bottom: 0,
+        // Doing the other way around crash on IE 11 "''" https://github.com/cssinjs/jss/issues/242
+        content: '"\\00a0"',
+        position: 'absolute',
+        right: 0,
+        transition: theme.transitions.create('border-bottom-color', {
+          duration: theme.transitions.duration.shorter
+        }),
+        pointerEvents: 'none' // Transparent to the hover style.
+
+      },
+      '&:hover:not($disabled):not($focused):not($error):before': {
+        borderBottom: "2px solid ".concat(theme.palette.text.primary),
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          borderBottom: "1px solid ".concat(bottomLineColor)
+        }
+      },
+      '&$disabled:before': {
+        borderBottomStyle: 'dotted'
+      }
+    },
+
+    /* Styles applied to the root element if `error={true}`. */
+    error: {},
+
+    /* Styles applied to the root element if `multiline={true}`. */
+    multiline: {},
+
+    /* Styles applied to the root element if `fullWidth={true}`. */
+    fullWidth: {},
+
+    /* Styles applied to the `input` element. */
+    input: {},
+
+    /* Styles applied to the `input` element if `margin="dense"`. */
+    inputMarginDense: {},
+
+    /* Styles applied to the `input` element if `multiline={true}`. */
+    inputMultiline: {},
+
+    /* Styles applied to the `input` element if `type` is not "text"`. */
+    inputType: {},
+
+    /* Styles applied to the `input` element if `type="search"`. */
+    inputTypeSearch: {}
+  };
+};
+
+exports.styles = styles;
+
+function Input(props) {
+  var disableUnderline = props.disableUnderline,
+      classes = props.classes,
+      other = (0, _objectWithoutProperties2.default)(props, ["disableUnderline", "classes"]);
+  return _react.default.createElement(_InputBase.default, (0, _extends2.default)({
+    classes: (0, _extends2.default)({}, classes, {
+      root: (0, _classnames.default)(classes.root, (0, _defineProperty2.default)({}, classes.underline, !disableUnderline)),
+      underline: null
+    })
+  }, other));
+}
+
+process.env.NODE_ENV !== "production" ? Input.propTypes = {
+  /**
+   * This property helps users to fill forms faster, especially on mobile devices.
+   * The name can be confusing, as it's more like an autofill.
+   * You can learn more about it here:
+   * https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill
+   */
+  autoComplete: _propTypes.default.string,
+
+  /**
+   * If `true`, the input will be focused during the first mount.
+   */
+  autoFocus: _propTypes.default.bool,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * The CSS class name of the wrapper element.
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * The default input value, useful when not controlling the component.
+   */
+  defaultValue: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object]))]),
+
+  /**
+   * If `true`, the input will be disabled.
+   */
+  disabled: _propTypes.default.bool,
+
+  /**
+   * If `true`, the input will not have an underline.
+   */
+  disableUnderline: _propTypes.default.bool,
+
+  /**
+   * End `InputAdornment` for this component.
+   */
+  endAdornment: _propTypes.default.node,
+
+  /**
+   * If `true`, the input will indicate an error. This is normally obtained via context from
+   * FormControl.
+   */
+  error: _propTypes.default.bool,
+
+  /**
+   * If `true`, the input will take up the full width of its container.
+   */
+  fullWidth: _propTypes.default.bool,
+
+  /**
+   * The id of the `input` element.
+   */
+  id: _propTypes.default.string,
+
+  /**
+   * The component used for the native input.
+   * Either a string to use a DOM element or a component.
+   */
+  inputComponent: _utils.componentPropType,
+
+  /**
+   * Attributes applied to the `input` element.
+   */
+  inputProps: _propTypes.default.object,
+
+  /**
+   * Use that property to pass a ref callback to the native input component.
+   */
+  inputRef: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.object]),
+
+  /**
+   * If `dense`, will adjust vertical spacing. This is normally obtained via context from
+   * FormControl.
+   */
+  margin: _propTypes.default.oneOf(['dense', 'none']),
+
+  /**
+   * If `true`, a textarea element will be rendered.
+   */
+  multiline: _propTypes.default.bool,
+
+  /**
+   * Name attribute of the `input` element.
+   */
+  name: _propTypes.default.string,
+
+  /**
+   * Callback fired when the value is changed.
+   *
+   * @param {object} event The event source of the callback.
+   * You can pull out the new value by accessing `event.target.value`.
+   */
+  onChange: _propTypes.default.func,
+
+  /**
+   * The short hint displayed in the input before the user enters a value.
+   */
+  placeholder: _propTypes.default.string,
+
+  /**
+   * It prevents the user from changing the value of the field
+   * (not from interacting with the field).
+   */
+  readOnly: _propTypes.default.bool,
+
+  /**
+   * If `true`, the input will be required.
+   */
+  required: _propTypes.default.bool,
+
+  /**
+   * Number of rows to display when multiline option is set to true.
+   */
+  rows: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * Maximum number of rows to display when multiline option is set to true.
+   */
+  rowsMax: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * Start `InputAdornment` for this component.
+   */
+  startAdornment: _propTypes.default.node,
+
+  /**
+   * Type of the input element. It should be a valid HTML5 input type.
+   */
+  type: _propTypes.default.string,
+
+  /**
+   * The input value, required for a controlled component.
+   */
+  value: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object]))])
+} : void 0;
+_InputBase.default.defaultProps = {
+  fullWidth: false,
+  inputComponent: 'input',
+  multiline: false,
+  type: 'text'
+};
+Input.muiName = 'Input';
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiInput'
+})(Input);
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1222 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(25));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _classCallCheck2 = _interopRequireDefault(__webpack_require__(30));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(__webpack_require__(32));
+
+var _getPrototypeOf2 = _interopRequireDefault(__webpack_require__(33));
+
+var _createClass2 = _interopRequireDefault(__webpack_require__(31));
+
+var _inherits2 = _interopRequireDefault(__webpack_require__(34));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _warning = _interopRequireDefault(__webpack_require__(42));
+
+var _classnames = _interopRequireDefault(__webpack_require__(8));
+
+var _utils = __webpack_require__(28);
+
+var _formControlState = _interopRequireDefault(__webpack_require__(1152));
+
+var _FormControlContext = _interopRequireDefault(__webpack_require__(1159));
+
+var _withFormControlContext = _interopRequireDefault(__webpack_require__(1150));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(26));
+
+var _reactHelpers = __webpack_require__(260);
+
+var _Textarea = _interopRequireDefault(__webpack_require__(1223));
+
+var _utils2 = __webpack_require__(1160);
+
+/* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
+var styles = function styles(theme) {
+  var light = theme.palette.type === 'light';
+  var placeholder = {
+    color: 'currentColor',
+    opacity: light ? 0.42 : 0.5,
+    transition: theme.transitions.create('opacity', {
+      duration: theme.transitions.duration.shorter
+    })
+  };
+  var placeholderHidden = {
+    opacity: 0
+  };
+  var placeholderVisible = {
+    opacity: light ? 0.42 : 0.5
+  };
+  return {
+    /* Styles applied to the root element. */
+    root: {
+      // Mimics the default input display property used by browsers for an input.
+      fontFamily: theme.typography.fontFamily,
+      color: theme.palette.text.primary,
+      fontSize: theme.typography.pxToRem(16),
+      lineHeight: '1.1875em',
+      // Reset (19px), match the native input line-height
+      cursor: 'text',
+      display: 'inline-flex',
+      alignItems: 'center',
+      '&$disabled': {
+        color: theme.palette.text.disabled,
+        cursor: 'default'
+      }
+    },
+
+    /* Styles applied to the root element if the component is a descendant of `FormControl`. */
+    formControl: {},
+
+    /* Styles applied to the root element if the component is focused. */
+    focused: {},
+
+    /* Styles applied to the root element if `disabled={true}`. */
+    disabled: {},
+
+    /* Styles applied to the root element if `startAdornment` is provided. */
+    adornedStart: {},
+
+    /* Styles applied to the root element if `endAdornment` is provided. */
+    adornedEnd: {},
+
+    /* Styles applied to the root element if `error={true}`. */
+    error: {},
+
+    /* Styles applied to the `input` element if `margin="dense"`. */
+    marginDense: {},
+
+    /* Styles applied to the root element if `multiline={true}`. */
+    multiline: {
+      padding: "".concat(8 - 2, "px 0 ").concat(8 - 1, "px")
+    },
+
+    /* Styles applied to the root element if `fullWidth={true}`. */
+    fullWidth: {
+      width: '100%'
+    },
+
+    /* Styles applied to the `input` element. */
+    input: {
+      font: 'inherit',
+      color: 'currentColor',
+      padding: "".concat(8 - 2, "px 0 ").concat(8 - 1, "px"),
+      border: 0,
+      boxSizing: 'content-box',
+      background: 'none',
+      margin: 0,
+      // Reset for Safari
+      // Remove grey highlight
+      WebkitTapHighlightColor: 'transparent',
+      display: 'block',
+      // Make the flex item shrink with Firefox
+      minWidth: 0,
+      width: '100%',
+      // Fix IE 11 width issue
+      '&::-webkit-input-placeholder': placeholder,
+      '&::-moz-placeholder': placeholder,
+      // Firefox 19+
+      '&:-ms-input-placeholder': placeholder,
+      // IE 11
+      '&::-ms-input-placeholder': placeholder,
+      // Edge
+      '&:focus': {
+        outline: 0
+      },
+      // Reset Firefox invalid required input style
+      '&:invalid': {
+        boxShadow: 'none'
+      },
+      '&::-webkit-search-decoration': {
+        // Remove the padding when type=search.
+        '-webkit-appearance': 'none'
+      },
+      // Show and hide the placeholder logic
+      'label[data-shrink=false] + $formControl &': {
+        '&::-webkit-input-placeholder': placeholderHidden,
+        '&::-moz-placeholder': placeholderHidden,
+        // Firefox 19+
+        '&:-ms-input-placeholder': placeholderHidden,
+        // IE 11
+        '&::-ms-input-placeholder': placeholderHidden,
+        // Edge
+        '&:focus::-webkit-input-placeholder': placeholderVisible,
+        '&:focus::-moz-placeholder': placeholderVisible,
+        // Firefox 19+
+        '&:focus:-ms-input-placeholder': placeholderVisible,
+        // IE 11
+        '&:focus::-ms-input-placeholder': placeholderVisible // Edge
+
+      },
+      '&$disabled': {
+        opacity: 1 // Reset iOS opacity
+
+      }
+    },
+
+    /* Styles applied to the `input` element if `margin="dense"`. */
+    inputMarginDense: {
+      paddingTop: 4 - 1
+    },
+
+    /* Styles applied to the `input` element if `multiline={true}`. */
+    inputMultiline: {
+      resize: 'none',
+      padding: 0
+    },
+
+    /* Styles applied to the `input` element if `type` is not "text"`. */
+    inputType: {
+      // type="date" or type="time", etc. have specific styles we need to reset.
+      height: '1.1875em' // Reset (19px), match the native input line-height
+
+    },
+
+    /* Styles applied to the `input` element if `type="search"`. */
+    inputTypeSearch: {
+      // Improve type search style.
+      '-moz-appearance': 'textfield',
+      '-webkit-appearance': 'textfield'
+    },
+
+    /* Styles applied to the `input` element if `startAdornment` is provided. */
+    inputAdornedStart: {},
+
+    /* Styles applied to the `input` element if `endAdornment` is provided. */
+    inputAdornedEnd: {}
+  };
+};
+/**
+ * `InputBase` contains as few styles as possible.
+ * It aims to be a simple building block for creating an input.
+ * It contains a load of style reset and some state logic.
+ */
+
+
+exports.styles = styles;
+
+var InputBase =
+/*#__PURE__*/
+function (_React$Component) {
+  (0, _inherits2.default)(InputBase, _React$Component);
+  (0, _createClass2.default)(InputBase, null, [{
+    key: "getDerivedStateFromProps",
+    value: function getDerivedStateFromProps(props, state) {
+      // The blur won't fire when the disabled state is set on a focused input.
+      // We need to book keep the focused state manually.
+      if (props.disabled && state.focused) {
+        return {
+          focused: false
+        };
+      }
+
+      return null;
+    }
+  }]);
+
+  function InputBase(props) {
+    var _this;
+
+    (0, _classCallCheck2.default)(this, InputBase);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InputBase).call(this, props));
+    _this.state = {
+      focused: false
+    };
+
+    _this.handleFocus = function (event) {
+      var muiFormControl = _this.props.muiFormControl; // Fix a bug with IE 11 where the focus/blur events are triggered
+      // while the input is disabled.
+
+      if ((0, _formControlState.default)({
+        props: _this.props,
+        muiFormControl: muiFormControl,
+        states: ['disabled']
+      }).disabled) {
+        event.stopPropagation();
+        return;
+      }
+
+      _this.setState({
+        focused: true
+      });
+
+      if (_this.props.onFocus) {
+        _this.props.onFocus(event);
+      }
+
+      if (muiFormControl && muiFormControl.onFocus) {
+        muiFormControl.onFocus(event);
+      }
+    };
+
+    _this.handleBlur = function (event) {
+      _this.setState({
+        focused: false
+      });
+
+      if (_this.props.onBlur) {
+        _this.props.onBlur(event);
+      }
+
+      var muiFormControl = _this.props.muiFormControl;
+
+      if (muiFormControl && muiFormControl.onBlur) {
+        muiFormControl.onBlur(event);
+      }
+    };
+
+    _this.handleChange = function () {
+      if (!_this.isControlled) {
+        _this.checkDirty(_this.inputRef);
+      } // Perform in the willUpdate
+
+
+      if (_this.props.onChange) {
+        var _this$props;
+
+        (_this$props = _this.props).onChange.apply(_this$props, arguments);
+      }
+    };
+
+    _this.handleRefInput = function (ref) {
+      _this.inputRef = ref;
+      process.env.NODE_ENV !== "production" ? (0, _warning.default)(!ref || ref instanceof HTMLInputElement || ref.focus, ['Material-UI: you have provided a `inputComponent` to the input component', 'that does not correctly handle the `inputRef` property.', 'Make sure the `inputRef` property is called with a HTMLInputElement.'].join('\n')) : void 0;
+      var refProp;
+
+      if (_this.props.inputRef) {
+        refProp = _this.props.inputRef;
+      } else if (_this.props.inputProps && _this.props.inputProps.ref) {
+        refProp = _this.props.inputProps.ref;
+      }
+
+      (0, _reactHelpers.setRef)(refProp, ref);
+    };
+
+    _this.handleClick = function (event) {
+      if (_this.inputRef && event.currentTarget === event.target) {
+        _this.inputRef.focus();
+      }
+
+      if (_this.props.onClick) {
+        _this.props.onClick(event);
+      }
+    };
+
+    _this.isControlled = props.value != null;
+
+    if (_this.isControlled) {
+      _this.checkDirty(props);
+    }
+
+    return _this;
+  }
+
+  (0, _createClass2.default)(InputBase, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      if (!this.isControlled) {
+        this.checkDirty(this.inputRef);
+      }
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate(prevProps) {
+      // Book keep the focused state.
+      if (!prevProps.disabled && this.props.disabled) {
+        var muiFormControl = this.props.muiFormControl;
+
+        if (muiFormControl && muiFormControl.onBlur) {
+          muiFormControl.onBlur();
+        }
+      }
+
+      if (this.isControlled) {
+        this.checkDirty(this.props);
+      } // else performed in the onChange
+
+    }
+  }, {
+    key: "checkDirty",
+    value: function checkDirty(obj) {
+      var muiFormControl = this.props.muiFormControl;
+
+      if ((0, _utils2.isFilled)(obj)) {
+        if (muiFormControl && muiFormControl.onFilled) {
+          muiFormControl.onFilled();
+        }
+
+        if (this.props.onFilled) {
+          this.props.onFilled();
+        }
+
+        return;
+      }
+
+      if (muiFormControl && muiFormControl.onEmpty) {
+        muiFormControl.onEmpty();
+      }
+
+      if (this.props.onEmpty) {
+        this.props.onEmpty();
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _classNames, _classNames2;
+
+      var _this$props2 = this.props,
+          autoComplete = _this$props2.autoComplete,
+          autoFocus = _this$props2.autoFocus,
+          classes = _this$props2.classes,
+          classNameProp = _this$props2.className,
+          defaultValue = _this$props2.defaultValue,
+          disabled = _this$props2.disabled,
+          endAdornment = _this$props2.endAdornment,
+          error = _this$props2.error,
+          fullWidth = _this$props2.fullWidth,
+          id = _this$props2.id,
+          inputComponent = _this$props2.inputComponent,
+          _this$props2$inputPro = _this$props2.inputProps;
+      _this$props2$inputPro = _this$props2$inputPro === void 0 ? {} : _this$props2$inputPro;
+      var inputPropsClassName = _this$props2$inputPro.className,
+          inputPropsProp = (0, _objectWithoutProperties2.default)(_this$props2$inputPro, ["className"]),
+          inputRef = _this$props2.inputRef,
+          margin = _this$props2.margin,
+          muiFormControl = _this$props2.muiFormControl,
+          multiline = _this$props2.multiline,
+          name = _this$props2.name,
+          onBlur = _this$props2.onBlur,
+          onChange = _this$props2.onChange,
+          onClick = _this$props2.onClick,
+          onEmpty = _this$props2.onEmpty,
+          onFilled = _this$props2.onFilled,
+          onFocus = _this$props2.onFocus,
+          onKeyDown = _this$props2.onKeyDown,
+          onKeyUp = _this$props2.onKeyUp,
+          placeholder = _this$props2.placeholder,
+          readOnly = _this$props2.readOnly,
+          renderPrefix = _this$props2.renderPrefix,
+          rows = _this$props2.rows,
+          rowsMax = _this$props2.rowsMax,
+          startAdornment = _this$props2.startAdornment,
+          type = _this$props2.type,
+          value = _this$props2.value,
+          other = (0, _objectWithoutProperties2.default)(_this$props2, ["autoComplete", "autoFocus", "classes", "className", "defaultValue", "disabled", "endAdornment", "error", "fullWidth", "id", "inputComponent", "inputProps", "inputRef", "margin", "muiFormControl", "multiline", "name", "onBlur", "onChange", "onClick", "onEmpty", "onFilled", "onFocus", "onKeyDown", "onKeyUp", "placeholder", "readOnly", "renderPrefix", "rows", "rowsMax", "startAdornment", "type", "value"]);
+      var ariaDescribedby = other['aria-describedby'];
+      delete other['aria-describedby'];
+      var fcs = (0, _formControlState.default)({
+        props: this.props,
+        muiFormControl: muiFormControl,
+        states: ['disabled', 'error', 'margin', 'required', 'filled']
+      });
+      var focused = muiFormControl ? muiFormControl.focused : this.state.focused;
+      var className = (0, _classnames.default)(classes.root, (_classNames = {}, (0, _defineProperty2.default)(_classNames, classes.disabled, fcs.disabled), (0, _defineProperty2.default)(_classNames, classes.error, fcs.error), (0, _defineProperty2.default)(_classNames, classes.fullWidth, fullWidth), (0, _defineProperty2.default)(_classNames, classes.focused, focused), (0, _defineProperty2.default)(_classNames, classes.formControl, muiFormControl), (0, _defineProperty2.default)(_classNames, classes.marginDense, fcs.margin === 'dense'), (0, _defineProperty2.default)(_classNames, classes.multiline, multiline), (0, _defineProperty2.default)(_classNames, classes.adornedStart, startAdornment), (0, _defineProperty2.default)(_classNames, classes.adornedEnd, endAdornment), _classNames), classNameProp);
+      var inputClassName = (0, _classnames.default)(classes.input, (_classNames2 = {}, (0, _defineProperty2.default)(_classNames2, classes.disabled, fcs.disabled), (0, _defineProperty2.default)(_classNames2, classes.inputType, type !== 'text'), (0, _defineProperty2.default)(_classNames2, classes.inputTypeSearch, type === 'search'), (0, _defineProperty2.default)(_classNames2, classes.inputMultiline, multiline), (0, _defineProperty2.default)(_classNames2, classes.inputMarginDense, fcs.margin === 'dense'), (0, _defineProperty2.default)(_classNames2, classes.inputAdornedStart, startAdornment), (0, _defineProperty2.default)(_classNames2, classes.inputAdornedEnd, endAdornment), _classNames2), inputPropsClassName);
+      var InputComponent = inputComponent;
+      var inputProps = (0, _extends2.default)({}, inputPropsProp, {
+        ref: this.handleRefInput
+      });
+
+      if (typeof InputComponent !== 'string') {
+        inputProps = (0, _extends2.default)({
+          // Rename ref to inputRef as we don't know the
+          // provided `inputComponent` structure.
+          inputRef: this.handleRefInput,
+          type: type
+        }, inputProps, {
+          ref: null
+        });
+      } else if (multiline) {
+        if (rows && !rowsMax) {
+          InputComponent = 'textarea';
+        } else {
+          inputProps = (0, _extends2.default)({
+            rowsMax: rowsMax,
+            textareaRef: this.handleRefInput
+          }, inputProps, {
+            ref: null
+          });
+          InputComponent = _Textarea.default;
+        }
+      } else {
+        inputProps = (0, _extends2.default)({
+          type: type
+        }, inputProps);
+      }
+
+      return _react.default.createElement("div", (0, _extends2.default)({
+        className: className,
+        onClick: this.handleClick
+      }, other), renderPrefix ? renderPrefix((0, _extends2.default)({}, fcs, {
+        startAdornment: startAdornment,
+        focused: focused
+      })) : null, startAdornment, _react.default.createElement(_FormControlContext.default.Provider, {
+        value: null
+      }, _react.default.createElement(InputComponent, (0, _extends2.default)({
+        "aria-invalid": fcs.error,
+        "aria-describedby": ariaDescribedby,
+        autoComplete: autoComplete,
+        autoFocus: autoFocus,
+        className: inputClassName,
+        defaultValue: defaultValue,
+        disabled: fcs.disabled,
+        id: id,
+        name: name,
+        onBlur: this.handleBlur,
+        onChange: this.handleChange,
+        onFocus: this.handleFocus,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+        placeholder: placeholder,
+        readOnly: readOnly,
+        required: fcs.required,
+        rows: rows,
+        value: value
+      }, inputProps))), endAdornment);
+    }
+  }]);
+  return InputBase;
+}(_react.default.Component);
+
+process.env.NODE_ENV !== "production" ? InputBase.propTypes = {
+  /**
+   * This property helps users to fill forms faster, especially on mobile devices.
+   * The name can be confusing, as it's more like an autofill.
+   * You can learn more about it here:
+   * https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill
+   */
+  autoComplete: _propTypes.default.string,
+
+  /**
+   * If `true`, the input will be focused during the first mount.
+   */
+  autoFocus: _propTypes.default.bool,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * The CSS class name of the wrapper element.
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * The default input value, useful when not controlling the component.
+   */
+  defaultValue: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object]))]),
+
+  /**
+   * If `true`, the input will be disabled.
+   */
+  disabled: _propTypes.default.bool,
+
+  /**
+   * End `InputAdornment` for this component.
+   */
+  endAdornment: _propTypes.default.node,
+
+  /**
+   * If `true`, the input will indicate an error. This is normally obtained via context from
+   * FormControl.
+   */
+  error: _propTypes.default.bool,
+
+  /**
+   * If `true`, the input will take up the full width of its container.
+   */
+  fullWidth: _propTypes.default.bool,
+
+  /**
+   * The id of the `input` element.
+   */
+  id: _propTypes.default.string,
+
+  /**
+   * The component used for the native input.
+   * Either a string to use a DOM element or a component.
+   */
+  inputComponent: _utils.componentPropType,
+
+  /**
+   * Attributes applied to the `input` element.
+   */
+  inputProps: _propTypes.default.object,
+
+  /**
+   * Use that property to pass a ref callback to the native input component.
+   */
+  inputRef: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.object]),
+
+  /**
+   * If `dense`, will adjust vertical spacing. This is normally obtained via context from
+   * FormControl.
+   */
+  margin: _propTypes.default.oneOf(['dense', 'none']),
+
+  /**
+   * @ignore
+   */
+  muiFormControl: _propTypes.default.object,
+
+  /**
+   * If `true`, a textarea element will be rendered.
+   */
+  multiline: _propTypes.default.bool,
+
+  /**
+   * Name attribute of the `input` element.
+   */
+  name: _propTypes.default.string,
+
+  /**
+   * @ignore
+   */
+  onBlur: _propTypes.default.func,
+
+  /**
+   * Callback fired when the value is changed.
+   *
+   * @param {object} event The event source of the callback.
+   * You can pull out the new value by accessing `event.target.value`.
+   */
+  onChange: _propTypes.default.func,
+
+  /**
+   * @ignore
+   */
+  onClick: _propTypes.default.func,
+
+  /**
+   * @ignore
+   */
+  onEmpty: _propTypes.default.func,
+
+  /**
+   * @ignore
+   */
+  onFilled: _propTypes.default.func,
+
+  /**
+   * @ignore
+   */
+  onFocus: _propTypes.default.func,
+
+  /**
+   * @ignore
+   */
+  onKeyDown: _propTypes.default.func,
+
+  /**
+   * @ignore
+   */
+  onKeyUp: _propTypes.default.func,
+
+  /**
+   * The short hint displayed in the input before the user enters a value.
+   */
+  placeholder: _propTypes.default.string,
+
+  /**
+   * It prevents the user from changing the value of the field
+   * (not from interacting with the field).
+   */
+  readOnly: _propTypes.default.bool,
+
+  /**
+   * @ignore
+   */
+  renderPrefix: _propTypes.default.func,
+
+  /**
+   * If `true`, the input will be required.
+   */
+  required: _propTypes.default.bool,
+
+  /**
+   * Number of rows to display when multiline option is set to true.
+   */
+  rows: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * Maximum number of rows to display when multiline option is set to true.
+   */
+  rowsMax: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * Start `InputAdornment` for this component.
+   */
+  startAdornment: _propTypes.default.node,
+
+  /**
+   * Type of the input element. It should be a valid HTML5 input type.
+   */
+  type: _propTypes.default.string,
+
+  /**
+   * The input value, required for a controlled component.
+   */
+  value: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object]))])
+} : void 0;
+InputBase.defaultProps = {
+  fullWidth: false,
+  inputComponent: 'input',
+  multiline: false,
+  type: 'text'
+};
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiInputBase'
+})((0, _withFormControlContext.default)(InputBase));
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1223 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _classCallCheck2 = _interopRequireDefault(__webpack_require__(30));
+
+var _createClass2 = _interopRequireDefault(__webpack_require__(31));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(__webpack_require__(32));
+
+var _getPrototypeOf2 = _interopRequireDefault(__webpack_require__(33));
+
+var _inherits2 = _interopRequireDefault(__webpack_require__(34));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _classnames = _interopRequireDefault(__webpack_require__(8));
+
+var _debounce = _interopRequireDefault(__webpack_require__(421));
+
+var _reactEventListener = _interopRequireDefault(__webpack_require__(420));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(26));
+
+var _reactHelpers = __webpack_require__(260);
+
+// < 1kb payload overhead when lodash/debounce is > 3kb.
+var ROWS_HEIGHT = 19;
+var styles = {
+  /* Styles applied to the root element. */
+  root: {
+    position: 'relative',
+    // because the shadow has position: 'absolute',
+    width: '100%'
+  },
+  textarea: {
+    width: '100%',
+    height: '100%',
+    resize: 'none',
+    font: 'inherit',
+    padding: 0,
+    cursor: 'inherit',
+    boxSizing: 'border-box',
+    lineHeight: 'inherit',
+    border: 'none',
+    outline: 'none',
+    background: 'transparent'
+  },
+  shadow: {
+    // Overflow also needed to here to remove the extra row
+    // added to textareas in Firefox.
+    overflow: 'hidden',
+    // Visibility needed to hide the extra text area on iPads
+    visibility: 'hidden',
+    position: 'absolute',
+    height: 'auto',
+    whiteSpace: 'pre-wrap'
+  }
+};
+/**
+ * @ignore - internal component.
+ */
+
+exports.styles = styles;
+
+var Textarea =
+/*#__PURE__*/
+function (_React$Component) {
+  (0, _inherits2.default)(Textarea, _React$Component);
+
+  function Textarea(props) {
+    var _this;
+
+    (0, _classCallCheck2.default)(this, Textarea);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Textarea).call(this));
+
+    _this.handleRefInput = function (ref) {
+      _this.inputRef = ref;
+      (0, _reactHelpers.setRef)(_this.props.textareaRef, ref);
+    };
+
+    _this.handleRefSinglelineShadow = function (ref) {
+      _this.singlelineShadowRef = ref;
+    };
+
+    _this.handleRefShadow = function (ref) {
+      _this.shadowRef = ref;
+    };
+
+    _this.handleChange = function (event) {
+      _this.value = event.target.value;
+
+      if (!_this.isControlled) {
+        // The component is not controlled, we need to update the shallow value.
+        _this.shadowRef.value = _this.value;
+
+        _this.syncHeightWithShadow();
+      }
+
+      if (_this.props.onChange) {
+        _this.props.onChange(event);
+      }
+    };
+
+    _this.isControlled = props.value != null; // <Input> expects the components it renders to respond to 'value'
+    // so that it can check whether they are filled.
+
+    _this.value = props.value || props.defaultValue || '';
+    _this.state = {
+      height: Number(props.rows) * ROWS_HEIGHT
+    };
+
+    if (typeof window !== 'undefined') {
+      _this.handleResize = (0, _debounce.default)(function () {
+        _this.syncHeightWithShadow();
+      }, 166); // Corresponds to 10 frames at 60 Hz.
+    }
+
+    return _this;
+  }
+
+  (0, _createClass2.default)(Textarea, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.syncHeightWithShadow();
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      this.syncHeightWithShadow();
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      this.handleResize.clear();
+    }
+  }, {
+    key: "syncHeightWithShadow",
+    value: function syncHeightWithShadow() {
+      var props = this.props; // Guarding for **broken** shallow rendering method that call componentDidMount
+      // but doesn't handle refs correctly.
+      // To remove once the shallow rendering has been fixed.
+
+      if (!this.shadowRef) {
+        return;
+      }
+
+      if (this.isControlled) {
+        // The component is controlled, we need to update the shallow value.
+        this.shadowRef.value = props.value == null ? '' : String(props.value);
+      }
+
+      var lineHeight = this.singlelineShadowRef.scrollHeight; // The Textarea might not be visible (p.ex: display: none).
+      // In this case, the layout values read from the DOM will be 0.
+
+      lineHeight = lineHeight === 0 ? ROWS_HEIGHT : lineHeight;
+      var newHeight = this.shadowRef.scrollHeight; // Guarding for jsdom, where scrollHeight isn't present.
+      // See https://github.com/tmpvar/jsdom/issues/1013
+
+      if (newHeight === undefined) {
+        return;
+      }
+
+      if (Number(props.rowsMax) >= Number(props.rows)) {
+        newHeight = Math.min(Number(props.rowsMax) * lineHeight, newHeight);
+      }
+
+      newHeight = Math.max(newHeight, lineHeight); // Need a large enough different to update the height.
+      // This prevents infinite rendering loop.
+
+      if (Math.abs(this.state.height - newHeight) > 1) {
+        this.setState({
+          height: newHeight
+        });
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this$props = this.props,
+          classes = _this$props.classes,
+          className = _this$props.className,
+          defaultValue = _this$props.defaultValue,
+          onChange = _this$props.onChange,
+          rows = _this$props.rows,
+          rowsMax = _this$props.rowsMax,
+          style = _this$props.style,
+          textareaRef = _this$props.textareaRef,
+          value = _this$props.value,
+          other = (0, _objectWithoutProperties2.default)(_this$props, ["classes", "className", "defaultValue", "onChange", "rows", "rowsMax", "style", "textareaRef", "value"]);
+      return _react.default.createElement("div", {
+        className: classes.root
+      }, _react.default.createElement(_reactEventListener.default, {
+        target: "window",
+        onResize: this.handleResize
+      }), _react.default.createElement("textarea", {
+        "aria-hidden": "true",
+        className: (0, _classnames.default)(classes.textarea, classes.shadow),
+        readOnly: true,
+        ref: this.handleRefSinglelineShadow,
+        rows: "1",
+        tabIndex: -1,
+        value: ""
+      }), _react.default.createElement("textarea", {
+        "aria-hidden": "true",
+        className: (0, _classnames.default)(classes.textarea, classes.shadow),
+        defaultValue: defaultValue,
+        readOnly: true,
+        ref: this.handleRefShadow,
+        rows: rows,
+        tabIndex: -1,
+        value: value
+      }), _react.default.createElement("textarea", (0, _extends2.default)({
+        rows: rows,
+        className: (0, _classnames.default)(classes.textarea, className),
+        defaultValue: defaultValue,
+        value: value,
+        onChange: this.handleChange,
+        ref: this.handleRefInput,
+        style: (0, _extends2.default)({
+          height: this.state.height
+        }, style)
+      }, other)));
+    }
+  }]);
+  return Textarea;
+}(_react.default.Component);
+
+process.env.NODE_ENV !== "production" ? Textarea.propTypes = {
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * @ignore
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * @ignore
+   */
+  defaultValue: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * @ignore
+   */
+  disabled: _propTypes.default.bool,
+
+  /**
+   * @ignore
+   */
+  onChange: _propTypes.default.func,
+
+  /**
+   * Number of rows to display when multiline option is set to true.
+   */
+  rows: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * Maximum number of rows to display when multiline option is set to true.
+   */
+  rowsMax: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * @ignore
+   */
+  style: _propTypes.default.object,
+
+  /**
+   * Use that property to pass a ref callback to the native textarea element.
+   */
+  textareaRef: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.object]),
+
+  /**
+   * @ignore
+   */
+  value: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number])
+} : void 0;
+Textarea.defaultProps = {
+  rows: 1
+};
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiPrivateTextarea'
+})(Textarea);
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1224 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(25));
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _classnames = _interopRequireDefault(__webpack_require__(8));
+
+var _utils = __webpack_require__(28);
+
+var _InputBase = _interopRequireDefault(__webpack_require__(1153));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(26));
+
+// @inheritedComponent InputBase
+var styles = function styles(theme) {
+  var light = theme.palette.type === 'light';
+  var bottomLineColor = light ? 'rgba(0, 0, 0, 0.42)' : 'rgba(255, 255, 255, 0.7)';
+  var backgroundColor = light ? 'rgba(0, 0, 0, 0.09)' : 'rgba(255, 255, 255, 0.09)';
+  return {
+    /* Styles applied to the root element. */
+    root: {
+      position: 'relative',
+      backgroundColor: backgroundColor,
+      borderTopLeftRadius: theme.shape.borderRadius,
+      borderTopRightRadius: theme.shape.borderRadius,
+      transition: theme.transitions.create('background-color', {
+        duration: theme.transitions.duration.shorter,
+        easing: theme.transitions.easing.easeOut
+      }),
+      '&:hover': {
+        backgroundColor: light ? 'rgba(0, 0, 0, 0.13)' : 'rgba(255, 255, 255, 0.13)',
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          backgroundColor: backgroundColor
+        }
+      },
+      '&$focused': {
+        backgroundColor: light ? 'rgba(0, 0, 0, 0.09)' : 'rgba(255, 255, 255, 0.09)'
+      },
+      '&$disabled': {
+        backgroundColor: light ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.12)'
+      }
+    },
+
+    /* Styles applied to the root element if `disableUnderline={false}`. */
+    underline: {
+      '&:after': {
+        borderBottom: "2px solid ".concat(theme.palette.primary[light ? 'dark' : 'light']),
+        left: 0,
+        bottom: 0,
+        // Doing the other way around crash on IE 11 "''" https://github.com/cssinjs/jss/issues/242
+        content: '""',
+        position: 'absolute',
+        right: 0,
+        transform: 'scaleX(0)',
+        transition: theme.transitions.create('transform', {
+          duration: theme.transitions.duration.shorter,
+          easing: theme.transitions.easing.easeOut
+        }),
+        pointerEvents: 'none' // Transparent to the hover style.
+
+      },
+      '&$focused:after': {
+        transform: 'scaleX(1)'
+      },
+      '&$error:after': {
+        borderBottomColor: theme.palette.error.main,
+        transform: 'scaleX(1)' // error is always underlined in red
+
+      },
+      '&:before': {
+        borderBottom: "1px solid ".concat(bottomLineColor),
+        left: 0,
+        bottom: 0,
+        // Doing the other way around crash on IE 11 "''" https://github.com/cssinjs/jss/issues/242
+        content: '"\\00a0"',
+        position: 'absolute',
+        right: 0,
+        transition: theme.transitions.create('border-bottom-color', {
+          duration: theme.transitions.duration.shorter
+        }),
+        pointerEvents: 'none' // Transparent to the hover style.
+
+      },
+      '&:hover:not($disabled):not($focused):not($error):before': {
+        borderBottom: "1px solid ".concat(theme.palette.text.primary)
+      },
+      '&$disabled:before': {
+        borderBottom: "1px dotted ".concat(bottomLineColor)
+      }
+    },
+
+    /* Styles applied to the root element if the component is focused. */
+    focused: {},
+
+    /* Styles applied to the root element if `disabled={true}`. */
+    disabled: {},
+
+    /* Styles applied to the root element if `startAdornment` is provided. */
+    adornedStart: {
+      paddingLeft: 12
+    },
+
+    /* Styles applied to the root element if `endAdornment` is provided. */
+    adornedEnd: {
+      paddingRight: 12
+    },
+
+    /* Styles applied to the root element if `error={true}`. */
+    error: {},
+
+    /* Styles applied to the root element if `multiline={true}`. */
+    multiline: {
+      padding: '27px 12px 10px',
+      boxSizing: 'border-box' // Prevent padding issue with fullWidth.
+
+    },
+
+    /* Styles applied to the `input` element. */
+    input: {
+      padding: '27px 12px 10px'
+    },
+
+    /* Styles applied to the `input` element if `margin="dense"`. */
+    inputMarginDense: {
+      paddingTop: 24,
+      paddingBottom: 6
+    },
+
+    /* Styles applied to the `input` element if `multiline={true}`. */
+    inputMultiline: {
+      padding: 0
+    },
+
+    /* Styles applied to the `input` element if `startAdornment` is provided. */
+    inputAdornedStart: {
+      paddingLeft: 0
+    },
+
+    /* Styles applied to the `input` element if `endAdornment` is provided. */
+    inputAdornedEnd: {
+      paddingRight: 0
+    }
+  };
+};
+
+exports.styles = styles;
+
+function FilledInput(props) {
+  var disableUnderline = props.disableUnderline,
+      classes = props.classes,
+      other = (0, _objectWithoutProperties2.default)(props, ["disableUnderline", "classes"]);
+  return _react.default.createElement(_InputBase.default, (0, _extends2.default)({
+    classes: (0, _extends2.default)({}, classes, {
+      root: (0, _classnames.default)(classes.root, (0, _defineProperty2.default)({}, classes.underline, !disableUnderline)),
+      underline: null
+    })
+  }, other));
+}
+
+process.env.NODE_ENV !== "production" ? FilledInput.propTypes = {
+  /**
+   * This property helps users to fill forms faster, especially on mobile devices.
+   * The name can be confusing, as it's more like an autofill.
+   * You can learn more about it here:
+   * https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill
+   */
+  autoComplete: _propTypes.default.string,
+
+  /**
+   * If `true`, the input will be focused during the first mount.
+   */
+  autoFocus: _propTypes.default.bool,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * The CSS class name of the wrapper element.
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * The default input value, useful when not controlling the component.
+   */
+  defaultValue: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object]))]),
+
+  /**
+   * If `true`, the input will be disabled.
+   */
+  disabled: _propTypes.default.bool,
+
+  /**
+   * If `true`, the input will not have an underline.
+   */
+  disableUnderline: _propTypes.default.bool,
+
+  /**
+   * End `InputAdornment` for this component.
+   */
+  endAdornment: _propTypes.default.node,
+
+  /**
+   * If `true`, the input will indicate an error. This is normally obtained via context from
+   * FormControl.
+   */
+  error: _propTypes.default.bool,
+
+  /**
+   * If `true`, the input will take up the full width of its container.
+   */
+  fullWidth: _propTypes.default.bool,
+
+  /**
+   * The id of the `input` element.
+   */
+  id: _propTypes.default.string,
+
+  /**
+   * The component used for the native input.
+   * Either a string to use a DOM element or a component.
+   */
+  inputComponent: _utils.componentPropType,
+
+  /**
+   * Attributes applied to the `input` element.
+   */
+  inputProps: _propTypes.default.object,
+
+  /**
+   * Use that property to pass a ref callback to the native input component.
+   */
+  inputRef: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.object]),
+
+  /**
+   * If `dense`, will adjust vertical spacing. This is normally obtained via context from
+   * FormControl.
+   */
+  margin: _propTypes.default.oneOf(['dense', 'none']),
+
+  /**
+   * If `true`, a textarea element will be rendered.
+   */
+  multiline: _propTypes.default.bool,
+
+  /**
+   * Name attribute of the `input` element.
+   */
+  name: _propTypes.default.string,
+
+  /**
+   * Callback fired when the value is changed.
+   *
+   * @param {object} event The event source of the callback.
+   * You can pull out the new value by accessing `event.target.value`.
+   */
+  onChange: _propTypes.default.func,
+
+  /**
+   * The short hint displayed in the input before the user enters a value.
+   */
+  placeholder: _propTypes.default.string,
+
+  /**
+   * It prevents the user from changing the value of the field
+   * (not from interacting with the field).
+   */
+  readOnly: _propTypes.default.bool,
+
+  /**
+   * If `true`, the input will be required.
+   */
+  required: _propTypes.default.bool,
+
+  /**
+   * Number of rows to display when multiline option is set to true.
+   */
+  rows: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * Maximum number of rows to display when multiline option is set to true.
+   */
+  rowsMax: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * Start `InputAdornment` for this component.
+   */
+  startAdornment: _propTypes.default.node,
+
+  /**
+   * Type of the input element. It should be a valid HTML5 input type.
+   */
+  type: _propTypes.default.string,
+
+  /**
+   * The input value, required for a controlled component.
+   */
+  value: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object]))])
+} : void 0;
+_InputBase.default.defaultProps = {
+  fullWidth: false,
+  inputComponent: 'input',
+  multiline: false,
+  type: 'text'
+};
+FilledInput.muiName = 'Input';
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiFilledInput'
+})(FilledInput);
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1225 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _classnames = _interopRequireDefault(__webpack_require__(8));
+
+var _utils = __webpack_require__(28);
+
+var _InputBase = _interopRequireDefault(__webpack_require__(1153));
+
+var _NotchedOutline = _interopRequireDefault(__webpack_require__(1226));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(26));
+
+// @inheritedComponent InputBase
+var styles = function styles(theme) {
+  var borderColor = theme.palette.type === 'light' ? 'rgba(0, 0, 0, 0.23)' : 'rgba(255, 255, 255, 0.23)';
+  return {
+    /* Styles applied to the root element. */
+    root: {
+      position: 'relative',
+      '& $notchedOutline': {
+        borderColor: borderColor
+      },
+      '&:hover:not($disabled):not($focused):not($error) $notchedOutline': {
+        borderColor: theme.palette.text.primary,
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          borderColor: borderColor
+        }
+      },
+      '&$focused $notchedOutline': {
+        borderColor: theme.palette.primary.main,
+        borderWidth: 2
+      },
+      '&$error $notchedOutline': {
+        borderColor: theme.palette.error.main
+      },
+      '&$disabled $notchedOutline': {
+        borderColor: theme.palette.action.disabled
+      }
+    },
+
+    /* Styles applied to the root element if the component is focused. */
+    focused: {},
+
+    /* Styles applied to the root element if `disabled={true}`. */
+    disabled: {},
+
+    /* Styles applied to the root element if `startAdornment` is provided. */
+    adornedStart: {
+      paddingLeft: 14
+    },
+
+    /* Styles applied to the root element if `endAdornment` is provided. */
+    adornedEnd: {
+      paddingRight: 14
+    },
+
+    /* Styles applied to the root element if `error={true}`. */
+    error: {},
+
+    /* Styles applied to the root element if `multiline={true}`. */
+    multiline: {
+      padding: '18.5px 14px',
+      boxSizing: 'border-box' // Prevent padding issue with fullWidth.
+
+    },
+
+    /* Styles applied to the `NotchedOutline` element. */
+    notchedOutline: {},
+
+    /* Styles applied to the `input` element. */
+    input: {
+      padding: '18.5px 14px'
+    },
+
+    /* Styles applied to the `input` element if `margin="dense"`. */
+    inputMarginDense: {
+      paddingTop: 15,
+      paddingBottom: 15
+    },
+
+    /* Styles applied to the `input` element if `multiline={true}`. */
+    inputMultiline: {
+      padding: 0
+    },
+
+    /* Styles applied to the `input` element if `startAdornment` is provided. */
+    inputAdornedStart: {
+      paddingLeft: 0
+    },
+
+    /* Styles applied to the `input` element if `endAdornment` is provided. */
+    inputAdornedEnd: {
+      paddingRight: 0
+    }
+  };
+};
+
+exports.styles = styles;
+
+function OutlinedInput(props) {
+  var classes = props.classes,
+      labelWidth = props.labelWidth,
+      notched = props.notched,
+      other = (0, _objectWithoutProperties2.default)(props, ["classes", "labelWidth", "notched"]);
+  return _react.default.createElement(_InputBase.default, (0, _extends2.default)({
+    renderPrefix: function renderPrefix(state) {
+      return _react.default.createElement(_NotchedOutline.default, {
+        className: classes.notchedOutline,
+        labelWidth: labelWidth,
+        notched: typeof notched !== 'undefined' ? notched : Boolean(state.startAdornment || state.filled || state.focused)
+      });
+    },
+    classes: (0, _extends2.default)({}, classes, {
+      root: (0, _classnames.default)(classes.root, classes.underline),
+      notchedOutline: null
+    })
+  }, other));
+}
+
+process.env.NODE_ENV !== "production" ? OutlinedInput.propTypes = {
+  /**
+   * This property helps users to fill forms faster, especially on mobile devices.
+   * The name can be confusing, as it's more like an autofill.
+   * You can learn more about it here:
+   * https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill
+   */
+  autoComplete: _propTypes.default.string,
+
+  /**
+   * If `true`, the input will be focused during the first mount.
+   */
+  autoFocus: _propTypes.default.bool,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * The CSS class name of the wrapper element.
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * The default input value, useful when not controlling the component.
+   */
+  defaultValue: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object]))]),
+
+  /**
+   * If `true`, the input will be disabled.
+   */
+  disabled: _propTypes.default.bool,
+
+  /**
+   * End `InputAdornment` for this component.
+   */
+  endAdornment: _propTypes.default.node,
+
+  /**
+   * If `true`, the input will indicate an error. This is normally obtained via context from
+   * FormControl.
+   */
+  error: _propTypes.default.bool,
+
+  /**
+   * If `true`, the input will take up the full width of its container.
+   */
+  fullWidth: _propTypes.default.bool,
+
+  /**
+   * The id of the `input` element.
+   */
+  id: _propTypes.default.string,
+
+  /**
+   * The component used for the native input.
+   * Either a string to use a DOM element or a component.
+   */
+  inputComponent: _utils.componentPropType,
+
+  /**
+   * Attributes applied to the `input` element.
+   */
+  inputProps: _propTypes.default.object,
+
+  /**
+   * Use that property to pass a ref callback to the native input component.
+   */
+  inputRef: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.object]),
+
+  /**
+   * The width of the legend.
+   */
+  labelWidth: _propTypes.default.number.isRequired,
+
+  /**
+   * If `dense`, will adjust vertical spacing. This is normally obtained via context from
+   * FormControl.
+   */
+  margin: _propTypes.default.oneOf(['dense', 'none']),
+
+  /**
+   * If `true`, a textarea element will be rendered.
+   */
+  multiline: _propTypes.default.bool,
+
+  /**
+   * Name attribute of the `input` element.
+   */
+  name: _propTypes.default.string,
+
+  /**
+   * If `true`, the outline is notched to accommodate the label.
+   */
+  notched: _propTypes.default.bool,
+
+  /**
+   * Callback fired when the value is changed.
+   *
+   * @param {object} event The event source of the callback.
+   * You can pull out the new value by accessing `event.target.value`.
+   */
+  onChange: _propTypes.default.func,
+
+  /**
+   * The short hint displayed in the input before the user enters a value.
+   */
+  placeholder: _propTypes.default.string,
+
+  /**
+   * It prevents the user from changing the value of the field
+   * (not from interacting with the field).
+   */
+  readOnly: _propTypes.default.bool,
+
+  /**
+   * If `true`, the input will be required.
+   */
+  required: _propTypes.default.bool,
+
+  /**
+   * Number of rows to display when multiline option is set to true.
+   */
+  rows: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * Maximum number of rows to display when multiline option is set to true.
+   */
+  rowsMax: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+
+  /**
+   * Start `InputAdornment` for this component.
+   */
+  startAdornment: _propTypes.default.node,
+
+  /**
+   * Type of the input element. It should be a valid HTML5 input type.
+   */
+  type: _propTypes.default.string,
+
+  /**
+   * The input value, required for a controlled component.
+   */
+  value: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object]))])
+} : void 0;
+_InputBase.default.defaultProps = {
+  fullWidth: false,
+  inputComponent: 'input',
+  multiline: false,
+  type: 'text'
+};
+OutlinedInput.muiName = 'Input';
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiOutlinedInput'
+})(OutlinedInput);
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1226 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(25));
+
+var _extends3 = _interopRequireDefault(__webpack_require__(10));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _classnames = _interopRequireDefault(__webpack_require__(8));
+
+var _styles = __webpack_require__(1068);
+
+var _helpers = __webpack_require__(65);
+
+var styles = function styles(theme) {
+  var align = theme.direction === 'rtl' ? 'right' : 'left';
+  return {
+    /* Styles applied to the root element. */
+    root: {
+      position: 'absolute',
+      bottom: 0,
+      right: 0,
+      top: -5,
+      left: 0,
+      margin: 0,
+      padding: 0,
+      pointerEvents: 'none',
+      borderRadius: theme.shape.borderRadius,
+      borderStyle: 'solid',
+      borderWidth: 1,
+      // Match the Input Label
+      transition: theme.transitions.create(["padding-".concat(align), 'border-color', 'border-width'], {
+        duration: theme.transitions.duration.shorter,
+        easing: theme.transitions.easing.easeOut
+      })
+    },
+
+    /* Styles applied to the legend element. */
+    legend: {
+      textAlign: 'left',
+      padding: 0,
+      lineHeight: '11px',
+      transition: theme.transitions.create('width', {
+        duration: theme.transitions.duration.shorter,
+        easing: theme.transitions.easing.easeOut
+      })
+    }
+  };
+};
+/**
+ * @ignore - internal component.
+ */
+
+
+exports.styles = styles;
+
+function NotchedOutline(props) {
+  var children = props.children,
+      classes = props.classes,
+      className = props.className,
+      labelWidthProp = props.labelWidth,
+      notched = props.notched,
+      style = props.style,
+      theme = props.theme,
+      other = (0, _objectWithoutProperties2.default)(props, ["children", "classes", "className", "labelWidth", "notched", "style", "theme"]);
+  var align = theme.direction === 'rtl' ? 'right' : 'left';
+  var labelWidth = labelWidthProp > 0 ? labelWidthProp * 0.75 + 8 : 0;
+  return _react.default.createElement("fieldset", (0, _extends3.default)({
+    "aria-hidden": true,
+    style: (0, _extends3.default)((0, _defineProperty2.default)({}, "padding".concat((0, _helpers.capitalize)(align)), 8 + (notched ? 0 : labelWidth / 2)), style),
+    className: (0, _classnames.default)(classes.root, className)
+  }, other), _react.default.createElement("legend", {
+    className: classes.legend,
+    style: {
+      // IE 11: fieldset with legend does not render
+      // a border radius. This maintains consistency
+      // by always having a legend rendered
+      width: notched ? labelWidth : 0.01
+    }
+  }, _react.default.createElement("span", {
+    dangerouslySetInnerHTML: {
+      __html: '&#8203;'
+    }
+  })));
+}
+
+process.env.NODE_ENV !== "production" ? NotchedOutline.propTypes = {
+  /**
+   * The content of the component.
+   */
+  children: _propTypes.default.node,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object,
+
+  /**
+   * @ignore
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * The width of the legend.
+   */
+  labelWidth: _propTypes.default.number.isRequired,
+
+  /**
+   * If `true`, the outline is notched to accommodate the label.
+   */
+  notched: _propTypes.default.bool.isRequired,
+
+  /**
+   * @ignore
+   */
+  style: _propTypes.default.object,
+
+  /**
+   * @ignore
+   */
+  theme: _propTypes.default.object
+} : void 0;
+
+var _default = (0, _styles.withStyles)(styles, {
+  name: 'MuiPrivateNotchedOutline',
+  withTheme: true
+})(NotchedOutline);
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1227 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(25));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _classnames = _interopRequireDefault(__webpack_require__(8));
+
+var _formControlState = _interopRequireDefault(__webpack_require__(1152));
+
+var _withFormControlContext = _interopRequireDefault(__webpack_require__(1150));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(26));
+
+var _FormLabel = _interopRequireDefault(__webpack_require__(1171));
+
+// @inheritedComponent FormLabel
+var styles = function styles(theme) {
+  return {
+    /* Styles applied to the root element. */
+    root: {
+      transformOrigin: 'top left'
+    },
+
+    /* Styles applied to the root element if `focused={true}`. */
+    focused: {},
+
+    /* Styles applied to the root element if `disabled={true}`. */
+    disabled: {},
+
+    /* Styles applied to the root element if `error={true}`. */
+    error: {},
+
+    /* Styles applied to the root element if `required={true}`. */
+    required: {},
+
+    /* Styles applied to the root element if the component is a descendant of `FormControl`. */
+    formControl: {
+      position: 'absolute',
+      left: 0,
+      top: 0,
+      // slight alteration to spec spacing to match visual spec result
+      transform: 'translate(0, 24px) scale(1)'
+    },
+
+    /* Styles applied to the root element if `margin="dense"`. */
+    marginDense: {
+      // Compensation for the `Input.inputDense` style.
+      transform: 'translate(0, 21px) scale(1)'
+    },
+
+    /* Styles applied to the `input` element if `shrink={true}`. */
+    shrink: {
+      transform: 'translate(0, 1.5px) scale(0.75)',
+      transformOrigin: 'top left'
+    },
+
+    /* Styles applied to the `input` element if `disableAnimation={false}`. */
+    animated: {
+      transition: theme.transitions.create(['color', 'transform'], {
+        duration: theme.transitions.duration.shorter,
+        easing: theme.transitions.easing.easeOut
+      })
+    },
+
+    /* Styles applied to the root element if `variant="filled"`. */
+    filled: {
+      // Chrome's autofill feature gives the input field a yellow background.
+      // Since the input field is behind the label in the HTML tree,
+      // the input field is drawn last and hides the label with an opaque background color.
+      // zIndex: 1 will raise the label above opaque background-colors of input.
+      zIndex: 1,
+      pointerEvents: 'none',
+      transform: 'translate(12px, 20px) scale(1)',
+      '&$marginDense': {
+        transform: 'translate(12px, 17px) scale(1)'
+      },
+      '&$shrink': {
+        transform: 'translate(12px, 10px) scale(0.75)',
+        '&$marginDense': {
+          transform: 'translate(12px, 7px) scale(0.75)'
+        }
+      }
+    },
+
+    /* Styles applied to the root element if `variant="outlined"`. */
+    outlined: {
+      // see comment above on filled.zIndex
+      zIndex: 1,
+      pointerEvents: 'none',
+      transform: 'translate(14px, 20px) scale(1)',
+      '&$marginDense': {
+        transform: 'translate(14px, 17px) scale(1)'
+      },
+      '&$shrink': {
+        transform: 'translate(14px, -6px) scale(0.75)'
+      }
+    }
+  };
+};
+
+exports.styles = styles;
+
+function InputLabel(props) {
+  var _classNames;
+
+  var children = props.children,
+      classes = props.classes,
+      classNameProp = props.className,
+      disableAnimation = props.disableAnimation,
+      FormLabelClasses = props.FormLabelClasses,
+      margin = props.margin,
+      muiFormControl = props.muiFormControl,
+      shrinkProp = props.shrink,
+      variant = props.variant,
+      other = (0, _objectWithoutProperties2.default)(props, ["children", "classes", "className", "disableAnimation", "FormLabelClasses", "margin", "muiFormControl", "shrink", "variant"]);
+  var shrink = shrinkProp;
+
+  if (typeof shrink === 'undefined' && muiFormControl) {
+    shrink = muiFormControl.filled || muiFormControl.focused || muiFormControl.adornedStart;
+  }
+
+  var fcs = (0, _formControlState.default)({
+    props: props,
+    muiFormControl: muiFormControl,
+    states: ['margin', 'variant']
+  });
+  var className = (0, _classnames.default)(classes.root, (_classNames = {}, (0, _defineProperty2.default)(_classNames, classes.formControl, muiFormControl), (0, _defineProperty2.default)(_classNames, classes.animated, !disableAnimation), (0, _defineProperty2.default)(_classNames, classes.shrink, shrink), (0, _defineProperty2.default)(_classNames, classes.marginDense, fcs.margin === 'dense'), (0, _defineProperty2.default)(_classNames, classes.filled, fcs.variant === 'filled'), (0, _defineProperty2.default)(_classNames, classes.outlined, fcs.variant === 'outlined'), _classNames), classNameProp);
+  return _react.default.createElement(_FormLabel.default, (0, _extends2.default)({
+    "data-shrink": shrink,
+    className: className,
+    classes: (0, _extends2.default)({
+      focused: classes.focused,
+      disabled: classes.disabled,
+      error: classes.error,
+      required: classes.required
+    }, FormLabelClasses)
+  }, other), children);
+}
+
+process.env.NODE_ENV !== "production" ? InputLabel.propTypes = {
+  /**
+   * The contents of the `InputLabel`.
+   */
+  children: _propTypes.default.node,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * @ignore
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * If `true`, the transition animation is disabled.
+   */
+  disableAnimation: _propTypes.default.bool,
+
+  /**
+   * If `true`, apply disabled class.
+   */
+  disabled: _propTypes.default.bool,
+
+  /**
+   * If `true`, the label will be displayed in an error state.
+   */
+  error: _propTypes.default.bool,
+
+  /**
+   * If `true`, the input of this label is focused.
+   */
+  focused: _propTypes.default.bool,
+
+  /**
+   * `classes` property applied to the [`FormLabel`](/api/form-label/) element.
+   */
+  FormLabelClasses: _propTypes.default.object,
+
+  /**
+   * If `dense`, will adjust vertical spacing. This is normally obtained via context from
+   * FormControl.
+   */
+  margin: _propTypes.default.oneOf(['dense']),
+
+  /**
+   * @ignore
+   */
+  muiFormControl: _propTypes.default.object,
+
+  /**
+   * if `true`, the label will indicate that the input is required.
+   */
+  required: _propTypes.default.bool,
+
+  /**
+   * If `true`, the label is shrunk.
+   */
+  shrink: _propTypes.default.bool,
+
+  /**
+   * The variant to use.
+   */
+  variant: _propTypes.default.oneOf(['standard', 'outlined', 'filled'])
+} : void 0;
+InputLabel.defaultProps = {
+  disableAnimation: false
+};
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiInputLabel'
+})((0, _withFormControlContext.default)(InputLabel));
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1228 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(25));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _classnames = _interopRequireDefault(__webpack_require__(8));
+
+var _utils = __webpack_require__(28);
+
+var _formControlState = _interopRequireDefault(__webpack_require__(1152));
+
+var _withFormControlContext = _interopRequireDefault(__webpack_require__(1150));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(26));
+
+var styles = function styles(theme) {
+  return {
+    /* Styles applied to the root element. */
+    root: {
+      fontFamily: theme.typography.fontFamily,
+      color: theme.palette.text.secondary,
+      fontSize: theme.typography.pxToRem(16),
+      lineHeight: 1,
+      padding: 0,
+      '&$focused': {
+        color: theme.palette.primary[theme.palette.type === 'light' ? 'dark' : 'light']
+      },
+      '&$disabled': {
+        color: theme.palette.text.disabled
+      },
+      '&$error': {
+        color: theme.palette.error.main
+      }
+    },
+
+    /* Styles applied to the root element if `focused={true}`. */
+    focused: {},
+
+    /* Styles applied to the root element if `disabled={true}`. */
+    disabled: {},
+
+    /* Styles applied to the root element if `error={true}`. */
+    error: {},
+
+    /* Styles applied to the root element if `filled={true}`. */
+    filled: {},
+
+    /* Styles applied to the root element if `required={true}`. */
+    required: {},
+    asterisk: {
+      '&$error': {
+        color: theme.palette.error.main
+      }
+    }
+  };
+};
+
+exports.styles = styles;
+
+function FormLabel(props) {
+  var _classNames;
+
+  var children = props.children,
+      classes = props.classes,
+      classNameProp = props.className,
+      Component = props.component,
+      disabled = props.disabled,
+      error = props.error,
+      filled = props.filled,
+      focused = props.focused,
+      muiFormControl = props.muiFormControl,
+      required = props.required,
+      other = (0, _objectWithoutProperties2.default)(props, ["children", "classes", "className", "component", "disabled", "error", "filled", "focused", "muiFormControl", "required"]);
+  var fcs = (0, _formControlState.default)({
+    props: props,
+    muiFormControl: muiFormControl,
+    states: ['required', 'focused', 'disabled', 'error', 'filled']
+  });
+  return _react.default.createElement(Component, (0, _extends2.default)({
+    className: (0, _classnames.default)(classes.root, (_classNames = {}, (0, _defineProperty2.default)(_classNames, classes.disabled, fcs.disabled), (0, _defineProperty2.default)(_classNames, classes.error, fcs.error), (0, _defineProperty2.default)(_classNames, classes.filled, fcs.filled), (0, _defineProperty2.default)(_classNames, classes.focused, fcs.focused), (0, _defineProperty2.default)(_classNames, classes.required, fcs.required), _classNames), classNameProp)
+  }, other), children, fcs.required && _react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.asterisk, (0, _defineProperty2.default)({}, classes.error, fcs.error))
+  }, "\u2009*"));
+}
+
+process.env.NODE_ENV !== "production" ? FormLabel.propTypes = {
+  /**
+   * The content of the component.
+   */
+  children: _propTypes.default.node,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * @ignore
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * The component used for the root node.
+   * Either a string to use a DOM element or a component.
+   */
+  component: _utils.componentPropType,
+
+  /**
+   * If `true`, the label should be displayed in a disabled state.
+   */
+  disabled: _propTypes.default.bool,
+
+  /**
+   * If `true`, the label should be displayed in an error state.
+   */
+  error: _propTypes.default.bool,
+
+  /**
+   * If `true`, the label should use filled classes key.
+   */
+  filled: _propTypes.default.bool,
+
+  /**
+   * If `true`, the input of this label is focused (used by `FormGroup` components).
+   */
+  focused: _propTypes.default.bool,
+
+  /**
+   * @ignore
+   */
+  muiFormControl: _propTypes.default.object,
+
+  /**
+   * If `true`, the label will indicate that the input is required.
+   */
+  required: _propTypes.default.bool
+} : void 0;
+FormLabel.defaultProps = {
+  component: 'label'
+};
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiFormLabel'
+})((0, _withFormControlContext.default)(FormLabel));
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1229 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(25));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _classCallCheck2 = _interopRequireDefault(__webpack_require__(30));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(__webpack_require__(32));
+
+var _getPrototypeOf2 = _interopRequireDefault(__webpack_require__(33));
+
+var _createClass2 = _interopRequireDefault(__webpack_require__(31));
+
+var _inherits2 = _interopRequireDefault(__webpack_require__(34));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _classnames = _interopRequireDefault(__webpack_require__(8));
+
+var _utils = __webpack_require__(28);
+
+var _utils2 = __webpack_require__(1160);
+
+var _withStyles = _interopRequireDefault(__webpack_require__(26));
+
+var _helpers = __webpack_require__(65);
+
+var _reactHelpers = __webpack_require__(260);
+
+var _FormControlContext = _interopRequireDefault(__webpack_require__(1159));
+
+var styles = {
+  /* Styles applied to the root element. */
+  root: {
+    display: 'inline-flex',
+    flexDirection: 'column',
+    position: 'relative',
+    // Reset fieldset default style.
+    minWidth: 0,
+    padding: 0,
+    margin: 0,
+    border: 0,
+    verticalAlign: 'top' // Fix alignment issue on Safari.
+
+  },
+
+  /* Styles applied to the root element if `margin="normal"`. */
+  marginNormal: {
+    marginTop: 16,
+    marginBottom: 8
+  },
+
+  /* Styles applied to the root element if `margin="dense"`. */
+  marginDense: {
+    marginTop: 8,
+    marginBottom: 4
+  },
+
+  /* Styles applied to the root element if `fullWidth={true}`. */
+  fullWidth: {
+    width: '100%'
+  }
+};
+/**
+ * Provides context such as filled/focused/error/required for form inputs.
+ * Relying on the context provides high flexibility and ensures that the state always stays
+ * consistent across the children of the `FormControl`.
+ * This context is used by the following components:
+ *  - FormLabel
+ *  - FormHelperText
+ *  - Input
+ *  - InputLabel
+ *
+ * ⚠️ Only one input can be used within a FormControl.
+ */
+
+exports.styles = styles;
+
+var FormControl =
+/*#__PURE__*/
+function (_React$Component) {
+  (0, _inherits2.default)(FormControl, _React$Component);
+  (0, _createClass2.default)(FormControl, null, [{
+    key: "getDerivedStateFromProps",
+    value: function getDerivedStateFromProps(props, state) {
+      if (props.disabled && state.focused) {
+        return {
+          focused: false
+        };
+      }
+
+      return null;
+    }
+  }]);
+
+  function FormControl(props) {
+    var _this;
+
+    (0, _classCallCheck2.default)(this, FormControl);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(FormControl).call(this));
+
+    _this.handleFocus = function () {
+      _this.setState(function (state) {
+        return !state.focused ? {
+          focused: true
+        } : null;
+      });
+    };
+
+    _this.handleBlur = function () {
+      _this.setState(function (state) {
+        return state.focused ? {
+          focused: false
+        } : null;
+      });
+    };
+
+    _this.handleDirty = function () {
+      if (!_this.state.filled) {
+        _this.setState({
+          filled: true
+        });
+      }
+    };
+
+    _this.handleClean = function () {
+      if (_this.state.filled) {
+        _this.setState({
+          filled: false
+        });
+      }
+    };
+
+    _this.state = {
+      adornedStart: false,
+      filled: false,
+      focused: false
+    }; // We need to iterate through the children and find the Input in order
+    // to fully support server-side rendering.
+
+    var children = props.children;
+
+    if (children) {
+      _react.default.Children.forEach(children, function (child) {
+        if (!(0, _reactHelpers.isMuiElement)(child, ['Input', 'Select'])) {
+          return;
+        }
+
+        if ((0, _utils2.isFilled)(child.props, true)) {
+          _this.state.filled = true;
+        }
+
+        var input = (0, _reactHelpers.isMuiElement)(child, ['Select']) ? child.props.input : child;
+
+        if (input && (0, _utils2.isAdornedStart)(input.props)) {
+          _this.state.adornedStart = true;
+        }
+      });
+    }
+
+    return _this;
+  }
+
+  (0, _createClass2.default)(FormControl, [{
+    key: "render",
+    value: function render() {
+      var _classNames;
+
+      var _this$props = this.props,
+          classes = _this$props.classes,
+          className = _this$props.className,
+          Component = _this$props.component,
+          disabled = _this$props.disabled,
+          error = _this$props.error,
+          fullWidth = _this$props.fullWidth,
+          margin = _this$props.margin,
+          required = _this$props.required,
+          variant = _this$props.variant,
+          other = (0, _objectWithoutProperties2.default)(_this$props, ["classes", "className", "component", "disabled", "error", "fullWidth", "margin", "required", "variant"]);
+      var _this$state = this.state,
+          adornedStart = _this$state.adornedStart,
+          filled = _this$state.filled,
+          focused = _this$state.focused;
+      var childContext = {
+        adornedStart: adornedStart,
+        disabled: disabled,
+        error: error,
+        filled: filled,
+        focused: focused,
+        margin: margin,
+        onBlur: this.handleBlur,
+        onEmpty: this.handleClean,
+        onFilled: this.handleDirty,
+        onFocus: this.handleFocus,
+        required: required,
+        variant: variant
+      };
+      return _react.default.createElement(_FormControlContext.default.Provider, {
+        value: childContext
+      }, _react.default.createElement(Component, (0, _extends2.default)({
+        className: (0, _classnames.default)(classes.root, (_classNames = {}, (0, _defineProperty2.default)(_classNames, classes["margin".concat((0, _helpers.capitalize)(margin))], margin !== 'none'), (0, _defineProperty2.default)(_classNames, classes.fullWidth, fullWidth), _classNames), className)
+      }, other)));
+    }
+  }]);
+  return FormControl;
+}(_react.default.Component);
+
+process.env.NODE_ENV !== "production" ? FormControl.propTypes = {
+  /**
+   * The contents of the form control.
+   */
+  children: _propTypes.default.node,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * @ignore
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * The component used for the root node.
+   * Either a string to use a DOM element or a component.
+   */
+  component: _utils.componentPropType,
+
+  /**
+   * If `true`, the label, input and helper text should be displayed in a disabled state.
+   */
+  disabled: _propTypes.default.bool,
+
+  /**
+   * If `true`, the label should be displayed in an error state.
+   */
+  error: _propTypes.default.bool,
+
+  /**
+   * If `true`, the component will take up the full width of its container.
+   */
+  fullWidth: _propTypes.default.bool,
+
+  /**
+   * If `dense` or `normal`, will adjust vertical spacing of this and contained components.
+   */
+  margin: _propTypes.default.oneOf(['none', 'dense', 'normal']),
+
+  /**
+   * If `true`, the label will indicate that the input is required.
+   */
+  required: _propTypes.default.bool,
+
+  /**
+   * The variant to use.
+   */
+  variant: _propTypes.default.oneOf(['standard', 'outlined', 'filled'])
+} : void 0;
+FormControl.defaultProps = {
+  component: 'div',
+  disabled: false,
+  error: false,
+  fullWidth: false,
+  margin: 'none',
+  required: false,
+  variant: 'standard'
+};
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiFormControl'
+})(FormControl);
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1230 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(25));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _classnames = _interopRequireDefault(__webpack_require__(8));
+
+var _utils = __webpack_require__(28);
+
+var _formControlState = _interopRequireDefault(__webpack_require__(1152));
+
+var _withFormControlContext = _interopRequireDefault(__webpack_require__(1150));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(26));
+
+var styles = function styles(theme) {
+  return {
+    /* Styles applied to the root element. */
+    root: {
+      color: theme.palette.text.secondary,
+      fontFamily: theme.typography.fontFamily,
+      fontSize: theme.typography.pxToRem(12),
+      textAlign: 'left',
+      marginTop: 8,
+      lineHeight: '1em',
+      minHeight: '1em',
+      margin: 0,
+      '&$disabled': {
+        color: theme.palette.text.disabled
+      },
+      '&$error': {
+        color: theme.palette.error.main
+      }
+    },
+
+    /* Styles applied to the root element if `error={true}`. */
+    error: {},
+
+    /* Styles applied to the root element if `disabled={true}`. */
+    disabled: {},
+
+    /* Styles applied to the root element if `margin="dense"`. */
+    marginDense: {
+      marginTop: 4
+    },
+
+    /* Styles applied to the root element if `variant="filled"` or `variant="outlined"`. */
+    contained: {
+      margin: '8px 12px 0'
+    },
+
+    /* Styles applied to the root element if `focused={true}`. */
+    focused: {},
+
+    /* Styles applied to the root element if `filled={true}`. */
+    filled: {},
+
+    /* Styles applied to the root element if `required={true}`. */
+    required: {}
+  };
+};
+
+exports.styles = styles;
+
+function FormHelperText(props) {
+  var _classNames;
+
+  var classes = props.classes,
+      classNameProp = props.className,
+      Component = props.component,
+      disabled = props.disabled,
+      error = props.error,
+      filled = props.filled,
+      focused = props.focused,
+      margin = props.margin,
+      muiFormControl = props.muiFormControl,
+      required = props.required,
+      variant = props.variant,
+      other = (0, _objectWithoutProperties2.default)(props, ["classes", "className", "component", "disabled", "error", "filled", "focused", "margin", "muiFormControl", "required", "variant"]);
+  var fcs = (0, _formControlState.default)({
+    props: props,
+    muiFormControl: muiFormControl,
+    states: ['variant', 'margin', 'disabled', 'error', 'filled', 'focused', 'required']
+  });
+  return _react.default.createElement(Component, (0, _extends2.default)({
+    className: (0, _classnames.default)(classes.root, (_classNames = {}, (0, _defineProperty2.default)(_classNames, classes.contained, fcs.variant === 'filled' || fcs.variant === 'outlined'), (0, _defineProperty2.default)(_classNames, classes.marginDense, fcs.margin === 'dense'), (0, _defineProperty2.default)(_classNames, classes.disabled, fcs.disabled), (0, _defineProperty2.default)(_classNames, classes.error, fcs.error), (0, _defineProperty2.default)(_classNames, classes.filled, fcs.filled), (0, _defineProperty2.default)(_classNames, classes.focused, fcs.focused), (0, _defineProperty2.default)(_classNames, classes.required, fcs.required), _classNames), classNameProp)
+  }, other));
+}
+
+process.env.NODE_ENV !== "production" ? FormHelperText.propTypes = {
+  /**
+   * The content of the component.
+   */
+  children: _propTypes.default.node,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * @ignore
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * The component used for the root node.
+   * Either a string to use a DOM element or a component.
+   */
+  component: _utils.componentPropType,
+
+  /**
+   * If `true`, the helper text should be displayed in a disabled state.
+   */
+  disabled: _propTypes.default.bool,
+
+  /**
+   * If `true`, helper text should be displayed in an error state.
+   */
+  error: _propTypes.default.bool,
+
+  /**
+   * If `true`, the helper text should use filled classes key.
+   */
+  filled: _propTypes.default.bool,
+
+  /**
+   * If `true`, the helper text should use focused classes key.
+   */
+  focused: _propTypes.default.bool,
+
+  /**
+   * If `dense`, will adjust vertical spacing. This is normally obtained via context from
+   * FormControl.
+   */
+  margin: _propTypes.default.oneOf(['dense']),
+
+  /**
+   * @ignore
+   */
+  muiFormControl: _propTypes.default.object,
+
+  /**
+   * If `true`, the helper text should use required classes key.
+   */
+  required: _propTypes.default.bool,
+
+  /**
+   * The variant to use.
+   */
+  variant: _propTypes.default.oneOf(['standard', 'outlined', 'filled'])
+} : void 0;
+FormHelperText.defaultProps = {
+  component: 'p'
+};
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiFormHelperText'
+})((0, _withFormControlContext.default)(FormHelperText));
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1231 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.styles = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _utils = __webpack_require__(28);
+
+var _SelectInput = _interopRequireDefault(__webpack_require__(1232));
+
+var _formControlState = _interopRequireDefault(__webpack_require__(1152));
+
+var _withFormControlContext = _interopRequireDefault(__webpack_require__(1150));
+
+var _withStyles = _interopRequireDefault(__webpack_require__(26));
+
+var _mergeClasses = _interopRequireDefault(__webpack_require__(930));
+
+var _ArrowDropDown = _interopRequireDefault(__webpack_require__(1174));
+
+var _Input = _interopRequireDefault(__webpack_require__(1151));
+
+var _NativeSelect = __webpack_require__(1177);
+
+var _NativeSelectInput = _interopRequireDefault(__webpack_require__(1178));
+
+// @inheritedComponent Input
+// To replace with InputBase in v4
+var styles = _NativeSelect.styles;
+exports.styles = styles;
+
+function Select(props) {
+  var autoWidth = props.autoWidth,
+      children = props.children,
+      classes = props.classes,
+      displayEmpty = props.displayEmpty,
+      IconComponent = props.IconComponent,
+      input = props.input,
+      inputProps = props.inputProps,
+      MenuProps = props.MenuProps,
+      muiFormControl = props.muiFormControl,
+      multiple = props.multiple,
+      native = props.native,
+      onClose = props.onClose,
+      onOpen = props.onOpen,
+      open = props.open,
+      renderValue = props.renderValue,
+      SelectDisplayProps = props.SelectDisplayProps,
+      variant = props.variant,
+      other = (0, _objectWithoutProperties2.default)(props, ["autoWidth", "children", "classes", "displayEmpty", "IconComponent", "input", "inputProps", "MenuProps", "muiFormControl", "multiple", "native", "onClose", "onOpen", "open", "renderValue", "SelectDisplayProps", "variant"]);
+  var inputComponent = native ? _NativeSelectInput.default : _SelectInput.default;
+  var fcs = (0, _formControlState.default)({
+    props: props,
+    muiFormControl: muiFormControl,
+    states: ['variant']
+  });
+  return _react.default.cloneElement(input, (0, _extends2.default)({
+    // Most of the logic is implemented in `SelectInput`.
+    // The `Select` component is a simple API wrapper to expose something better to play with.
+    inputComponent: inputComponent,
+    inputProps: (0, _extends2.default)({
+      children: children,
+      IconComponent: IconComponent,
+      variant: fcs.variant,
+      type: undefined,
+      // We render a select. We can ignore the type provided by the `Input`.
+      multiple: multiple
+    }, native ? {} : {
+      autoWidth: autoWidth,
+      displayEmpty: displayEmpty,
+      MenuProps: MenuProps,
+      onClose: onClose,
+      onOpen: onOpen,
+      open: open,
+      renderValue: renderValue,
+      SelectDisplayProps: SelectDisplayProps
+    }, inputProps, {
+      classes: inputProps ? (0, _mergeClasses.default)({
+        baseClasses: classes,
+        newClasses: inputProps.classes,
+        Component: Select
+      }) : classes
+    }, input ? input.props.inputProps : {})
+  }, other));
+}
+
+process.env.NODE_ENV !== "production" ? Select.propTypes = {
+  /**
+   * If true, the width of the popover will automatically be set according to the items inside the
+   * menu, otherwise it will be at least the width of the select input.
+   */
+  autoWidth: _propTypes.default.bool,
+
+  /**
+   * The option elements to populate the select with.
+   * Can be some `MenuItem` when `native` is false and `option` when `native` is true.
+   */
+  children: _propTypes.default.node,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * If `true`, the selected item is displayed even if its value is empty.
+   * You can only use it when the `native` property is `false` (default).
+   */
+  displayEmpty: _propTypes.default.bool,
+
+  /**
+   * The icon that displays the arrow.
+   */
+  IconComponent: _utils.componentPropType,
+
+  /**
+   * An `Input` element; does not have to be a material-ui specific `Input`.
+   */
+  input: _propTypes.default.element,
+
+  /**
+   * Attributes applied to the `input` element.
+   * When `native` is `true`, the attributes are applied on the `select` element.
+   */
+  inputProps: _propTypes.default.object,
+
+  /**
+   * Properties applied to the [`Menu`](/api/menu/) element.
+   */
+  MenuProps: _propTypes.default.object,
+
+  /**
+   * If true, `value` must be an array and the menu will support multiple selections.
+   */
+  multiple: _propTypes.default.bool,
+
+  /**
+   * If `true`, the component will be using a native `select` element.
+   */
+  native: _propTypes.default.bool,
+
+  /**
+   * Callback function fired when a menu item is selected.
+   *
+   * @param {object} event The event source of the callback.
+   * You can pull out the new value by accessing `event.target.value`.
+   * @param {object} [child] The react element that was selected when `native` is `false` (default).
+   */
+  onChange: _propTypes.default.func,
+
+  /**
+   * Callback fired when the component requests to be closed.
+   * Use in controlled mode (see open).
+   *
+   * @param {object} event The event source of the callback
+   */
+  onClose: _propTypes.default.func,
+
+  /**
+   * Callback fired when the component requests to be opened.
+   * Use in controlled mode (see open).
+   *
+   * @param {object} event The event source of the callback
+   */
+  onOpen: _propTypes.default.func,
+
+  /**
+   * Control `select` open state.
+   * You can only use it when the `native` property is `false` (default).
+   */
+  open: _propTypes.default.bool,
+
+  /**
+   * Render the selected value.
+   * You can only use it when the `native` property is `false` (default).
+   *
+   * @param {*} value The `value` provided to the component.
+   * @returns {ReactElement}
+   */
+  renderValue: _propTypes.default.func,
+
+  /**
+   * Properties applied to the clickable div element.
+   */
+  SelectDisplayProps: _propTypes.default.object,
+
+  /**
+   * The input value.
+   * This property is required when the `native` property is `false` (default).
+   */
+  value: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object]))]),
+
+  /**
+   * The variant to use.
+   */
+  variant: _propTypes.default.oneOf(['standard', 'outlined', 'filled'])
+} : void 0;
+Select.defaultProps = {
+  autoWidth: false,
+  displayEmpty: false,
+  IconComponent: _ArrowDropDown.default,
+  input: _react.default.createElement(_Input.default, null),
+  multiple: false,
+  native: false
+};
+Select.muiName = 'Select';
+
+var _default = (0, _withStyles.default)(styles, {
+  name: 'MuiSelect'
+})((0, _withFormControlContext.default)(Select));
+
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1232 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(5);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _extends2 = _interopRequireDefault(__webpack_require__(10));
+
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(25));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(16));
+
+var _toConsumableArray2 = _interopRequireDefault(__webpack_require__(1025));
+
+var _classCallCheck2 = _interopRequireDefault(__webpack_require__(30));
+
+var _createClass2 = _interopRequireDefault(__webpack_require__(31));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(__webpack_require__(32));
+
+var _getPrototypeOf2 = _interopRequireDefault(__webpack_require__(33));
+
+var _inherits2 = _interopRequireDefault(__webpack_require__(34));
+
+var _typeof2 = _interopRequireDefault(__webpack_require__(139));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+var _propTypes = _interopRequireDefault(__webpack_require__(2));
+
+var _classnames = _interopRequireDefault(__webpack_require__(8));
+
+var _warning = _interopRequireDefault(__webpack_require__(42));
+
+var _utils = __webpack_require__(28);
+
+var _Menu = _interopRequireDefault(__webpack_require__(1010));
+
+var _utils2 = __webpack_require__(1160);
+
+var _reactHelpers = __webpack_require__(260);
+
+function areEqualValues(a, b) {
+  if ((0, _typeof2.default)(b) === 'object' && b !== null) {
+    return a === b;
+  }
+
+  return String(a) === String(b);
+}
+/**
+ * @ignore - internal component.
+ */
+
+
+var SelectInput =
+/*#__PURE__*/
+function (_React$Component) {
+  (0, _inherits2.default)(SelectInput, _React$Component);
+
+  function SelectInput(props) {
+    var _this;
+
+    (0, _classCallCheck2.default)(this, SelectInput);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(SelectInput).call(this));
+    _this.ignoreNextBlur = false;
+
+    _this.update = function (_ref) {
+      var event = _ref.event,
+          open = _ref.open;
+
+      if (_this.isOpenControlled) {
+        if (open) {
+          _this.props.onOpen(event);
+        } else {
+          _this.props.onClose(event);
+        }
+
+        return;
+      }
+
+      _this.setState({
+        // Perform the layout computation outside of the render method.
+        menuMinWidth: _this.props.autoWidth ? null : _this.displayRef.clientWidth,
+        open: open
+      });
+    };
+
+    _this.handleClick = function (event) {
+      // Opening the menu is going to blur the. It will be focused back when closed.
+      _this.ignoreNextBlur = true;
+
+      _this.update({
+        open: true,
+        event: event
+      });
+    };
+
+    _this.handleClose = function (event) {
+      _this.update({
+        open: false,
+        event: event
+      });
+    };
+
+    _this.handleItemClick = function (child) {
+      return function (event) {
+        if (!_this.props.multiple) {
+          _this.update({
+            open: false,
+            event: event
+          });
+        }
+
+        var _this$props = _this.props,
+            onChange = _this$props.onChange,
+            name = _this$props.name;
+
+        if (onChange) {
+          var value;
+
+          if (_this.props.multiple) {
+            value = Array.isArray(_this.props.value) ? (0, _toConsumableArray2.default)(_this.props.value) : [];
+            var itemIndex = value.indexOf(child.props.value);
+
+            if (itemIndex === -1) {
+              value.push(child.props.value);
+            } else {
+              value.splice(itemIndex, 1);
+            }
+          } else {
+            value = child.props.value;
+          }
+
+          event.persist();
+          event.target = {
+            value: value,
+            name: name
+          };
+          onChange(event, child);
+        }
+      };
+    };
+
+    _this.handleBlur = function (event) {
+      if (_this.ignoreNextBlur === true) {
+        // The parent components are relying on the bubbling of the event.
+        event.stopPropagation();
+        _this.ignoreNextBlur = false;
+        return;
+      }
+
+      if (_this.props.onBlur) {
+        var _this$props2 = _this.props,
+            value = _this$props2.value,
+            name = _this$props2.name;
+        event.persist();
+        event.target = {
+          value: value,
+          name: name
+        };
+
+        _this.props.onBlur(event);
+      }
+    };
+
+    _this.handleKeyDown = function (event) {
+      if (_this.props.readOnly) {
+        return;
+      }
+
+      if ([' ', 'ArrowUp', 'ArrowDown'].indexOf(event.key) !== -1) {
+        event.preventDefault(); // Opening the menu is going to blur the. It will be focused back when closed.
+
+        _this.ignoreNextBlur = true;
+
+        _this.update({
+          open: true,
+          event: event
+        });
+      }
+    };
+
+    _this.handleDisplayRef = function (ref) {
+      _this.displayRef = ref;
+    };
+
+    _this.handleInputRef = function (ref) {
+      var inputRef = _this.props.inputRef;
+
+      if (!inputRef) {
+        return;
+      }
+
+      var nodeProxy = {
+        node: ref,
+        // By pass the native input as we expose a rich object (array).
+        value: _this.props.value,
+        focus: function focus() {
+          _this.displayRef.focus();
+        }
+      };
+      (0, _reactHelpers.setRef)(inputRef, nodeProxy);
+    };
+
+    _this.isOpenControlled = props.open !== undefined;
+    _this.state = {
+      menuMinWidth: null,
+      open: false
+    };
+    return _this;
+  }
+
+  (0, _createClass2.default)(SelectInput, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      if (this.isOpenControlled && this.props.open) {
+        // Focus the display node so the focus is restored on this element once
+        // the menu is closed.
+        this.displayRef.focus(); // Rerender with the resolve `displayRef` reference.
+
+        this.forceUpdate();
+      }
+
+      if (this.props.autoFocus) {
+        this.displayRef.focus();
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this2 = this,
+          _classNames;
+
+      var _this$props3 = this.props,
+          autoWidth = _this$props3.autoWidth,
+          children = _this$props3.children,
+          classes = _this$props3.classes,
+          className = _this$props3.className,
+          disabled = _this$props3.disabled,
+          displayEmpty = _this$props3.displayEmpty,
+          IconComponent = _this$props3.IconComponent,
+          inputRef = _this$props3.inputRef,
+          _this$props3$MenuProp = _this$props3.MenuProps,
+          MenuProps = _this$props3$MenuProp === void 0 ? {} : _this$props3$MenuProp,
+          multiple = _this$props3.multiple,
+          name = _this$props3.name,
+          onBlur = _this$props3.onBlur,
+          onChange = _this$props3.onChange,
+          onClose = _this$props3.onClose,
+          onFocus = _this$props3.onFocus,
+          onOpen = _this$props3.onOpen,
+          openProp = _this$props3.open,
+          readOnly = _this$props3.readOnly,
+          renderValue = _this$props3.renderValue,
+          required = _this$props3.required,
+          SelectDisplayProps = _this$props3.SelectDisplayProps,
+          tabIndexProp = _this$props3.tabIndex,
+          _this$props3$type = _this$props3.type,
+          type = _this$props3$type === void 0 ? 'hidden' : _this$props3$type,
+          value = _this$props3.value,
+          variant = _this$props3.variant,
+          other = (0, _objectWithoutProperties2.default)(_this$props3, ["autoWidth", "children", "classes", "className", "disabled", "displayEmpty", "IconComponent", "inputRef", "MenuProps", "multiple", "name", "onBlur", "onChange", "onClose", "onFocus", "onOpen", "open", "readOnly", "renderValue", "required", "SelectDisplayProps", "tabIndex", "type", "value", "variant"]);
+      var open = this.isOpenControlled && this.displayRef ? openProp : this.state.open;
+      delete other['aria-invalid'];
+      var display;
+      var displaySingle = '';
+      var displayMultiple = [];
+      var computeDisplay = false; // No need to display any value if the field is empty.
+
+      if ((0, _utils2.isFilled)(this.props) || displayEmpty) {
+        if (renderValue) {
+          display = renderValue(value);
+        } else {
+          computeDisplay = true;
+        }
+      }
+
+      var items = _react.default.Children.map(children, function (child) {
+        if (!_react.default.isValidElement(child)) {
+          return null;
+        }
+
+        process.env.NODE_ENV !== "production" ? (0, _warning.default)(child.type !== _react.default.Fragment, ["Material-UI: the Select component doesn't accept a Fragment as a child.", 'Consider providing an array instead.'].join('\n')) : void 0;
+        var selected;
+
+        if (multiple) {
+          if (!Array.isArray(value)) {
+            throw new Error('Material-UI: the `value` property must be an array ' + 'when using the `Select` component with `multiple`.');
+          }
+
+          selected = value.some(function (v) {
+            return areEqualValues(v, child.props.value);
+          });
+
+          if (selected && computeDisplay) {
+            displayMultiple.push(child.props.children);
+          }
+        } else {
+          selected = areEqualValues(value, child.props.value);
+
+          if (selected && computeDisplay) {
+            displaySingle = child.props.children;
+          }
+        }
+
+        return _react.default.cloneElement(child, {
+          onClick: _this2.handleItemClick(child),
+          role: 'option',
+          selected: selected,
+          value: undefined,
+          // The value is most likely not a valid HTML attribute.
+          'data-value': child.props.value // Instead, we provide it as a data attribute.
+
+        });
+      });
+
+      if (computeDisplay) {
+        display = multiple ? displayMultiple.join(', ') : displaySingle;
+      } // Avoid performing a layout computation in the render method.
+
+
+      var menuMinWidth = this.state.menuMinWidth;
+
+      if (!autoWidth && this.isOpenControlled && this.displayRef) {
+        menuMinWidth = this.displayRef.clientWidth;
+      }
+
+      var tabIndex;
+
+      if (typeof tabIndexProp !== 'undefined') {
+        tabIndex = tabIndexProp;
+      } else {
+        tabIndex = disabled ? null : 0;
+      }
+
+      return _react.default.createElement("div", {
+        className: classes.root
+      }, _react.default.createElement("div", (0, _extends2.default)({
+        className: (0, _classnames.default)(classes.select, classes.selectMenu, (_classNames = {}, (0, _defineProperty2.default)(_classNames, classes.disabled, disabled), (0, _defineProperty2.default)(_classNames, classes.filled, variant === 'filled'), (0, _defineProperty2.default)(_classNames, classes.outlined, variant === 'outlined'), _classNames), className),
+        ref: this.handleDisplayRef,
+        "aria-pressed": open ? 'true' : 'false',
+        tabIndex: tabIndex,
+        role: "button",
+        "aria-owns": open ? "menu-".concat(name || '') : undefined,
+        "aria-haspopup": "true",
+        onKeyDown: this.handleKeyDown,
+        onBlur: this.handleBlur,
+        onClick: disabled || readOnly ? null : this.handleClick,
+        onFocus: onFocus // The id can help with end-to-end testing automation.
+        ,
+        id: name ? "select-".concat(name) : undefined
+      }, SelectDisplayProps), display || _react.default.createElement("span", {
+        dangerouslySetInnerHTML: {
+          __html: '&#8203;'
+        }
+      })), _react.default.createElement("input", (0, _extends2.default)({
+        value: Array.isArray(value) ? value.join(',') : value,
+        name: name,
+        ref: this.handleInputRef,
+        type: type
+      }, other)), _react.default.createElement(IconComponent, {
+        className: classes.icon
+      }), _react.default.createElement(_Menu.default, (0, _extends2.default)({
+        id: "menu-".concat(name || ''),
+        anchorEl: this.displayRef,
+        open: open,
+        onClose: this.handleClose
+      }, MenuProps, {
+        MenuListProps: (0, _extends2.default)({
+          role: 'listbox',
+          disableListWrap: true
+        }, MenuProps.MenuListProps),
+        PaperProps: (0, _extends2.default)({}, MenuProps.PaperProps, {
+          style: (0, _extends2.default)({
+            minWidth: menuMinWidth
+          }, MenuProps.PaperProps != null ? MenuProps.PaperProps.style : null)
+        })
+      }), items));
+    }
+  }]);
+  return SelectInput;
+}(_react.default.Component);
+
+process.env.NODE_ENV !== "production" ? SelectInput.propTypes = {
+  /**
+   * @ignore
+   */
+  autoFocus: _propTypes.default.bool,
+
+  /**
+   * If true, the width of the popover will automatically be set according to the items inside the
+   * menu, otherwise it will be at least the width of the select input.
+   */
+  autoWidth: _propTypes.default.bool,
+
+  /**
+   * The option elements to populate the select with.
+   * Can be some `<MenuItem>` elements.
+   */
+  children: _propTypes.default.node,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css-api) below for more details.
+   */
+  classes: _propTypes.default.object.isRequired,
+
+  /**
+   * The CSS class name of the select element.
+   */
+  className: _propTypes.default.string,
+
+  /**
+   * If `true`, the select will be disabled.
+   */
+  disabled: _propTypes.default.bool,
+
+  /**
+   * If `true`, the selected item is displayed even if its value is empty.
+   */
+  displayEmpty: _propTypes.default.bool,
+
+  /**
+   * The icon that displays the arrow.
+   */
+  IconComponent: _utils.componentPropType,
+
+  /**
+   * Use that property to pass a ref callback to the native select element.
+   */
+  inputRef: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.object]),
+
+  /**
+   * Properties applied to the [`Menu`](/api/menu/) element.
+   */
+  MenuProps: _propTypes.default.object,
+
+  /**
+   * If true, `value` must be an array and the menu will support multiple selections.
+   */
+  multiple: _propTypes.default.bool,
+
+  /**
+   * Name attribute of the `select` or hidden `input` element.
+   */
+  name: _propTypes.default.string,
+
+  /**
+   * @ignore
+   */
+  onBlur: _propTypes.default.func,
+
+  /**
+   * Callback function fired when a menu item is selected.
+   *
+   * @param {object} event The event source of the callback.
+   * You can pull out the new value by accessing `event.target.value`.
+   * @param {object} [child] The react element that was selected.
+   */
+  onChange: _propTypes.default.func,
+
+  /**
+   * Callback fired when the component requests to be closed.
+   * Use in controlled mode (see open).
+   *
+   * @param {object} event The event source of the callback
+   */
+  onClose: _propTypes.default.func,
+
+  /**
+   * @ignore
+   */
+  onFocus: _propTypes.default.func,
+
+  /**
+   * Callback fired when the component requests to be opened.
+   * Use in controlled mode (see open).
+   *
+   * @param {object} event The event source of the callback
+   */
+  onOpen: _propTypes.default.func,
+
+  /**
+   * Control `select` open state.
+   */
+  open: _propTypes.default.bool,
+
+  /**
+   * @ignore
+   */
+  readOnly: _propTypes.default.bool,
+
+  /**
+   * Render the selected value.
+   *
+   * @param {*} value The `value` provided to the component.
+   * @returns {ReactElement}
+   */
+  renderValue: _propTypes.default.func,
+
+  /**
+   * @ignore
+   */
+  required: _propTypes.default.bool,
+
+  /**
+   * Properties applied to the clickable div element.
+   */
+  SelectDisplayProps: _propTypes.default.object,
+
+  /**
+   * @ignore
+   */
+  tabIndex: _propTypes.default.oneOfType([_propTypes.default.number, _propTypes.default.string]),
+
+  /**
+   * @ignore
+   */
+  type: _propTypes.default.string,
+
+  /**
+   * The input value.
+   */
+  value: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object, _propTypes.default.arrayOf(_propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number, _propTypes.default.bool, _propTypes.default.object]))]).isRequired,
+
+  /**
+   * The variant to use.
+   */
+  variant: _propTypes.default.oneOf(['standard', 'outlined', 'filled'])
+} : void 0;
+var _default = SelectInput;
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1233 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var _interopRequireDefault = __webpack_require__(1154);
+
+exports.__esModule = true;
+exports.default = void 0;
+
+var _inheritsLoose2 = _interopRequireDefault(__webpack_require__(1234));
+
+var _react = __webpack_require__(1);
+
+var _setDisplayName = _interopRequireDefault(__webpack_require__(1175));
+
+var _wrapDisplayName = _interopRequireDefault(__webpack_require__(1176));
+
+var shouldUpdate = function shouldUpdate(test) {
+  return function (BaseComponent) {
+    var factory = (0, _react.createFactory)(BaseComponent);
+
+    var ShouldUpdate =
+    /*#__PURE__*/
+    function (_Component) {
+      (0, _inheritsLoose2.default)(ShouldUpdate, _Component);
+
+      function ShouldUpdate() {
+        return _Component.apply(this, arguments) || this;
+      }
+
+      var _proto = ShouldUpdate.prototype;
+
+      _proto.shouldComponentUpdate = function shouldComponentUpdate(nextProps) {
+        return test(this.props, nextProps);
+      };
+
+      _proto.render = function render() {
+        return factory(this.props);
+      };
+
+      return ShouldUpdate;
+    }(_react.Component);
+
+    if (process.env.NODE_ENV !== 'production') {
+      return (0, _setDisplayName.default)((0, _wrapDisplayName.default)(BaseComponent, 'shouldUpdate'))(ShouldUpdate);
+    }
+
+    return ShouldUpdate;
+  };
+};
+
+var _default = shouldUpdate;
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 1234 */
+/***/ (function(module, exports) {
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+  subClass.__proto__ = superClass;
+}
+
+module.exports = _inheritsLoose;
+
+/***/ }),
+/* 1235 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+exports.default = void 0;
+
+var setStatic = function setStatic(key, value) {
+  return function (BaseComponent) {
+    /* eslint-disable no-param-reassign */
+    BaseComponent[key] = value;
+    /* eslint-enable no-param-reassign */
+
+    return BaseComponent;
+  };
+};
+
+var _default = setStatic;
+exports.default = _default;
+
+/***/ }),
+/* 1236 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+exports.default = void 0;
+
+var getDisplayName = function getDisplayName(Component) {
+  if (typeof Component === 'string') {
+    return Component;
+  }
+
+  if (!Component) {
+    return undefined;
+  }
+
+  return Component.displayName || Component.name || 'Component';
+};
+
+var _default = getDisplayName;
+exports.default = _default;
+
+/***/ }),
+/* 1237 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(1154);
+
+exports.__esModule = true;
+exports.default = void 0;
+
+var _shallowEqual = _interopRequireDefault(__webpack_require__(265));
+
+var _default = _shallowEqual.default;
+exports.default = _default;
 
 /***/ })
 /******/ ]);
