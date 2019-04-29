@@ -2,7 +2,6 @@ import argparse
 import asyncio
 import logging
 import sys
-import uuid
 
 import base64
 import json
@@ -116,6 +115,10 @@ def check_attribute(obj, att):
 
 
 class TrxRequestHandler(RequestHandler):
+
+    async def get(self, *args, **kwargs):
+        logger.info('IP: {}'.format(self.request.headers.get("X-Real-IP")))
+
     def data_received(self, chunk):
         pass
 
@@ -272,6 +275,7 @@ class LoginHandler(TrxRequestHandler):
                     self.redirect(self.request.uri)
 
     def get(self, *args, **kwargs):
+        print(self.request.headers)
         error = self.get_cookie('error', None)
         messages = []
         if error:
@@ -1507,7 +1511,7 @@ def env_setup():
 
     logging.basicConfig(
         level=logging.DEBUG,
-        format='%(levelname)7s: %(message)s',
+        format='%(asctime)s %(levelname)7s: %(message)s',
         stream=sys.stderr,
     )
 
@@ -1638,7 +1642,7 @@ if __name__ == "__main__":
     logger.setLevel(logging.DEBUG)
 
     log_handler = logging.FileHandler('trx.log')
-    logger_formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+    logger_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     log_handler.setFormatter(logger_formatter)
 
     logger.addHandler(log_handler)
