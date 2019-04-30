@@ -85,18 +85,23 @@ class StartHandler(RequestHandler):
             log.info('Bots received')
 
             if len(application.bots) > 0:
-                for bot in application.bots:
-                    log.debug(bot.identify())
-                    identities.append({'message': bot.identify(), 'id': str(bot.id), 'number': bot.number})
-                    await bot.write_message()
-                    await bot.relay_message('Jigga jigga WHAT?!?!?!')
+                if len(application.bots) > int(num_requested):
+                    for i in range(int(num_requested) - 1, len(application.bots) - 1):
+                        identities.append({'message': application.bots[i].identify(), 'id': str(application.bots[i].id), 'number': application.bots[i].number})
+                else:
+                    for bot in application.bots:
+                        log.debug(bot.identify())
+                        identities.append({'message': bot.identify(), 'id': str(bot.id), 'number': bot.number})
+                        await bot.write_message()
+                        await bot.relay_message('Jigga jigga WHAT?!?!?!')
 
-            self.set_status(201, reason='Bot creation')
-            self.write(json.dumps({'response': 201, 'resource': 'bot', 'num': num_requested,
-                                   'response_text': 'Created %s bots successfully' % str(num_requested),
-                                   'data': identities}))
+                self.set_status(201, reason='Bot creation')
+                self.write(json.dumps({'response': 201, 'resource': 'bot', 'num': num_requested,
+                                       'response_text': 'Created %s bots successfully' % str(num_requested),
+                                       'data': identities}))
         else:
             log.info('Unable to create bots')
+            self.set_status(500)
             self.write(json.dumps({'response': 500, 'resource': 'bot', 'num': num_requested, 'error': True,
                                    'response_text': 'Error when attempting to create bots.\nReason given: %s' %
                                                     create_bot_result['error']}))
