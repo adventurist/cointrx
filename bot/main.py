@@ -345,7 +345,7 @@ async def handle_ws_request(type, data):
                 uid = str(bot.session['uid'])
                 name = str(bot.session['name'])
                 application.user_sessions.append(uid)
-                return {'action': 'bot:login:result', 'payload': {'uid': uid, 'name': name, 'bot_id': data['bot_id']}}
+                return {'action': 'bot:login:result', 'payload': {'uid': uid, 'id': uid, 'name': name, 'bot_id': data['bot_id']}}
 
     async def fetch_user_balance(type, data):
         """
