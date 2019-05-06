@@ -700,8 +700,7 @@ def smooth(y, box_pts):
 
 
 def handle_error(err, name):
-    print(err)
-    log.debug(name + ' error: ', str(err))
+    log.debug('{name}: {err}'.format(name=name, err=str(err)))
 
 
 def has_error(d):
