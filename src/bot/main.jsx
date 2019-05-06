@@ -891,7 +891,7 @@ export class TrxLayout extends React.Component {
 
     acceptTrade = async () => {
         if (this.state.tradeReady) {
-            const result = requestTrade(this.state.loadedTrade, getUser(getSelectedBot(this.state)))
+            const result = await requestTrade(this.state.loadedTrade, getUser(getSelectedBot(this.state)))
             if (!result.error) {
                 this.setState({loadedTrade: null, tradeReady: false}, () => {
                     this.logInfo('Trade completed')

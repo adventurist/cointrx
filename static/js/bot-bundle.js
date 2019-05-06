@@ -28347,20 +28347,27 @@ function (_React$Component2) {
         while (1) {
           switch (_context19.prev = _context19.next) {
             case 0:
-              if (_this2.state.tradeReady) {
-                result = requestTrade(_this2.state.loadedTrade, getUser(getSelectedBot(_this2.state)));
-
-                if (!result.error) {
-                  _this2.setState({
-                    loadedTrade: null,
-                    tradeReady: false
-                  }, function () {
-                    _this2.logInfo('Trade completed');
-                  });
-                }
+              if (!_this2.state.tradeReady) {
+                _context19.next = 5;
+                break;
               }
 
-            case 1:
+              _context19.next = 3;
+              return requestTrade(_this2.state.loadedTrade, getUser(getSelectedBot(_this2.state)));
+
+            case 3:
+              result = _context19.sent;
+
+              if (!result.error) {
+                _this2.setState({
+                  loadedTrade: null,
+                  tradeReady: false
+                }, function () {
+                  _this2.logInfo('Trade completed');
+                });
+              }
+
+            case 5:
             case "end":
               return _context19.stop();
           }
