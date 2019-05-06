@@ -65,7 +65,7 @@ export async function bidRequest (options) {
  */
 export async function offerRequest (options) {
   const response = await request({
-    url: '/bid',
+    url: '/offer',
     method: 'POST',
     body: {
         uid: options.user.uid,

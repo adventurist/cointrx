@@ -217,6 +217,18 @@ export default function TradeManager (user, pending = { bids: [], offers: [] }) 
   this.numOfAvailableTrades = () => {
     return this.candidates.length
   }
+
+  /**
+   * @param unfitTrades Trades which must be removed from the trade manager's candidates
+   */
+  this.removeConflicts = unfitTrades => {
+    this.candidates = this.getMatchedWithoutConflict(unfitTrades)
+  }
+
+  this.updateCandidates = trades => {
+    this.candidates = [...this.candidates, ...trades]
+  }
+
 }
 
 export function Trade(offer, bid, type) {

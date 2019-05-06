@@ -26,7 +26,7 @@ import PlayCircle from 'material-ui/svg-icons/av/play-circle-filled'
 import Sync from 'material-ui/svg-icons/notification/sync'
 import BotsOff from 'material-ui/svg-icons/file/cloud-off'
 import Patterns from 'material-ui/svg-icons/image/blur-linear'
-import { orange500, red500 } from 'material-ui/styles/colors'
+import { orange500, red500, green500 } from 'material-ui/styles/colors'
 
 /* Menu */
 import DropDownMenu from 'material-ui/DropDownMenu'
@@ -202,7 +202,9 @@ export class TrxLayout extends React.Component {
             dataReady: false,
             tradeParts: undefined,
             btcRate: 0,
-            btcNumber: 0
+            btcNumber: 0,
+            loadedTrade: null,
+            tradeReady: false
         }
     }
 
@@ -797,22 +799,20 @@ export class TrxLayout extends React.Component {
 
 
     findMatches = async (bot) => {
-        // for (bot in botConnections) {
-            if (hasUser(bot)) {
-                const user = getUser(bot)
-                const tm = user.tradeManager
-                tm.start()
-                const matched = tm.getMatchedTrades()
-                if (matched) {
-                    this.logInfo(`${user.name} has pending bids and/or offers`)
-                    log.info(`${user.name} has the following matched trades`, matched)
-                } else {
-                    this.logInfo(`${user.name} has no bids or offers`)
-                }
+        if (hasUser(bot)) {
+            const user = getUser(bot)
+            const tm = user.tradeManager
+            tm.start()
+            const matched = tm.getMatchedTrades()
+            if (matched.length > 0) {
+                this.logInfo(`${user.name} has pending bids and/or offers`)
+                log.info(`${user.name} has the following matched trades`, matched)
 
-
+            } else {
+                this.logInfo(`${user.name} has no bids or offers`)
             }
-        // }
+            return matched
+        }
     }
 
     makeBid = async () => {
@@ -850,7 +850,7 @@ export class TrxLayout extends React.Component {
      * Update user data for the selected bot
      * @param {Object} data
      */
-    updateBotUser (data, id = undefined) {
+    async updateBotUser (data, id = undefined) {
         try {
             let bot
             if (!id) {
@@ -870,12 +870,33 @@ export class TrxLayout extends React.Component {
             })
             if (!update) {
                 bot.users.push({...data, tradeManager: new TradeManager({...data}, { ...this.state.tradeParts })})
-                this.findMatches(bot)
+                const matches = await this.findMatches(bot)
+                if (matches) {
+                    const [trade, ...remainingTrades] = matches
+                    this.setState({ loadedTrade: trade, tradeReady: true })
+                    for (const trxBot of botConnections) {
+                        const botUser = getUser(trxBot)
+                        if (botUser) {
+                            botUser.tradeManager.removeConflicts([trade])
+                        }
+                    }
+                }
             }
             return true
         } catch (err) {
             log.error('Error updating user for bot', err)
             return false
+        }
+    }
+
+    acceptTrade = async () => {
+        if (this.state.tradeReady) {
+            const result = requestTrade(this.state.loadedTrade, getUser(getSelectedBot(this.state)))
+            if (!result.error) {
+                this.setState({loadedTrade: null, tradeReady: false}, () => {
+                    this.logInfo('Trade completed')
+                })
+            }
         }
     }
 
@@ -1023,6 +1044,25 @@ export class TrxLayout extends React.Component {
                     icon={<Patterns style={{color: '#F44336'}} />} />
 
                     </div>
+
+                    <Chip
+                    id="data-ready"
+                    className={this.state.tradeReady ? "data-ready-show" : "data-ready-hidden"}
+                    backgroundColor={green500}
+                    style={styles.chip}
+                    deleteIconStyle={{ width: 5, height: 5, fontSize: 5 }}>
+                    <Avatar size={2} color={green500} backgroundColor={green500} style={{fontSize: '12px', fontWeight: 700}}>
+                        Confirm trade?
+                    </Avatar>
+                </Chip>
+
+                <RaisedButton
+                    label="Accept"
+                    labelPosition="before"
+                    onClick={this.acceptTrade}
+                    primary={true}
+                    icon={<Patterns style={{color: '#F44336'}} />} />
+
                 </div>
             </Card>
             <Card>
@@ -1278,4 +1318,16 @@ function hasUser(bot) {
  */
 function getUser(bot) {
     return bot.users.find(user => user.name)
+}
+
+async function requestTrade(trade, user) {
+    const response = await request({
+      method: 'POST',
+      url: '/api/trade/request',
+      body: {
+        trade: trade,
+        uid: user.id
+      }
+    })
+    return handleResponse(response)
 }
