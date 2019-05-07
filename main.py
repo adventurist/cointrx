@@ -1306,21 +1306,32 @@ async def request_trade(sid, rid, amount, rate, currency):
     sender = await db.get_user(sid)
     recipient = await db.get_user(rid)
     if db.sender_recipient_ready(sender, recipient):
+        amount = amount if not isSatoshis(amount) else satoshisToBtc(amount)
         logger.info(
             'Attempting trade between ' + str(sid) + ' and ' + str(rid) + ' in the amount of ' + str(
                 amount) + ' at a rate of ' + str(rate) + ' ' + str(currency) + ' for a total of: ' + str(
                 rate * amount))
         try:
-            if await TransactionTestHandler.handle_transaction(sender, recipient, COIN * amount):
+            result = await TransactionTestHandler.handle_transaction(sender, recipient, COIN * amount)
+            if result and not result['error']:
                 #  Transfer funds
                 return {'result': True, 'transaction': True, 'code': 200}
             else:
+                await handle_failed_transaction(result)
                 application.queue.enqueue(TRXTransaction(sid, rid, COIN * amount))
                 await db.trx_block_pending()
                 return {'result': True, 'transaction': False, 'code': 202,
                         'message': 'The request was accepted, but has been queued for processing at a later time.'}
         except Exception as e:
             return {'result': False, 'transaction': False, 'code': 400, 'message': str(e)}
+
+
+def isSatoshis(value):
+    return len(str(value)) > 8
+
+
+def satoshisToBtc (value: any) -> int:
+    return int(value / 100000000)
 
 
 class AllUserHandler(TrxRequestHandler):
@@ -1546,6 +1557,7 @@ async def handle_transaction_queue():
     coinmaster_available = True
     intra_user_pending, result = None, None
     paused = False
+    remaining = 0
     # If handling is not paused and there are transactions in the queue
     while not paused and not application.queue.is_empty():
         transaction = application.queue.dequeue()
@@ -1565,6 +1577,7 @@ async def handle_transaction_queue():
                     transaction.set_pending()
                 # Since there was an error, we need to enqueue it for a future re-attempt
                 application.queue.enqueue(transaction)
+                remaining += 1
                 # If the sender was the coinmaster, we can assume there was no result because the coinmaster is
                 # exhausted for the current block
                 if transaction.sender == coinmaster():
@@ -1594,7 +1607,10 @@ async def manage_blockchain():
         if RegTest.create_new_block():
             logger.info('New block added to blockchain')
             db.trx_block_not_pending()
-            await handle_transaction_queue()
+            remaining = await handle_transaction_queue()
+            logger.debug('Queue handler complete: {} transactions remaining'.format(remaining))
+            if remaining:
+                await db.trx_block_pending()
 
 
 def set_trx_token(handler: RequestHandler):
