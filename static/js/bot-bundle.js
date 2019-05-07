@@ -28342,20 +28342,25 @@ function (_React$Component2) {
     _asyncToGenerator(
     /*#__PURE__*/
     regeneratorRuntime.mark(function _callee19() {
-      var result;
+      var trade, result;
       return regeneratorRuntime.wrap(function _callee19$(_context19) {
         while (1) {
           switch (_context19.prev = _context19.next) {
             case 0:
               if (!_this2.state.tradeReady) {
-                _context19.next = 5;
+                _context19.next = 6;
                 break;
               }
 
-              _context19.next = 3;
-              return requestTrade(_this2.state.loadedTrade, getUser(getSelectedBot(_this2.state)));
+              trade = _objectSpread({}, _this2.state.loadedTrade, {
+                offer: _objectSpread({}, _this2.state.loadedTrade.offer, {
+                  amount: Object(__WEBPACK_IMPORTED_MODULE_31__utils_trade__["b" /* isSatoshis */])(_this2.state.loadedTrade.offer.amount) ? _this2.state.loadedTrade.offer.amount / 100000000 : _this2.state.loadedTrade.offer.amount
+                })
+              });
+              _context19.next = 4;
+              return requestTrade(trade, getUser(getSelectedBot(_this2.state)));
 
-            case 3:
+            case 4:
               result = _context19.sent;
 
               if (!result.error) {
@@ -28367,7 +28372,7 @@ function (_React$Component2) {
                 });
               }
 
-            case 5:
+            case 6:
             case "end":
               return _context19.stop();
           }
@@ -110639,6 +110644,7 @@ function addMilliseconds (dirtyDate, dirtyAmount, dirtyOptions) {
 /* unused harmony export TradeType */
 /* harmony export (immutable) */ __webpack_exports__["a"] = TradeManager;
 /* unused harmony export Trade */
+/* harmony export (immutable) */ __webpack_exports__["b"] = isSatoshis;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_loglevel__ = __webpack_require__(460);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_loglevel___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_loglevel__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_accounting__ = __webpack_require__(1184);
@@ -110963,6 +110969,10 @@ function isEmpty(obj) {
   }
 
   return true;
+}
+
+function isSatoshis(value) {
+  return value.toString().length > 8;
 }
 
 /***/ }),

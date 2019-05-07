@@ -47,7 +47,7 @@ import Chip from 'material-ui/Chip'
 
 /* utils */
 import { request, handleResponse, requestWs, isJson, SOCKET_OPEN } from '../utils/'
-import TradeManager from '../utils/trade'
+import TradeManager, { isSatoshis } from '../utils/trade'
 import Bot from '../utils/bot'
 import log from 'loglevel'
 
@@ -891,7 +891,16 @@ export class TrxLayout extends React.Component {
 
     acceptTrade = async () => {
         if (this.state.tradeReady) {
-            const result = await requestTrade(this.state.loadedTrade, getUser(getSelectedBot(this.state)))
+            const trade = {
+                ...this.state.loadedTrade,
+                offer: {
+                    ...this.state.loadedTrade.offer,
+                    amount: isSatoshis(this.state.loadedTrade.offer.amount) ?
+                        this.state.loadedTrade.offer.amount / 100000000 :
+                        this.state.loadedTrade.offer.amount
+                }
+            }
+            const result = await requestTrade(trade, getUser(getSelectedBot(this.state)))
             if (!result.error) {
                 this.setState({loadedTrade: null, tradeReady: false}, () => {
                     this.logInfo('Trade completed')
