@@ -265,3 +265,8 @@ function isEmpty (obj) {
   }
   return true
 }
+
+
+export function isSatoshis (value) {
+  return value.toString().length > 8
+}

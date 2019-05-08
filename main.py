@@ -1339,6 +1339,11 @@ class AllUserHandler(TrxRequestHandler):
         self.write(json.dumps(await db.regtest_all_user_data()))
 
 
+class UserBalanceSimpleHandler(TrxRequestHandler):
+    async def get(self, *args, **kwargs):
+        self.write(json.dumps(await db.regtest_balance_by_user_simple()))
+
+
 class TRXApplication(Application):
     def __init__(self):
         self.session = None
@@ -1436,6 +1441,7 @@ class TRXApplication(Application):
             (r"/api/user/(?=.{4,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._@%]+(?<![_.])", UserHandler),
             (r"/api/user/(.*)/balance/regtest", RegtestUserBalanceHandler),
             (r"/api/account/balance", UserBalanceHandler),
+            (r"/api/user/balance/simple", UserBalanceSimpleHandler),
 
             # KEYS
 

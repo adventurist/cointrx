@@ -168,6 +168,10 @@ def get_users():
     return session.query(User).filter(User.id != COINMASTER_USER_ID).all()
 
 
+async def get_all_users():
+    return session.query(User).filter(User.status == 1).all()
+
+
 def get_coinmaster():
     return session.query(User).filter(User.id == COINMASTER_USER_ID).one()
 
@@ -937,6 +941,16 @@ async def regtest_balance_by_user():
             user_data['keys'].append(
                 {'id': key.id, 'value': key.value, 'balance': await btcd_utils.RegTest.get_user_balance([key])})
         data.append(user_data)
+    return data
+
+
+async def regtest_balance_by_user_simple():
+    data = []
+    for user in await get_all_users():
+        balance = 0
+        for key in user.trxkey:
+            balance += await btcd_utils.RegTest.get_key_balance(key)
+        data.append({'name': user.name, 'id': user.id, 'balance': balance})
     return data
 
 
