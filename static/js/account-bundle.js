@@ -106569,6 +106569,10 @@ function requestWs(options) {
     }
   };
 
+  ws.onerror = function (event) {
+    console.error('WebSocket error has occurred: ', event);
+  };
+
   return ws;
 }
 /**

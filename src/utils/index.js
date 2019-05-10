@@ -144,6 +144,10 @@ export function requestWs(options, msgHandler = undefined) {
             }
         }
     }
+
+    ws.onerror = event => {
+        console.error('WebSocket error has occurred: ', event)
+    }
     return ws
 }
 
