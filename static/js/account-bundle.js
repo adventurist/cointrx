@@ -110341,6 +110341,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__init__ = __webpack_require__(1153);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__user__ = __webpack_require__(1168);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__auth__ = __webpack_require__(1216);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__bot__ = __webpack_require__(1224);
+
 
 
 
@@ -110350,6 +110352,9 @@ var trxPlugins = [{
 }, {
   name: 'user',
   fn: __WEBPACK_IMPORTED_MODULE_1__user__["a" /* default */]
+}, {
+  name: 'bot',
+  fn: __WEBPACK_IMPORTED_MODULE_3__bot__["a" /* default */]
 }];
 function trx() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -113096,6 +113101,170 @@ reducers[__WEBPACK_IMPORTED_MODULE_0__actionTypes__["b" /* SET_TOKEN */]] = {
 };
 var reducer = Object(__WEBPACK_IMPORTED_MODULE_1_redux_actions__["a" /* handleActions */])(reducers, {
   token: undefined
+});
+/* harmony default export */ __webpack_exports__["a"] = (reducer);
+
+/***/ }),
+/* 1223 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SET_BOTS; });
+var SET_BOTS = 'SET_BOTS';
+
+/***/ }),
+/* 1224 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = bot;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_redux_saga_effects__ = __webpack_require__(149);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__interface_events_events__ = __webpack_require__(1225);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__interface_api__ = __webpack_require__(1228);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__interface_reducers__ = __webpack_require__(1230);
+// Redux-Saga
+ // Events
+
+ // Sagas
+// import * as botSagas from './sagas'
+// Auth module
+
+
+ // The interface to implement.
+// import pluginInterface from '../interface'
+
+function bot() {
+  var _marked =
+  /*#__PURE__*/
+  regeneratorRuntime.mark(init);
+
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  function init() {
+    return regeneratorRuntime.wrap(function init$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            _context.next = 2;
+            return Object(__WEBPACK_IMPORTED_MODULE_0_redux_saga_effects__["a" /* put */])(mapEvents(__WEBPACK_IMPORTED_MODULE_1__interface_events_events__["a" /* default */]));
+
+          case 2:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _marked, this);
+  }
+
+  var capabilities = ['accessBots'];
+  return {
+    // sagas: Object.values(authSagas),
+    capabilities: capabilities,
+    init: init,
+    api: __WEBPACK_IMPORTED_MODULE_2__interface_api__["a" /* default */],
+    name: 'Bot',
+    reducer: __WEBPACK_IMPORTED_MODULE_3__interface_reducers__["a" /* default */]
+  };
+}
+
+/***/ }),
+/* 1225 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__actionTypes__ = __webpack_require__(1223);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__eventTypes__ = __webpack_require__(1226);
+
+
+var eventsMap = {};
+
+eventsMap[__WEBPACK_IMPORTED_MODULE_0__actionTypes__["a" /* SET_BOTS */]] = function (action) {
+  return [{
+    type: __WEBPACK_IMPORTED_MODULE_1__eventTypes__["a" /* BOT_CHANGE */],
+    args: action.payload
+  }];
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (eventsMap);
+
+/***/ }),
+/* 1226 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BOT_CHANGE; });
+var BOT_CHANGE = 'bot:change';
+
+/***/ }),
+/* 1227 */,
+/* 1228 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = api;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__actions__ = __webpack_require__(1229);
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+
+function api(context) {
+  var botApi = {
+    setBots: function setBots(bots) {
+      context.dispatch(Object(__WEBPACK_IMPORTED_MODULE_0__actions__["a" /* setBots */])(bots));
+    },
+    getBots: function getBots() {
+      return _toConsumableArray(context.getState().Bot.bots);
+    }
+  };
+  return {
+    bot: botApi
+  };
+}
+
+/***/ }),
+/* 1229 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = setBots;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__actionTypes__ = __webpack_require__(1223);
+
+function setBots(bots, err) {
+  return {
+    type: __WEBPACK_IMPORTED_MODULE_0__actionTypes__["a" /* SET_BOTS */],
+    payload: bots,
+    error: err ? true : false
+  };
+}
+
+/***/ }),
+/* 1230 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__actionTypes__ = __webpack_require__(1223);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_redux_actions__ = __webpack_require__(448);
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+var reducers = {};
+reducers[__WEBPACK_IMPORTED_MODULE_0__actionTypes__["a" /* SET_BOTS */]] = {
+  next: function next(state, action) {
+    return _objectSpread({}, state, {
+      bots: action.payload
+    });
+  }
+};
+var reducer = Object(__WEBPACK_IMPORTED_MODULE_1_redux_actions__["a" /* handleActions */])(reducers, {
+  bots: []
 });
 /* harmony default export */ __webpack_exports__["a"] = (reducer);
 

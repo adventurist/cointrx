@@ -54,10 +54,11 @@ import log from 'loglevel'
 /* requests */
 import { fetchTradeParts, bidRequest, offerRequest } from './requests'
 
-// import trx from '../redux'
+import trxApp from '../redux'
 
-// const trxState = trx()
-// console.log(trxState)
+const trx = trxApp()
+console.log(trx)
+window.trx = trx
 // The urls provided by the back end
 const urls = JSON.parse(botUrls.replace(/'/g, '"'))
 log.setLevel('debug')
@@ -121,7 +122,6 @@ const styles = {
 // The container to be attached to the window
 const container = {}
 // The sub-container for the bots
-const botConnections = []
 /**
  * Helper method for building the Bot Menu
  *
@@ -330,12 +330,12 @@ export class TrxLayout extends React.Component {
                 this.logInfo('Fetching bots')
                 const response = await this.sendWsRequest('fetchBots')
                 if (response) {
-                    container.bots = botConnections
+                    container.bots = trx.bot.getBots()
                     this.onBotsCreate(container.bots.length)
                 }
             }
         }
-        window.trx = container
+        window.container = container
         const tradeParts = await fetchTradeParts()
         if (tradeParts) {
             this.setState({ tradeParts }, () => {
@@ -403,7 +403,7 @@ export class TrxLayout extends React.Component {
             if (Array.isArray(data.body.data)) {
                 data.body.data.map(bot => {
                     log.info(bot.message)
-                    const previousBot = botConnections.find(connectedBot => connectedBot.id === bot.id)
+                    const previousBot = trx.bot.getBots().find(connectedBot => connectedBot.id === bot.id)
                     if (previousBot) {
                         validatedBots.push({
                             ...previousBot,
@@ -415,14 +415,14 @@ export class TrxLayout extends React.Component {
                             ...bot,
                             dataReady: false,
                             users: [],
-                            analysisBot: new Bot(ws, [])
+                            ws,
+                            analysisBot: new Bot(undefined, ws, [])
                         })
                     }
                 })
-                botConnections.length = 0
-                botConnections = validatedBots
+                trx.bot.setBots(validatedBots)
                 // Update state
-                this.onBotsCreate(botConnections.length)
+                this.onBotsCreate(trx.bot.getBots().length)
             }
         }
     }
@@ -505,7 +505,7 @@ export class TrxLayout extends React.Component {
      * in the data it has previously loaded and analyzed
      */
     findPatterns = async () => {
-        const selectedBot = botConnections[this.state.selectedBot]
+        const selectedBot = trx.bot.getBots()[this.state.selectedBot]
 
         const data = {
             data: { bot_id: selectedBot.id },
@@ -553,8 +553,8 @@ export class TrxLayout extends React.Component {
      * Helper function to prepare the selected bot for trading
      */
     prepareBots = async () => {
-        for (let i = 0; i < botConnections.length; i++) {
-            const bot = botConnections[i]
+        for (let i = 0; i < trx.bot.getBots().length; i++) {
+            const bot = trx.bot.getBots()[i]
             this.setState({ selectedBot: i }, async () => {
                 this.loadMarketData()
                 if (bot.users.length === 0 || (bot.users[0] && ! 'uid' in bot.users[0])) {
@@ -571,10 +571,10 @@ export class TrxLayout extends React.Component {
      */
     performTrade = async () => {
         const bot = getSelectedBot(this.state)
-        if (botConnections.length === 1) {
+        if (trx.bot.getBots().length === 1) {
             bot.analysisBot.trade(false, true)
         } else {
-            const recipient = botConnections[findRandomBotIndex(this.state.selectedBot)]
+            const recipient = trx.bot.getBots()[findRandomBotIndex(this.state.selectedBot)]
             // bot.analysisBot.trade(recipient, true)
             if ('users' in recipient && recipient.users.length > 0) {
 
@@ -613,7 +613,7 @@ export class TrxLayout extends React.Component {
      * Helper function to login all connected bots that are not already connected
      */
     loginBots = async () => {
-        botConnections.forEach(bot => {
+        trx.bot.getBots().forEach(bot => {
             if (bot.users.length === 0) {
                 const data = {
                     data: { bot_id: bot.id},
@@ -647,19 +647,19 @@ export class TrxLayout extends React.Component {
 
                     if (Array.isArray(bots)) {
                         if (bots.length > 0) {
-                            bots.map(bot => botConnections.push({
+                            bots.map(bot => trx.bot.getBots().push({
                                 id: bot.id,
                                 ws: requestWsForBot(this.msgHandler),
                                 number: bot.number,
                                 dataReady: false,
                                 users: []
                             }))
-                            this.onBotsCreate(botConnections.length)
+                            this.onBotsCreate(trx.bot.getBots().length)
                             this.logInfo('Bot connections updated')
                         } else {
                             this.logInfo('No bots available')
-                            botConnections.map(bot => bot.ws.close())
-                            botConnections.splice(0, botConnections.length)
+                            trx.bot.getBots().map(bot => bot.ws.close())
+                            trx.bot.getBots().splice(0, trx.bot.getBots().length)
                         }
 
                     }
@@ -667,8 +667,8 @@ export class TrxLayout extends React.Component {
                 case 'killbots':
                 // The server is sending back a successful response from the bots:close
                 // request, thus all bot connections should be closed
-                    botConnections.map(bot => bot.ws.close())
-                    botConnections.splice(0, botConnections.length)
+                    trx.bot.getBots().map(bot => bot.ws.close())
+                    trx.bot.getBots().splice(0, trx.bot.getBots().length)
                     // TODO: find out why this isn't working - back end issue?
                     this.consoleOut('Bots killed (0 connections)')
                     break
@@ -876,7 +876,7 @@ export class TrxLayout extends React.Component {
                 if (matches) {
                     const [trade, ...remainingTrades] = matches
                     this.setState({ loadedTrade: trade, tradeReady: true })
-                    for (const trxBot of botConnections) {
+                    for (const trxBot of trx.bot.getBots()) {
                         const botUser = getUser(trxBot)
                         if (botUser) {
                             botUser.tradeManager.removeConflicts([trade])
@@ -1077,8 +1077,8 @@ export class TrxLayout extends React.Component {
                 </div>
             </Card>
             <Card>
-                <CardTitle title="Bot Detail" subtitle={botConnections[this.state.selectedBot] !== void 0 && 'id' in botConnections[this.state.selectedBot] ?
-                    botConnections[this.state.selectedBot].id : 'None selected'}/>
+                <CardTitle title="Bot Detail" subtitle={this.state.selectedBot !== void 0 && trx.bot.getBots().length > 0 ?
+                    trx.bot.getBots()[this.state.selectedBot].id : 'None selected'}/>
                 <CardText>
                     Bot Controls
                 </CardText>
@@ -1138,7 +1138,7 @@ export class TrxLayout extends React.Component {
      * @param {Number} The position value of the selected bot, relevant to the container
      */
     handleBotSelect = (event, index, value) => {
-        const dataReady = value !== -1 ? botConnections[value].dataReady : allDataReady()
+        const dataReady = value !== -1 ? trx.bot.getBots()[value].dataReady : allDataReady()
         this.setState({
             selectedBot: value,
             dataReady: dataReady
@@ -1203,7 +1203,7 @@ function sendMessage(bot, data) {
 }
 
 function allDataReady() {
-    return botConnections.filter(bot => bot.dataReady).length === botConnections.length
+    return trx.bot.getBots().filter(bot => bot.dataReady).length === trx.bot.getBots().length
 }
 
 const defaultConfig = () => {
@@ -1252,7 +1252,7 @@ function findPatternName (data) {
  * @returns {Number} returns an Intege6r representing the index of a bot
  */
 function findRandomBotIndex (cursor = 0) {
-    const num = botConnections.length
+    const num = trx.bot.getBots().length
     let randomNumber = num
     while (randomNumber === num || randomNumber === cursor) {
         randomNumber = getRandomInt(num)
@@ -1281,7 +1281,7 @@ function getRandomInt (num) {
  * @returns {Object} The currently selected bot
  */
 function getSelectedBot (state) {
-    return botConnections[state.selectedBot]
+    return trx.bot.getBots()[state.selectedBot]
 }
 
 /**
@@ -1291,8 +1291,8 @@ function getSelectedBot (state) {
  * @param {string} id
  */
 function getBotById (state, id) {
-    if (Array.isArray(botConnections) && botConnections.length > 1) {
-        return botConnections.find( connection => connection.id === id)
+    if (Array.isArray(trx.bot.getBots()) && trx.bot.getBots().length > 1) {
+        return trx.bot.getBots().find( connection => connection.id === id)
     }
 }
 
@@ -1304,7 +1304,7 @@ function getBotById (state, id) {
  */
 function getBotWithUser (state, uid) {
     let matchedBot, matchedUser
-    for (let bot of botConnections) {
+    for (let bot of trx.bot.getBots()) {
         const user = bot.users.find ( user => user.uid === uid)
         if (user) {
             matchedBot = bot
