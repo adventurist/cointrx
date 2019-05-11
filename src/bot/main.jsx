@@ -399,29 +399,31 @@ export class TrxLayout extends React.Component {
         }
         log.info(response)
         if ('body' in response && 'data' in response.body) {
-            let previousBotNumber = botConnections.length
+            const validatedBots = []
             if (Array.isArray(data.body.data)) {
                 data.body.data.map(bot => {
                     log.info(bot.message)
-                    // Open a message stream for each bot
-                    const ws = requestWsForBot(this.msgHandler)
-                    if (ws) {
-                        const analysisBot = new Bot(ws, [])
-                        // Place in the container where they will await instruction
-                        botConnections.push({id: bot.id, ws: ws, analysisBot: analysisBot, number: bot.number, dataReady: false, users: []})
+                    const previousBot = botConnections.find(connectedBot => connectedBot.id === bot.id)
+                    if (previousBot) {
+                        validatedBots.push({
+                            ...previousBot,
+                            ...bot
+                        })
+                    } else {
+                        const ws = requestWsForBot(this.msgHandler)
+                        validatedBots.push({
+                            ...bot,
+                            dataReady: false,
+                            users: [],
+                            analysisBot: new Bot(ws, [])
+                        })
                     }
                 })
-                let currentBotNumber = botConnections.length
-                let numDiff = currentBotNumber - previousBotNumber
-                let createResult = Math.abs(numDiff) === data.body.data.length
-
-                if (!createResult) {
-                    this.logInfo('Problem creating the requested number of bots')
-                }
+                botConnections.length = 0
+                botConnections = validatedBots
                 // Update state
-                this.onBotsCreate(currentBotNumber)
+                this.onBotsCreate(botConnections.length)
             }
-
         }
     }
 

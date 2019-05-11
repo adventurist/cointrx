@@ -27173,9 +27173,9 @@ function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
-
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -27198,6 +27198,8 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _readOnlyError(name) { throw new Error("\"" + name + "\" is read-only"); }
 
 
 /* React */
@@ -27657,7 +27659,7 @@ function (_React$Component2) {
     _asyncToGenerator(
     /*#__PURE__*/
     regeneratorRuntime.mark(function _callee5() {
-      var data, response, previousBotNumber, currentBotNumber, numDiff, createResult;
+      var data, response, validatedBots;
       return regeneratorRuntime.wrap(function _callee5$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
@@ -27683,37 +27685,30 @@ function (_React$Component2) {
               __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info(response);
 
               if ('body' in response && 'data' in response.body) {
-                previousBotNumber = botConnections.length;
+                validatedBots = [];
 
                 if (Array.isArray(data.body.data)) {
                   data.body.data.map(function (bot) {
-                    __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info(bot.message); // Open a message stream for each bot
+                    __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.info(bot.message);
+                    var previousBot = botConnections.find(function (connectedBot) {
+                      return connectedBot.id === bot.id;
+                    });
 
-                    var ws = requestWsForBot(_this2.msgHandler);
-
-                    if (ws) {
-                      var analysisBot = new __WEBPACK_IMPORTED_MODULE_32__utils_bot___default.a(ws, []); // Place in the container where they will await instruction
-
-                      botConnections.push({
-                        id: bot.id,
-                        ws: ws,
-                        analysisBot: analysisBot,
-                        number: bot.number,
+                    if (previousBot) {
+                      validatedBots.push(_objectSpread({}, previousBot, bot));
+                    } else {
+                      var ws = requestWsForBot(_this2.msgHandler);
+                      validatedBots.push(_objectSpread({}, bot, {
                         dataReady: false,
-                        users: []
-                      });
+                        users: [],
+                        analysisBot: new __WEBPACK_IMPORTED_MODULE_32__utils_bot___default.a(ws, [])
+                      }));
                     }
                   });
-                  currentBotNumber = botConnections.length;
-                  numDiff = currentBotNumber - previousBotNumber;
-                  createResult = Math.abs(numDiff) === data.body.data.length;
+                  botConnections.length = 0;
+                  botConnections = (_readOnlyError("botConnections"), validatedBots); // Update state
 
-                  if (!createResult) {
-                    _this2.logInfo('Problem creating the requested number of bots');
-                  } // Update state
-
-
-                  _this2.onBotsCreate(currentBotNumber);
+                  _this2.onBotsCreate(botConnections.length);
                 }
               }
 
@@ -28627,7 +28622,11 @@ function (_React$Component2) {
             _matches,
             trade,
             remainingTrades,
-            _i,
+            _iteratorNormalCompletion,
+            _didIteratorError,
+            _iteratorError,
+            _iterator,
+            _step,
             trxBot,
             botUser,
             _args22 = arguments;
@@ -28656,7 +28655,7 @@ function (_React$Component2) {
                 });
 
                 if (update) {
-                  _context22.next = 11;
+                  _context22.next = 32;
                   break;
                 }
 
@@ -28669,38 +28668,78 @@ function (_React$Component2) {
               case 9:
                 matches = _context22.sent;
 
-                if (matches) {
-                  _matches = _toArray(matches), trade = _matches[0], remainingTrades = _matches.slice(1);
-                  this.setState({
-                    loadedTrade: trade,
-                    tradeReady: true
-                  });
+                if (!matches) {
+                  _context22.next = 32;
+                  break;
+                }
 
-                  for (_i = 0; _i < botConnections.length; _i++) {
-                    trxBot = botConnections[_i];
-                    botUser = getUser(trxBot);
+                _matches = _toArray(matches), trade = _matches[0], remainingTrades = _matches.slice(1);
+                this.setState({
+                  loadedTrade: trade,
+                  tradeReady: true
+                });
+                _iteratorNormalCompletion = true;
+                _didIteratorError = false;
+                _iteratorError = undefined;
+                _context22.prev = 16;
 
-                    if (botUser) {
-                      botUser.tradeManager.removeConflicts([trade]);
-                    }
+                for (_iterator = botConnections[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                  trxBot = _step.value;
+                  botUser = getUser(trxBot);
+
+                  if (botUser) {
+                    botUser.tradeManager.removeConflicts([trade]);
                   }
                 }
 
-              case 11:
+                _context22.next = 24;
+                break;
+
+              case 20:
+                _context22.prev = 20;
+                _context22.t0 = _context22["catch"](16);
+                _didIteratorError = true;
+                _iteratorError = _context22.t0;
+
+              case 24:
+                _context22.prev = 24;
+                _context22.prev = 25;
+
+                if (!_iteratorNormalCompletion && _iterator.return != null) {
+                  _iterator.return();
+                }
+
+              case 27:
+                _context22.prev = 27;
+
+                if (!_didIteratorError) {
+                  _context22.next = 30;
+                  break;
+                }
+
+                throw _iteratorError;
+
+              case 30:
+                return _context22.finish(27);
+
+              case 31:
+                return _context22.finish(24);
+
+              case 32:
                 return _context22.abrupt("return", true);
 
-              case 14:
-                _context22.prev = 14;
-                _context22.t0 = _context22["catch"](1);
-                __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.error('Error updating user for bot', _context22.t0);
+              case 35:
+                _context22.prev = 35;
+                _context22.t1 = _context22["catch"](1);
+                __WEBPACK_IMPORTED_MODULE_33_loglevel___default.a.error('Error updating user for bot', _context22.t1);
                 return _context22.abrupt("return", false);
 
-              case 18:
+              case 39:
               case "end":
                 return _context22.stop();
             }
           }
-        }, _callee22, this, [[1, 14]]);
+        }, _callee22, this, [[1, 35], [16, 20, 24, 32], [25,, 27, 31]]);
       }));
 
       return function updateBotUser(_x7) {
@@ -29147,17 +29186,35 @@ function getBotById(state, id) {
 
 function getBotWithUser(state, uid) {
   var matchedBot, matchedUser;
+  var _iteratorNormalCompletion2 = true;
+  var _didIteratorError2 = false;
+  var _iteratorError2 = undefined;
 
-  for (var _i2 = 0; _i2 < botConnections.length; _i2++) {
-    var bot = botConnections[_i2];
-    var user = bot.users.find(function (user) {
-      return user.uid === uid;
-    });
+  try {
+    for (var _iterator2 = botConnections[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+      var bot = _step2.value;
+      var user = bot.users.find(function (user) {
+        return user.uid === uid;
+      });
 
-    if (user) {
-      matchedBot = bot;
-      matchedUser = user;
-      break;
+      if (user) {
+        matchedBot = bot;
+        matchedUser = user;
+        break;
+      }
+    }
+  } catch (err) {
+    _didIteratorError2 = true;
+    _iteratorError2 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+        _iterator2.return();
+      }
+    } finally {
+      if (_didIteratorError2) {
+        throw _iteratorError2;
+      }
     }
   }
 
