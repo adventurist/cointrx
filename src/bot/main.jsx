@@ -330,8 +330,7 @@ export class TrxLayout extends React.Component {
                 this.logInfo('Fetching bots')
                 const response = await this.sendWsRequest('fetchBots')
                 if (response) {
-                    container.bots = trx.bot.getBots()
-                    this.onBotsCreate(container.bots.length)
+                    this.logInfo('Sent Websocket request to fetch bots')
                 }
             }
         }
@@ -399,31 +398,7 @@ export class TrxLayout extends React.Component {
         }
         log.info(response)
         if ('body' in response && 'data' in response.body) {
-            const validatedBots = []
-            if (Array.isArray(data.body.data)) {
-                data.body.data.map(bot => {
-                    log.info(bot.message)
-                    const previousBot = trx.bot.getBots().find(connectedBot => connectedBot.id === bot.id)
-                    if (previousBot) {
-                        validatedBots.push({
-                            ...previousBot,
-                            ...bot
-                        })
-                    } else {
-                        const ws = requestWsForBot(this.msgHandler)
-                        validatedBots.push({
-                            ...bot,
-                            dataReady: false,
-                            users: [],
-                            ws,
-                            analysisBot: new Bot(undefined, ws, [])
-                        })
-                    }
-                })
-                trx.bot.setBots(validatedBots)
-                // Update state
-                this.onBotsCreate(trx.bot.getBots().length)
-            }
+            const validatedBots = validateBots(data.body.data, this.msgHandler)
         }
     }
 
@@ -643,25 +618,11 @@ export class TrxLayout extends React.Component {
             log.info('ACTION', action)
             switch (action) {
                 case 'updatebots':
-                    const bots = data
+                    const bots = validateBots(data, this.msgHandler)
 
-                    if (Array.isArray(bots)) {
-                        if (bots.length > 0) {
-                            bots.map(bot => trx.bot.getBots().push({
-                                id: bot.id,
-                                ws: requestWsForBot(this.msgHandler),
-                                number: bot.number,
-                                dataReady: false,
-                                users: []
-                            }))
-                            this.onBotsCreate(trx.bot.getBots().length)
-                            this.logInfo('Bot connections updated')
-                        } else {
-                            this.logInfo('No bots available')
-                            trx.bot.getBots().map(bot => bot.ws.close())
-                            trx.bot.getBots().splice(0, trx.bot.getBots().length)
-                        }
-
+                    if (bots) {
+                        trx.bot.setBots(bots)
+                        this.onBotsCreate(trx.bot.getBots().length)
                     }
                     break
                 case 'killbots':
@@ -1341,4 +1302,30 @@ async function requestTrade(trade, user) {
       }
     })
     return handleResponse(response)
+}
+
+function validateBots (bots, msgHandler) {
+    const validatedBots = []
+    if (Array.isArray(bots)) {
+        bots.map(bot => {
+            log.info(bot.message)
+            const previousBot = trx.bot.getBots().find(connectedBot => connectedBot.id === bot.id)
+            if (previousBot) {
+                validatedBots.push({
+                    ...previousBot,
+                    ...bot
+                })
+            } else {
+                const ws = requestWsForBot(msgHandler)
+                validatedBots.push({
+                    ...bot,
+                    dataReady: false,
+                    users: [],
+                    ws,
+                    analysisBot: new Bot(undefined, ws, [])
+                })
+            }
+        })
+    }
+    return validatedBots
 }
