@@ -1,0 +1,1 @@
+export const BOT_CHANGE = 'bot:change'
