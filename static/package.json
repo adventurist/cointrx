@@ -14,7 +14,7 @@
     "cesium": "^1.39.0",
     "create-react-class": "^15.6.2",
     "fs": "0.0.1-security",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.19",
     "path": "^0.12.7",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
