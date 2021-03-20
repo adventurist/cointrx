@@ -31,7 +31,7 @@ imagesize==0.7.1
 iso8601==0.1.12
 itermate==1.0.2
 itsdangerous==0.24
-Jinja2==2.9.6
+Jinja2==2.11.3
 join==0.1.1
 JSON-log-formatter==0.2.0
 keychain==0.14.2.0
