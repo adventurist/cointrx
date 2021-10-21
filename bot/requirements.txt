@@ -4,7 +4,7 @@ alabaster==0.7.10
 async-timeout==2.0.1
 asyncio==3.4.3
 attrs==17.4.0
-Babel==2.5.1
+Babel==2.9.1
 base58==0.2.5
 bitcoin==1.1.42
 bitmerchant==0.1.8
