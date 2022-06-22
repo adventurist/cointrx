@@ -44,7 +44,7 @@ more-itertools==4.1.0
 multidict==4.1.0
 mypy==0.540
 netaddr==0.7.19
-numpy==1.14.2
+numpy==1.22.0
 numpydoc==0.7.0
 packaging==17.1
 pandas==0.22.0
