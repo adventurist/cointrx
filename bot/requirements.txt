@@ -12,7 +12,7 @@ blockcypher==1.0.72
 blocktrail-sdk==1.0.6
 bokeh==0.12.15
 cachetools==2.0.1
-certifi==2017.7.27.1
+certifi==2022.12.7
 cffi==1.10.0
 chardet==3.0.4
 commontools==0.1.0
